@@ -1,0 +1,228 @@
+# ---------------------------------------------------------------------------
+# Consultas de evaluación y de demo.
+#
+# Escritas en REGISTRO CLÍNICO, que es como escribe quien va a usar el sistema.
+# El corpus, en cambio, tiene el motivo de consulta en voz del paciente
+# ("ME DISPARARON", "ME CAI", "LE APUÑALARON LA CARA"). Esa brecha de registro
+# es justamente lo que separa a una ruta densa de una léxica.
+#
+# `mecanismo` y `regiones` NO son filtros: son la definición operativa de
+# relevancia que usa eval/prelabel.py para pre-anotar:
+#
+#     2 = coincide mecanismo Y comparte al menos una región
+#     1 = coincide solo uno de los dos
+#     0 = ninguno
+#
+# Es un PROXY de relevancia clínica, no relevancia clínica. Mide "¿la ruta trae
+# casos del mecanismo y la región correctos?", que es necesario pero no
+# suficiente. Sirve para elegir ruta; no sirve para afirmar utilidad clínica.
+# Por eso eval/evaluate.py exporta una muestra para validación manual.
+#
+# `categoria` agrupa por el fenómeno que cada consulta pone a prueba.
+# `demo: true` marca las que van en el guion de la demostración.
+# ---------------------------------------------------------------------------
+
+consultas:
+
+  # --- léxicas: el término de la consulta aparece literal en el corpus ------
+  - id: lex-01
+    texto: herida por arma de fuego en tórax con hipoventilación
+    boton: '1 · Caso directo'
+    muestra: 'Funcionamiento normal: el término de la consulta aparece literal en el corpus.'
+    categoria: lexica
+    mecanismo: arma_de_fuego
+    regiones: [torax]
+    demo: true
+
+  - id: lex-02
+    texto: fractura de cadera por caída de propia altura en paciente anciano
+    categoria: lexica
+    mecanismo: caida
+    regiones: [pelvis]
+    demo: true
+
+  - id: lex-03
+    texto: trauma craneoencefálico severo con Glasgow menor de 9
+    categoria: lexica
+    mecanismo: no_determinado
+    regiones: [craneo_encefalo]
+
+  - id: lex-04
+    texto: quemadura de segundo grado en miembro superior
+    categoria: lexica
+    mecanismo: quemadura
+    regiones: [miembro_superior]
+
+  - id: lex-05
+    texto: accidente de tránsito en motociclista con politraumatismo
+    categoria: lexica
+    mecanismo: accidente_transito
+    regiones: [miembro_inferior]
+
+  - id: lex-06
+    texto: herida por arma cortopunzante en abdomen con laparotomía
+    categoria: lexica
+    mecanismo: cortopunzante
+    regiones: [abdomen]
+
+  # --- brecha de vocabulario: el clínico y el corpus usan palabras distintas
+  - id: voc-01
+    texto: paciente apuñalado en el pecho, herida penetrante
+    boton: '2 · Brecha de vocabulario'
+    muestra: 'Ninguna de estas palabras está en el corpus, que dice «HPACP en tórax» o «ME APUÑALARON». Aquí gana la ruta densa sobre la léxica.'
+    categoria: vocabulario
+    mecanismo: cortopunzante
+    regiones: [torax]
+    demo: true
+    nota: 'el corpus dice «HPACP en tórax» o «ME APUÑALARON»: la consulta no comparte ningún término'
+
+  - id: voc-02
+    texto: sujeto baleado en extremidad inferior
+    categoria: vocabulario
+    mecanismo: arma_de_fuego
+    regiones: [miembro_inferior]
+    nota: '«baleado» no aparece en el corpus; sí «me dispararon» y «HPAF»'
+
+  - id: voc-03
+    texto: peatón arrollado por vehículo automotor
+    categoria: vocabulario
+    mecanismo: accidente_transito
+    regiones: [miembro_inferior]
+    nota: 'el corpus escribe «atropellado» y «peaton vs moto»'
+
+  - id: voc-04
+    texto: precipitación desde altura con trauma de columna
+    categoria: vocabulario
+    mecanismo: caida
+    regiones: [columna]
+    nota: 'el corpus dice «cayó de» y «caída de X metros»'
+
+  - id: voc-05
+    texto: lesión ocular penetrante por cuerpo extraño metálico
+    categoria: vocabulario
+    mecanismo: cuerpo_extrano
+    regiones: [ojo]
+
+  - id: voc-06
+    texto: agresión física con objeto romo en región craneal
+    categoria: vocabulario
+    mecanismo: contundente
+    regiones: [craneo_encefalo]
+    nota: 'el corpus dice «me golpearon», «riña», «arma contundente»'
+
+  # --- abreviaturas: miden directamente el valor de la expansión -----------
+  - id: abr-01
+    texto: HPAF en cráneo con orificio de entrada parietal
+    boton: '3 · Abreviatura'
+    muestra: 'HPAF funciona en los dos sentidos gracias a la expansión aumentativa del corpus.'
+    categoria: abreviatura
+    mecanismo: arma_de_fuego
+    regiones: [craneo_encefalo]
+    demo: true
+
+  - id: abr-02
+    texto: HPACP en zona II de cuello
+    categoria: abreviatura
+    mecanismo: cortopunzante
+    regiones: [cuello]
+
+  - id: abr-03
+    texto: TCE leve con pérdida de conciencia transitoria
+    categoria: abreviatura
+    mecanismo: no_determinado
+    regiones: [craneo_encefalo]
+
+  - id: abr-04
+    texto: FX de radio distal con inmovilización
+    categoria: abreviatura
+    mecanismo: caida
+    regiones: [miembro_superior]
+
+  - id: abr-05
+    texto: paciente con IOT y manejo en UCI por trauma de tórax
+    categoria: abreviatura
+    mecanismo: no_determinado
+    regiones: [torax]
+
+  # --- erratas y variación ortográfica reales del corpus -------------------
+  - id: ort-01
+    texto: pcte con heridad por arma de fuego en torax
+    categoria: ortografica
+    mecanismo: arma_de_fuego
+    regiones: [torax]
+    nota: '«pcte» aparece en 1.148 documentos; «heridad» es errata inducida'
+
+  - id: ort-02
+    texto: traumatismo craneoencefalico sin tildes en region parietal
+    categoria: ortografica
+    mecanismo: no_determinado
+    regiones: [craneo_encefalo]
+    nota: 'solo 10.497 de 27.157 registros originales usaban tildes'
+
+  - id: ort-03
+    texto: luxacion de hombro por caida
+    categoria: ortografica
+    mecanismo: caida
+    regiones: [miembro_superior]
+
+  - id: ort-04
+    texto: qemadura por gasolina en cara y cuello
+    categoria: ortografica
+    mecanismo: quemadura
+    regiones: [cara, cuello]
+
+  # --- discriminación fina: casos parecidos que hay que separar ------------
+  - id: fin-01
+    texto: mordedura de perro en mano con pérdida de tejido
+    categoria: fina
+    mecanismo: mordedura
+    regiones: [miembro_superior]
+
+  - id: fin-02
+    texto: trauma abdominal cerrado con lesión esplénica
+    categoria: fina
+    mecanismo: contundente
+    regiones: [abdomen]
+
+  - id: fin-03
+    texto: lactante con trauma craneal por caída de la cama
+    categoria: fina
+    mecanismo: caida
+    regiones: [craneo_encefalo]
+    pediatrico: true
+
+  - id: fin-04
+    texto: herida por arma de fuego con desenlace fatal en sala de urgencias
+    boton: '4 · Desenlace fatal'
+    muestra: 'Casos con desenlace fatal; suelen incluir registros truncados, donde el sistema declara que el texto se corta en vez de inventar el final.'
+    categoria: fina
+    mecanismo: arma_de_fuego
+    regiones: [torax]
+    demo: true
+
+  # --- fuera de dominio: el sistema DEBE abstenerse ------------------------
+  # En una demostración ante público clínico, ver que el sistema dice "no
+  # encuentro casos suficientemente similares" convence más que diez aciertos.
+  - id: neg-01
+    texto: manejo de cetoacidosis diabética en urgencias
+    boton: '5 · Fuera de alcance'
+    muestra: 'El sistema se abstiene: no hay casos de trauma parecidos. Es la respuesta que más tranquiliza a un público clínico.'
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true
+    demo: true
+
+  - id: neg-02
+    texto: protocolo de vacunación infantil contra el sarampión
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true
+
+  - id: neg-03
+    texto: cuál es la capital de Colombia
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true

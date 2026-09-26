@@ -1,0 +1,260 @@
+record_id,detector,match,veredicto,contexto
+39747,trigger_institucion,HOSPITAL PSIQUIÁTRICO,esperado,"INADO POR UN COMPAÑERO, PACIENTE SE ENCONTRABA INTERNADO EN HOSPITAL PSIQUIÁTRICO E INMOVILIZADO.  Evolución y hospitalización: PACIENTE CON "
+37113,trigger_institucion,CLÍNICA NEUROLÓGICA,esperado," (paciente) HEMODINAMICAMENTE ESTABLE, COMPLETO OBSERVACIÓN CLÍNICA NEUROLÓGICA, CON ESTUDIOS RADIOGRÁFICOS NEGATIVOS PARA FRACTURAS, SCAN "
+37373,trigger_institucion,CLINICA CON,esperado,"volución y hospitalización: PACIENTE CON ADECUADA EVOLUCION CLINICA CON TRAUMA EN PIE, SIN COMPROMIZO ARTICULAR NI OSEO EVIDENCIADO"
+34123,trigger_institucion,clínica satisfactoria,esperado,"erior paso de enema. [FECHA]: Pcte (paciente) con evolución clínica satisfactoria, con deposición y micción espontáneas. Por lo que se decide"
+35799,trigger_institucion,clinica quien,esperado,volución y hospitalización: paciente con adecuada evolucion clinica quien es valorado por ortopedia donde deciden manejo ortopedico d
+36466,trigger_institucion,CLINICA POR,esperado,"RESPIRATORIA, SE DECIDE QUE COMPLETO PERIODO DE OBSERVACION CLINICA POR LO CUAL SE DECIDE DAR SALIDA CON RECOMENDACIONES Y SIGNOS D"
+31804,trigger_institucion,CLINICA POR,esperado,"CIA NEUROLIGICA, HEMODINAMICAMENTE ESTABLE. BUENA EVOLUCION CLINICA POR LO CUAL SE DA DE ALTA CON RECOMENDACIONES Y SIGNOS DE ALARM"
+31308,trigger_institucion,CLINICA POR,esperado,ON GASA ESTERIL Y ESPARADRAPO. PACIENTE CON BUENA CONDICION CLINICA POR LO QUE SE DECIDE DAR EGRESO.
+30380,trigger_institucion,HOSPITAL DONDE,esperado,"AS 12 DEL DIA FUE ATROPELLADO POR UN AUTOMOVIL ES TRAIDO AL HOSPITAL DONDE SE EVIDENCIA AVULCION EN DORSO DE DE TORAX DE APROX 12 CMS,"
+28242,trigger_institucion,CLÍNICA CON,esperado,"volución y hospitalización: PACIENTE CON ADECUADA EVOLUCIÓN CLÍNICA CON ANGIOTAC DE VASOS DE CUELLO CON REPORTE NORMAL, SE DECIDE D"
+28854,trigger_institucion,CLINICA FAVORABLE,esperado,ERECHO  Evolución y hospitalización: PACIENTE CON EVOLUCION CLINICA FAVORABLE COMPLETANDO 24 HORAS DE OBSERVACION SE LE REALIZA CURACION 
+25142,trigger_institucion,CLINICA DEL,revisar,UE NO PUEDE SER ATENDIDA EN EL [INSTITUCION] SE REMITA A LA CLINICA DEL NORTE
+25215,trigger_institucion,CLINICA SIN,esperado,volución y hospitalización: PACIENTE CPN ADECUADA EVOLUCION CLINICA SIN DEFICIT NEUROLOGICO TOLERO VIA ORAL.SE ORDENA SALIDA CON SI
+25339,trigger_institucion,CLINICA SIN,esperado,"  Evolución y hospitalización: PACIENTE CON BUENA EVOLUCION CLINICA SIN NINGUNA ALTERACION EN LOS ESTUDIOS IMAGENOLOGICOS, SE ORDEN"
+25621,trigger_institucion,clinica estacionaria,esperado,"iento.  Evolución y hospitalización: Paciente con evolucion clinica estacionaria, sin familiares, con leve mejoria del estado de conciencia "
+25709,trigger_institucion,clinica por,esperado,"rangos de normalidad, abdomen negativo, con buena evolucion clinica por lo cual se le da salida."
+25835,trigger_institucion,clínica uroanálisis,esperado,"ción y hospitalización: Paciente que se tuvo en observación clínica uroanálisis normal, RX (radiografia) torax: normal.se da salida con sig"
+21755,trigger_institucion,HOSPITAL LOCAL,esperado,AL PACIENTE CON RECOMENDACIONES Y SE LE PIDE RECONSULTAR EN HOSPITAL LOCAL.
+17433,trigger_institucion,hospital para,esperado,o T4  Evolución y hospitalización: Paciente remitido a otro hospital para continuar manejo
+12603,trigger_institucion,clinica satisfactoria,esperado,"n deficit senitivo o motor aparente, paciente con evolucion clinica satisfactoria, se da salida con cita en consulta externa."
+13863,trigger_institucion,clinica estable,esperado,ntubacion de via lacrimal; sin complicaciones Con evolucion clinica estable. Se decide Salida.
+56532,trigger_institucion,CLINICA CON,esperado,"A, PSICOLOGIA, TRABAJO SOCIAL. EL PACIENTE PRESENTA MEJORIA CLINICA CON PRESENCIA DE TEJIDO EPITELIZADO. SE LE BRINDA ALTA HOSPITAL"
+57373,trigger_institucion,HOSPITAL PERIFERIA,esperado,lta: HERIDA CON NAVAJA  Examen físico: PACIENTE ATENDIDO EN HOSPITAL PERIFERIA POR SUFRIR HERIDA POR ARMA CORTOPUNZANTE TORACOABDOMINAL AN
+5187,anio,2000,esperado,no sangrado. ventana pericardica negativa. hemoperitoneo de 2000cc adherencias interasas de pared abdominal. Hx (herida) 4cm
+53792,trigger_institucion,clinica favorable,esperado,"4*4CM.  Evolución y hospitalización: Paciente con evolucion clinica favorable sin deterioro o compromiso neurologico, glasgow 15/15 no de"
+52445,trigger_institucion,CLÍNICA POR,esperado,"LA ANALGESIA E IMAGENOLOGIA. SE OBSERVA CON BUENA EVOLUCIÓN CLÍNICA POR LO QUE SE DA ALTA CON RECOMENDACIONES, INCAPACIDAD, ANALGES"
+38377,trigger_institucion,hospital psiquiatrico,esperado,"decide iniciar manejo antipsicotico, sedacion y remision al hospital psiquiatrico."
+38860,trigger_institucion,clinica satisfactoria,esperado,"nte con Dx (diagnostico) previamente anotados con evolución clinica satisfactoria, en glasgow de 15/15 en la actualidad y tolerando la via or"
+39421,trigger_institucion,clinica satisfactoria,esperado,"edema.  Evolución y hospitalización: paciente con evolucion clinica satisfactoria, disminucion del dolor por lo que se da salida con recomend"
+39627,trigger_institucion,hospital cercano,esperado,"o, y se sutura. se da alta hospitalaria con cita externa en hospital cercano para retirar puntos de sutura."
+40324,trigger_institucion,clínica tras,esperado,volución y hospitalización: paciente con adecuada evolución clínica tras accidente de transito. con fractura de radio tratada con ye
+40707,trigger_institucion,CLINICA SATISFACTORIA,esperado,"IONAL.  Evolución y hospitalización: PACIENTE CON EVOLUCION CLINICA SATISFACTORIA SE REALIZA SUTURA DE HERIDA A NIVEL DE RODILLA, SE APLICA T"
+40853,trigger_institucion,CLÍNICA REFIRIENDO,esperado,"D. PACIENTE EN OBSERVACIÓN NEUROLÓGICA, CON BUENA EVOLUCIÓN CLÍNICA REFIRIENDO SENTIRSE BIEN, SE DA SALIDA CON ANALGESIA Y SIGNOS Y SÍNTOM"
+37722,trigger_institucion,CLÍNICA ANOTADA,esperado,"ARCADA.  Evolución y hospitalización: PACIENTE CON HISTORIA CLÍNICA ANOTADA, EVOLUCIÓN FAVORABLE, SIN DETERIORO NEUROLOGICO, SI SIGNOS "
+37879,trigger_institucion,CLINICA SATISFACTORIA,esperado,"PITAL.  Evolución y hospitalización: PACIENTE CON EVOLUCION CLINICA SATISFACTORIA SIN DEFICIT NEUROLOGICO, SE ENCIENTRA ALERTA Y ORIENTADO, E"
+33833,trigger_institucion,CLÍNICA POR,esperado,"IONES. ATB EV DURANTE 48 HORAS, INGESTA ADECUADA, EVOLUCIÓN CLÍNICA POR LO QUE SE LE DA SALIDA."
+28587,trigger_institucion,CLINICA POR,esperado,ETROS NORMALES SE DEJA EN OBSERVACION Y CON BUENA CONDICION CLINICA POR LO CUAL SE DECIDE DAR SALIDA
+25908,trigger_institucion,CLINICA CON,esperado,Q  Evolución y hospitalización: PACENTE CON BUENA EVOLUCION CLINICA CON TAC (tomografia axial computarizada) HEMATOMA SUBDURAL SE D
+24216,trigger_institucion,clinica con,esperado,"aciente que ha (hipertension arterial) presentado evolucion clinica con tac (tomografia axial computarizada) sin alteraciones, se r"
+25237,trigger_institucion,CLÍNICA SIN,esperado,volución y hospitalización: PACIENTE CON ADECUADA EVOLUCIÓN CLÍNICA SIN DETERIORO NEUROLOGICO A QUIEN SE LE DA SALIDA POR OTORRINO 
+21735,trigger_institucion,CLINICA SATIFACTORIA,esperado,"NORMAL, GLASGOW [HORA] PTE TOLERANDO VIA ORAL CON EVOLUCION CLINICA SATIFACTORIA POR LO CUAL SE DECIDE DAR SALIDA CON RECOMENDACIONES Y SIGN"
+18499,trigger_institucion,clinica por,esperado,ura de cuello de femur derecho paciente con buena evolucion clinica por lo cual se decide dar salida
+14321,trigger_institucion,hospital para,esperado,muslo derecho  Evolución y hospitalización: Remitido a otro hospital para continuar manejo ATB
+15683,trigger_institucion,clinica sin,esperado,"l[ANIO]: pte sin signo de sirs paciente con buena evolucion clinica sin deficit neurologico, se decide egreso y cita de control neu"
+12667,trigger_institucion,hospital para,esperado,volución y hospitalización: Pte (paciente) se remíte a otro hospital para retiro de aguja
+1739,trigger_institucion,clinica colon,revisar,"Cx, se ubica cupo UCI (unidad de cuidados intensivos) en la clinica colon donde es remitida"
+55475,anio,2000,esperado,TICA) - PACIENTE AL QUE SE LE REALIZA LAVADO DE LA ZONA CON 2000 CC SSN + DRENAJE DE HEMATOMA SUBUNGUEAL DE LOS DEDOS 3 Y 4.
+52436,trigger_institucion,clinica debe,esperado,"ia del evento, imagenes en parametros de normalidad, por la clinica debe permanecer en observacion neurologica. Por buena evolucion "
+53007,trigger_institucion,CLINICA NEUROLOGICA,esperado,"ENAS CONDICIONES GENERALES, COMPLETO 24HORAS DE OBSERVACION CLINICA NEUROLOGICA IMAGENES NEGATIVAS PARA TRAZOS DE FRACTURA, TAC (tomografia"
+38997,trigger_institucion,clínica satisfactoria,esperado," superior a la terapéutica de metoclopramida, con evolución clínica satisfactoria, en el momento asintomático, sin toxidromos, activo, tolera"
+39153,trigger_institucion,CLINICA ADECUADA,esperado," 1 cm.  Evolución y hospitalización: PACIENTE CON EVOLUCION CLINICA ADECUADA, NO DIFICULTAD RESPIRATORIA, HEMODINAMICAMENTE ESTABLE. EL "
+39213,trigger_institucion,HOSPITAL PARA,esperado,"UE NO REQUIERE VALORACION POR ESTE NIVEL, SE REFIERE A OTRO HOSPITAL PARA TOMA DE RX (radiografia) DE CARA."
+39230,trigger_institucion,hospital cercano,esperado,a alta hospitalaria para consulta hospitalaria en 5 días en hospital cercano para retirar puntos.
+40318,trigger_institucion,clinica evaluado,esperado,al) tenido mas espisodios de hemoptisis con buena evolucion clinica evaluado por cirugia quienes deciden dar egreso con recomendaciones 
+37355,trigger_institucion,CLINICA HEMODINAMICAMENTE,esperado,"  Evolución y hospitalización: PACIENTE CON BUENA EVOLUCION CLINICA HEMODINAMICAMENTE ESTABLE SIN DIFICULTAD RESPIRATORIA, CON ESTUDIOS RADIOGRAF"
+33421,trigger_institucion,Clínica del,revisar,vio ulnar MSD (miembro superior derecho); pcte comnetado en Clínica del Rosario para continuar manejo médico.
+34561,trigger_institucion,hospital para,esperado,"recho, la Policía Nacional recoge al paciente y trae a este hospital para valoración.  Evolución y hospitalización: [FECHA]: PACIENTE"
+28868,trigger_institucion,CLINICA POR,esperado,IENTE QUIEN SUFRE ACCIDENTE DE TRANSITO CON BUENA EVOLUCION CLINICA POR LO CUAL SE DECIDE DAR SALIDA
+31305,trigger_institucion,CLINICA ESTABLE,esperado,RAL Y COLUMNA CERVICAL SIN EVIDENCIA DE LESIONES. EVOLUCION CLINICA ESTABLE. SE DECIDE DAR EGRESO CON RECOMENDACIONES Y SIGNOS DE ALARM
+28026,trigger_institucion,CLINICA LEVE,esperado,"IOR EDEMA, ERITEMA Y DOLOR, ACTUALMENTE CON BUENA EVOLUCION CLINICA LEVE EDEMA Y ERITEMA"
+28588,trigger_institucion,CLINICA POR,esperado,  Evolución y hospitalización: PACIENTE CON BUENA EVOLUCION CLINICA POR LO CUAL SE DECIDE DAR SALIDA
+23072,trigger_institucion,clinica que,esperado,"tramites administrativos con EPS Sura, se ordena traslado a clinica que tenga convenio con EPS Sura"
+23673,anio,2000,esperado,"OLUCION CLINICA, SE LE COLOCA TUBO DE TORAX DONDE SE DRENAN 2000CC PACIENTE ESTABLE SE LE DA SALIDA CON RECOMENDACIONES Y TE"
+18096,trigger_institucion,CLINICA QUE,esperado,italización: [FECHA]: PTE (paciente) CON ADECUADA EVOLUCION CLINICA QUE ES LLEVADA A LAVA.SUTURA SIN COMPLICACIONES. SE DECIDE DAR 
+15632,trigger_institucion,"clinica
+
+Evolución",esperado,uierdo Sin registro de fc (frecuencia cardiaca) en historia clinica  Evolución y hospitalización: Remitido a nivel ll para continuar manej
+11767,trigger_institucion,clinica sin,esperado,  Evolución y hospitalización: paciente con buena evolucion clinica sin deterioro neurologico se decide dar salida
+8769,trigger_institucion,clinica por,esperado,"AJE HEMOPERITONEAL paciente que presenta adecuada evolucion clinica por lo cual se decide dar egreso, se dan recomendaciones genera"
+2115,trigger_institucion,clinica por,esperado,L+ D + C. estabilizacion fractura con yeso. Buena evolucion clinica por lo cual se decide dar salida
+41436,trigger_institucion,clinica sin,esperado,"inal ([FECHA]) por caida de carretilla, con buena evolucion clinica sin nuevos picos febriles, disminucion de dolor en flanco derec"
+44725,trigger_institucion,CLINICA FALLECIENDO,esperado, DE TRAUMA REANIMACION CARDIOVASCULAR SIN OBTENER RESPUESTA CLINICA FALLECIENDO PACIENTE HOY [FECHA] SE REALIZO TRAMITE DE CADENA DE CUSTOD
+40524,trigger_institucion,CLINICA DEL,revisar,"QUIRURGICO AMBULATORIO, PACIENTE QUIEN COMPLETA OBSERVACION CLINICA DEL TRAUMA SE DECIDE DAR EGRESO CON RECOMENDACIONES SIGNOS DE A"
+40738,trigger_institucion,clinica hemodinamicameyte,revisar,"  Evolución y hospitalización: paciente con buena evolucion clinica hemodinamicameyte estable, con rx (radiografia) de rodilla izquierda normal c"
+40831,trigger_institucion,CLÍNICA FAVORABLE,esperado," PATELA, POR LO QUE SE DECIDE INMOVILIZAR, Y A SU EVOLUCIÓN CLÍNICA FAVORABLE SE RECOMIENDA DAR SALIDA CON SIGNOS Y SÍNTOMAS DE ALARMA."
+40874,trigger_institucion,CLÍNICA SATISFACTORIA,esperado,"RAL Y ABDOMEN NEGATIVO, SE CONSIDERA PACIENTE CON EVOLUCIÓN CLÍNICA SATISFACTORIA, SE DECIDE DAR SALIDA CON RECOMENDACIONES Y SIGNOS DE ALARM"
+37451,trigger_institucion,clínica favorable,esperado,"RECHO.  Evolución y hospitalización: Paciente con evolución clínica favorable no deterioro neurológico, no vomito no cefalea, tolera via "
+37601,trigger_institucion,CLÍNICA HEMODINAMICAMENTE,esperado,"  Evolución y hospitalización: PACIENTE CON BUENA EVOLUCIÓN CLÍNICA HEMODINAMICAMENTE ESTABLE SIN DÉFICIT NEUROLÓGICO, DE AMBULANDO, CON RX (radi"
+33256,trigger_institucion,hospital psiquiatrico,esperado,e no realizar dicha cirugia paciente sera contraremitido al hospital psiquiatrico para manejo de su aptologia psiquiatrica.
+34766,trigger_institucion,CLINICA CON,esperado,"ACGEMTOS DE LA TUBEROISIDA MAYOR SUELTO), SE LE BRINDA ALTA CLINICA CON MANEJO DE ANTIHIPERTENSIVOS, TAC (tomografia axial computar"
+35640,trigger_institucion,CLINICA SATISFACTORIA,esperado,erecho  Evolución y hospitalización: PACIENTE CON EVOLUCION CLINICA SATISFACTORIA POR LO QUE SE DARA DE ALTA HOSPITALARIA. ALTA HOSPITALARIA 
+31868,trigger_institucion,CLINICA ADECUADA,esperado,SCULAR  Evolución y hospitalización: PACIENTE CON EVOLUCION CLINICA ADECUADA CON PROYECTIL EXTRA - ARTICULAR EL CUAL NO REQUIERE MANEJO 
+28093,trigger_institucion,CLÍNICA POR,esperado,": PACIENTE QUE ES DEJADO EN OBSERVACIÓN CON BUENA EVOLUCIÓN CLÍNICA POR LO CUAL SE ORDENA SALIDA, CON CITA DE CONTROL, SIGNOS DE AL"
+28578,trigger_institucion,CLINICA SIN,esperado,  Evolución y hospitalización: PACIENTE CON BUENA EVOLUCION CLINICA SIN EPISODIOS DE SANGRADO NO EXPASION DEL HEMATOMA MEJORIA EN L
+28733,trigger_institucion,CLINICA POR,esperado,n: PACIENTE ES DEJADO EN OBSERVACION CON ADECUADA EVOLUCION CLINICA POR LO CUAL SE DECIDE DAR SALIDA
+24872,trigger_institucion,clinica satisfactoria,esperado,"ion clinica, pruebas imagenologicos normales, con evolucion clinica satisfactoria quien completa vigilancia de abdomen con via oral sin compl"
+25003,trigger_institucion,CLINICA ADECUADA,esperado,ATERAL  Evolución y hospitalización: PACIENTE CON EVOLUCION CLINICA ADECUADA SE DA SALIDA CON RECOMENDACIONES
+25623,anio,2000,esperado,talización: Se le realiza lavado ocular con solucion salina 2000 cc en cada ojo. Se hospitaliza para valoracion bajo anestes
+25770,trigger_institucion,CLINICA DESFAVORABLE,revisar,"CONDICIONES SIN MEJORIA DE ESTADO NEUROLOGICO CON EVOLUCION CLINICA DESFAVORABLE, HEMODINAMICAMENTE ESTEBRE PERO PESISTE CON SIRS PACIENTE E"
+20690,trigger_institucion,clinica valorado,revisar,  Evolución y hospitalización: paciente con buena evolucion clinica valorado por ortopedia el cual decide dar salida hospitalaria.se dan
+22261,trigger_institucion,clinica sin,esperado, y hospitalización: Paciente cumple 24 horas de observacion clinica sin cambios en su estado clinico ni deficit neurologico. Valora
+17252,trigger_institucion,clinica pos,revisar,volución y hospitalización: paciente con adecuada evolucion clinica pos operatoria por lo cual se decide dar salida HALLAZGOS OPERA
+18199,trigger_institucion,clinica estable,esperado,"te) de [EDAD:15-19], con diagnostico estable, con evolucion clinica estable, sin signos de dificultad respiratoria, no dolor, afebrilrx"
+15844,trigger_institucion,clinica mejoria,revisar,a pericardica es traladado a salas donde presenta evolucion clinica mejoria con presion negativa sin dificultad respiratoria alerta tol
+15850,trigger_institucion,clinica por,esperado,"ución y hospitalización: pte (paciente) con buena evolucion clinica por lo que se decide dar salida, con cita de control."
+11431,trigger_institucion,clinica satisfactoria,esperado,e antebrazo derecho  Evolución y hospitalización: evolucion clinica satisfactoria se da salida con recomendaciones.
+12175,trigger_institucion,hospital por,esperado,ctil  Evolución y hospitalización: Paciente remitido a otro hospital por que tiene eps contributiva
+12619,trigger_institucion,clinica los,esperado,"ontinuamente, con adecuado progreso, con adecuada evolucion clinica los dias posteriores.encuentran adecuada epitelizacion en el 95"
+7863,trigger_institucion,clinica torpida,revisar,"Evolución y hospitalización: [FECHA] Paciente con evolucion clinica torpida, continua con mucho dolor a pesar del tratamiento con analg"
+8111,trigger_institucion,hospital donde,esperado, es arrollada por auto bus en dia anterior y es atendida en hospital donde le toman imagenes radiologicas y no muestran ninguna altera
+3647,trigger_institucion,clinica por,esperado,adio y ulna izquierda [FECHA]. Paciente con buena evolucion clinica por lo cual se decide dar salida
+4545,trigger_institucion,Hospital Psiquiatrico,esperado, de femur derecho. [FECHA]: Se le da salida con remisión al Hospital Psiquiatrico San Isidro y control con ortopedia.
+1331,trigger_institucion,hospital que,esperado, que ingiere una pepa de collar es valorado y remitido a un hospital que tenga para realizar broncoscopia.
+9515,anio,2000,esperado," pulmon derecho. Hemopericardio de 400cc, hemotorax derecho 2000cc  COMPLICACIONES: pte (paciente) presenta choque durante p"
+9933,trigger_institucion,clinica estable,esperado,- 2seg  Evolución y hospitalización: Paciente con evolucion clinica estable. Cirugia RC +OTS con clavo cefalomedular de femur derecho. 
+57368,trigger_institucion,CLINICA POR,esperado,"NTE ESTABLE, SIN DEFICIT NEUROLÓGICO CON ADECUADA EVOLUCIÓN CLINICA POR LO QUE SE DECIDE DAR SALILDA CON RECOMENDACIONES Y SIGNOS D"
+41070,trigger_institucion,CLÍNICA POR,esperado,"LE, TERMINA SU OBSERVACIÓN NEUROLÓGICA, CON BUENA EVOLUCIÓN CLÍNICA POR LO QUE SE DECIDE DAR SALIDA CON SIGNOS Y SÍNTOMAS DE ALARMA"
+38743,trigger_institucion,clinica satisfactoria,esperado,"nte con Dx (diagnostico) previamente anotado, con evolución clinica satisfactoria. En el momento estable hemodinamicamente, tiene pendiente r"
+39327,trigger_institucion,clinica evidente,revisar,"eriores.  Evolución y hospitalización: paciente con mejoria clinica evidente, sin signos de irritacion peritoneal, tolero via oral, lect"
+39466,trigger_institucion,CLINICA SATISFACTORIA,esperado,IOGRAFICOS POR LO CUAL SE SUSPENDEN. SE CONSIDERA EVOLUCION CLINICA SATISFACTORIA POR LO CUAL SE DECIDE DAR EGRESO A LA PACIENTE.
+36145,trigger_institucion,CLINICA SIN,esperado,  Evolución y hospitalización: PACIENTE CON BUENA EVOLUCION CLINICA SIN DETERIORO DE SU ESTADO NEUROLOGICO ALERTA ORIENTADA NO FOCA
+36145,trigger_institucion,CLINICA HASTA,revisar,"O NUEVOS EPISODIOS EMETICOS, SE DECIDE CONTINUAR VIGILANCIA CLINICA HASTA COMPLETAR 12 HORAS Y SI CONTINUA BUENA EVOLUCION SE DARA EG"
+37573,trigger_institucion,CLINICA SIN,esperado,"  Evolución y hospitalización: PACIENTE CON BUENA EVOLUCION CLINICA SIN DIFICULTAD RESPIRATORIA, TOLERANDO VIA ORAL NO DOLOR ABDOMI"
+37573,trigger_institucion,CLINICA CON,esperado,"RIORO NEUROLOGICO, SIN DOLOR CERVICAL, COMPLETO OBSERVACION CLINICA CON ESTUDIOS RADIOGRAFICOS NEGATIVOS, SE DECIDE DAR EGRESO CON "
+37914,trigger_institucion,CLINICA MÍNIMA,revisar," PARÁMETROS DE NORMALIDAD, QUIEN YA COMPLETO LA OBSERVACIÓN CLINICA MÍNIMA, SE DECIDE DAR EGRESO CON RECOMENDACIONES Y SIGNOS DE ALARM"
+38311,trigger_institucion,clinica satisfactoria,esperado,"lización: Paciente hemodinamicamente estable, con evolucion clinica satisfactoria, tolerando via oral, en manejo anticonvulsivante con acido "
+16304,trigger_institucion,clinica sin,esperado,"oral subdural derecho. [FECHA].Paciente con buena evoluciòn clinica sin deterioro neurologico, se decide dar salida, con TAC Cerebr"
+17106,trigger_institucion,clinica por,esperado,ccion de fractura + clavo cefalomedular con buena evolucion clinica por lo cual se da salida
+34124,trigger_institucion,CLINICA MANUAL,revisar,ORADO Y SUTURADO POR CIRUGIA PLASTICA (VER NOTA EN HISTORIA CLINICA MANUAL) SE CONSIDERA ENTONCES SALIDA PARA CONTINUAR MANEJO AMBULAT
+34435,trigger_institucion,HOSPITAL PRESENTA,esperado,"DA DE CONCIENCIA POR POCOS SEGUNDOS; DURANTE SU TRASLADO AL HOSPITAL PRESENTA 3 EPISODIOS DE VÓMITO EN PROYECTIL Y CONFUSIÓN, AGITACIÓN Y"
+35516,trigger_institucion,CLINICA POR,esperado,INAMICAMENTE ESTABLE ALERTA Y ORIENTADO CON BUENA EVOLUCION CLINICA POR LO QUE SE DARA DE ALTA HOSPITALARIA.
+30675,trigger_institucion,clinica por,esperado,sion de organos internos. Sin hematuria. Adecuada evolucion clinica por lo cual se da salida.
+30831,trigger_institucion,CLÍNICA VALORADO,revisar,  Evolución y hospitalización: PACIENTE CON BUENA EVOLUCIÓN CLÍNICA VALORADO POR CX PEDIÁTRICA Y OFTALMOLOGIA QUE ORDENAN SALIDA CON MED
+31238,trigger_institucion,CLINICA POR,esperado,DEJA EN OBSERVACION NEUROLOGICA PRESENTANDO BUENA EVOLUCION CLINICA POR LO CUAL SE DECIDE DAR SALIDA
+31485,trigger_institucion,HOSPITAL LOCAL,esperado,"DE LAPICERO CON POSTERIOR EPISODIO DE EMESIS, ES LLEVADO AL HOSPITAL LOCAL DONDE REALIZAN MANIOBRAS DE SALIDA, LA PACIENTE VUELVA A PR"
+9733,trigger_institucion,clinica favorable,esperado,"erial)  Evolución y hospitalización: Paciente con evolucion clinica favorable, asintomatico sin deterioro neurologico con TAC (tomografia"
+10507,trigger_institucion,clinica para,esperado,"amicamente estable, con toracostomia funcionalse traslada a clinica para continuar manejo de toracostomia."
+10555,trigger_institucion,hospital psiquiatrico,esperado,presivo bipolar  Examen físico: Pte (paciente) remitido del hospital psiquiatrico por cuadro clinico de 9 dias de evolucion consistente en to
+11119,trigger_institucion,clinica hemodinamicamente,esperado,"terica, fue llevada a RA + OTS DHS 135, con buena evolucion clinica hemodinamicamente estable, por lo cual se decide dar salida con recomendacion"
+28288,trigger_institucion,CLINICA POR,esperado, DE LOS PARAMETROS NORMALES PRESENTA UNA ADECUADA EVOLUCION CLINICA POR LO CUAL SE DECIDE DAR SALIDA
+23870,trigger_institucion,clinica llama,revisar, antiguas por aplastamiento de L3-L4-L5. Durante vigilancia clinica llama la atencion que paciente permanece tranquilo pero al examin
+24507,trigger_institucion,CLINICA POR,esperado,"CIENTE QUE VALORADA EN REVISTA EL CUAL PRESENTA UNA MEJORIA CLINICA POR EL CUAL SE ORDENA SALIDA CON CITA DE CONTROL, ANALGESIA, SI"
+24807,trigger_institucion,CLINICA TAC,revisar,  Evolución y hospitalización: PACIENTE CON BUENA EVOLUCION CLINICA TAC (tomografia axial computarizada) CEREBRAL MUESTRA HSA (hemo
+25046,anio,2000,esperado," CON LPM.  Evolución y hospitalización: HEMOTORAX IZQUIERDO 2000CC TAPONAMIENTO CARDIACO, HERIDA EN EL VENTRICULO DERECHO9 E"
+25642,trigger_institucion,CLÍNICA SIN,esperado,"PLICACIONES, NI FX (fractura), PACIENTE CON BUENA EVOLUCIÓN CLÍNICA SIN DÉFICIT NEUROLÓGICO POR LO CUAL SE DA ALTA CON ANTIBIÓTICO,"
+25978,trigger_institucion,CLÍNICA POCO,revisar,DAR SALIDA CON RECOMENDACIONES Y SIGNOS DE ALARMA. HISTORIA CLÍNICA POCO ESPECIFICADO.
+22998,trigger_institucion,clinica con,esperado,"ución y hospitalización: pte (paciente) con buena evolucion clinica con Rx (radiografia) de torax normal, angiotac, sin evidencia d"
+12293,trigger_institucion,hospital psiquiatrico,esperado,ecide manejo ambulatorio por lo que se requiere traslado al hospital psiquiatrico por transtornos esquizofrenico se da salida por trauma
+12989,anio,2000,esperado,"oral superficial pordebajo de 6 to bifurcacion, sangrado de 2000 cc."
+13865,trigger_medico,"dr.
+Sangrado",esperado,der. Con un solo orificio salida a nivel anterior antebrazo dr. Sangrado activo a nivel de linea acilar posterior izq.  Evolución y 
+40763,trigger_institucion,CLÍNICA SIN,esperado,"VIDENCIA DE FRACTURAS NI LUXACIONES, SE REALIZA OBSERVACIÓN CLÍNICA SIN COMPLICACIONES NI ALTERACIONES, PACIENTE HEMODINAMICAMENTE "
+37560,trigger_institucion,CLINICA COMO,revisar,"RIO O HEMODINAMICO CON FX (fractura) DE CLAVICULA IZQ TANTO CLINICA COMO RADIOGRAFICAMENTE, SE DECIDE DAR EGRESO CON INMOVILIZADOR D"
+37664,trigger_institucion,CLINICA SATISFACTORIA,esperado,"n: PACIENTE QUE HA (hipertension arterial) TENIDO EVOLUCION CLINICA SATISFACTORIA, CON RADIOGRAFIAS NORMALES POR LO QUE SE DARA DE ALTA HOSPI"
+33307,trigger_institucion,clínica favorable,esperado,"ón y hospitalización: [FECHA]: Pcte (paciente) co evolución clínica favorable, se decide dar alta médica con recomendaciones, signos de a"
+31484,trigger_institucion,CLINICA POR,esperado,  Evolución y hospitalización: PACIENTE CON BUENA EVOLUCION CLINICA POR LO CUAL SE DECIDE DAR SALIDA
+23276,trigger_institucion,CLINICA POR,esperado,  Evolución y hospitalización: PACIENTE CON BUENA EVOLUCION CLINICA POR LO QUE SE DECIDE DAR SALIDA
+23639,anio,2000,esperado,OR T9  Evolución y hospitalización: HALLAZGOS HEMOPERITONEO 2000CC HERIDAS MULTIPLES GRADO II EN BAZO CON SANGRADO ACTIVO HE
+24497,trigger_institucion,CLINICA POR,esperado,  Evolución y hospitalización: PACIENTE CON BUENA EVOLUCION CLINICA POR LO CUAL SE ORDENA SALIDA.
+24735,trigger_institucion,CLINICA POR,esperado,  Evolución y hospitalización: PACIENTE CON BUENA EVOLUCION CLINICA POR LO CUAL SE LE DA DE ALTA.
+25235,trigger_institucion,CLÍNICA POR,esperado,"A EN OBSERVACIÓN, ES VALORADA, PACIENTE CON BUENA EVOLUCIÓN CLÍNICA POR LO CUAL SE ORDENA SALIDA CON SIGNOS DE ALARMA Y RECOMENDACI"
+25444,trigger_institucion,CLINICA MANIFIESTA,revisar,"  Evolución y hospitalización: PACIENTE CON BUENA EVOLUCION CLINICA MANIFIESTA QUE SE SIENTE MEJOR, PACIENTE COMENTADA CON ORTOPEDISTA QUI"
+21786,trigger_institucion,CLINICA HEMODINAMICAMENTE,esperado,N SIGNOS DE LESION VASCULAR. PACIENTE EN ADECUADA EVOLUCION CLINICA HEMODINAMICAMENTE ESTABLE SIN SIGNOS DE DIFICULTAD RESPIRATORIA QUIEN PRESENT
+22070,trigger_institucion,hospital nivel,esperado,"es se decide dar salida con cita de control en 2 semanas en hospital nivel 2, se dan recomendaciones y signos de alarma."
+22716,trigger_institucion,CLINICA CON,esperado,ón y hospitalización: PTE (paciente) CON ADECUADA EVOLUCION CLINICA CON TAC (tomografia axial computarizada) SIMPLE Y RX (radiograf
+17517,trigger_institucion,hospital nivel,esperado,zación: Pte (paciente) se remite para manejo de trama en un hospital nivel 2
+17540,trigger_institucion,clinica por,esperado,torax. se pasa tubo de torax mejora disnea. Buena evolucion clinica por lo cual se decide dar salida
+18307,trigger_institucion,clinica con,esperado,"ospitalización: [FECHA]: pte (paciente) con buena evolucion clinica con pop adecuada, se decide dar salida"
+14939,trigger_institucion,clinica glasgow,revisar,"fia axial computarizada) de control muestra buena evolucion clinica glasgow 15/15, se da salida"
+15621,trigger_medico,"doctor
+
+Examen",esperado,Motivo de consulta: Bala doctor  Examen físico: Multiples heridas por arma de fuegoen pene dorso co
+15633,trigger_institucion,clinica satisfactoria,esperado,"  Evolución y hospitalización: pte (paciente) con evolucion clinica satisfactoria, estable, sin sirs. se decide dar salida con recomendacione"
+16327,trigger_institucion,"clinica
+
+Evolución",esperado,"s media clavicualr izquerda No registra glasgow en historia clinica  Evolución y hospitalización: hallazgo operatorios: hemotorax 500 cc, "
+13284,trigger_institucion,hospital nivel,esperado, Pte (paciente) que este remitido para manejo conservador a hospital nivel II
+13509,trigger_institucion,clinica signos,revisar,"ión y hospitalización: paciente estable con buena evolucion clinica signos vitales en parametros normales, sin signos sugestivos, se d"
+13540,trigger_institucion,clinica satisfactoria,esperado,"  Evolución y hospitalización: pte (paciente) con evolucion clinica satisfactoria, hemodinamicamente estable, sin signos de respuesta infecci"
+13941,trigger_institucion,clinica mas,esperado,Paciente valorada por el servicio de ortopedia donde por la clinica mas apoyo imagenologico se identifica fractura supracondilea iz
+9493,anio,2000,esperado,"ospitalización: Hallazgos operatorios: Hemotorax derecho de 2000cc, herida transfixiante de pulmon derecho, lobulo medio e i"
+10293,trigger_institucion,CLINICA ESTABLE,esperado,"  Evolución y hospitalización: PACIENTE CON BUENA EVOLUCION CLINICA ESTABLE SIN FIEBRE, SE DESIDE A DAR SALIDA CON CONTROL DE CONSULTA "
+6683,trigger_institucion,clinica sin,esperado,o.  Evolución y hospitalización: pte (paciente) con mejoria clinica sin tratamiento mas que analgesia. se da salida con control en 
+7025,trigger_institucion,clinica sin,esperado,"via placa minifragmento 2,0 paciente con adecuada evolucion clinica sin sirs, ni dificultad respiratoria es llevado a cirugia el [F"
+2473,trigger_institucion,clinica estricta,esperado,"s febriles sin signos de sirs, se solicita pcr y vigilancia clinica estricta."
+55665,trigger_institucion,CLINICA DEL,revisar,AMENTO COLATERAL LATERAL Y LIGAMENTO CRUZADO POSTERIOR (POR CLINICA DEL PACIENTE). PIE CAIDO CON POSIBLE LESION DLE NERVIO PERONEO.
+56939,trigger_institucion,CLINICA SATISFACTORIA,esperado,"SFACTORIA EVOLUCION, SIN DEFICIT NEUROLOGICO, CON EVOLUCION CLINICA SATISFACTORIA, SE DECIDE DAR EGRESO CON RECOMENDACIONES Y SIGNOS DE ALARM"
+53255,trigger_institucion,HOSPITAL NIVEL,esperado,EQUIERE INTERVENCIONISMO QUIRURGICO QUE PUEDE REALIZARSE EN HOSPITAL NIVEL II (POR ESTABILIDAD HEMODINAMICA. PACIENTE QUE DESDE EL MOM
+41517,anio,2000,esperado,".  Evolución y hospitalización: se da manejo con lev hartam 2000 cc, paciente con buena evolución clínica, hemodinamicamente"
+39495,trigger_institucion,CLINICA CON,esperado," DIA, ORDEN PARA ELECTROENCEFALOGRAMA Y CITA CON NEUROLOGIA CLINICA CON RESULTADO DE ESTE."
+40537,trigger_institucion,CLÍNICA ALERTA,revisar,"  Evolución y hospitalización: PACIENTE CON BUENA EVOLUCIÓN CLÍNICA ALERTA ORIENTADO NO FOCALIZADA SIN DETERIORO NEUROLÓGICO, SIN DOLO"
+37211,trigger_institucion,CLINICA DESARROLLA,revisar,"OS RADIOGRAFICOS NORMALES, SIN EMBARGO DURANTE SU EVOLUCION CLINICA DESARROLLA DOLOR ABDOMINAL A NIVEL DE FLANCO IZQUIERDO, POR LO CUAL EL"
+37296,trigger_institucion,CLINICA SATISFACTORIA,esperado,"PITAL.  Evolución y hospitalización: PACIENTE CON EVOLUCION CLINICA SATISFACTORIA, NO HUBO DETERIORO NEUROLOGICO, TOLERO ADECUDAMENTE LA VIA "
+37546,trigger_institucion,CLINICA DONDE,esperado," VOLUNTARIA, REFIERE QUE VA A SER VALORADA Y MANEJADA EN LA CLINICA DONDE ELLA LABORA. SE EXPLICA A PACIENTE LOS RIEZGOS, SE ACLARA Q"
+37898,trigger_institucion,CLINICA MINIMA,revisar," PARAMETROS DE NORMALIDAD, QUIEN YA COMPLETO LA OBSERVACIÓN CLINICA MINIMA, SE DECIDE DAR EGRESO CON RECOMENDACIONES Y SIGNOS DE ALARM"
+33492,trigger_institucion,clínica favorable,esperado,"  Evolución y hospitalización: [FECHA]: Pcte (paciente) con clínica favorable, sin signos de lesión vascular, motivo por el cual se decid"
+35837,trigger_institucion,CLINICA SATISFACTORIA,esperado,ación: PACIENTE EN BUENAS CONDICIONES ESTABLE CON EVOLUCION CLINICA SATISFACTORIA MPOR LO QUE SE DARA DE LATA HOSPOITALARIA
+35868,trigger_institucion,CLINICA HEMODINAMICAMENTE,esperado,  Evolución y hospitalización: PACIENTE CON BUENA EVOLUCION CLINICA HEMODINAMICAMENTE ESTABLE POR LO QUE SE ORDENA EMPEZAR DIETA LIQUIDA Y VIGILA
+32158,trigger_institucion,CLINICA SIN,esperado,  Evolución y hospitalización: PACIENTE CON BUENA EVOLUCION CLINICA SIN DETERIORO NEUROLOGICO
+32343,trigger_institucion,hospital para,esperado,"a, es llevado a HCHT, donde es remitido sin comentar a este hospital para manejo por cx. plástica. Hx. tercio distal del antebrazo iz"
+32387,trigger_institucion,clínica satisfactoria,esperado,"(diagnostico). de semiahogamiento y neumonia, con evolución clínica satisfactoria. Se decide dar salida con tratamiento ambulatorio y cita de"
+23749,trigger_institucion,hospital nivel,esperado,): 70/50  Evolución y hospitalización: paciente se remite a hospital nivel 2 para manejo tubo de torax
+24317,anio,2000,esperado,NTISEPCIA CON YODADOS INFILTRACION CON LIDOCAINA LAVADO CON 2000 CC DE SSN SE REALIZA REDUCCION ABIERTA. SE LE DA SALIDA
+24734,trigger_institucion,clinica sastifactoria,esperado,  Evolución y hospitalización: pte (paciente) con evolucion clinica sastifactoria reexampsion pulmonar eco (ecografia) doppler msd (miembro s
+25472,trigger_institucion,CLINICA SASTIFACTORIA,esperado,  Evolución y hospitalización: PTE (paciente) CON EVOLUCION CLINICA SASTIFACTORIA TMF CON MULTIPLES FX (fractura) QUE SERAN MANEJADAS AMBULAT
+21897,trigger_institucion,clínica favorable,esperado,"llenado capilar < 3 segundos, pulsos fuertes, con evolución clínica favorable se decide inmovilizar con férula de yeso y dar salida con c"
+13179,trigger_institucion,clinica que,esperado,"ución y hospitalización: Pte (paciente) con buena evolucion clinica que inicia cuando recibe Tx (tratamiento) en craneo, no vomito,"
+13372,trigger_institucion,hospital por,esperado,aton que lo agredieron con arma corto punzante saliendo del hospital por hinchas  Examen físico: pte (paciente) con palidez generali
+951,trigger_institucion,"clinica
+
+Evolución",esperado,ESTRILLO. sin registro de TA (tension arterial) en historia clinica  Evolución y hospitalización: [FECHA]: se realiza RC + inmovilizacion 
+41608,trigger_institucion,hospital cercano,esperado,"s y síntomas de alarma, se da cita para retiro de puntos en hospital cercano en 5 dias."
+47018,trigger_institucion,clinica colombial,revisar, paciente es remitido a UCI (unidad de cuidados intensivos) clinica colombial.
+38768,trigger_institucion,CLINICA OFTALMOLOGICA,esperado,.  Evolución y hospitalización: SE REIMITE PACIENTE PARA LA CLINICA OFTALMOLOGICA POR QUE EN EL MOMENTO NO HAY RETINOLOGO PARA REALIZAR PROCE
+39324,trigger_institucion,clínica por,esperado,"cerrada se deja con taponamiento nasal, con buena evolución clínica por lo que se decide egreso con recomendaciones signos de alarm"
+36646,trigger_institucion,CLINICA SATISFACYTORIA,revisar,ón: paciente valorado por ortopedia. PACIENTE CON EVOLUCION CLINICA SATISFACYTORIA POR LO QUE SE DARA SALIDA ANALGESIA INCAPACIDAD X 15 DIAS C
+38500,trigger_institucion,CLINICA SATISFACTORIA,esperado,L.  Evolución y hospitalización: PACIENTE CON UNA EVOLUCION CLINICA SATISFACTORIA POR LO QUE SE DECIDE DAR SALIDA CON RECOMENDACIONES Y SIGNO
+34055,trigger_institucion,clínica favorable,esperado,"n y hospitalización: [FECHA]: Pcte (paciente) con evolución clínica favorable, sin alteración neurológica, sin otorragia, con lesión del "
+34876,trigger_institucion,CLINICA OFTALMOLOGICA,esperado, FARMACOLOGICO AMBULATORIO POST QX (quirurgico). REMITIDO A CLINICA OFTALMOLOGICA DE [MUNICIPIO].
+35170,trigger_institucion,"clinica
+Toma",revisar,ión se le podrá dar salida. Dieta comun Estricta vigilancia clinica Toma de TA (tension arterial) cada 6 horas. [FECHA]: 1. salida 2
+35307,trigger_institucion,HOSPITAL PRESENTÓ,esperado,"ANSITO, REFIERE DURANTE LA NOCHE QUE FUE DADO DE ALTA EN EL HOSPITAL PRESENTÓ RECTORRAGIA, DOLOR A LA PALPACIÓN DE LA REJA COSTAL IZQUIER"
+31812,trigger_institucion,HOSPITAL LOCAL,esperado,eoencefalico) Y PERDIDA DE LA CONCIENCIA. ES REMITIDO DESDE HOSPITAL LOCAL POR SOMNOLENCIA. AL EXAMEN FISICO SE OBSERVA HERIDA SUTURAD
+28319,trigger_institucion,CLINICA SATISFACTORIA,esperado,EDEMA.  Evolución y hospitalización: PACIENTE CON EVOLUCION CLINICA SATISFACTORIA FUE VALORADO POR OFTALMOLOGIA CON REPORTE DE CRANEO Y ORBIT
+29172,trigger_institucion,CLINICA FAVORABLE,esperado,ESCASO  Evolución y hospitalización: PACIENTE CON EVOLUCION CLINICA FAVORABLE NO SIGNOS DE HEMO NI NEUMOTORAX A RX (radiografia) DE TORAX
+29385,trigger_institucion,clinica por,esperado,ción: paciente es dejada en observacion con buena evolucion clinica por lo cual se decide dar salida
+23495,trigger_institucion,clínica favorable,esperado,"ación: paciente que es dejada en observación, con evolución clínica favorable, paciente sin signos de irritación peritoneal, blando -no d"
+23636,trigger_institucion,hospital nivel,esperado,"oria de sus parametors paraclinicos, se decide remitir a un hospital nivel 2 para continuar con medidas generales y manejo del tuboi."
+24523,trigger_institucion,clinica por,esperado,"n abierta + osteosintesis placa DCP 3,5 mm, buena evolucion clinica por lo cual se da salida"
+25492,trigger_institucion,clinica estable,esperado,"stable  Evolución y hospitalización: Paciente con evolucion clinica estable, sind eterioro neurologico, quien requiere RMN (resonancia "
+25637,trigger_institucion,clinica por,esperado,"n hallazgos anormales, paciente estable con buena evolucion clinica por lo cual se considera dar salida por neurocirugia y unidad d"
+26013,trigger_institucion,CLINICA POR,esperado,volución y hospitalización: PACIENTE CON ADECUADA EVOLUCION CLINICA POR LO CUAL SE LE DA SALIDA CON SIGNOS DE ALARMA
+17064,trigger_institucion,clinica santillana,revisar,o con urgencia a la uci (unidad de cuidados intensivos) del clinica santillana
+17395,trigger_institucion,clinica estable,esperado,"X1 CM NO PORULENTO.  Evolución y hospitalización: evolucion clinica estable. salida con analgesia, cita control."
+12663,trigger_institucion,clinica satisfactoria,esperado,"o deficit neurologico, patron repiratorio normal, evolucion clinica satisfactoria de postoperatorio, hemodinamicamente estable, sale con reco"
+13157,trigger_institucion,clínica sin,esperado,"ulna. [FECHA]: Paciente que POP presenta adecuada evolución clínica sin signos de infección local, con adecuada reducción de fractu"
+8791,trigger_institucion,hospital para,esperado,neo  Evolución y hospitalización: Paciente se remite a otro hospital para manejo de tubo de torax
+3487,trigger_institucion,clinica radicular,revisar,"mil C3, C4 DERECHA Y C4, C5 bilateral de tener presentacion clinica radicular."
+58739,trigger_institucion,HOSPITAL POR,esperado,tensivos). EN EL MOMENTO NO HAY DISPONIBILIDAD DE UCI EN EL HOSPITAL POR LO CUAL SE REMITE A [INSTITUCION].
+58899,trigger_institucion,CLINICA POR,esperado,". PACIENTE EN BUENAS CONDICIONES GENERALES, BUENA EVOLICIÓN CLINICA POR LO CUAL SE DECIDE DAR SALIDA."
+58918,trigger_institucion,CLINICA POR,esperado,E ENTRAR AL CANA DE HUNTER. PACIENTE CON ADECUADA EVOLUCIÓN CLINICA POR LO CUAL SE DA SALIDA CON CITA CONTROL EN 2 SEMANAS
+58936,trigger_institucion,CLÍNICA POR,esperado,ÓN DE FRACTURA CRANEAL MAR-03. PACIENTE CON BUENA EVOLUCIÓN CLÍNICA POR LO CUAL SE DECIDE DAR SALIDA CON SIGNOS DE ALARMA Y CITA CO
+58944,trigger_institucion,CLINICA POR,esperado,QUE INVOLUCRA SEGMENTO V Y VI. PACIENTE CON BUENA EVOLUCIÓN CLINICA POR LO CUAL SE DECIDE DAR SALIDA.
+58957,trigger_institucion,CLINICA POR,esperado,EBAN EL PROCEDIMIENTO FIRMANDO DESENTIMIENTO EN LA HISTORIA CLINICA POR LO QUE SE CONSIDERA SOPORTE VITAL BASICO. JUN-28. PACIENTE 
+59029,trigger_institucion,CLINICA POR,esperado,R EN CARA ANTERIOR. MAY-18. PACIENTE CON ADECUADA EVOLUCIÓN CLINICA POR LO CUAL SE DECIDE DAR SALIDA CON RECOMENDACIONES GENERALES.
+59047,trigger_institucion,CLINICA POR,esperado,TIRA TUBO DE TÓRAX MARZ-04. PACIENTE CON ADECUADA EVOLUCIÓN CLINICA POR LO CUAL SE DECIDE DAR SALIDA.
+59057,trigger_institucion,CLINICA SIN,esperado,ENAJE DE HEMATOMA EPIDURAL. PACIENTE CON ADECUADA EVOLUCIÓN CLINICA SIN DEFICIT NEUROLOGICO POR LO CUAL SE DECIDE DAR SALIDA CON RE
+59410,anio,2000,esperado,"espacio intercostal) DER PARAESTERNAL, CHOQUE HIPOVOLEMICO, 2000 CC DE SANGRE EN TÓRAX, HEMOPERICARDIO SIN TAPONAMIENTO, HER"
+59440,trigger_institucion,CLINICA SIN,esperado,OMA EPIDURAL 20 CC. MAR-19. PACIENTE CON ADECUADA EVOLUCIÓN CLINICA SIN DEFICIT NEUROLOGICO. SE DECIDE DAR SALIDA CON RECOMENDACION
+59444,trigger_institucion,CLINICA POR,esperado,PLORACIÓN DE DIAFRAGMA NEGATIVA PACIENTE EN BUENA CONDICIÓN CLINICA POR LO CUAL SE DECIDE DAR SALIDA.
+59447,trigger_institucion,CLINICA POR,esperado,IN SANGRADO ACTIVO. MAR-15. PACIENTE CON ADECUADA EVOLUCIÓN CLINICA POR LO CUAL SE DECIDE DAR SALIDA CON RECOMENDACIONES Y SIGNOS D
+60695,trigger_institucion,HOSPITAL BÁSICO,esperado,hospitalización: [FECHA] [HORA] PACIENTE QUE ES REMITIDO DE HOSPITAL BÁSICO [INSTITUCION] POR TRAUMA CRANEOENCEFALICO SEVERO POR HERIDA
+56496,trigger_institucion,CLÍNICA QUIEN,esperado,"ación: SE REALIZA REDUCCIÓN CERRADA, PACIENTE CON EVOLUCIÓN CLÍNICA QUIEN CUMPLE VIGILANCIA NEUROLÓGICO CON BUEN ESTADO GENERAL PACIE"
+47036,trigger_institucion,clínica satisfactoria,esperado,"bservación neurológica no presentó deterioro, con evolución clínica satisfactoria por lo que se decide dar egreso con recomendaciones y signo"
+46498,trigger_institucion,clínica sin,esperado,el de la extremidad.  [FECHA]. Paciente con buena evolución clínica sin signos de sindrome compartimental por lo cual se decide dar
+52890,trigger_institucion,CLINICA FAVORABLE,esperado,"ón: LIMPIEZA Y REPARACIÓN DEHERIDAS, PACIENTE CON EVOLUCIÓN CLINICA FAVORABLE, SE RECOMIENDA DAR EGRESO CON RECOMENDACIONES DE ALARMA."
+46189,trigger_institucion,clínica por,esperado,lesiones intraparenquimatosas. Paciente con buena evolución clínica por lo cual se decide dar salida.
+46908,trigger_institucion,hospital periferia,esperado,lavicular y limitación funcional. Realizan Rx (radiografia) hospital periferia donde se evidencia fractura a nivel de cabeza humero por lo
+47137,trigger_institucion,clínica espontánea,revisar,ón (VIH) pendiente resultado.  Paciente con buena evolución clínica espontánea. Se considera dar salida con recomendaciones y signos de al
+47037,trigger_institucion,clinica satisfactoria,esperado,"zación: Paciente en buenas condiciones generales, evolución clinica satisfactoria, no dificultad respiratoria y disminución del dolor por lo "
+49482,trigger_institucion,CLINICA ESTABLE,esperado,DO DOLOR EN ARCOS COSTALES CRONICOS. PACIENTE CON EVOLUCION CLINICA ESTABLE  Evolución y hospitalización: PACIENTE CON EVOLUCION CLINIC
+49482,trigger_institucion,CLINICA ESTABLE,esperado,"STABLE  Evolución y hospitalización: PACIENTE CON EVOLUCION CLINICA ESTABLE, TOLERANDO VIA ORL (otorrinolaringologia) POR LO CUAL SE DA"
+48180,trigger_institucion,clínica satisfactoria,esperado,"escaso  Evolución y hospitalización: Paciente con evolución clínica satisfactoria, hemodinamicamente estable, tolera vía oral. Se decide dar "
+53135,trigger_institucion,CLINICA DEL,revisar,"NAS.  Evolución y hospitalización: PACIENTE REFIERE MEJORIA CLINICA DEL DOLOR CEFALEA, NIEGA VERTIGO, TOLERA DEAMBULACION Y VIA ORA"
+53135,trigger_institucion,CLINICA SATISFACTORIA,esperado,"EAMBULACION Y VIA ORAL, SIN PRESENTAR EMESIS, CON EVOLUCION CLINICA SATISFACTORIA, SE DECIDE DAR EGRESO CON RECOMENDACIONES Y SIGNOS DE ALARM"
+52826,trigger_institucion,CLINICA FAVORABLE,esperado,"COMPROMISO DE TRAZOS LUXO FRACTURAS, PACIENTE CON EVOLUCIÓN CLINICA FAVORABLE, HEMODINAMICAMENTE ESTABLE, SE DA EGRESO CON RECOMENDACIONE"
+45501,trigger_institucion,clinica por,esperado, escape de medio de contraste. Paciente con buena evolución clinica por lo cual se decide dar de alta.
+46274,trigger_institucion,clínica satisfactoria,esperado,"ón: Paciente en buenas condiciones generales, con evolución clínica satisfactoria por lo que se decide dar egreso con recomendaciones."
+46921,trigger_institucion,clínica sin,esperado,"aumento del hematoma epidural. Paciente con buena evolución clínica sin deterioro neurologico, no requiere manejo quirúrgico.  Paci"

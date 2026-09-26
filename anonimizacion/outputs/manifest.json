@@ -1,0 +1,58 @@
+{
+  "generado": "2026-09-25T22:23:40",
+  "entrada": "C:\\Users\\JOSE\\Documents\\dev\\rag_trauma\\anonimizacion\\trauma.csv",
+  "sha256_entrada": "c673e3f7c2fb7d7238d5747cb50de4afabc305d6cc6d2334276fa4a498bfb40e",
+  "n_registros": 27157,
+  "n_indexables": 8198,
+  "criterio_indice": "apto_rag",
+  "n_excluidos_indexables": {
+    "truncado": 2865,
+    "incompleto": 11113
+  },
+  "parametros": {
+    "min_chars": 40,
+    "seed": 42,
+    "aviso_en_texto": false,
+    "incluir_incompletos": false
+  },
+  "calidad": {
+    "total": 27157,
+    "empty": 3684,
+    "too_short": 1176,
+    "duplicate": 671,
+    "truncated": 2865,
+    "incompleto": 12711,
+    "indexable": 22176,
+    "excluido_truncado": 2865,
+    "excluido_incompleto": 11113,
+    "apto_rag": 8198
+  },
+  "reemplazos_por_regla": {
+    "fecha": 5049,
+    "hora": 1841,
+    "edad": 750,
+    "institucion": 668,
+    "municipio": 290,
+    "institucion_hospital": 200,
+    "medico": 191,
+    "institucion_sigla": 157,
+    "anio": 90,
+    "institucion_santoral": 7,
+    "documento": 3
+  },
+  "residuo_por_detector": {
+    "trigger_institucion": {
+      "matches": 235,
+      "a_revisar": 33
+    },
+    "anio": {
+      "matches": 12,
+      "a_revisar": 0
+    },
+    "trigger_medico": {
+      "matches": 2,
+      "a_revisar": 0
+    }
+  },
+  "duracion_s": 17.3
+}

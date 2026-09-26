@@ -1,0 +1,1600 @@
+record_id,n_chars_doc,mecanismo_lesion,desenlace,truncado,texto
+36025,612,accidente_transito,hospitalizacion,False,"Motivo de consulta: LO ATROPELLO UNA MOTO
+
+Examen físico: CABEZA: ESCORIACIÓN EN REGIÓN FRONTAL IZQ Y EN REGIÓN CELAR DEL MISMO LADO, CON HEMATOMA EN REGIÓN OCCIPITAL DERECHA CON QUEMADURA GRADO I EN DICHO SITIO NO DEPRESIÓN OSEA PALPABLE.
+
+Evolución y hospitalización: PTE (paciente) CON ANTECEDENTES DE ACCIDENTE DE TRANSITO, CON TCE (trauma craneoencefalico) LEVE Y QUEMADURA EN PABELLÓN AURICULAR, SE DEJA EN OBSERVACIÓN NEUROLÓGICA. SE REALIZA TAC (tomografia axial computarizada) DE TÓRAX QUE NO EVIDENCIA LESIONES.
+
+PTE EN BUENAS CONDICIONES GENERALES, SE DA EGRESO CON RECOMENDACIONES Y SIGNOS DE ALARMA."
+12975,298,caida,alta,False,"Motivo de consulta: Me cai
+
+Examen físico: Deformidad y rotacion externa de MID (miembro inferior derecho), doloroso a la palpacion a nivel subtrocanterico.
+
+Evolución y hospitalización: PACIENTE ORIENTADA EN TIEMPO LUGAR Y PERSONA CON LEV HERIDA QUIRURGICA LIMPIA SE DA SALIDA CON SIGNOS DE ALARMA"
+21820,420,caida,alta,False,"Motivo de consulta: me cai
+
+Examen físico: paciente quien sufre caida de su propia altura, con posterior trauma, dolor, no se evidencia deformidad en clavicula ni dolor.
+
+Evolución y hospitalización: paciente hemodinamicamente estable se toma rx (radiografia) ap (antecedentes personales) de hombro se evidencia fractura de glenoides derecha estable se decide dar salida con signos de alarma y recomendaciones generales."
+46896,307,contundente,no_determinado,False,"Motivo de consulta: Herida por arma cortocontundente
+
+Examen físico: Paciente que sufre heridas por arma cortocontundente en miembros superiores con abundante sangrado
+
+Evolución y hospitalización: [FECHA]. Se realiza neururrafia ulnar + exploración vascular.
+
+L+ C + Tenorrafia de extensores mano izquierda"
+897,480,caida,no_determinado,False,"Motivo de consulta: Se cayo de un carretilla
+
+Examen físico: abrasion frontal derecha, abdomen negativo, MSD (miembro superior derecho) deformidad 1/3 distal de antebrazo derecho, herida puntiforme en cara dorsal del antebrazo derecho pulso distal presente
+
+Evolución y hospitalización: detalles operatorios: fractura de ulna expuesta GI con Hx (herida) de 0,5 cm comunica con foco de fractura de radio con gran conminutas e inestabilidad, se realiza reduccion cerradada de radio."
+56299,614,arma_de_fuego,alta,False,"Motivo de consulta: HERIDA EN MIEMBRO SUPERIOR
+
+Examen físico: HPAF (herida por arma de fuego) EN CRESTA ILIACA IZQUIERDA
+HPAF EN BRAZO IZQUIERDO
+
+Evolución y hospitalización: PREVIA ASEPSIA Y ANTISEPSIA CON YODADOS Y LAVADO CON SSN, SE REALIZA INFILTRACIÓN CON LIDOCAINA AL 2 %, COLOCACIÓN DE CAMPOS ESTÉRILES, SE REALIZA DESBRIDAMIENTO DE HERIDAS, PROCEDIMIENTO ESTERIL SIN MENCIÓN DE COMPLICACIONES Y SE REALIZA CUBRIMIENTO CON APÓSITOS.
+SE REALIZA INMOVILIZACIÓN CON FÉRULA BRAQUIO PALMAR EN POSICIÓN FUNCIONAL.
+SE DA SALIDA CON CITA EL PRÓXIMO [FECHA]
+SE DA SALIDA CON ANALGESIA YS IGNOS Y SINTOMAS DE ALARMA."
+39838,660,cortopunzante,no_determinado,False,"Motivo de consulta: HERIDA CON UN MACHETE EN LA CABEZA
+
+Examen físico: SE EVIDENCIA LESIÓN CON SANGRADO ACTIVO EN REGIÓN PARIETAL IZQUIERDA APROXIMADAMENTE 4 CM DE LONGITUD CON SANGRADO ACTIVO, A LA PALPACIÓN SE EVIDENCIAN PUNTOS DE DEPRESIÓN DE LA TABLA ÓSEA.
+
+Evolución y hospitalización: PREVIA ASEPSIA Y ANTISEPSIA SE PROCEDE A INFILTRAR HERIDA DE 4 CM DE LONGITUD EN REGIÓN PARIETAL IZQUIERDA CON 10 CC DE LIDOCAINA AL 2 %, SE SATURA PLANO SUPERFICIAL CON SEDA 3-0 CON 4 PUNTOS DE AFRONTAMIENTO, PROCEDIMIENTO SIN COMPLICACIONES, SE TAPA SUTURA CON GASA Y VENDAJE ELASTICO.
+PACIENTE CON BUENA EVOLUCIÓN CLÍNICA Y SE DAN RECOMENDACIONES DE SIGNOS Y ALARMA."
+23495,563,arma_de_fuego,hospitalizacion,False,"Motivo de consulta: HPAF (herida por arma de fuego) en abdomen
+
+Examen físico: se observa herida penetrante en abdomen oe: en mesogastrio linea media inferior a linea umbilical. sin orificio de salida. abdomen doloroso a la palpación en mesogastrio e hipogastrio.
+
+Evolución y hospitalización: paciente que es dejada en observación, con evolución clínica favorable, paciente sin signos de irritación peritoneal, blando -no doloroso con buena tolerancia oral sin alteración en diafragma
+se ordena salida con signos de alarma, recomendaciones generales y analgesia."
+15991,218,contundente,no_determinado,False,"Motivo de consulta: me golpearon en la cara
+
+Examen físico: Dolor, deformidad y crepitacion en nariz, equimosis periorbitaria ojo izq. Vision borrosa en ojo izq.
+
+Evolución y hospitalización: Sin indicacion quirurgica."
+24492,465,caida,hospitalizacion,False,"Motivo de consulta: me cai de una carretilla
+
+Examen físico: se observa paciente con dolor a la palpacion del musculo esternocleidomastoideo, y ala plantiflexion pie derecho.
+
+Evolución y hospitalización: PACIENTE CON TCE (trauma craneoencefalico), TAC (tomografia axial computarizada) CEREBAL SIN SANGRADO XON FX (fractura) MASTOIDEA, PACIENTE COMPLETA 24 DE OBSERVACION SE ORDENA SALIDA CON CITA DE CONTROL ANALGESIA, SIGNOS DE ALARMA Y RECOMENDACIONES GENERALES."
+18410,584,no_determinado,cirugia,False,"Motivo de consulta: por ñuñalada
+
+Examen físico: Hx (herida) en 4 EIC (espacio intercostal) izq. Con linea paraesternal izq. MV aumentado, disminucion de ruidos cardiacos. Relajacion de esfinteres, abundante sangrado.
+
+Evolución y hospitalización: Procedimientos quirurgicos: hallazgos operatorios: [FECHA]
+Toracotomia + cardiorrafia + toracostomia: hematoma disecante por fuera de pericardio 200 cc. Hemopericardio 100 cc. Lesion grado III UD.
+26-082012: pte (paciente) estable sin signos de dificultad respiratoria, aleta tranquilo, afebril, no refiere vomito. se decide dar salida."
+48180,559,accidente_transito,alta,False,"Motivo de consulta: Accidente de tránsito, moto vs auto
+
+Examen físico: Paciente que sufre accidente de tránsito, sale eyectado y cae al pavimiento. Pérdida de conciencia sin tiempo cuantificado. Refiere mucho dolor a nivel retroauricular derecho. Extremidades móviles con laceraciones superficiales en pierna derecha y herida en rodilla derecha de +/- 2 cms con sangrado escaso
+
+Evolución y hospitalización: Paciente con evolución clínica satisfactoria, hemodinamicamente estable, tolera vía oral. Se decide dar egreso con recomendaciones y signos de alarma."
+25144,724,arma_de_fuego,alta,False,"Motivo de consulta: HPAF (herida por arma de fuego) en miembro superior derecho.
+
+Examen físico: Paciente que presenta HPAF (herida por arma de fuego) en MSD (miembro superior derecho), orificio de 1,5 x 2 cm, dolor a la movilización de dicho miembro. Trae RX (radiografia) de periferia que evidencia fractura cabalgada de humero derecho y presencia de proyectil.
+
+Evolución y hospitalización: Paciente a quien en sala de emergencia se le realiz{o limpieza, desbridamiento de herida, fijación con pinza azucar, ademas de reducción cerrada de fractura de humero. se solicita RX (radiografia) de torax, se verifica RX y se da salida con cita control por consulta externa ortopedia en 3 semana., se formula analgesi por 5 dias."
+36075,731,accidente_transito,hospitalizacion,False,"Motivo de consulta: ACCIDENTE DE TRANSITO
+
+Examen físico: ESCORIACIÓN LEVE Y DOLOR EN CODO IZQUIERDO, NO PRESENTA LIMITACIÓN EN LA MOVILIDAD DE ÉSTE. REFIERE DOLOR EN TERCIO SUPERIOR DEL TOBILLO IZQUIERDO, NO PRESENTA LIMITACION EN ESTA EXTREMIDAD.
+
+Evolución y hospitalización: PACIENTE INGRESA BAJO EFECTOS DEL CONSUMO DE ALCOHOL, SE OBSERVAN LACERACIONES MÚLTIPLES. PACIENTE SE LE ENVÍA PARA TOMA DE IMAGENOLOGIA, ADMINISTRACIÓN DE TOXOIDE TETÁNICO, ANALGÉSICOS, CURACIÓN DE HERIDAS CON TÉCNICA ASEPTICA. PACIENTE EVOLUCIONA SATISFACTORIAMENTE TRAS 12 HORAS OBSERVACIÓN. SE BRINDA SALIDA CON RECOMENDACIONES (NO MOVILIZAR LA RODILLA IZQUIERDA), SIGNOS DE ALARMA, ANALGESIA AMBULATORIA Y CITA DE CONTROL POR ORTOPEDIA EN 10 DÍAS."
+8869,451,no_determinado,alta,False,"Motivo de consulta: La golpeo la pareja
+
+Examen físico: Edema, equimosis asociado a Ptosis palpebral en region periocular izq, se evidencia hematoma subconjuntival, mvtos extraoculares conservados.
+En rostro, edema hipostesia infraorbitaria, dolor a la palpacion infraorbitaria, dolor a la palpacion en pilar maxilomalar.
+
+Evolución y hospitalización: Paciente requiere manejo quirurgico, se da salida para realizar procedimiento por consulta externa."
+32903,659,no_determinado,alta,False,"Motivo de consulta: Pcte (paciente) remitido para valoración por Cx. de mano
+
+Examen físico: Pcte (paciente) con antecedente de traumatismo x pulidora en muñeca izquierda hace 17 días. Se intervino en esta institución, se realizó neurorrafia del mediano, tenorrafia de flesores superiores y profundos. Manifiesta parestesias en 1 al 4 deso, sin dolor. Marcada limitación funcional
+
+Evolución y hospitalización: [FECHA]: L + D, sutura mano, tenorrafia flexores superficiales profundos 2,3 y 4, tenorrafia flexores largo pulgar, neurorrafia N. mediano, miorrafia. Procedimiento sin complicaciones. se da salida con ATB, anestesia y control por consulta externa."
+40803,648,accidente_transito,alta,False,"Motivo de consulta: ACCIDENTE DE TRANSITO
+
+Examen físico: ESCORIACIONES A NIVEL LUMBAR Y EN HEMICADERA IZQUIERDA, NO SE EVIDENCIAN CREPITOS O DEFORMIDAD. LEVE DOLOR EN COLUMNA DORSOLUMBAR. ESCORIACIONES SUPERFICIALES EN MANO Y ANTEBRAZO IZQUIERDO.
+
+Evolución y hospitalización: INGRESA PACIENTE ESTABLE, SE SOLICITA IMAGENOLOGIA, SE APLICA TOXOIDE TETÁNICO, SE BRINDA ANALGESIA. PACIENTE CON BUENA EVOLUCIÓN SIN COMPROMISO HEMODINAMICO, NEUROLÓGICO O VENTILATORIO. IMÁGENES EN PARÁMETROS NORMALES, SE BRINDA ALTA CON RECOMENDACIONES, SIGNOS DE ALARMA, TRATAMIENTO FARMACOLÓGICO AMBULATORIO CON METOCARBAMOL 750 MG/12 HORAS E INCAPACIDAD POR 5 DIAS."
+31011,262,no_determinado,alta,False,"Motivo de consulta: HERIDA EN TORAX
+
+Examen físico: PACIENTE QUIEN ESTABA BAJO EFECTOS DEL ALCOHOL CON HERIDA DE 3 CEM A NIVEL DE ESCAPULAS IZQUIERDA Y DERECHA
+
+Evolución y hospitalización: PACIENTE QUIEN EVOLUCIONA ADECUADAMENTE POR LO CUAL SE DECIDE DAR SALIDA"
+23369,757,arma_de_fuego,alta,False,"Motivo de consulta: me dispararon
+
+Examen físico: paciente que presenta mutiples heridas:
+1). a nivel de pared de órbita (izquierdo) bien delimitados
+2). a nivel dorso de nariz izquierdo
+3). zona posterior cervical- deltoides izquierdo
+4). cresta iliaca izquierda linea media
+5). región glútea izquierda tercio superior
+6). región glútea izquierda tercio medio
+7). tercio medio de fémur anterior izquierdo
+8). tercio medio posterior de fémur izquierdo
+
+Evolución y hospitalización: [FECHA]: ingresa paciente a sala de cirugía, donde se realiza blefaroplastia, blefarorrafia e intubacion de la vía lacrimal, sin complicaciones.
+paciente estable, valorado por oftalmologia quien ordena salida con cita de control, signos de alarma y recomendaciones generales."
+16314,293,cortopunzante,no_determinado,False,"Motivo de consulta: Me apuñalearon el brazo
+
+Examen físico: Sangrado leve en antebrazo derecho 1/3 proximal donde presenta herida, pulsos perifericos presentes, no frialdad. Presenta hemaoma en sitio de herida
+
+Evolución y hospitalización: Pte (paciente) se la de de alta bajo recomendaciones."
+7465,550,arma_de_fuego,no_determinado,False,"Motivo de consulta: Remitido por HaF (herida por arma de fuego) 1/3 distal brazo der, HAF en region lumbar.
+
+Examen físico: Region paralumbar derecha con orificio de entrada de proyectil, muslo derecho tercio superior orificio de proyectil sangrado activo.
+
+Evolución y hospitalización: [FECHA]: pendiente realizacion ecodoppler de MSD (miembro superior derecho)
+[FECHA]: conducta definida RA+ placa dereconstruccion se firma consentimiento.
+procedimientos quirurgicos: hallazgos operatorios: [FECHA]
+RA + OTS: Fx (fractura) supracondilea desplazada."
+14799,257,arma_de_fuego,fallecimiento,False,"Motivo de consulta: Remitido por HPAF (herida por arma de fuego)
+
+Examen físico: HPAF (herida por arma de fuego) orificio de entrada parietal der. Sin orifico de salida, con masa cerebral expuesta.
+
+Evolución y hospitalización: Pte (paciente) fallece [HORA]"
+38250,484,no_determinado,no_determinado,False,"Motivo de consulta: LO COGIO UN CARRO
+
+Examen físico: EQUIMOSIS EN REGION FRONTAL, EDEMA PALPEBRAL IZQ. PTE (paciente) BAJO EFECTOS DE SUSTANCIAS PSICOACTIVAS.
+
+Evolución y hospitalización: PACIENTE EN QUIEN SE DESCARTARON LESIONES TRAUMATICAS MAYORES, CON NEUROIMAGEN Y ESTUDIOS RADIOLOGICOS DENTRO DE LA NORMALIDAD, HEMODINAMICAMENTE ESTABLE, CON RECUPERACION NEUROLOGICA COMPLETA. YA VALORADO POR SERVICIO DE TRABAJO SOCIAL, SE CONSIDERA QUE EL PACIENTE PUEDE EGRESAR DEL HOSPITAL."
+17001,499,arma_de_fuego,fallecimiento,False,"Motivo de consulta: hpaf (herida por arma de fuego) torax
+
+Examen físico: herida en region axilar 2 EIC (espacio intercostal), herida en linea media escapular a nivel de T8
+
+Evolución y hospitalización: [FECHA]: Laparotomia exploratoria
+Hallazgos: Hemoperitoneo masivo, hematoma retroperitoneal zona I, II derecha expansivo, seccion de la vena iliaca interna derecha, 6 hx (herida) en ileon
+Toracotomia de reanimacion, pcte (paciente) entra en asistolia, se inicia protocolo de ranimacion y fallece."
+36493,578,accidente_transito,hospitalizacion,False,"Motivo de consulta: accidente de transito
+
+Examen físico: abrasiones en cuero cabelludo, sin sangrado activo, sin crepitación, no escalón oseo.
+vendaje en mano izquierda, no sangrado activo, retiran vendaje y férula, se observa avulsion piel en falange media del 4 dedo. herida suturada en 5 dedo, deformidad y limitación para los movimientos.
+laceraciones en rodilla izquierda, equimosis en cara lateral del pie izquierdo.
+
+Evolución y hospitalización: paciente que completa observación abdominal, se le da salida con antibiótico oral y cita de control con ortopedia fracturas."
+13505,337,contundente,no_determinado,False,"Motivo de consulta: Me cayo una piedra en el ojo
+
+Examen físico: Agudeza visual normal
+En conjuntiva menor se observa herida y al fondo de ojo contusion retinal
+
+Evolución y hospitalización: Agudeza visual normal
+Reflejos pupilares normales
+Se observa herida en conjuntiva menor de cuadrantey al fondo de ojo se observa contusion retinal"
+17092,371,cortopunzante,alta,False,"Motivo de consulta: Remitido por HPACP (herida por arma cortopunzante) en abdomen
+
+Examen físico: herida a nivel de epigastrio.
+herida a nivel de fosa iliaca der.
+
+Evolución y hospitalización: PTE (paciente) ESTABLE SIN SIRS, ABDOMEN NEGATIVO, TOLERANDO VIA ORAL.
+ANTE ADECUADA EVOLUCION SE DECIDE MANEJO AMBULATORIO. SE DA SALIDA CON RECOMENDACIONES YCON SIGNOS DE ALRMA"
+17786,215,caida,no_determinado,False,"Motivo de consulta: Me cai
+
+Examen físico: Dolor a la movilizacion, deformidad en 1/3 distal antebrazo derecho
+
+Evolución y hospitalización: Se le realiza reduccion cerrada e inmoilizacion con yeso antebrazo palmar."
+14318,341,caida,no_determinado,False,"Motivo de consulta: Me cai de un 2 piso
+
+Examen físico: Pierna izda en rotacion externa, edema en 1/3. Medio, pulso positivo, dolor.
+
+Evolución y hospitalización: procedimientos quirurgicos:
+-RC MAS OTS: hallazgos operatorios
+Fx (fractura) rasgo oblicuo
+pulsos distales conservados
+limitacion y ausencia de extension del hallux y del tobillo"
+40199,462,no_determinado,no_determinado,False,"Motivo de consulta: le pegaron un tiro
+
+Examen físico: ORIFICIO DE ENTRADA EN TERCIO PROXIMAL CARA DORSAL DE ANTEBRAZO IZQUIERDO.
+ORIFICIO DE SALIDA EN CARA ANTERIOR IPSILATERAL AL MISMO NIVEL.
+
+Evolución y hospitalización: SE REALIZA DESBRIDAMIENTO DE LAS HERIDAS CON PREVIA ASEPSIA Y ANTISEPSIA, ADEMÁS MANIOBRAS DE REDUCCIÓN CERRADA CON YESO BRAQUIO PALMAR.
+PACIENTE SE DA CITA EXTERNA PARA VALORACIÓN POR ANESTESIOLOGIA, ORDEN PRE QUIRÚRGICA CON EL [MEDICO]."
+39278,624,accidente_transito,alta,False,"Motivo de consulta: ACCIDENTE DE TRANSITO
+
+Examen físico: MULTIPLES LACERACIONES EN CALOTA Y REGION FRONTAL, REFIERE NAUCEAS, NIEGA PERDIDAD DEL CONOCIMIENTO.
+
+Evolución y hospitalización: PACIENTE INGRESA POR LESIONES EN CRANEO TRAS ACCIDENTE DE TRANSITO. NO HEMORRAGIA, NO DETERIORO NEUROLOGICO, PACIENTE SE OBSERVA HEMODINAMICAMENTE ESTABLE. SE SOLICITA IMAGENOLOGIA LA CUAL ES REVISADA POR NEUROCIRUGIA Y SE EVIDENCIA VERMIX PEQUEÑO Y MEGACISTERNA MAGNA (VARIANTE NORMAL) SE REALIZA SUTURA DE ESCALPO Y SE ADMINISTRA ANALGESIA. SE BRINDA ALTA CON RECOMENDACIONES Y SIGNOS DE ALARMA. CITA DE CONTROL POR CONSULTA EXTERNA."
+21675,320,cortopunzante,alta,False,"Motivo de consulta: hpacp (herida por arma cortopunzante) brazo derecho
+
+Examen físico: pte (paciente) con hpacp (herida por arma cortopunzante) en tercio superior brazo derecho.
+
+Evolución y hospitalización: pte (paciente) con hpcp (herida por arma cortopunzante) brazo se valora y se decide lavar heridas y dar salida."
+12553,909,arma_de_fuego,no_determinado,False,"Motivo de consulta: Herida por arma de fuego region toracoabdominal
+
+Examen físico: HPAF (herida por arma de fuego) con orificio en linea axilar posterior a nivel de T12 en ultimo espacio intercostal, sin aparente orificio de salida, con escaso sangrado. pte (paciente) con abdomen blando depresible, no signos de irritacion.
+torax normoexpansivo, con hipoventilacion basal derecha.
+
+Evolución y hospitalización: [FECHA] HALLAZGOS QX (quirurgico): hemoperitoneo 1000cc, herida lateral en pared abdominal en insercion de diafragma der. herida no sangrante en seg VIII contigua a la herida anterior. herida GIV en seg II de higado con sangrado en capa, herida en diagragma izquierda.
+revision sistemica de cavidad sin evidencia de otras lesiones.
+proyectil subcutaneo en pared toracica toracoabdominal anterior izq.
+
+PTE (paciente) CON BUENA EVOLUCION, SE LE DA SALIDA CON SIGNOS DE ALARME Y CONTROL EN 2 MESES."
+36013,622,accidente_transito,alta,False,"Motivo de consulta: accidente de transito
+
+Examen físico: dolor franco a la movilización del hombro izquierdo, sin deformidad, con edema y limitación funcional.
+
+Evolución y hospitalización: PACIENTE CON ADECUADA EVOLUCION CLINICA, SIN COMPROMIZO HEMODIANMICO O RESPIRATORIO, QUE NO HA (hipertension arterial) PRESENTADO ALTERACIONES NEUROLOGICAS, , SIN COMPROMISO ARTICULAR, SOLO CO MPROMISO DE TEJIDOS BLANMDOS, CON IMAGENOLOGIA EN PARAMETROS DE NORMALIDAD, TOLERA ADECUADAMENTE LA VIA ORAL, POR LO QUE SE DECIDE DAR EGRESO CON RECOMENDACIONES Y SIGNOS DE ALARMA SE EXPLICA A FAMILIARES Y A PACIENTE ADEMAS DE ANALGECIA."
+47776,327,arma_de_fuego,no_determinado,False,"Motivo de consulta: un tiro
+
+Examen físico: herida de arma de fuego con orificio de entrada en trapecio izquierdo sin orificio de salida, dolor a la movilización de hombro derecho.
+
+Evolución y hospitalización: desbridación de herida con previa asepsia y antisepsia.
+control de signos vitales,
+administración de signos vitales."
+57383,440,caida,cirugia,False,"Motivo de consulta: CAIDA DE SU PROPIA ALTURA
+
+Examen físico: PACIENTE QUE SUFRE CAIDA DESDE SU PROPIA ALTURA RECIBIENDO TRAUMA EN RODILLA DERECHA.
+REMITIDO DE PERIFERIA POR DIAGNÓSTICO DE FRACTURA DE CADERA
+
+Evolución y hospitalización: SE REALIZA REDUCCIÓN ABIERTA MAS FIJACIÓN CON CLAVO CERVICO DIAFISIARIO. PROCEDIMIENTO SIN COMPLICACIONES.
+
+PACIENTE EN BUENAS CONDICIONES GENERALES POR LO CUAL SE DECIDE DAR SALIDA CON RECOMENDACIONES."
+24661,291,no_determinado,no_determinado,False,"Motivo de consulta: Me chuzaron
+
+Examen físico: Se evidencia herida por arma corto punzante en tórax posterior izquierdo de aproximadamente 2 cm
+
+Evolución y hospitalización: Paciente quien se le realiza radiografía de tórax y se encuentra dentro de los rangos normales, con buena evolución."
+12293,600,cortopunzante,remision,False,"Motivo de consulta: Me golpearon, me Apuñalaron
+
+Examen físico: Edema, equimosis y Hx (herida) en parpado superior de orbita derecha, hematoma en reg palpebral que se extiende a region frontal der.
+Pqña aquimosis en canto interno de orbita izq
+Hx de 0,5cm en torao nasal izq, Hx de 2cm a nivel del angulo de mandibula izq.
+Equimosis en hombro izq
+Dolor a la palpacion de hipogastrio,
+
+Evolución y hospitalización: Paciente que fue valorado por oftalmologia quien decide manejo ambulatorio por lo que se requiere traslado al hospital psiquiatrico por transtornos esquizofrenico se da salida por trauma"
+31294,733,no_determinado,alta,False,"Motivo de consulta: Remitido por trauma facial
+
+Examen físico: Paciente alerta, sin signos de dificultad respiratoria.
+oidos: Izqui: normal Derecho: coe normal, timapanos irritados
+cara: 1/3superior: normal. 1/3medio: no edemas 1/3inferior: fractura dento alveolar de piezas dentales:71,72,81,82(invulsion), no hay disminuciòn oral
+
+Evolución y hospitalización: se da salida al pcte (paciente) con cita prioritaria para el dìa lunes [FECHA] del [ANIO], con radiografia y odontologìa. Se le explica a la madre, que continue los cuidados. Se compromete a traer al pcte el lunes con los Rx (radiografia) solicitados.
+Paciente en buenas condiciones generales, alerta, asintomatico. se le da salida con recomendaciones y control el lunes."
+25649,580,accidente_transito,hospitalizacion,False,"Motivo de consulta: Remitido por accidente de transito
+
+Examen físico: Paciente politramatisado a nivel facial con herida en labio superior de aproximadamente 4 cm, irregular, 2 heridas sobre labio inferior irregular, epistaxis. Deformidad en muñeca derecha. Laceracion en muslo izquierdo.
+
+Evolución y hospitalización: Paciente politraumatisado secundario a accidente de transito con TCE (trauma craneoencefalico) moderado con lesion axional difusa, manejada por neurocirugia, rx (radiografia) de torax normal completa observacion abdominal con abdomen negativo, tolera via oral."
+33043,489,caida,alta,False,"Motivo de consulta: me cai
+
+Examen físico: no se registran signos vitales en HC.
+dolor y limitacion a la movilidad en hombro derecho, edema, limitacion flexion codo, supinacion.
+
+Evolución y hospitalización: paciente que trae Rx (radiografia) de periferia donde se evidencia fx (fractura) cupula radial izquierda no desplazada y luxacion acromioclavicular grado I. inmovilizacion con inmovilizador de clavicula y yeso braquiopalmar, se da salida con recomendaciones y control en 2 semanas."
+21861,415,arma_de_fuego,alta,False,"Motivo de consulta: me dispararon
+
+Examen físico: pte (paciente) con hpaf (herida por arma de fuego) en brazo izquierdo con orificio de salida en cara posterior de 1/3 de brazo izquierdo.
+
+Evolución y hospitalización: pte (paciente) con hpaf (herida por arma de fuego) en brazo izquierdo, se realiza desbridamiento de heridas se realiza inmovilizacion con pinzas de azucar.
+se decide dar salida con recomendaciones."
+36827,463,accidente_transito,hospitalizacion,False,"Motivo de consulta: ACCIDENTE DE TRANSITO
+
+Examen físico: ESTIGMAS DE TRAUMA EN C7, T1 Y T2.
+ESCORIACIONES, DOLOR Y LIMITACIÓN FUNCIONAL LEVE EN CODO DERECHO.
+
+Evolución y hospitalización: PACIENTE QUE NO HA (hipertension arterial) PRESENTADO COMPLICACIONES, RESPIRATORIAS Y HEMODINAMICAS DURANTE SU OBSERVACION Y MANEJO MEDICO, POR LO QUE SE DECIDE CONTINUAR MANEJO AMBULATORIO DE CONTUSION DE PARED LUMBAR DE TEJIDOS BLANDO Y DE PARED PELVICA DE TEJIDOS BLANDOS"
+29228,573,caida,fallecimiento,False,"Motivo de consulta: ME CAÍ DESPUÉS DE BAÑARME
+
+Examen físico: PACIENTE QUE SUFRE CAÍDA DE SU PROPIA ALTURA CON POSTERIOR TX (tratamiento) EN CADERA DERECHA, SE EVIDENCIA EDEMA, DOLOR, LIMITACIÓN FUNCIONAL.
+
+Evolución y hospitalización: PACIENTE QUE DURANTE SU ESTADÍA SUFRE DETERIORO NEUROLÓGICO, ES VALORADO POR CX DE TRAUMA Y EMERGENCIAS QUIENES INICIAN REANIMACIÓN CON LÍQUIDOS, SE SOLICITA CUPO EN UCI (unidad de cuidados intensivos), DURANTE LOS TRAMITES ADMINISTRATIVOS PACIENTE PRESENTA PCR, SE HABLA CON FAMILIARES, PACIENTE NO REANIMA BLE, PACIENTE FALLECE [HORA]."
+59088,816,arma_de_fuego,alta,False,"Motivo de consulta: HERIDAS PROYECTIL ARMA DE FUEGO
+
+Examen físico: PACIENTE QUE SUFRE HPAF (herida por arma de fuego) EN LA REGIÓN POST Y ANT DEL TÓRAX. REMITEN DE PERIFIERIA POR SOSPECHA DE HEMATOMA EXPANSIVO. PACIENTE CON ENFISEMA SUBCUTÁNEO A NIVEL DE ZONA 1-2 DE CUELLO DERECHO CON PROYECTIL ALOJADO EN SU INTERIOR SEGÚN RX (radiografia) DE PERIFERIA ASOCIADO A HEMOPTISIS LEVE.
+
+Evolución y hospitalización: TUBO DE TÓRAX. DRENA 540 CC DE SANGRE AL PASO.
+MAR-06. ESOFAGOGASTRODUODENOSCOPIA. NO SE EVIDENCIA LESIONES.
+MARZ-10. SALIDA DE MATERIAL PURULENTO EN SITIO DE INSERCIÓN DE TORACOSTOMIA A NIVEL DE TEJIDOS BLANDOS SIN EVIDENCIA DE COMPROMISO PLEURAL. SE INICIA ATB PARA INFECCIÓN NOSOCOMIAL.
+MARZ-13. PACIENTE EN BUENAS CONDICIONES GENERALES, SIN DIFICULTAD RESPIRATORIA POR LO CUAL SE DECIDE DAR SALIDA."
+6873,279,arma_de_fuego,fallecimiento,False,"Motivo de consulta: HAF (herida por arma de fuego) en muslo izq
+
+Examen físico: Herida por arma de fuego en MII (miembro inferior izquierdo) con sangrado activo, Ingresa con IOT (intubacion orotraqueal)
+
+Evolución y hospitalización: Entra en PCR ritmo de asistolia Fallece [HORA]"
+12731,629,cuerpo_extrano,no_determinado,False,"Motivo de consulta: me enterre una lima en la mano
+
+Examen físico: Extremidades: se observa empalamiento con objeto de metal de 10x5 cm que ingresa a nivel palmar obre el pliegue palmar en direccion lateroposterior y se palpa subcutaneo en dorso medial de mano derecha, limitacion de la movilizacion por dolor.el objeto atraviesa el 5to matacarpiano drecho fracturandolo a su paso.
+
+Evolución y hospitalización: al paciente se le realiza curetaje en mtc y retiro de cuerpo extraño en mano derecha.
+
+hallazgo operatorios: empalamiento mano derecha. fractura 5 metacarpiano expuesta grado I.
+
+paciente estable, con buena evolucion."
+17780,537,contundente,cirugia,False,"Motivo de consulta: Me golpearon
+
+Examen físico: Edema secundario a trauma en hemicara derecha, se palpan crepitos en region malar con dificultad a la oclusion dental. Abrasion en hombro derecho, con dolr a la palpacion. Valracion por oftalmologia se evidencia trauma ocular contuso, hemorragia subconjuntival ojo drecho
+
+Evolución y hospitalización: se realiza reduccion abierta + osteosintesis de fx (fractura) malar derecha.
+buena evolucion POP, estable, sin disnea.
+se decide salida con recomendaciones, analgesia y control en 6 dias"
+40719,680,caida,alta,False,"Motivo de consulta: se cayo
+
+Examen físico: dolor y edema en codo izquierdo, induración y limitación para la flexo-extensión completa, pulsos periféricos presentes, llenado capilar normal.
+
+Evolución y hospitalización: 30dic[ANIO]: paciente que por fractura se decide inicialmente manejo con férula braquiopalmar y comentar el dia de mañana en revista para decidir manejo.
+
+31dic[ANIO]: se decide manejo ortopédico con reducción cerrada e inmolvización con yeso braquiopalmar en prono.
+se da salida, cita control en 3 semanas en ortopedia fracturas con rx (radiografia) AP (antecedentes personales) y lateral de codo izquierdo, se dan recomendaciones generales y signos de alarma."
+28879,337,arma_de_fuego,no_determinado,False,"Motivo de consulta: ME DISPARARON
+
+Examen físico: HERIDA EN CARA POSTEROLATERAL DE BRAZO IZQUIERDO 1/3 MEDIO CON HEMATOMA ESTABLE Y EFISEMA SUBCUTANEO ADEMAS DE DEFORMIDAD
+
+Evolución y hospitalización: PACIENTE QUIEN PRESENTA FX (fractura) POR HERIDA CON ARMA DE FUEGO SE LE REALIZA REDUCCION CERRADA Y COLOCACION DE YESO SE LE DA SALIDA"
+39239,754,no_determinado,no_determinado,False,"Motivo de consulta: PACIENTE REMITIDA PARA VALORACION POR CX GENERAL
+
+Examen físico: se ausculta hipoventilacion en hemitorax izquierdo, herida penetrante en cuello zona I con hematoma estable perilesional, herida de aproximadamente 1 cm en brazo izquierdo sobre musculo deltoides, herida frontal derecha de aproximadamente 2 cm.
+
+Evolución y hospitalización: PACIENTE ESTABLE HEMODINAMICAMENTE SIN SIRS EN ELMOMENTO LA PACIENTE INICIO LA VIA ORAL POR SUPROPIA CUENTA PENDIENTE ESOFAGOGRAMA SIN PICOS FEBRILES SIN SANGRADOS CON RX (radiografia) TORAX CONTROL NO NEUMO NI HEMNOTRAX NO ENSANCHAMIENTO MEDIASTINAL SE VALORARA CON [MEDICO] SE RETIRIARA TUBO DE TORAX SE VALORARA EVOLUCION Y POSIBLE ALTA.SALIDA.
+CITA DE CONTROL CIRUGIA DE TRAUMA EN 1 SEMANA."
+34281,746,caida,remision,False,"Motivo de consulta: FRACTURA DE LOS HUESOS DE LA NARIZ"".
+
+Examen físico: Paciente remitido del HSJD, refiere paciente que mientras se encontraba en estado etílico presenta caída de propia altura con trauma contundente en cara a nivel de región nasal, refiere que presento epistaxis y dolor a palpación.
+
+Evolución y hospitalización: [FECHA]: Paciente masculino de [EDAD:60-69]. Mecanismo: Trauma contuso en rostro. Dg.- Fractura de huesos propios de nariz. S: refiere leve molestia en excoriaciones de región malar derecha.
+[FECHA]: SALIDA
+RECOMENDACIONES Y SIGNOS DE ALARMA
+ACETAMINOFÉN TAB 500mg CADA SEIS HORAS SI HAY DOLOR. PACIENTE CON ALTA HOSPITALARIA POR PARTE DE CIRUGÍA PLÁSTICA.
+TIENE PROGRAMADO CX PLÁSTICA PARA EL DÍA JUEVES [FECHA]."
+36778,907,accidente_transito,hospitalizacion,False,"Motivo de consulta: ACCIDENTE DE TRANSITO
+
+Examen físico: LACERACION EN CUERO CABELLUDO HEMICRANEO DERECHO + EQUIMOSIS Y EDEMA BIPALPEBRAL OJO DERECHO, CON LIMITACIÓN PARA LA APERTURA. HERIDA SUTURADA EN PARPADO SUPERIOR DERECHO. DOLOR Y EDEMA EN HEMICARA DERECHA. LACERACION EN LABIO Y PIEZAS DENTALES FLOJAS.
+LACERACIONES EN AMBAS RODILLAS.
+
+Evolución y hospitalización: PTE (paciente) CON ANTECEDENTES DE ACCIDENTE DE TRANSITO, CON TCE (trauma craneoencefalico) MODERADO, FRACTURA DE BASE CRÁNEO ANTERIOR, TRAUMA FACIAL Y CONTUSIÓN DE RODILLA. FUE VALORADO POR CX GENERAL QUIENES DEJARON EN OBSERVACIÓN DE ABDOMEN SIN ENCONTRAR LESIONES, TAMBIÉN FUE VALORADO POR ORL (otorrinolaringologia), OFTALMO QUIENES DARÁN MANEJO EXPECTANTE POR HEMORRAGIA VÍTREA Y RETINIANA.
+NQX NO CONSIDERAN MANEJO POR ESTA ESPECIALIDAD.
+
+PTE EN BUENAS CONDICIONES GENERALES, SE DA EGRESO CON RECOMENDACIONES Y SIGNOS DE ALARMA."
+38740,420,cortopunzante,no_determinado,False,"Motivo de consulta: Lo hirieron
+
+Examen físico: paciente con HPACP (herida por arma cortopunzante) en region precordial en zona paraesternal izquierda a nivel de 3 EIC (espacio intercostal) torax posterior, paravertebral derecha a nivel de T4, paravertebral izquierda a nivel de T1, lateral a escapula izquierda.
+
+Evolución y hospitalización: paciente se reemite a nivel II para posible procedimiento ventana pericardia."
+36079,578,accidente_transito,alta,False,"Motivo de consulta: ACCIDENTE DE TRANSITO
+
+Examen físico: ESCORIACION EN RODILLA IZQUIERDA Y PIE IZQUIERDO, ACOMPAÑADO DE EDEMA Y LIMITACION FUNCIONAL; LACERACIONES EN CODO, LIMITACION PARA LA FLEXOEXTENSION DE LA MANO IZQUIERDA.
+
+Evolución y hospitalización: PACIENTE INGLESA CON MÚLTIPLES LESIONES. SE LE ENVÍA IMAGENOLOGIA, SE LE REALIZA CURACIÓN DE ABRASIONES Y LACERACIONES, ADMINISTRATORIO DE MEDICAMENTOS, AL EVIDENCIAR FRACTURA SE REALIZA REDUCCIÓN CERRADA CON COLOCACIÓN DE FÉRULA. SE BRINDA ALTA CON RECOMENDACIONES, SIGNOS DE ALARMA Y CITA DE CONTROL CON ORTOPEDISTA."
+29341,512,arma_de_fuego,alta,False,"Motivo de consulta: ME CAYO UN TIRO
+
+Examen físico: HPAF (herida por arma de fuego) UNICA CON ORIFICIO DE ENTRADA A 1 CM BAJO LIGAMENTO INGUINAL IZQ, SIN ORIFICIO DE SALIDA.
+
+Evolución y hospitalización: PTE (paciente) QUE SUFRE HPAF (herida por arma de fuego) EN REGIÓN INGUINAL IZQ, POR SU TRAYECTORIA SE DECIDE HACER ECO (ecografia) DOPPLER PARA DESCARTAR LESION VASCULAR, SIN OBTENER HALLAZGOS DE LESIÓN VASCULAR, SE REALIZA L+D DE HX (herida).
+
+SE DA SALIDA CON RECOMENDACIONES GENERALES Y SIGNOS DE ALARMA."
+2085,631,no_determinado,cirugia,False,"Motivo de consulta: Golpe contuso en cara con cacha de revolver. En contexto de robo
+
+Examen físico: 1/3medio: equimosis bipalpebral, edema ojo der, deformidad de reborde infraorbitario, hemorragia subconjuntival ojo der.
+1/3inferior: edema y deformidad rama inferior mandibula der, perdidas dentales.
+Heirda posterior oreja izq.
+
+Evolución y hospitalización: [FECHA]: REDUCCION ABIERTA FX (fractura) MALAR, PISO ORBITA: fx malar impactada medialmente conminuta con compromiso del piso orbita y herniacion del contenido.
+fx pared anterior seno maxilar conminuta pilar fronto naso maxilar y pilar maxilomalar con severa conminnucion"
+47407,555,quemadura,alta,False,"Motivo de consulta: Se quemó
+
+Examen físico: Paciente que mientras pintaba una bicicleta, derrama tinner sobre su camiseta y posterior a eso enciende un cigarrilo generando llamas sufriendo quemaduras grado II en cara, tórax, abdomen y dorso de miembros superiores
+
+Evolución y hospitalización: [FECHA]. Se realiza escarectomía en regiones afectadas, procedimiento sin complicaciones.
+
+Paciente con buena evolución clínica, alerta, activo, no doloroso, diuresis adecuada, no disnea, afebril, por lo cual se decide dar salida con recomendaciones generales."
+13361,545,no_determinado,no_determinado,False,"Motivo de consulta: Herida en cara y mano izquierda
+
+Examen físico: Extremidades: Hx (herida) entre 1 y 2 dedo mano derecha de 5 cm con sangrado activo, compromiso de la actividad motora del primer dedo, sensibilidad disminuida.
+
+Evolución y hospitalización: [FECHA]: herida en 1era comisura derecha de 6 cm, nitida, lineal, profunda, sangrado activo por lesion de arco palmar superficial, seccion de musculos grupo tenar, seccion de flexor largo de pulgar
+Fractura de la base de 1er MTC
+seccion de nervio y arteriavdigital propis ulnar 1er dedo"
+56523,688,no_determinado,hospitalizacion,False,"Motivo de consulta: FRACTURA DE CLAVICULA
+
+Examen físico: TRAUMA CONTUSO A NIVEL DEL HOMBRO Y CLAVICULA IZQUIERDA, CONTUSION ADEMAS EN CRANEO SIN PERDIDA DE CONOCIMIENTO, ESCORIACIONES EN HEMICARA IZQUIERDA.
+
+Evolución y hospitalización: MANEJO DE URGENCIAS: SE SOLICITA IMAGENOLOGIA, SE BRINDA ANALGESIA, SE SOLICITA VALORACION POR ORTOPEDIA Y COLOCACION DE INMOVILIZADOR CLINICO DE HOMBRO. PDTE OBSERVACION NEUROLOGICA Y AVISAR CAMBIOS.
+
+* MD ORTOPEDIA: PLACAS CON PRESENCIA DE FRACTURA DE CLAVICULA POR LO QUE SE MANEJA CON INMOVILIZADOR DE HOMBRO POR 3 SEMANAS Y CITA DE CONTROL EN 3 SEMANAS CON NUEVAS RADIOGRAFIAS. SE BRINDA ALTA HOSPITALARIA CON RECOMENDACIONES Y SIGNOS DE ALARMA."
+27964,925,arma_de_fuego,alta,False,"Motivo de consulta: me dispararon
+
+Examen físico: herida en glúteo izquierdo sin orificio de salida pte (paciente) no permite realizar tacto rectal.
+ext: MSI (miembro superior izquierdo) hx (herida) #1 en 1/3 medio de antebrazo izq cara medial.
+hx #2 en cra lateral de articulación de codo sin prificio de salida, con hematoma estable, no pulsatil, sin sangrado activo.
+
+Evolución y hospitalización: pte (paciente) que recibe 3 impactos por proyectil de arma de fuego en MSI (miembro superior izquierdo) con posterior fx (fractura) de ulna izquierda, con proyectil alojado en aspecto medial del codo, sin trazo de fx se descarta lesion vascular con eco (ecografia) doppler. Glúteo izquierdo, proyectil alojado en isquion, sin aparente lesión.
+
+Se realiza inmovilizacion de extremidad con yeso braquiopalmar. Pte hemodinamicamente estable, sin dolor en mejores condiciones.
+
+se deicde dar salida con recomendaciones generales."
+35306,743,accidente_transito,alta,False,"Motivo de consulta: ACCIDENTE DE TRANSITO
+
+Examen físico: hombro izquierdo: dolor, edema, y abrasion en hombro izquierdo.
+rodilla derecha: dolor, edema y abrasion en cara anterior, cajon negativo.
+rodilla izquierda: dolor, edema y abrasion en cara anterior 1/3 proximal.
+pie izquierdo: dolor y edema en 5to dedo artejo.
+
+Evolución y hospitalización: se inmoviliza el hombro izquierdo.
+se valora por ortopedcia y encuentran luxacion posterior de hombro derecho por lo cual se le realiza maniobra de reduccion siendo satisfactorias.
+se da manejo ambulatorio con cabestrillo por dos semanas y volver a cita de control en 2 semanas.
+salida con signos y sintomas de alarma.
+recomendaciones.
+inmovilizador clinico de hombro.
+incapacidad por 20 dias."
+29237,496,no_determinado,remision,False,"Motivo de consulta: LO ENCONTRARON CONVULSIONANDO EN EL SUELO
+
+Examen físico: CABEZA: EDEMA PERIORBITARIO DE OJO IZQ, HERIDAS EN REGIÓN OCCIPITAL.
+
+Evolución y hospitalización: PTE (paciente) QUE ES ENCONTRADO EN VÍA PUBLICA CONVULSIONANDO, ES REMITIDO DESDE [MUNICIPIO], EN MALAS CONDICIONES, SE REALIZAN PRUEBAS DIAGNOSTICAS QUE EVIDENCIA FX (fractura) DE BASE DE CRÁNEO, CAE EN PARO CADIORESPIRATORIO, SE LOGRA SACAR Y LAS [HORA] PRESENTA OTRA PARADA SE REALIZA RCP SIN RESULTADOS PTE FALLACE."
+25978,473,intoxicacion,alta,False,"Motivo de consulta: remitido
+
+Examen físico: paciente con abrasión supraciliar, en puente nasal, y parpado izquierdo. se observa edema peri orbitario mas equimosis en ojo izquierdo.
+
+Evolución y hospitalización: PACIENTE QUE INGRESA A SERVICIO SE DESCONOCE MECANISMO DE LESIÓN, AL PARECER PRESENTA SÍNTOMAS ASOCIADOS A UNA INTOXICACIÓN POR ÓRGANO FOSFORADOS Y TRAUMA NO CLARO, SE DECIDE DAR SALIDA CON RECOMENDACIONES Y SIGNOS DE ALARMA. HISTORIA CLÍNICA POCO ESPECIFICADO."
+16162,671,arma_de_fuego,remision,False,"Motivo de consulta: HAF (herida por arma de fuego) en abdomen
+
+Examen físico: Ventilacion espontanea superficial, diaforetico, palidez mucocutanea generalizada intensa. Herida en hipoondrio derecho, herida paravertebral derecha L1. Se pasa inmediatamente a sala de operaciones, durante traslado presenta paro cardiao, recupera pulso despues de 2 minutos de reanimacion
+
+Evolución y hospitalización: Hallazgos operatorios: hemoperitoneo de 4000, heridas hepaticas GIII en segmento IV (intravenoso), en lobulo cuadrado
+Herida en vena cava en su porcion retrohepatica
+Herida GII de 1era porcion de duodeno
+Paciente presenta asistolia durante procedimiento, se declara muerto"
+27927,593,arma_de_fuego,hospitalizacion,False,"Motivo de consulta: me dispararon
+
+Examen físico: hapf en cuello orificio de entrada en zona 1, 4 cm por encima de clavícula derecha, sangrado activo a nivel de C7 en linea media, hematoma en cuello estable, no solplos.
+
+Evolución y hospitalización: pte (paciente) con hpaf (herida por arma de fuego) en cuello zona 1 lado derecho, con hematoma estable y sangrado activo, se le realiza TAC (tomografia axial computarizada) de cuello y se evidencia fx (fractura) de apofisis transversa C7, no lesion vascular. Se deja en observación.
+
+[FECHA]: se decide dar salida con recomendaciones generales"
+52672,625,cortopunzante,alta,False,"Motivo de consulta: ME ENTERRÉ UN VIDRIO
+
+Examen físico: PACIENTE REFIERE HACE 5 DIAS CONSULTO A SU IPS POR MANEJO DE LESION EN PIE (NO ESPECIFICADO) YA QUE TUVO CONTACTO CON VIDRIO AL PISARLO. NO REFIERE FIEBRE NI DEFICIT NEUROVASCULAR EN LOS ULTIMOS DIAS. PACIENTE ESTABLE QUE INGRESA PARA EXTRACCION BAJO ANESTESIA DE POSIBLE CUERPO EXTRAÑO.
+
+Evolución y hospitalización: INGRESA PACIENTE Y SE DEJA PARA MANEJO QUIRÚRGICO - EXTRACCIÓN DE CUERPO EXTRAÑO EN PIE.
+PROCEDIMIENTO SIN COMPLICACIONES, SE REALIZA LAVADO CON EXTRACCIÓN DEL CUERPO Y SUTURA. SE BRINDA ALTA CON RECOMENDACIONES, SIGNOS DE ALARMA Y ANTBIOTICOTERAPIA."
+3261,468,caida,alta,False,"Motivo de consulta: Caida bicicleta trauma maxilofacial
+
+Examen físico: Laceracion frontal 4cm suturada lado izquierdo, cefalohematoma subyacente edema palpebral y maxilomalar ipsilateral, no lefort
+Herida en dorso de lengua de 2cm suturada.
+hombro izquierdo con abrasiones superficiales.
+
+Evolución y hospitalización: pte (paciente) que presenta celulitis preseptal ojo izq. que responde a manejo de ATB.
+PTE ESTABLE SE LE DA SALIDA BAJO ANALGESIA Y SIGNOS DE ALARMA."
+18849,549,arma_de_fuego,no_determinado,False,"Motivo de consulta: Me dispararon
+
+Examen físico: Hpaf (herida por arma de fuego) q ingresa en region lumbar derecha trayecto aparentemente tangencial sin OS, se aloja entre epigastrio e hipocondrio izdo con enfisema subcutaneo local, dolor a la palpacion abdominal generalizada, no signo de irritacion peritoneal en el momento, moviliza las 4 extremidades
+
+Evolución y hospitalización: paciente es llevado a laparatomia exploratoria encontrando multiples lesiones, es llevado a cx encontrando acceso intraabdominal, se drena y se cierra la cavidad."
+9521,549,mordedura,no_determinado,False,"Motivo de consulta: Mordedura de perro
+
+Examen físico: Ojo izquierdo herida en papado inferior izquierdo, avulsion de incisivo superior derecho
+
+Evolución y hospitalización: Valoracion por oftalmologia: se evidencia compromiso de borde libre y via lacrimal ojo izquierdo
+[FECHA]: Blefarorafia + intubacion via lacrimal ojo izquierdo.
+Hallazgos:
+Parpado superior Hx (herida) borde libre tercio medio, parpado inferior hx medial a punto lacrimal.
+Disco optico, bordes deprimidos, excav 10%. Macula ok. Vasos ok., no opacidades, ni hemorragias vitreas."
+17938,411,caida,alta,False,"Motivo de consulta: Me cai de la bicicleta.
+
+Examen físico: En mano izquierda 3er dedo heridas multiples de aproximadamnete 4cm con exposicion de tendones con imposibilidad para la extension de 3er dedo. En rodilla izquierda herida de 3cm pulsos positivos, no alteracion de la sensibilidad
+
+Evolución y hospitalización: pte (paciente) con buena evolucion postquirurgica, se decide dar salida con cita de control"
+52777,920,accidente_transito,alta,False,"Motivo de consulta: ACCIDENTE DE TRANSITO MOTO VS AUTO
+
+Examen físico: CODO DERECHO CON HERIDA DE 8 CM LONGITUD, PROFUNDA, EN CARA POSTERIOR
+
+ORL (otorrinolaringologia) MUCOSAS HUMEDAS Y ROSADAS, SIN COMPROMISO DE LA VIA AEREA
+ACP CLAROS, VENTILADOS, RSCSRS, NO VELADOS, RESPIRACION SIMETRICA
+ABD (abdomen) BLANDO, DEPRESIBLE, NO DEFENDIDO, NO DOLOROSO, PELVIS ESTABLE
+SNC GLASGOW 15 /15, PIRR, NO LATERALIZADO, EBRIO
+
+Evolución y hospitalización: PACIENTE QUE SUFRIO ACCIDENTE DE TRANSITO, MOTO Vs. AUTOMOVIL, SUFRIENDO TRAUMA EN MSD (miembro superior derecho), EL CUAL PERSISTE CON DOLOR EN HOMBRO DERECHO, SE REEVALUA PACIENTE, PRESENTA LIMITACION PARA LA EXTENSION HOMBRO POR DOLOR, SIN SIGNOS DE INESTABILIDAD, NO CREPITOS, POR LO QUE SE DEJA CON INMOVILIZADOR CLINICO DE HOMBRO DERECHO, Y CONTROL AMBULATORIO POR ORTOPEDIA MIEMBRO SUPERIOR CON ECOGRAFIA DE HOMBRO DERECHO. SE DAN RECOMENDACIONES Y SIGNOS DE ALARMA"
+31232,533,arma_de_fuego,no_determinado,False,"Motivo de consulta: ME DIO UNA BALA PERDIDA EN LA PIERNA IZQUIERDA
+
+Examen físico: PACIENTE QUIEN MIENTRAS SE ENCONTRABA BEBIENDO LICOR RECIBE HPAF (herida por arma de fuego) EN MIEMBRO INFERIOR IZQUIERDO CON POSTERIOR HERIDA TRANSFIXIANTE EN 1/3 MEDIO DE PIERNA IZQUIERDA CON ORIFICIO DE ENTRADA EN CARALATERAL Y DE SALIDA EN CARA MEDIAL
+
+Evolución y hospitalización: PACIENTE CON ECODOPPLER QUE EL SERVICIO DE CIRUGIA TOMA COMO NEGATIVO PARA LESION VASCULAR ORTOPEDIA DECIDE MANEJO DE FRACUTURA CON INMOVILIZACION Y SE LE DA SALIDA"
+18134,496,cortopunzante,no_determinado,False,"Motivo de consulta: Me corte
+
+Examen físico: Impacto en antebrazo derecho con vidrios cortadas de mas o menos 10cm que se extiende desde el estiloides ulnar con exposicion tendinosa anestecia de 5to dedo e hiperestencion de 3y4to dedo limitacion para la oposicion, llenado capilar de 3seg.
+
+Evolución y hospitalización: paciente estable con herida en cara anterior 1/3 medio de antebrazo derecho cubierta. sin signos inflamatorios locales, con alteracion funcional de4 y 5 dedo.
+se decide salida."
+36380,569,accidente_transito,hospitalizacion,False,"Motivo de consulta: ME ACCIDENTE
+
+Examen físico: ABRASIÓN Y EDEMA EN MALAR DERECHO DE 6CM DE DIÁMETRO.
+ABRASIÓN PERIMANDIBULAR DERECHA DE 3CM DE DIÁMETRO.
+HERIDA EN LABIO SUPERIOR DERECHO DE 1CM DE LONGITUD.
+
+Evolución y hospitalización: PTE (paciente) VICTIMA DE ACCIDENTE DE TRANSITO VALORADO POR ORL (otorrinolaringologia) QUIENES HACEN SUTURA DE LABIO SUPERIOR, EN OBSERVACIÓN DE ABDOMEN, CON IMÁGENES DIAGNOSTICAS QUE NO EVIDENCIAN FX (fractura).
+
+PTE EN BUENAS CONDICIONES GENERALES, HEMODINAMICAMENTE ESTABLE, SE DA EGRESO CON RECOMENDACIONES Y SIGNOS DE ALARMA."
+25854,503,arma_de_fuego,cirugia,False,"Motivo de consulta: Me dispararon"".
+
+Examen físico: Paciente que presenta HPAF (herida por arma de fuego) en 2do y 3er dedo de mano izquierda.Se aprecia fractura expuesta de falange media de 2 do dedo y lesión por abrasión de tejidos blandos con parestesias y palidez.
+
+Evolución y hospitalización: Paciente se le realiza reducción abierta de fractura falange media 2do dedo, lavado y desbridamiento, sutura de mano y tenorrafia extensores dedos. Por buena evolución del post operatorio se le da salida."
+2001,312,caida,alta,False,"Motivo de consulta: Me cai
+
+Examen físico: se observa gran edema en antebrazo izquierdo, con deformidad, dolor al movimiento
+no hay registro de TA (tension arterial) en HC
+
+Evolución y hospitalización: [FECHA]: se da salida con documentacon para realizar tramites de intervencion quirurgica de manera ambulatoria"
+57366,669,accidente_transito,uci,False,"Motivo de consulta: ACCIDENTE DE TRÁNSITO
+
+Examen físico: PACIENTE QUE SUFRE ACCIDENTE DE TRANSITO PEATÓN VS MOTO EN CALIDAD DE PEATÓN. RECIBE TRAUMA DIRECTO EN TÓRAX POSTERIOR CON DOLOR INTENSO. RX (radiografia) TOMADO EN PERIFERIA SUGIERE HEMOTORAX.
+
+Evolución y hospitalización: SE REALIZA TORACOSTOMÍA. PROCEDIMIENTO SIN COMPLICACIONES. DRENAJE ESCASO, SIN CAMBIOS EN LA MORFOLOGÍA DE LA IMAGEN RX (radiografia) LO CUAL HACE SOSPECHAR ATELECTASIA SEGMENTARIA. DRENA 40 CC EN 24 HORAS.
+SE INDICA SOPORTE CON TERAPIA RESPIRATORIA.
+[FECHA]. SE DECIDE ASEGURAR VÍA AÉREA CON INTUBACIÓN OROTRAQUEAL.
+PACIENTE ACEPTADO EN UCI (unidad de cuidados intensivos) [INSTITUCION]"
+13792,418,cortopunzante,alta,False,"Motivo de consulta: Remitido Herida por arma cortopunzante
+
+Examen físico: Herida profunda en labio superior sangrado escaso.
+
+Evolución y hospitalización: Paciente con herida por arma cortopunzante en labio superior, se le realiza limpieza de herida desbridamiento y sutura de tejido profundo con vicril 4-0 y sutura de piel nylon 5-0.
+se da salida con cefalexina, aines, retiro de puntos en 5 dias y recomendaciones."
+37338,441,no_determinado,alta,False,"Motivo de consulta: me arrollo una moto
+
+Examen físico: deformidad en muñeca izquierda, con dolor y limitacion para el movimiento, laceracion en codo izquierdo.
+
+Evolución y hospitalización: PACIENTE CON ADECUADA EVOLUCION MEDICA, QUIEN FUE VALORADA POR EL SERVICIO DE ORTOPEDIA, QUIENES CONSIDERAN MANEJO ORTOPEDICO POR ADECUADA REDUCCION CERRADA, DECIDEN DAR EGRESO Y CONTROL EN 15 DIAS CON RX (radiografia) DE CONTROL Y CITA EN 2 SEMANAS."
+11635,263,no_determinado,no_determinado,False,"Motivo de consulta: Remitido para valoracion cirugia plastica
+
+Examen físico: Herida de 3 cm en escalpo suturada, herida de 2 cm en region posterior de oreja izquierda con leve sangrado.
+
+Evolución y hospitalización: Valoracion por cirugia plastica L + D + Sutura"
+24905,320,contundente,no_determinado,False,"Motivo de consulta: me pegaron con una tabla
+
+Examen físico: presenta laceracion horizontal en dorso de nariz de 4 cms de longitud aprox. con fx (fractura) expuesta edema en piramide nasal y edema e y equimosis en parpado inferior
+
+Evolución y hospitalización: se lleva a procedimiento qx (quirurgico) sin complicaciones"
+36556,855,accidente_transito,hospitalizacion,False,"Motivo de consulta: ACCIDENTE DE TRANSITO
+
+Examen físico: CABEZA: CEFALOHEMATOMA FRONTAL IZQUIERDO, MENTÓN CON EQUIMOSIS IZQUIERDA.
+CERVICAL: DOLOR A LA PALPACIÓN DE LOS PROCESOS ESPINOSOS C4, C5.
+MANO IZQ: DOLOR, EDEMA, ABRASIÓN PALMAR EN REGIÓN HIPOTENAR.
+CODO IZQUIERDO: DOLOR, EDEMA Y ABRASIÓN POSTERIOR.
+RODILLA DERECHA: DOLOR, EDEMA. ABRASIÓN ANTERIOR.
+PIERNA IZQUIERDA: HERIDA DE 4 CM DE LONGITUD CARA POSTERIOR 1/3 PROXIMAL.
+
+Evolución y hospitalización: PACIENTE CON ADECUADA EVOLUCIÓN CLÍNICA, SIN DETERIORO NEUROLÓGICO, HEMODINÁMICO O RESPIRATORIO, CON TRAUMA A NIVEL DE TEJIDOS BLANDOS, SIN COMPROMISO ARTICULAR CON IMAGENOLOGIA EN RANGOS DE NOTRMALIDAD, QUIEN YA COMPLKETO OBSERVACION NEUROLOGICA, SIN DETERIORO EN EL PASO DEL TIEMPO, SE DECIDE DAR EGRESO CON RECOMENDACIONES, SIGNOS DE ALARMA Y ANALGESIA, SE EXPLICA A PACIENTE Y A FAMILIAR."
+55663,656,caida,no_determinado,False,"Motivo de consulta: JUGANDO FUTBOL SE GOLPIO CON EL FILO DEL ANDEN
+
+Examen físico: CAIDA DESDE SU PROPIA ALTURA, CONTUSIÓN EN CARA CON POSTERIOR DOLOR, EDEMA Y DEFORMIDAD A NIVEL DE LOS HUESOS PROPIOS DE LA NARIZ (DESVIACION SEPTAL HACIA LA IZQUIERDA). REFIERE DIFICULTAD PARA RESPIRAR, NIEGA PERDIDA DE CONOCIMIENTO U OTRAS LESIONES. NO SE PERCIBEN CREPITOS NI ESCALONES EN REGION ORBITARIA.
+
+Evolución y hospitalización: VALORADO POR OTORRINOLARINGOLOGIA QUIEN REALIZA REDUCCION CERRADA DE HUESOS PROPIOS DE LA NARIZ POR DESVIACION SEPTAL. PACIENTE SE LE BRINDA ALTA CON ANALGESIA Y CEFALEXINA AMBULATORIA. CITA DE CONTROL POR CONSULTA EXTERNA EN 5 DÌAS."
+48509,605,no_determinado,alta,False,"Motivo de consulta: REMITIDA POR FRACTURA DE CALCANEO
+
+Examen físico: MASA RETROAURICULAR IZQUIERDA DE APROX 4CM MOVIL NO DOLOROSA, FÉRULA DE YESO Y VENDAJE EN MIEMBRO INFERIOR IZQUIERDO; AL RETIRAR FÉRULA SE EVIDENCIA EDEMA EN PIE TOBILLO, LIMITACION FUNCIONAL, DOLOR A LA MOVILIDAD PASIVA.
+
+Evolución y hospitalización: PACIENTE CON IMÁGENES QUE CONFIRMAN TRAZO DE FRACTURA EN CALCANEO, EDEMA EN EXTREMIDAD AFECTADA POR LO QUE EL ESPECIALISTA CONSIDERA APLICAR VENDAJE BULTOSO, EN 8 DÍAS SE CITA PARA REALIZAR EL CAMBIO A YESO SUROPEDIO. SE BRINDA ALTA CON RECOMENDACIONES, ANALGESIA Y SIGNOS DE ALARMA."
+4851,409,caida,no_determinado,False,"Motivo de consulta: Me cai de un carro, mientras me bajaba
+
+Examen físico: Pte (paciente) que miemtra bajaba de un jeep cae al piso cuando el carro arranca, ocacionando tx (tratamiento) cadera derecha, refiriendo dolor en cadera derecha y limitacion para flexion completa de la articulacion, no se evidencia rotacion externa, ni acortamiento de extremidad
+
+Evolución y hospitalización: pdte Cx para el [FECHA]"
+17391,552,arma_de_fuego,fallecimiento,False,"Motivo de consulta: remitido por HAF (herida por arma de fuego) en craneo. encontrado por Ponal
+
+Examen físico: encontrado en via publica inconciente con 2 HAF (herida por arma de fuego):
+1 temporal izq, 2 parieto occpital der.
+pupilas fijas midriaticas, mirada desviada, ptopsis bilateral maracada. llega con IOT (intubacion orotraqueal), BVM, llenado capilar 4sg.
+con priapismo.
+
+Evolución y hospitalización: signos de muerte cerebral, ausencia de reflejos del tallo, oculocefalico.
+[HORA] entra en PCR maniobras de RCCP sin respuesta. fallece [HORA]"
+31933,488,caida,no_determinado,False,"Motivo de consulta: CAÍDA DE CABALLO
+
+Examen físico: PIEL: PACIENTE PRESENTA HERIDA EN ESCALPO, YA SUTURADA, CUBIERTA CON APÓSITO ABRASIONES EN FRENTE IZQUIERDA, SUPRA-ESCAPULAR Y ESCAPULAR DERECHA,
+EXTREMIDADES: ABRASIONES EN RODILLA CARA ANTERIOR DERECHA, RODILLA CAR ANTERIOR IZQUIERDA, TERCIO DISTAL DE LA PIERNA Y PIE DERECHO.
+
+Evolución y hospitalización: PACIENTE CON TRAUMA CRÁNEO-ENCEFÁLICO LEVE,
+TAC (tomografia axial computarizada) CEREBRAL NORMAL
+RX (radiografia) TÓRAX NORMAL"
+52368,699,no_determinado,alta,False,"Motivo de consulta: ME ARROLLO UN CARRO - EN CONDICIÓN DE GESTANTE
+
+Examen físico: PACIENTE GESTANTE (G3P2 DE 19,4SS), INICIA CON DOLOR EN HIPOGASTRIO, NIEGA SALIDA DE LIQUIDO POR VAGINA, REFIERE DOLOR EN CODO IZQUIERDO, ESPALDA Y PIERNA IZQUIERDA. POSTERIORMENTE REFIERE LEVE DOLOR A LA PALPACIÓN DE FOSA ILIACA Y FLANCO DERECHO.
+
+Evolución y hospitalización: PACIENTE ESTABLE CON DOLOR EN CAJA TORACICA Y MÚLTIPLES LACERACIONES. PACIENTE GESTANTE QUE REQUIERE RADIOGRAFÍA PARA DESCARTAR LESIONES CON COMPROMISO DE LA VIDA (SE LE EXPLICA Y REFIERE ENTENDER). PACIENTE SIN HALLAZGOS EN IMÁGENES, SIN COMPROMISO DEL FETO. SE BRINDA ALTA CON INCAPACIDAD, ANALGESIA, RECOMENDACIONES Y SIGNOS DE ALARMA."
+32975,779,cuerpo_extrano,remision,False,"Motivo de consulta: Me dieron de golpes en la cabeza"".
+
+Examen físico: Pcte (paciente) remitido de [MUNICIPIO], con HC de tma contusi en cráneo, con otorragia izquierda, niega pérdida de la conciencia. Presenta laceraciones y escoriaciones en región frontal y parietal izquierda; otorragia izquierda. Pcte bajo efectos de alcohol.
+
+Evolución y hospitalización: [FECHA]: Pcrte consciente y orientado, no cefalea, no emesis, glasgow 15/15, no déficit motor ni sensitivo, se observa en TAC (tomografia axial computarizada) Cerebral, hematoma epidural lamelar sin crecimiento. Pcte (paciente) hemodinámicamente estable. Manejo por CE (cuerpo extrano) con Neuro Cxen 1 mes con previo TAC Cerebral Simple de control en 3 meses. Se dan recomendaciones al pcte; vigilar signos de alarma."
+10215,307,contundente,no_determinado,False,"Motivo de consulta: Me cayo un palo en la cara
+
+Examen físico: Edema, equimosis bipalpebral en OI (ojo izquierdo). Edema, inestabilidad nasal, estigma de epistaxis. Herida suturada en canto medial ojo izquierdo
+
+Evolución y hospitalización: Se le realiza taponamiento nasal y seda salida con recomendaciones"
+13067,296,arma_de_fuego,no_determinado,False,"Motivo de consulta: Me. Dbispararon
+
+Examen físico: HPAF (herida por arma de fuego) en brazo derecho
+OE 1/3 distal posterior brazo derecho
+OS 1/3 medio anterior brazo derecho
+
+Evolución y hospitalización: paciente con hematoma estable a eco (ecografia) soppler normal que descarta lesion vascular"
+10605,393,caida,no_determinado,False,"Motivo de consulta: Me cai de 4 metros
+
+Examen físico: Pte (paciente) que cae en bipedestacion, con posterior dolor y edema en pie derecho Escoriacion 2cm en dorso de pie, sin evidencia de sangrado activo, con edema perimaleolar, dolor, limitacion de la movilidad del pie, dorsoflexion plantiflexion
+
+Evolución y hospitalización: Manejo conservador ortopedico con ferula suro-pedia a 90 grados"
+30632,330,arma_de_fuego,alta,False,"Motivo de consulta: HPAF (herida por arma de fuego) EN CUELLO
+
+Examen físico: PACIENTE QUIEN RECIBE HPAF (herida por arma de fuego) EN ZONA I DE CUELLO SIN ORIFICIO DE SALIDA SIN HEMATOMA SIN ABUNDANTE PERDIDA DE SANGRE
+
+Evolución y hospitalización: PACIENTE SE ENCUENTRA HEMODINAMICAMENTE ESTABLE POR LO CUAL SE DECIDE DAR SALIDA"
+5579,362,arma_de_fuego,no_determinado,False,"Motivo de consulta: Me dispararon en el brazo.
+
+Examen físico: Se observa lesion por arma de fuego en region lateral del brazo izquierdo, con orificio de entrada, no se observan signos de infeccion. Limitacion funcional
+
+Evolución y hospitalización: [FECHA] Paciente firma alta voluntaria
+[FECHA]: pcte (paciente) reingresa por cita para procedimiento quirugico."
+32963,758,caida,alta,False,"Motivo de consulta: Me caí, ahora tengo vómito, mareo y dolor de cabeza"".
+
+Examen físico: Pcte (paciente) que sufre caída de su propia altura y al resbalar cae en decúbito supini presentando tma en cráneo, cuello, tórax y pelvis, sin alteración de conciencia. Consulta hoy por vómito, cefalea EVA 8/10 y mareo posicional. Presenta dolor espontáneo en cara lateral de cuello y a la palpación de procesos espinosos cervicales.
+
+Evolución y hospitalización: [FECHA]: Se inicia manejo analgésico, se solicitan imágenes, se inmoviliza cuello. Pcte (paciente) con adecuada evolución a manejo médico, actualmente sin sintomatología, con TAC (tomografia axial computarizada) Cerebral y de columna cervical normales. Por lo anterior se decide dar egreso hospitalario."
+52312,194,mordedura,no_determinado,False,"Motivo de consulta: lo mordiò un perro
+
+Examen físico: laceraciòn en labio inferior sagital de aproximadamente 2 cm.
+
+Evolución y hospitalización: limpieza de heridas e aplicaciòn contra tètano."
+31095,472,accidente_transito,cirugia,False,"Motivo de consulta: Me accidenté en la moto
+
+Examen físico: Paciente que iba en moto cuando es sorprendido por un perro, pierde el control y choca con un objeto fijo. Presenta lesión en borde interno de 5to dedo de la mano derecha con incapacidad para la extensión. Llenado capilar < 2seg.
+
+Evolución y hospitalización: Se realiza procedimiento quirurgico de lavado + desbridamiento y tenorrafia de extensores y se sutura piel. Procedimiento quirurgico sin complicaciones."
+57593,564,cortopunzante,remision,False,"Motivo de consulta: HERIDA CON ARMA BLANCA
+
+Examen físico: PACIENTE REMITIDO DE PERIFERIA SUFRE HERIDAS POR ARMA CORTOPUNZANTE EN BRAZO DERECHO Y TÓRAX POSTERIOR A NIVEL INFRAESCAPULAR. PLACA DE TÓRAX EVIDENCIA HEMONEUMOTÓRAX DERECHO POR LO CUAL REMITEN CON TUBO DE TÓRAX
+
+Evolución y hospitalización: TUBO DE TÓRAX OSCILANDO ADECUADAMENTE CON UN DRENAJE TOTAL DE 14 ML LIQUIDO DE ASPECTO HEMÁTICO.
+
+[FECHA]. TUBO DE TÓRAX BIEN POSICIONADO DRENANDO LIQUIDO HEMÁTICO, DRENA 32 ML.
+
+PACIENTE EN BUENAS CONDICIONES GENERALES SIN DIFICULTAD RESPIRATORIA. SE DA SALIDA."
+40687,474,caida,no_determinado,False,"Motivo de consulta: se cayo jugando
+
+Examen físico: presenta edema a nivel de codo derecho asociado a equimosis en cara anterior, hay dolor que limita valorar movimientos, pulsos presentes de adecuada intensidad,
+
+Evolución y hospitalización: paciente al cual por fractura de humero se considera manejo ortopedico con inmovilizador con yeso braquipalmar, procedimiento sin complicaciones.
+se da de alta con cita control en 2 semanas por ortopedia fracturas con nuevas placas"
+3745,316,no_determinado,no_determinado,False,"Motivo de consulta: Salto de un muro, recibiendo impacto facial
+
+Examen físico: Escoriacion y herida en region facial y palma.
+En parpado inferior izq, herida que compromete base der del parpado, y herida frontal de 1 cm irregular.
+Escoriacion multiples.
+
+Evolución y hospitalización: salida con analgasia y control."
+40047,480,arma_de_fuego,alta,False,"Motivo de consulta: PACIENTE REMITIDO PARA VALORACION Y MANEJO
+
+Examen físico: HPAF (herida por arma de fuego) con orificio de entrada en cara posterolateral y anteromeidal de miembro inferior izquierdo.
+
+Evolución y hospitalización: PACIENTE CON FRACTURA UNICORTICORTICAL DE FEMUR IZQUIERDO TERCIO DISTAL, CANDIDATA A MANEJO ORTOPEDICO, SE COLOCA INMOVILIZADOR DE RODILLA, SE DAN RECOMENDACIONES Y SIGNOS DE ALARMA. SE DAN RECOMENDACIONES DE NO APOYO.
+SE DA SALIDA POR ORTOPEDIA."
+30772,562,arma_de_fuego,alta,False,"Motivo de consulta: HPAF (herida por arma de fuego)
+
+Examen físico: PACIENTE QUIEN EN CONTEXTO DE RIÑA RECIBE DISPARO EN 1/3 PROXIMAL DE BRAZO DERECHO Y SALE POR PLIEGUE AXILAR ANTERIOR DERECHO.
+HERIDA EN LINEA AXILAR POSTERIOR A NIVEL DE T3 SE ALOJA EN AXILAR ANTERIOR EN 10 EIC (espacio intercostal)
+HERIDA EN GLUTEO DERECHO CON ORIFICIO DE SALIDA EN PARTE LATERAL DE MUSLO DERECHO TERCIO PROXIMAL
+
+Evolución y hospitalización: PACIENTE QUIEN RECIBE MULTIPLES HERIDAS POR ARMA DE FUEGO ES LLEVADO A OPERACION SIN COMPLICACIONES POR LO CUAL SE DECIDE DAR SALIDA"
+53101,744,contundente,alta,False,"Motivo de consulta: ME GOLPEARON CON UNA MANOPLA DE HIERRO
+
+Examen físico: MÚLTIPLES CONTUSIONES POR AGRESIÓN EN CARA Y CABEZA, PACIENTE CON DESVIACIÓN NASAL HACIA LA DERECHA, DEFORMIDAD. EQUIMOSIS INFRAORBITARIA IZQUIERDA, NO SE PERCIBE CREPITO O ESCALONAMIENTO A LA PALPACIÓN FACIAL. REFIERE NO TUVO PERDIDA DE CONSCIENCIA. EN LA ESCENA PRESENTA EPIXTASIS AUTOLIMITADA.
+
+Evolución y hospitalización: PACIENTE ESTABLE, MANEJADO POR CX PLASTICA, SE OBSERVA DESVIACION NASAL HACIA LA DERECHA, SIN DIFICULTAD PARA LA VENTILACION. NO OBSTANTE SE DEJA POR 24 HORAS PARA VALORACION NEUROLOGICA Y POSTERIORMENTE SE LE BRINDA ALTA CON RECOMENDACIONES Y SIGNOS DE ALARMA. SE PROGRAMA CX EN UNA SEMANA POR CONSULTA EXTERNA PARA CORRECION DE LATERORINIA."
+35447,531,no_determinado,alta,False,"Motivo de consulta: REMITIDA POR CEFALOHEMATOMA
+
+Examen físico: PTE (paciente) CON CEFALOHEMATOMA EN REGIÓN PARRIETO-TEMPORAL DERECHA, DOLOROSO A LA PALPACIÓN.
+
+Evolución y hospitalización: PTE (paciente) CON ANTECEDENTE DE TCE (trauma craneoencefalico) MODERADO, CON DX (diagnostico) DE HEMATOMA EPIDURAL PARIETAL, SE DA MANEJO POR NEUROLOGÍA, TRABAJO SOCIAL, QUE HACEN REMISIÓN A ICBF. SE MANEJARA CON ANTICONVULSIVANTE.
+
+PTE EN BUENAS CONDICIONES GENERALES, SIN DEFICIF NEUROLÓGICO. SALIDA CON RECOMENDACIONES Y SIGNOS DE ALARMA"
+10581,346,arma_de_fuego,no_determinado,False,"Motivo de consulta: Me dispararon
+
+Examen físico: Hx (herida) de 0,5cm en escalpo occipital izq.
+Orificio de entrada de cuerpo extraño en cara lateral muslo izq, no se evidencia orificio de salida.
+
+Evolución y hospitalización: Se le explica al pte (paciente) los procedimientos y riesgos, Sin embaro pte rechaza tto medico, firma alta voluntaria"
+31147,481,contundente,alta,False,"Motivo de consulta: ME GOLPEARON
+
+Examen físico: INGRESA PACIENTE A SERVICIO DE URGENCIA POR PRESENTA TRAUMA EN CARA AL EXAMEN FÍSICO PACIENTE MANIFIESTA VISIÓN BORROSA Y DOLOR PERI ORBITARIO.
+
+Evolución y hospitalización: PACIENTE HEMODINAMICAMENTE ESTABLE, SE TOMA TAC (tomografia axial computarizada) QUE EVIDENCIA FX (fractura) DE HPN, QUE REQUIERE CX, SE DESCARTA LESIÓN OCULAR, SE ORDENA EGRESO CON CITA DE CONTROL PREQUIRURGICA, SIGNOS DE ALARMA Y RECOMENDACIONES GENERALES."
+29093,589,caida,alta,False,"Motivo de consulta: ME CAI Y ME FRACTURE
+
+Examen físico: DOLOR Y LIMITACION FUNCIONAL A LA MOVILIZACION DE MSD (miembro superior derecho) SIN COMPROMISO VASCULAR
+
+Evolución y hospitalización: [FECHA] PACIENTE CON RX (radiografia) QUE EVIDENCIA FX (fractura) DE CONDILO MEDIAS DEL HUMERO, SE CONSIDERA PTE (paciente) CON INDICACION QUIRURGICA Y COMENTARLO EN REVISTA EL DIA DE MAÑANA.
+
+[FECHA] PACIENTE COMENTADO EN REVISTA CON [MEDICO] QUE CONSIDERO QUE NO REQUIERE MANEJO QUIRURGICO, SE DECIDE INMOVILIZAR CON FERULA BRAQUIOPALMAR EN SUPINO Y SE DA SALIDA CON CITA DE CONTROL EN 2 SEMANAS"
+16757,462,no_determinado,remision,False,"Motivo de consulta: me picaron las abejas
+
+Examen físico: Multiples picaduras de abejas, se observa insecto en oido derecho, mucosas semipalidas, estigmas de epistaxis, tendencia a la somnolencia! Emesis de contenido alimentario y un insecto.
+
+Evolución y hospitalización: [FECHA]: aumento de 20 veces la CK actualmente en 5280, con alto riesgo de injuria renal secundaria a miogloinuria.
+se remiten a la EPS SURA porque no hay camas disponibles en [INSTITUCION]"
+47245,625,caida,alta,False,"Motivo de consulta: Se cayó de las escaleras
+
+Examen físico: Paciente que cae de escaleras con perdida de la conciencia y episodio de emesis de contenido alimentario. Hematoma frontal izquierdo con laseraciones, no signo clínico de fractura de tabla ósea, cuello móvil no dolor al movimiento ni a la palpación
+
+Evolución y hospitalización: Paciente con buena evolución, glasgow 15/15. Paraclínicos e imágenes dentro de los límites normales.
+
+[FECHA].Valorada por trabajo social quien autoriza egreso por lo tanto dan recomendaciones y signos de alarma.
+Evolución favorable, sin déficit neurológico, hemodinamicamente estable."
+39861,359,accidente_transito,alta,False,"Motivo de consulta: ACCIDENTE DE TRANSITO.
+
+Examen físico: HERIDA EN REGION FRONTAL DERECHA DE APROX 2,5 CM.
+DEFORMIDAD EN DORSO NASAL, LA CUAL PARECE ANTIGUA, SIN EMBARGO CON EDEMA EN PIRAMIDE NASAL.
+EQUIMOSIS PALPEBRAL DERECHA
+
+Evolución y hospitalización: PTE (paciente) EN BUENAS CONDICIONES GENERALES, SE DA EGRESO CON RECOMENDACIONES Y SIGNOS DE ALARMA."
+31261,667,cortopunzante,alta,False,"Motivo de consulta: Me corté con una ventana
+
+Examen físico: Ingresa paciente al servicio de urgencia por presentar herida cortopunzante mientras se encontraba realizando actividades de mantenimiento en su hogar.
+Al examen fisico se observa laceración en cara radial de muñeca de MSD (miembro superior derecho). Con sangrado activo.
+
+Evolución y hospitalización: Se encuentra herida en cara anterior de muñeca suturada sin sangrado activo. Llenado capilar < 3 seg, paciente con herida que compromete herida radial derecha la cual fue ligada.
+Paciente con buena evolución clínica, se ordena salida con signos de alarma y recomendaciones generales.
+Consulta de control."
+34478,685,cortopunzante,cirugia,False,"Motivo de consulta: me apuñalaron
+
+Examen físico: herida por arma cortopunzante en torax posterior a nivel de T4 paravertebral izquierda, T8 paravertebral izquierda con hematoma y enfisema subcutaneo, herida en torax anterior en 2 EIC (espacio intercostal) linea paraesternal derecha, murmullo vesicular disminuido en base izquierda posterior con matidez a la percusion, herida en cabeza por arma contundente, herida en tercio priximal de antebrazo izquierdo y trauma con signo de inflamacion en mano derecha.
+
+Evolución y hospitalización: procedimiento quirurgico: [FECHA]: coagulos abundantes basales, herida soplante segmento basal pulmon.
+se da salida paciente con recomendaciones."
+46775,580,no_determinado,alta,False,"Motivo de consulta: Se le enterró el anillo en el dedo
+
+Examen físico: Paciente que cae de escaleras recibiendo trauma contuso en mano derecha 4to dedo con posterior dificultad para retirarse el anillo pues este quedó enterrado en la piel
+
+Evolución y hospitalización: Paciente valorada por cirugía plástica. Se realiza lavado + irrigación de la herida + colgajo local de piel. No lesión tendinosa, la herida no compromete más allá del tejido subcutáneo. Procedimiento sin complicaciones
+
+Paciente con buena evolución por lo cual se decide dar salida con recomendaciones generales"
+9473,665,arma_de_fuego,fallecimiento,False,"Motivo de consulta: Remitido por multiples HAF (herida por arma de fuego)
+
+Examen físico: Hx (herida) en region izq nuca y cuello zona II con hematoma expansivo. Hx en 4to EIC (espacio intercostal) der y lateral de torax. Hx en region paravertebral der T8, cara medial 1/3 proximal de brazo der sin sangrado. HAF (herida por arma de fuego) en fosa iliaca izq, Hx inguinal lateral y glutea izq.. Viene con TOT
+
+Evolución y hospitalización: Lesion total de la carotida externa izq sobre la bifurcacion. Hemotorax masivo derecho pulmon lesion de parenquima pulmonar lobulo medio e inferior
+Pcte (paciente) entra en ritmo de AESP sin reanimacion exitosa. Fallece [HORA]"
+16778,234,caida,no_determinado,False,"Motivo de consulta: Me cai de las escaleras
+
+Examen físico: Dolor a la palpacion de columna toracica y lumbar.
+Cuello inmovilizado con collar cervical
+
+Evolución y hospitalización: Pte (paciente) se le da manejo conservador con corse."
+9763,192,caida,no_determinado,False,"Motivo de consulta: Se cayo
+
+Examen físico: Deformidad en rotacion externa MII (miembro inferior izquierdo), moviliza artejos, edema
+
+Evolución y hospitalización: operacion sin complicaciones."
+39591,514,caida,no_determinado,False,"Motivo de consulta: SE CAYO DE UN CABALLO
+
+Examen físico: EDEMA Y EQUIMOSIS EN HEMICARA DERECHA, HERIDA DE 1 CM EN REGION PERIORBITARIA DERECHA.
+DOLOR EN REBORDE ORBITARIO Y REGION MALAR DERECHA.
+EDEMA Y HEMATOMA EN CARA ANTEROLATERAL DE ANTEBRAZO IZQ.
+
+Evolución y hospitalización: Valorada por ORL (otorrinolaringologia). Realizan sutura de herida y dan salida con indicaciones médicas.
+Rayos x tórax - antebrazo izquierdo sin lesiones por trauma.
+Se decide entonces salida con indicacion de cuidado ambulatorio."
+14011,343,arma_de_fuego,no_determinado,False,"Motivo de consulta: HPAF (herida por arma de fuego)
+
+Examen físico: Hx (herida) en 4 EIC (espacio intercostal) derecho soplante, murmullo vesicular disminuido, sin OS.
+Hx en region lumbar derecha no OS, abdomen agudo.
+
+Evolución y hospitalización: LAPARATOMIA EXPLORATORIA, FRENORRAFIA, EXPLORACION VASCULAR RETROPERITONEAL SIN COMPLICACIONES."
+20249,501,arma_de_fuego,no_determinado,False,"Motivo de consulta: ME DISPARARON
+
+Examen físico: HERIDA POR ARMA DE FUEGO EN LINEA MEDIO AXILAR SEGUNDO ESPACIO INTERCOSTAL, NO SANGRADO ACTIVO, HAY LIMITACION FUNCIONAL POR DOLOR EN FLEXION DE HOMBRO DERECHO, CAMPOS PULMONARES VENTILADOS.
+
+Evolución y hospitalización: NEUMOTORAX RESIDUAL DEL 15%, PACIENTE CON HIPOVENTILACION EN HEMITORAX DERECHO, SIN SIGNOS DE INFLAMACION EN EL MOMENTO HEMODINAMICAMENTE ESTABLE, SE CONTINUA MANEJO DE TUBO Y SE MANDAN TERAPIAS RESPIRATORIAS, CONCIENTE ORIENTADO."
+55429,671,no_determinado,hospitalizacion,False,"Motivo de consulta: SE GOLPEO LA CABEZA
+
+Examen físico: CONTUSIÓN A NIVEL FRONTAL (MECANISMO DEL TRAUMA DESCONOCIDO) - REFIERE QUE ANTES DEL TRAUMA PRESENTA EPISODIO DE AMAUROSIS. SE DESCONOCE SI HUBO O NO PERDIDA DE CONSCIENCIA. ASOCIADO A LA CEFALEA INTENSA DE CARACTER OPRESIVO, SE PRESENTAN MULTIPLES EPISODIOS DE EMESIS.
+
+Evolución y hospitalización: MANEJADO CON OBSERVACION NEUROLOGICA ESTRICTA, ANTIEMETICO (METOCLOPRAMIDA) Y ANTINFLAMATORIO-ANALGESIA (DIPIRONA). EVALUACION DEL TAC (tomografia axial computarizada) POR RADIOLOGIA Y NEUROCIRUGIA QUIEN CONSIDERA UNA MEGACISTERNA MAGNA CON VARIANTE ANATOMICA. SE BRINDA ALTA CON RECOMENDACIONES Y SIGNOS DE ALARMA."
+39199,795,accidente_transito,hospitalizacion,False,"Motivo de consulta: ACCIDENTE DE TRANSITO
+
+Examen físico: PACIENTE ALERTA, ORIENTADO EN SUS TRES ESFERAS, NO SE EVIDENCIAN CREPITOS EN TORAX, NORMOVENTILADO, NO SOBREAGREGADOS, DOLOR LEVE EN EPIGASTRIO, BLOMBERG (-) NO IRRITACION PERITONEAL APARENTE. PUPILAS ISOCORICAS REACTIVAS, GLASGLOW 15/15
+
+Evolución y hospitalización: PACIENTE INGRESA POR ACCIDENTE DE TRANSITO, SE SOLICITA IMAGENOLOGIA LA CUAL SE EVIDENCIA EN PARÁMETROS NORMALES, NO SE LE APLICA ANALGESIA YA QUE EL PACIENTE REFIERE NO TOLERAR NINGÚN TIPO DE FÁRMACO POR REACCIONES DE HIPERSENSIBILIDAD, SE REALIZA VIGILANCIA ESTRICTA NEUROLÓGICA Y NADA POR VÍA ORAL. TRAS COMPLETAR LA OBSERVACIÓN Y SIN COMPLICACIONES APARENTES, SE LE BRINDA ALTA HOSPITALARIA CON RECOMENDACIONES Y SIGNOS DE ALARMA. REVALORACION POR CONSULTA EXTERNA."
+40070,712,contundente,alta,False,"Motivo de consulta: LO GOLPIARON
+
+Examen físico: paciente alicorado, se evidencia herida en region parieto occipital izquierda de aproximadamente 3 cm con exposicion de tabla osea, herida en region frontal izquierda de aproximadamente 3 cm con exposicion osea, estigmas de epistaxis, dolor a la palpacion de puente nasal.
+
+Evolución y hospitalización: Paciente con historia de heridas por arma cortocontundente en escalpo, hemodinamicamente estable y sin SIRS, con adecuada evolucion clinica y sin otras alteraciones al examen fisico. Se realiza lavado de heridas y sutura, procedimiento sin complicaciones. Paciente con glasgow 15/15, signos vitales estables, tolera via oral por lo que se
+considera dar salida."
+34180,466,contundente,alta,False,"Motivo de consulta: politraumatismo
+
+Examen físico: se evidencia equimosis y edema palpebral, dolor a la palpacion en bordes de la orbita izquierda, equimosis en region ciliar izquierda.
+dolor a la palpacion de gluteo derecho, dolor para la marcha (marcha antalgica).
+
+Evolución y hospitalización: paciente que al parecer ha (hipertension arterial) sido victima de agresion fisica por terceros ""bullyng"", paciente conciente, alerta, se da salida conr ecomendaciones."
+2651,484,accidente_transito,no_determinado,False,"Motivo de consulta: Me atropellaron
+
+Examen físico: Hematoma en region frontal izq, no hemorragia, laceraciones. Dolor a la movilizacion del cuello sin presencia de lesiones. Evidencia de trauma en la reja costal izq. Dlor en flanco izq, fosa iliaca e hipogatrio sin estigma de trauma. Fractura expuesta en region medial deMSI. fractura expuesta en MID (miembro inferior derecho). Presencia de sangrado vafinal activo
+
+Evolución y hospitalización: [FECHA]: pendiente cupo en ortopedia"
+33996,745,arma_de_fuego,cirugia,False,"Motivo de consulta: herida por arma de fuego
+
+Examen físico: murmullo vesicular abolido en base pulmonar izquierda, se observan 3 heridas avulsivas que van desde fin de reja costal hasta porcion superior de region lumbar izquierda,
+soplantes con enfisema subcutaneo.
+
+Evolución y hospitalización: PACIENTE SENTADO EN CAMA, SE OBSERVA EN BUENAS CONDICIONES GENERALES, TOLERANDO O2 AMBIENTE, TRANQUILO Y COLABORADOR.TORAX: SIMETRICO, NORMOEXPANSIVO. NO SE APRECIAN MASAS NI RETRACCIONES. RUIDOS CARDIACOS RITMICOS, DE BUENA INTENSIDAD, NO SE PERCIBO SOPLOS NI RUIDOS PATOLOGICOS. CAMPOS PULMONARES NORMOVENTILADOS, SIN SOBREAGREGADOS. TUBO DE TORAX EN HEMITORAX DERECHO, NO OSCILANTE.
+no se especifica si se le hizo algun procedimiento quirurgico."
+36381,558,accidente_transito,alta,False,"Motivo de consulta: ME ARROYO UNA MOTO
+
+Examen físico: HERIDA EN DORSO DE MANO IZQ, DE APROX 10CM.
+PTE (paciente) TRAE RX (radiografia) QUE EVIDENCIA FX (fractura) DE METACARPIANO DE 4TO DEDO
+
+Evolución y hospitalización: PTE (paciente) QUE SUFRE ACCIDENTE DE TRANSITO, CON TRAUMA EN MANO IZQ Y FX (fractura) DE 4 Y 5TO METACARPIANO SE LLEVA A QX (quirurgico).
+[FECHA]: [HORA]-[HORA] SE REALIZA L+D, SUTURA DE HERIDA, MIORRAFIA Y RA+OTS DE FX DE 4 Y 5TO METACARPIANO.
+
+PTE EN BUENAS CONDICIONES GENERALES, SE DA SALIDA CON RECOMENDACIONES Y SIGNOS DE ALARMA."
+46930,483,caida,hospitalizacion,False,"Motivo de consulta: Se cayó de una bicicleta
+
+Examen físico: Paciente que cae desde bicicleta presentando trauma frontal, 2 episodios de emesis de contenido alimentario. Escoriación a nivel de antebrazo derecho y cresta iliaca
+
+Evolución y hospitalización: Paciente que completa periodo de observación neurológica. TCE (trauma craneoencefalico) leve, asintomático, tolerando vía oral sin alteración neurologica por lo cual se decide dar salida con recomendaciones y signos de alarma."
+33783,360,caida,cirugia,False,"Motivo de consulta: SE CAYO DE LA CAMA
+
+Examen físico: no se registra TA (tension arterial) en HC.
+deformidad en codo izquierdo con edema.
+
+Evolución y hospitalización: procedimiento quirurgico: [FECHA]: RC + OTS: fx (fractura) supracondilea de humero izquierdo gartlad III. procedimiento sin complicaciones, se da salida con recomendaciones y cita de control."
+1177,346,no_determinado,no_determinado,False,"Motivo de consulta: Me arrollo un camion
+
+Examen físico: Abdomen blando con defensa voluntaria, dolor generalizado a la palpacion principalmente en fosa iliaca derecha
+
+Evolución y hospitalización: HALLAZGOS: hemoperitoneo de 2500cc. hx (herida) a 200cc del angulo de treitz que compomete meso y yeyuno cons sangrado activo. bazo e higado normal."
+25643,544,caida,hospitalizacion,False,"Motivo de consulta: Paciente con caida de 2 piso y perdida de conocimiento > 5 minutos
+
+Examen físico: paciente con caida de 2 piso, al momento del impacto tuvo perdida del conociemiento > 5 min, al momento de ingreso paciente en buenas condicieones, abdomen blando.
+
+Evolución y hospitalización: paciente que por caida de 2 piso, presento politraumatismo, TCE (trauma craneoencefalico) leve, TCT- TCa leve, con buena evoluci{on y ayudas diagnosticas normales, se tuvio al paciente en observación por buena evolución se da salida con analgesia."
+34329,874,caida,hospitalizacion,False,"Motivo de consulta: Remitida del [INSTITUCION] de [MUNICIPIO]"".
+
+Examen físico: Pcte (paciente) quien sufre caída de camarote 1 mt aprox. con posterior contusión directa sobre región temporo parietal izquierda y equimosis periorbitaria izquierda asociadas a perdida de conciencia durante 20 minutos con cambios en el estado de animo (irritabilidad y somnolencia) con emesis persistente. Dejan en observación durante 24 horas pero remiten del [INSTITUCION] de [MUNICIPIO] para toma de TAC (tomografia axial computarizada) cráneo simple.
+
+Evolución y hospitalización: [FECHA]: Glasgow de 15, obedece ordenes, no alteracion del lenguaje, moviliza cuatro miembros. Tolera bien la via oral. Alta. Recomendamos vigilancia por los familiares los primeros dias, en caso de vómitos repetitivos, cefalea muy intensa o disminución del nivel de consciencia acudir a puerta de urgencias."
+17558,155,caida,no_determinado,False,"Motivo de consulta: se cayo por las escaleras
+
+Examen físico: Ferula braquiopalmar derecha con edema en codo.
+
+Evolución y hospitalización: ¶ b mmbmb m bn,"
+47910,725,accidente_transito,no_determinado,False,"Motivo de consulta: Accidente de tránsito, moto vs moto
+
+Examen físico: Paciente que sufre accidente de tránsito recibiendo trauma directo en abdomen y en miembro inferior izquierdo.Paciente en estado de gravidez con 4 meses de embarazo, niega perdidas vaginales. No signos de irritación peritoneal, leve herida en pie izquierdo cerca a 4to y 5to dedo con edema y deformidad.
+
+Evolución y hospitalización: Paciente sin alteraciones obstetricas, con ecografía dentro de los límites normales.
+
+[FECHA] Previa asepsia y antisepsia se realiza desbridamiento de tejido en pie izquierdo, procedimiento sin complicaciones.
+Paciente en buenas condiciones generales por lo cual se decide dar de alta con cita para valoración de herida"
+28313,559,contundente,alta,False,"Motivo de consulta: MODEDURA DE UN PERRO
+
+Examen físico: PACIENTE ES MORDIDO POR UN PERRO EN MENTON Y OJO IZQUIERDO CON POSIBLE COMPROMISO DEL LAGRIMAL
+
+Evolución y hospitalización: JUN[ANIO] HALLAZGOS OPERATORIOS: SE LE REALIZA PREVIA ASEPSIA Y ANTISEPSIA CON YODADOS, SE LIMPIA LA HERIDA CON ISOPOS, SE RETIRA MEMBRANAS FIBRINA Y DENTRITOS
+SE DILATAN PANTOS LAGRIMALES
+SE PASA SET DE CRAFOR PUS CANALICULO INFERIOR HASTA INFERSO CON DIFICULTAD. SE PASA SET PUT SUPUERIOS HASTA MEATO INFERIOR SE COLOCAN PUNTOS SIMPLES EN PIEL.
+OFTALMOLOGIA DECIDE DAR SALIDA"
+51767,376,accidente_transito,alta,False,"Motivo de consulta: ACCIDENTE DE TRANSITO - PEATÓN VS MOTO
+
+Examen físico: CONTUSIÓN EN RODILLA IZQUIERDA CON PRESENCIA DE DOLOR, EDEMA, EQUIMOSIS EN CARA ANTERIOR Y LIMITACIÓN EN A MOVILIDAD. PULSOS DISTALES CONSERVADOS.
+
+Evolución y hospitalización: SE DESCARTA CON RADIOGRAFÍA LA FRACTURA. SE BRINDA ALTA CON RECOMENDACIONES Y SIGNOS DE ALARMA POR EL SERVICIO DE ORTOPEDIA."
+58915,730,cortopunzante,cirugia,False,"Motivo de consulta: HACP (herida por arma cortopunzante) EN REGIÓN PRECORDIAL
+
+Examen físico: PACIENTE QUE SUFRE HACP (herida por arma cortopunzante) EN REGIÓN PRECORDIAL 3ER EIC (espacio intercostal) LPE DERECHA. INGRESA EN SHOCK, TAQUICARDICO, HIPOTENSO, HIPOVENTILACIÓN EN CAMPO PULMONAR IZQUIERDO
+
+Evolución y hospitalización: TUBO DE TÓRAX. DRENA AL PASO 1250 CC DE CONTENIDO HEMATICO. DESPUÉS DEL PASO DRENAJE 300 CC EN UNA HORA.
+TORACOTOMIA EXPLORATORIA. HEMOTORAX DE 1400CC, SANGRADO PROVENIENTE DE LESIÓN MAMARIA INTERNA SE CONTROLA CON LIGADURA. HEMATOMA ESTABLE EN MEDIASTINO SUP, NO LESIONES DE GRANDES VASOS.
+FEB-25. PACIENTE EN BUENAS CONDICIONES GENERALES POR LO CUAL SE DECIDE DAR SALIDA Y CITA CONTROL EN 10 DIAS."
+14816,273,caida,alta,False,"Motivo de consulta: Caida propia altura
+
+Examen físico: Edema y dolor mas limitacion movimiento
+
+Evolución y hospitalización: pte (paciente) estable, afebril, con adecuada evolucion herida limpia sin signos de infeccion.
+se da salida con recomendaaciones y signos de alarma"
+29107,436,cuerpo_extrano,no_determinado,False,"Motivo de consulta: SE TRAGO UNJA BOLA DE UN TROMPO
+
+Examen físico: PACIENTE QUE INGRESA A SERVICIO DE URGENCIA POR PRESENTAR CUERPO EXTRAÑO EN VIAS RESPIRATORIAS ( BOLA DE TROMPO.
+
+Evolución y hospitalización: SE REALIZAN ESTUDIOS IMAGENOLOGICOS, DONDE SE EVIDENCIA ATRAPA MIENTO DE AIRE QUE SE ASOCIA A CUADRO ASMÁTICO, NEUMOLOGO DECIDE REALIZA FIBROBRONCOSCOPIA RÍGIDA PERO AL NO HABER ESTE ELEMENTO EL [INSTITUCION] DECIDEN REMITIR."
+37206,352,no_determinado,alta,False,"Motivo de consulta: SE VOLTEO LA BUSETA
+
+Examen físico: PTE (paciente) CON TEC (trauma encefalocraneano) MÍNIMO
+TCT
+TCA
+TX (tratamiento) PELVIS
+TX RODILLA
+
+Evolución y hospitalización: PTE (paciente) CON BUENA EVOLUCIÓN CLÍNICA, CON RX (radiografia) NORMALES CON TX (tratamiento) DE TEJIDOS BLANDOS.
+SE DA SALIDA CON RECOMENDACIONES Y SIGNOS DE ALARMA."
+21786,630,cortopunzante,alta,False,"Motivo de consulta: me cortaron
+
+Examen físico: paciente que sufre herida cortocontusa, laceracion en el cuello zona 3, que compromete area de la mandibula y pabellon auricular derecho con sangrado abundante.
+
+Evolución y hospitalización: PACIENTE CON LACERACION EN ZONA 3 A NIVEL E CUELLO SIN SIGNOS DE LESION VASCULAR.
+PACIENTE EN ADECUADA EVOLUCION CLINICA HEMODINAMICAMENTE ESTABLE SIN SIGNOS DE DIFICULTAD RESPIRATORIA QUIEN PRESENTO TCE (trauma craneoencefalico) MODERADO TOLERANDO VIA ORAL, SIGNOS VITALES ESTABLES EL CUAL SE DECIDE DAR SALIDA CON FORMULA MEDICA, CITA DE CONTROL POR CX PLASTICA, RECOMENDACIONES GENERALES."
+34029,619,cortopunzante,hospitalizacion,False,"Motivo de consulta: ME HIRIERON EN LA ESPALDA"".
+
+Examen físico: PCTE (paciente) EN ESTADO DE EMBRIAGUEZ, SUFRE HPACP (herida por arma cortopunzante) De 3 CM APROX. A NIVEL DE REGIÓN LUMBAR DERECHA, CON LÍNEA MEDIO ESCAPULAR (L2 APROX.)SANGRADO ACTIVO; EN HECHOS DESCONOCIDOS EN VÍA PÚBLICA. FUE ENVIADO EN TAXI DESDE EL LUGAR DE LOS HECHOS POR TRANSEUNTES.
+
+Evolución y hospitalización: [FECHA]: Sutura de Hx (herida). única el área general. Procedimiento sin complicaciones.
+[FECHA]: Pcte (paciente) con abdomen negativo, tolerando VO (via oral), con 48 h de observación. Salida con recomendaciones y signos de alarma."
+35131,896,quemadura,alta,False,"Motivo de consulta: PACIENTE QUE SUFRE QUEMADURAS GRADO II POR QUEMADURA DE VIVIENDA
+
+Examen físico: PACIENTE QUE EN CONTEXTO DE INCENDIO DE VIVIENDA, PRESENTA QUEMADURA TERMICA CON FLAMAS:
+1. QUEMADURA GRADO I EN TÓRAX POSTERIOR DE APROXIMADAMENTE 10 % AFECCIÓN A SUPERFICIE CORPORAL.
+QUEMADURA GRADO IIA EN REGIÓN LATERAL DEL BRAZO DERECHO, REGIÓN DORSAL DEL TERCIO PROXIMAL DE ANTEBRAZO IPSILATERAL DE 3% DE AFECCIÓN A SUPERFICIE CORPORAL.
+
+Evolución y hospitalización: PACIENTE INGRESA EN CONDICIONES GENERALES, HIDRATADO SIN SIGNOS DE DISNEA, DIURESIS ESPONTANEA, SIN DEFICIT NEUROLOGICO, SE CONSIDERA NO PRESENTA CRITERIOS PARA SER HOSPITALIZADO. POR TANTO SE DECIDE REALIZAR MANEJO AMBULATORIO POR UNIDAD DE QUEMADOS, MANEJO CON ANALGESIA Y ANTIHISTAMINICOS, CURACIONES Y COBERTURA DE QUEMADURAS, PROFILAXIS ANTITETANICA, PACIENTE ACEPTA Y SE LE BRINDAN RECOMENDACIONES Y SIGNOS DE ALARMA."
+17729,407,caida,alta,False,"Motivo de consulta: Me cai
+
+Examen físico: MSI (miembro superior izquierdo) edema mas equimosis a nivel de codo mas dolor a la flexioextension, deformidad 1/3 distal de antebrazo parestesia en 5 dedo
+HC SIN REPORTE DE TA (tension arterial)
+
+Evolución y hospitalización: pte (paciente) con buena evolucion poop que muetra adecuada posicion de ots, se decide dar salida para seguimiento y control ambulatorio."
+25510,853,caida,alta,False,"Motivo de consulta: Me caì
+
+Examen físico: paciente que sufre caida de escaleras, de espalda, presenta perdida del conocimeinto al momento del accidente, pero si recuerda el evento. Paciente con inmovilizador cervical se palpan procesos espinosos sin dolor, dolor en regiòn lateral izquierda.Hipostesias en cara lateral brazo y antebrazo derecho.Escoraciòn en regiòn occipital izquierda.
+
+Evolución y hospitalización: paciente que presenta caida caida por escaleras, recibiendo politrauma con TCE (trauma craneoencefalico) leve, y re revisa TAC (tomografia axial computarizada) que se evidencia normal, , es valorada por neurocirugia quien decide dar salida, es valorada por ortopedia, es valorada por otorrinolaringologia quien ordena RX (radiografia) panorex, pero por buena evoluciòn se da salida, con cita control, recomendaciones, signos de alarma."
+37016,886,accidente_transito,hospitalizacion,False,"Motivo de consulta: ACCIDENTE DE TRANSITO
+
+Examen físico: encuentro paciente alerta conciente orientado hemodinamicamnete estable glasgow 15/15 normoventilada murmullo vesicular universal ruidos cardiacos ritmicos no soplo abdomen blando no dolor a la palpacion tolerando via oral extremidades ahora sin limitacion funcional paciente completo 8 horas de observacion signos vitales actuales pa 120/80 fc (frecuencia cardiaca) 80 fr (frecuencia respiratoria) 18 t 37
+
+Evolución y hospitalización: se revisan rx (radiografia) de codo se encuentra relaciones articulares conservadas no trazos de fractura rx waters beuna neumatizacion simetrica en senos paranasales no trazzos de fractura paciente con trauma menores y trauma superficial evoluciona favorablemente resultados de rx dentro de lo normal estable en el momento actual por lo que se da alta con signos de alrama y recomendaciones"
+3777,580,no_determinado,no_determinado,False,"Motivo de consulta: Le pegaron en el ojo con un teja
+
+Examen físico: Pte (paciente) en aceptable condicione general sin dificultad respiratoria, alerta, orientado, colaboradora
+Ojo derecho con protector ocular, se observa sutura de cornea con edema de cornea. Paciente el [FECHA] [HORA] le realizan sutura de cornea + reposicion de iris + aspiracion catarata + vitrectomia en instituto de ciegos y sordos
+
+Evolución y hospitalización: 11feb-2012 se realiza sutura corneal + reposicion de iris + aspiracion de catarata+ vitrectomia anterior.
+Paciente con adecuada evolucion clinica"
+18285,643,caida,no_determinado,False,"Motivo de consulta: Se cayo de la bicicleta en movimiento
+
+Examen físico: Mano izq. En flexion edema en dorso, laceracion en cara plantar de falange distal de 4 dedo. Limitacion a la extension de 2-3 dedo, hipoestesia de territorio radial, mediano y ulnar.
+
+Evolución y hospitalización: Paciente que sufre caida de bicicleta se valora y se le da salid. En la fecha [FECHA] vuelve y reingresa Se le toman rx (radiografia) el cual muestra fractura oblicua no dezplazada en 4 metacarpiano se realizo manejo conservador con inmovilizacion cerrada. Reconsulta por marcado dolor, limitacion funcional en extension 3-4 dedo, se le realiza cx plastica"
+48016,432,arma_de_fuego,no_determinado,False,"Motivo de consulta: le dispararon
+
+Examen físico: hpaf (herida por arma de fuego) preauricular derecho.
+hpaf en zona 3 de cuello izquierdo
+hpaf en mentón
+hpaf en deltoides izquierdo, cara anterior.
+hpaf en deltoides cara posterior.
+
+Evolución y hospitalización: limpieza de heridas, reposición de líquidos, control de signos vitales,
+paciente firma alta voluntaria, se le explica riesgos, asume entender y sale por su propia cuenta."
+34096,672,arma_de_fuego,alta,False,"Motivo de consulta: ME PEGARON UN TIRO Y UNA PUÑALADA"".
+
+Examen físico: Pcte (paciente) quien en contexto no claro, recibe HACP (herida por arma cortopunzante) a nivel de tercio medio esternal, con leve sangrado, no se palpa Fx (fractura); y HPAF (herida por arma de fuego) con OE en region glúteo perianal izquierda con proyectil alojado en cara anterior de muslo izquierdo tercio proximal subcutáneo, presenta dolor a la movilización de MII (miembro inferior izquierdo), disnea, por lo cual consulta al Centro de salud de Siloé y lo remiten para manejo por cirugía.
+
+Evolución y hospitalización: [FECHA]: Se da egreso hospitalario con recomendaciones y signos de alarma."
+47182,511,arma_de_fuego,cirugia,False,"Motivo de consulta: multiples HPAF (herida por arma de fuego)
+
+Examen físico: HPAF (herida por arma de fuego) en zona III de cuello izquierdo, herida region paraescapular a nivel de T4 con OS en trapecio izquierdo con LMC, herida a nivel de L2, herida en gluteo izquierdo cuadrante supeior con OS ne region anterolateral 1/3 proximal de muslo, paciente con defensa abdominal involuntaria.
+
+Evolución y hospitalización: procedimiento quirurgico: laparotomia exploratoria: hemoperitoneo de aproximadamente 200 cc."
+16298,323,no_determinado,no_determinado,False,"Motivo de consulta: me arranque un dedo
+
+Examen físico: Avulsion de tejidos de falange media, falange distal ausente en mano izquierda
+
+Evolución y hospitalización: Se realiza desarticulacion de la falange medial a nivel de la articulacion interfalangica proximal y remodelacion del muñon, procedimiento ssin complicaciones"
+36151,558,accidente_transito,alta,False,"Motivo de consulta: ACCIDENTE DE TRANSITO
+
+Examen físico: HEMATOMA EN MIEMBROS INFERIORES Y PALMA DE LA MANO IZQUIERDA, LACERACION EN CARA ANTERIOR DE PIERNA DERECHA.
+
+Evolución y hospitalización: PACIENTE INGRESA CON LESIONES OSTEOMUSCULARES, PACIENTE RECIBE MANEJO POR MEDICINA GENERAL, SE LE REALIZAN CURACIONES, IMAGENOLOGIA, ADMINISTRACION DE ANALGESICOS Y TOXOIDE TETANICO. PACIENTE CON BUENA EVOLUCION, SE EVIDENCIA ESGUINCE DE MUÑECA Y SE MANEJA CON INMOVILIZACION CON FERULA DE POLIPROPILENO. SE BRINDA SALIDA CON RECOMENDAICONES Y SIGNOS DE ALARMA."
+32595,383,no_determinado,hospitalizacion,False,"Motivo de consulta: Lo cogió un carro
+
+Examen físico: Pcte (paciente) arrollado por automóvil fantasma, con posterior politraumatismo, con episodio de convulsiones en periferia, en el momento alerta.
+
+Evolución y hospitalización: [FECHA]: Pcte (paciente) en observación, sin dolor abdominal, sin convulsiones, sin alteración del sensorio. Valorado por Cx. Pediátrica quien da salida."
+29017,448,cortopunzante,remision,False,"Motivo de consulta: ME CORTE
+
+Examen físico: MSI (miembro superior izquierdo): HERIDA EN 1/3 MEDIO DE BRAZO IZQ DE 10 CM, EN CARA MEDIAL YA SUTURADA, SIN HEMATOMA, SANGRADO ESCASO.
+
+Evolución y hospitalización: PTE (paciente) QUE SUFRE HPACP (herida por arma cortopunzante) EN BRAZO IZQ, ES REMITIDO DESDE PERIFERIA POR POSIBLE LESIÓN VASCULAR, SE REALIZA ECO (ecografia) DOPPLER QUE NO EVIDENCIA LESIÓN VASCULAR.
+
+SE DA SALIDA CON RECOMENDACIONES."
+33256,595,no_determinado,cirugia,False,"Motivo de consulta: remitido del HPUV
+
+Examen físico: herida en region parietoccipital derecha no suturada con secrecion purulenta, edema y dolor a la movilizacion de codo izquierdo.
+
+Evolución y hospitalización: paciente con lesion en region parietoccipital derecha, valorado por neurocirugia quien define manejo quirurgico pero en sus facultades mentales segun valoracion con salud mental decide no aceptar el procedimiento quirurgico a pesar de explicarle los riesgos de no realizar dicha cirugia paciente sera contraremitido al hospital psiquiatrico para manejo de su aptologia psiquiatrica."
+27754,280,caida,alta,False,"Motivo de consulta: me cai de la moto
+
+Examen físico: Multiples laceraciones en pierna izquierda
+
+Evolución y hospitalización: paciente llevado a cx el [FECHA] donde le realizaron L + D + Cutetaje osea de tibia y fibula, RA + OTS + RQ Fijador externo.
+Buena evolucion se da egreso"
+57373,622,cortopunzante,cirugia,False,"Motivo de consulta: HERIDA CON NAVAJA
+
+Examen físico: PACIENTE ATENDIDO EN HOSPITAL PERIFERIA POR SUFRIR HERIDA POR ARMA CORTOPUNZANTE TORACOABDOMINAL ANTERIOR IZQUIERDA DE APROX 7CM NO SOPLANTE, SIN SANGRADO ACTIVO. ECO (ecografia) FAST (ecografia FAST abdominal) QUE EVIDENCIA LIQUIDO LIBRE EN LA CAVIDAD
+
+Evolución y hospitalización: SE REALIZA HEPATORRAFIA MÚLTIPLE CON DESBRIDAMIENTO Y HEMOSTASIS, CAUTERIZACIÓN DE LESION HEPATICA, LAPAROTOMÍA EXPLORATORIA. PROCEDIMIENTO SIN COMPLICACIONES.
+
+PACIENTE EN BUENAS CONDICIONES GENERALES, HEMODINAMICAMENTE ESTABLE, SIN SIGNOS DE SIRS
+ENE-16-2015 PACIENTE SE DA A LA FUGA"
+36538,890,accidente_transito,alta,False,"Motivo de consulta: accidente de transito
+
+Examen físico: en cabeza se evidencia cefalohematoma derecho, euqimosis y edema palpebral en ojo derecho con hemorragia conjuntival, herida frontal derecha suturada, estigmas de trauma en hemicara derecha, edema en dorso nasal con estigmas de epistaxis.
+edema y laceraciones en dorso de ambas manos dolor a la movilidad, laceraciones en rodilla.
+
+Evolución y hospitalización: PACIENTE HOSPITALIZADO BAJO EL CONCEPTO DE ACCIDENTE DE TRANSITO PRESENTANDO TRAUMA FACIAL CON COMPROMISO DEL OJO DERECHO, AL EXAMEN FISICO OFTALMOLÓGICO SE EVIDENCIA UNA AGUDEZA VISUAL DISMINUIDA QUE MEJORA CON EL USO DE PH, CONSIDERANDO UN EFECTO REFRACTARIO, A LA LÁMPARA DE HENDIDURA SE EVIDENCIA HEMORRAGIA SUBCONJUNTIVAL, LA CUAL NO REQUIERE NINGUN MANEJO Y EN EL FONDE DE OJO CONTUSIÓN RETINIANA. SE DECIDE DAR SALIDA POR PARTE DE OFTALMOLOGÍA Y CONTROL EN 3 DIAS."
+34716,521,no_determinado,alta,False,"Motivo de consulta: me fracture el humero
+
+Examen físico: se observa región del hombro izquierdo con equimosis y edema marcado con un cabestrillo y marcado limitación para la movilización, manteniendo la extremidad en posición flejada y aductora.
+
+Evolución y hospitalización: por la edad del paciente y características de la fractura se decide dar tratamiento conservadora con un inmovilizado clínico de hombro, de alta medica, se llama a control en 3 semanas con radiografías.
+se dan recomendaciones y signos de alarma."
+31441,326,caida,hospitalizacion,False,"Motivo de consulta: ME CAI DE UN TOBOGAN
+
+Examen físico: PACIENTE QUIEN CAE DE UN TOBOGAN POR PERDIDA DE CONOCIMIENTO DE 6 MINUTOS AHORA CON CEFALEA MODERADA
+
+Evolución y hospitalización: PACIENTE SE DEJA EN OBSERVACION DE 12 HORAS CON ADECUADA EVOLUCION POR LO CUAL SE DECIDE DAR SALIDA CON RECOMENDACIONES Y SIGNOS DE ALARMA"
+28273,573,no_determinado,alta,False,"Motivo de consulta: LO EMBISTIÓ UNA VACA
+
+Examen físico: PACIENTE QUE RECIBE TRAUMA EN CRÁNEO, SE OBSERVA LACERACION DE 2 CM EN CUERO CABELLUDO A NIVEL PARIETO-OCCIPITAL, LACERACION DE DERMIS EN TÓRAX POSTERIOR.
+
+Evolución y hospitalización: PACIENTE QUE INGRESA POR SER EMBESTIDO POR VACA, SE TOMAN ESTUDIOS IMAGENOLOGICOS QUE EVIDENCIAN CONTUSIÓN HEMORRAGICA A NIVEL FRONTAL DERECHO, PACIENTE CON CEFALEA INTENSA, SE INICIO MANEJO CON FENITOINA, SE ORDENA EGRESO PARA MANEJO AMBULATORIO, SE ORDENA ANALGESIA, CITA DE CONTROL, SIGNOS DE ALARMA Y RECOMENDACIONES GENERALES."
+40914,391,cortopunzante,alta,False,"Motivo de consulta: me chuzaron con una botella
+
+Examen físico: HACP (herida por arma cortopunzante) a nivel de cara lateral de brazo izquierdo con sangrado en capa.
+pulsos distales conservados de buena intensidad.
+
+Evolución y hospitalización: paciente hemodinamicamente estable, herida de miembro superior ya fue suturada adecuadamente. se da salida con recomendaciones y signos de alarma."
+23289,478,caida,alta,False,"Motivo de consulta: se cayo
+
+Examen físico: se observa paciente con múltiples lesiones, edema en MSD (miembro superior derecho) a nivel de muñeca, escoriaciones a nivel de menton
+
+Evolución y hospitalización: se realiza reducción cerrada se inmoviliza con yeso braquio-palmar derecho.
+se revisa rx (radiografia) post reducción se evidencia que el paciente requiere manejo quirúrgico por lo que se da salida con cita prequirurgica, valoración por anestesista, se envía analgesia."
+27767,565,cortopunzante,no_determinado,False,"Motivo de consulta: me apuñalaron
+
+Examen físico: Herida torax posterior +/- T3 paravertebral izquierda, +/- 2 cm, hemitorax izquierdo hipoventilado, ruiodos cardiacos velados.
+
+Herida +/- 2 cm en hipocondrio derecho
+
+MSI (miembro superior izquierdo) con herida +/- a com en region deltoidea
+
+Evolución y hospitalización: paciente con herida por arma corto-punzante en tórax con NEUMOTORAX IZQUIERDO, se pasa tubo de tórax, funcionando; HPACP (herida por arma cortopunzante) en abdomen con abdomen negativo; se decide remitir a nivel II para manejo de tubo de torax"
+57648,541,caida,no_determinado,False,"Motivo de consulta: SE APOYÓ EN UNA CORTINA Y SE CAYÓ Y SE GOLPIÓ LA CABEZA
+
+Examen físico: PACIENTE CON EXTREMIDADES, ZONA DORSAL Y ABDOMINAL NORMALES, SIMETRICAS, DEPRESIBLES Y EXPANSIVOS, CABEZA Y CARA CON ANORMALIDADES, ASIMETRICAS, FRACTURA FRONTAL IZQUIERDA, NO DESPLAZADA, LINEA MEDIA DESPLAZADA 12MM.
+
+Evolución y hospitalización: PACIENTE QUE INGRESA POR CAÍDA DESDE SU PROPIA ALTURA, CON POSTERIOR PERDIDA DE CONSCIENCIA DE 5 MIN, SE LE REALIZA IMAGENOLOGÍA QUE REVELA HEMORRAGIA SUBARACNOIDEA FISHER III Y HEMATOMA SUBDURAL AGUDO."
+25235,370,no_determinado,hospitalizacion,False,"Motivo de consulta: pcte (paciente) remitido tce (trauma craneoencefalico)
+
+Examen físico: paciente en buen estado hemodinamico.
+
+Evolución y hospitalización: PACIENTE CON TCE (trauma craneoencefalico) LEVE PACIENTE ES DEJADA EN OBSERVACIÓN, ES VALORADA, PACIENTE CON BUENA EVOLUCIÓN CLÍNICA POR LO CUAL SE ORDENA SALIDA CON SIGNOS DE ALARMA Y RECOMENDACIONES GENERALES."
+15177,700,arma_de_fuego,no_determinado,False,"Motivo de consulta: Remitido HMCR por HPAF (herida por arma de fuego) torax izquierdo y HPAF brazo izquierdo
+
+Examen físico: HPAF (herida por arma de fuego) en torax, region axilar izq. no soplante. abdomen, duro, doloroso, positivo.
+HPAF en tercio medio brazo izq. trayecto lateral a medial con hematoma no expansivo, no sangrado activo, deformidad mas crepitacion.
+
+Evolución y hospitalización: [FECHA] HALLAZGOS QX (quirurgico): Lesion que destruye la mitad del bazo con sangrado activo, herida de 1cm diametro diafragma izq. heridas que comprometen el 60% de la circunferencia en colon trasverso #4, hemoperitoneo de 500cc no contaminacion macroscopica, proyectil en linea media, pared abdominal."
+46836,637,arma_de_fuego,no_determinado,False,"Motivo de consulta: HERIDA POR ARMA DE FUEGO EN MAXILAR
+
+Examen físico: HERIDA POR ARMA DE FUEGO EN MAXILAR SUPERIOR CON COMPROMISO DE PALADAR DURO Y PIEZAS DENTALES, SANGRADO MODERADO, PROYECTIL SIN ORIFICIO DE SALIDA. PACIENTE BAJO EFECTOS DE PSA, PIRAMIDE NSAL ESTABLE, NO EPIXTASIS.
+HEMILEFORT IZQUIERDO I CON HEMOSENO Y ENFISEMA SUBCUTANEO.
+
+Evolución y hospitalización: INGRESA PACIENTE CON HERIDA POR ARMA DE FUEGO EN CONTEXTO DESCONOCIDO, SE INICIA MANEJO DE HEMORRAGIA, PACIENTE RESPONDE AL LLAMADO, SE REALIZA CONTENCION CON APOSITO IMPREGNADO CON AGUA OXIGENADA, ENJUAGUES CON CLORHEXIDINA Y MANEJO INTRAVENOSO CON CEFAZOLINA."
+24520,281,caida,alta,False,"Motivo de consulta: ME CAI
+
+Examen físico: EQUIMOSIS EN CARA POSTEROMEDIAL DE MUSLO DERECHO, DOLOR A LA ROTACION INTRNA Y EXTERNA DE CADERA.
+
+Evolución y hospitalización: PACIENTE ESTABLE SE ORDENA SALIDA CON SIGNOS DE ALARMA, RECOMENDACIONES GENRALES, CITA DE CONTROL Y ANALGESIA."
+23334,487,no_determinado,alta,False,"Motivo de consulta: HPACC MANO IZQUIERDA
+
+Examen físico: HERIDA MANO IZQUIERDA CON ABUNDANDTE SANGRADO Y PALIDEZ MUCOTANEA GENERALIZADA
+HERIDA TRANSVERSAL EN PALMA DE MANO IZQUIERDA CON LESION DE ZONA III Y LESION DE FLEXOR COMUN DE LOS DEDOS
+
+Evolución y hospitalización: SE LE REALIZO LAVADO MAS DESBRIDAMIENTO, NEURORRAFIA COLATERAL ULNAR QUINTO DEDO MANO IZQ, TENORRAFIA DE FLEXORES PROFUNDOS SEGUIDO A QUINTO DEDO Y SUPERFICIAL TERCER DEDO, PACIENTE CON BUENA EVLUCION, SE DA SALIDA"
+32539,408,contundente,no_determinado,False,"Motivo de consulta: Trauma contundente"".
+
+Examen físico: Pcte (paciente) con cuadro clínico consistente en tma con objeto contundente en cara. Presenta edema y equimosis palpebral superior e inferior y región cigomatica derecha.
+
+Evolución y hospitalización: [FECHA]: Pcte (paciente) sin síntomas de abstinencia, estable hemodinamicamente. Se cita por consulta externa ORL (otorrinolaringologia), en 15 días."
+22911,553,mordedura,no_determinado,False,"Motivo de consulta: POR QUE ME MORDIÓ UN PERRO.
+
+Examen físico: paciente mordido por un perro, a la inspección de genitales herida aproximadamente de 0.5 cm a nivel de prepucio y a nivel del escroto, retracción cremastérica presente.
+
+Evolución y hospitalización: paciente con heridas por mordedura de perro, en el área genital, se le realiza limpieza de herida, se lleva a cirugía sutura de escroto y circuncisión, sale estable de la cirugía, por lo que se le da salida, con analgesia y antibióticos, cita control con cirugía de pediatría en 2 semanas."
+56451,704,no_determinado,no_determinado,False,"Motivo de consulta: PACIENTE TRAIDO POR LA POLICÍA CON HERIDA POR ARMA CORTO PUNZANTE
+
+Examen físico: HERIDA A NIVEL PARAVERTEBRAL CERVICAL ""LINEA MEDIA NIVEL C7 NO SOPLANTE, SANGRADO ACTIVO PROFUSO, CON HEMATOMA ESTABLE.
+HERIDA A NIVEL PARAVERTEBRAL TORACICA IZQUIERDA A NIVEL DE T3,
+
+Evolución y hospitalización: LAVADO + SUTURA DE HERIDA EN CUELLO, Y TÓRAX POSTERIOR, SE EXPLICA EL PROCEDIMIENTO AL PACIENTE INDICA COMPRENDER Y ACEPTAR, SE REALIZA ASEPSIA Y ANTISEPSIA CON YODADOS, INFILTRACIÓN CON LIDOCAINA AL 2% SIMPLE EN TOTAL DE 8 CC, LAVADO CON AGUA ESTERIL 500 CC, SUTURA EN UN SOLO PLANO CON PROLENE 3-0, SEPARADOS PARA UN TOTAL DE 5 PUNTOS, SE CONTROLA SSANGRADO, SANGRADO SIN COMPLICACIONES."
+13543,566,no_determinado,no_determinado,False,"Motivo de consulta: Se estrello
+
+Examen físico: Equimosis edema periorbitaria izda, pupilas midriaticas hiporeactivas,
+Deformidad, edema en 1/3 distal antebrazo izdo, edema muslo izdo
+
+Evolución y hospitalización: [FECHA]: paciente que por accidente de moto llego con trauma craneocefalico severo, con ventilador mecanico y TOT, no se encuentra focalizado, se realiza tac (tomografia axial computarizada) cerebral simple con hematoma epiduralfrontal y fractura hueso temporal izq y base de craneo, ademas se le realiza tac facial donde se encuentra fractura maxilar."
+52932,622,caida,alta,False,"Motivo de consulta: SE CAYO DE LAS ESCALERAS
+
+Examen físico: CONTUSION EN MANO IZQUIERDA, BAJO EFECTO DE ALCOHOL. INGRESA ACOMPAÑADO DE FAMILIAR, ADEMAS CUENTA CON INMOVILIZADOR EN MIEMBRO SUPERIOR IZQUIERDO. SE OBSERVA DEFORMIDAD A NIVEL DISTAL DEL ANTEBRAZO IZQUIERDO, BUEN LLENADO CAPILAR, REFIERE DOLOR A LA PALPACION. LIMITACION PRA LA FLEXOEXTENSION DE DEDOS.
+
+Evolución y hospitalización: PACIENTE SE COMENTA CON ORTOPEDISTA [MEDICO] QUIEN CONSIDERA SE DEBE MANEJAR CON REDUCCION CERRADA E INMOVILIZACION CON YESO BRAQUIOPALMAR. CITA DE CONTROL EN 1 SEMANA, SE BRINDAN RECOMENDACIONES, SIGNOS DE ALARMA Y ANAÑGESIA."
+22003,338,contundente,no_determinado,False,"Motivo de consulta: Me golpearon
+
+Examen físico: Sangrado escaso en laceracion en region infraorbitraria izquierda y frontaal, presenta equimosis en ambas regiones periorbitraria.
+Paciente conciente no recuerda que le sucedio, presenta perdida de conocimiento.
+
+Evolución y hospitalización: Paciente que se lava, se sutura herida en cara."
+53102,679,no_determinado,remision,False,"Motivo de consulta: PACIENTE TRAÍDO POR POLICÍA EL CUAL PRESENTA HERIDA EN ANTEBRAZO IZQUIERDO
+
+Examen físico: PACIENTE CON HERIDA EN REGION VENTRAL DE ANTEBRAZO IZQUIERDO, INGRESA CON VENDAJE COMPRESIVO EN 1/3 MEDIO DEL ANTEBRAZO, SE EVIDENCIA LIMITACIÓN EN LA FLEXION DE LOS DEDOS DE LA MANO IZQUIERDA, AL EXPONER LA HERIDA SE OBSERVA HERIDA EN LENGUETA DE APROX 15 CM DE LONGITUD CON SANGRADO VENOSO QUE CEDE A LA COMPRESION. SE OBSERVA UN BUEN PULSO RADIAL, ADECUADO LLENADO CAPILAR. PULSO ULNAR DISMINUIDO CON DIAFORESIS Y FRIALDAD DISTAL DE LA EXTREMIDAD.
+
+Evolución y hospitalización: REMISIÓN - GESTIÓN DEL CRYR
+SE TRASLADA PACIENTE A [INSTITUCION] PARA CONTINUAR MANEJO."
+13953,450,arma_de_fuego,uci,False,"Motivo de consulta: Un disparo
+
+Examen físico: Herida parietal derecha sin orificio de salida, exposicion masa encefalica, pupilas mioticas hiporeactivas, palidez mucocutanea intensa, hemiparesia derecha, ingresa con IOT (intubacion orotraqueal)
+
+Evolución y hospitalización: No es posible realizar tac (tomografia axial computarizada) cerebral ya que el equpo se encentra dañado, se remite para hospitalizacion en uci (unidad de cuidados intensivos)"
+22490,403,no_determinado,alta,False,"Motivo de consulta: se lastimo la pierna
+
+Examen físico: equimosis en cara anterior pierna derecha, dolor a la palpacion de pierna y tobillo, AMAS de tobillo limitados por dolor.
+
+Evolución y hospitalización: pte (paciente) a quien se le realiza reduccion cerrada de fx (fractura) de tibia derecha y se inmoviliza con yeso, se recomienda no apoyar en extremida.
+
+se decide dar salida con recomndaciones."
+2129,713,no_determinado,cirugia,False,"Motivo de consulta: Heridas multiples por explosion en mina
+
+Examen físico: Multiples heridas por fragmentos de roca en cara, tronco y extremidades. Hematoma en labios, lesion en oreja derecha estigmas de otorragia
+
+Evolución y hospitalización: Valoracion por oftalmologia; trauma penetrante AO (ambos ojos), heridas corneales AO, cuerpos extraños cornea AO, herida borde libre PSI
+En procedimiento quirurgico se realiza Extraccion de catarata traumatica OD (ojo derecho), Virrectomia OD, Sutura esclerar OI (ojo izquierdo), blefarorrafia. En OD se encuentra edema corneal difuso, catarata traumatica iridodialisis extensa superonasal, hemovitreo. En OI cuerpos extraños multiples subconjutivales, herida esclerar"
+15313,294,no_determinado,cirugia,False,"Motivo de consulta: Remitido de sevila x cirugia plastica
+
+Examen físico: Presenta herida suturada, compleja en 2 dedo mano derecha con afectacion MCF y falange proximal de igual mano
+
+Evolución y hospitalización: Se da salida para realizar Reduccion Abierta e injerto oseo por consulta externa"
+35307,816,accidente_transito,no_determinado,False,"Motivo de consulta: REMITIDO PARA VALORACION Y MANEJO POR TRAUMATOLOGIA
+
+Examen físico: PACIENTE QUE EL DIA DE AYER ES VALORADO POR ACCIDENTE DE TRANSITO, REFIERE DURANTE LA NOCHE QUE FUE DADO DE ALTA EN EL HOSPITAL PRESENTÓ RECTORRAGIA, DOLOR A LA PALPACIÓN DE LA REJA COSTAL IZQUIERDA Y TÓRAX POSTERIOR.
+
+Evolución y hospitalización: PACIENTE CON ESTIGMA DE LESION GASTROINTESTINAL POST-TRAUMA, REFIERE RECTORRAGIA. SE INICIA MANEJO CON LIQUIDOS ENDOVENOSOS ISOTONICOS CRISTALOIDES (SOLUCION SALINA 0.9%) 100 CC/HORA, MONITORIZACION CARDIACA NO INVASIVA, PARACLINICOS DE QUIMICA SANGUINEA, RX (radiografia) DE TORAX, TAC (tomografia axial computarizada) TORACOABDOMINAL CONTRASTADO, NADA POR VIA ORAL Y VALORACION POR CIRUGIA GENERAL. DURANTE SU EVOLUCIÓN NO PRESENTA EPISODIO HEMORRAGICO, NO HEMATURIA, NO DISNEA."
+23244,489,quemadura,alta,False,"Motivo de consulta: me queme
+
+Examen físico: paciente con multiples tramos de quemadura en cara anterior del torax, region lumbar y cara, se observa edema, rubor y perdida de piel, flictenas.
+
+Evolución y hospitalización: [FECHA]: ingresa paciente a sala de operaciones donde se realiza escarectomia en cara, cuello, torax. sin complicaciones.
+paciente en mejores condiciones clinicas, se observan heridas epitalizadas se ordena salida con manejo ambulatorio, control por consulta externa."
+34179,539,arma_de_fuego,alta,False,"Motivo de consulta: lo hirieron
+
+Examen físico: herida por arma de fuego en hemotorax posterior izquierdo a la altura de tercio medio de escapula con linea medio clavicular, herida en cuadrante superolateral izquierdo con sangrado activo, 2 orificios por herida en hombro izquierdo uno anterior y otro posterior con sangrado activo, herida por arma de fuego en muslo izquierdo a nivel de tercio medio en cara frontal.
+
+Evolución y hospitalización: se da salida con inmovilizador clinico de hombro, se dan recomendaciones y cita de control."
+23986,506,caida,alta,False,"Motivo de consulta: SE CAYO UN MURO CUANDO ESTABA DURMIENDO
+
+Examen físico: HERIDA TIPO ABRASIONEN REGION FRONTAL
+DOLOR A LA PALPACION EN CUADRANTE INFERIOR DERECHO-- RESISTENCIA MUSCULAR EN HEMIABDOMEN DERECHO.
+
+Evolución y hospitalización: PACIENTE HEMODINAMICAMENTE ESTABLE SIN SIGNOS DE IRRITACION PERITONEAL. CON EDEMA EN REGION INGUINAL DERECHA. NO HEMATURIA, ES VALORADO POR UROLOGIA QUIEN DESCARTA TRAUMA RENAL SE DA ALTA CON RECOMENDACIONES GENERALES, ANALGESIA SIGNOS DE ALARMA Y CITA DE CONTROL."
+22647,788,accidente_transito,no_determinado,False,"Motivo de consulta: Lo atropello un carro.
+
+Examen físico: Paciente que en accidente de transito, transitaba en bicicleta, presenta escoriaciones y laceraciones en piel frente, laceración en cuero cabelludo lado izquierdo y tórax izquierdo.
+Dolor a la palpación en región costal izquierda, con laceraciones y escoriaciones.
+laceraciones en rodillas.
+
+Evolución y hospitalización: Paciente que sufre politraumatismo por accidente de transito bicicleta vrs carro, por el cual presenta TCE (trauma craneoencefalico) leve, y escoriaciones y laceraciones multiples, pero al examen físico presenta fractura proximal de halux derecho. Por lo que se decide realizare reducción cerrada mas yeso bota.
+Paciente que es valorado por neurocirugía lo encuentran en condiciones normales y le dan salida."
+33102,693,intoxicacion,alta,False,"Motivo de consulta: intoxicacion exogena
+
+Examen físico: paciente que ingiere sustancia desconocida, al examen fisico presenta perdida de la capacidad para el sosten corporal o la bipedestacion, no responde al llamado por su madre, desorientada, obnubilada, paciente hiporeactiva a estimulos externos, no se conecta con su entorno, poco respuesta a entrevistador, no responde a estimulos auditivos ni mecanicos no comunicacion verbal.
+
+Evolución y hospitalización: paciente hemodinamicamente estable, sin signos de dificultad respiratoria, con Dx (diagnostico) de intoxicacion exogena, con mejoria clinica, sin hallazgos clinicos patologicos, tolera via oral, se da salida con recomendaciones."
+27648,432,caida,alta,False,"Motivo de consulta: remitido del HJPB por caida por gradas y tce (trauma craneoencefalico)
+
+Examen físico: presenta 2 cefalohematomas occipitales.
+
+Evolución y hospitalización: pte (paciente) pediátrico que ingresa por caida desde escaleras con tx (tratamiento) en region occipital, se le realiza TAC (tomografia axial computarizada) cerebral que no evidencia ninguna lesión intracraneana.
+
+se decide dar salida con recomendaciones."
+15030,240,no_determinado,no_determinado,False,"Motivo de consulta: Herida en mano
+
+Examen físico: Presenta edema a nivel de mano izq con limitacion a la flexoextension de los dedos. Sensibilidad conservada, llenado capilar <2seg
+
+Evolución y hospitalización: Se decide manejo conservador"
+25992,189,arma_de_fuego,no_determinado,False,"Motivo de consulta: Me dispararon
+
+Examen físico: Presenta herida retroauricular izquierda en escalpo
+
+Evolución y hospitalización: No deficit neurologico.Se realiza lavado + desbridamiento"
+17762,357,no_determinado,no_determinado,False,"Motivo de consulta: Por la fx (fractura) me golpiaron
+
+Examen físico: Dolor en mandibula izq y limitacion para la apertura de la boca
+Hc sin reporte de fc (frecuencia cardiaca) y ta (tension arterial)
+
+Evolución y hospitalización: Paciente que ingresa por politraumatismo se le realiza cx plastica la cual los datos no estan asignados en la historia clinica"
+37026,615,accidente_transito,alta,False,"Motivo de consulta: ACCIDENTE DE TRANSITO
+
+Examen físico: LEVE DOLOR A LA MOVILIZACIÓN DE MID (miembro inferior derecho) Y DE COLUMNA LUMBAR.
+
+Evolución y hospitalización: PTE (paciente) HEMODINAMICAMENTE ESTABLE, SIN DIFICULTAD RESPIRATORIA SIN DETERIORO NEUROLÓGICO ÁLGIDO, SIN OTRA SINTOMATOLOGIA SE INICIO VIA ORAL EN EL MOMENTO BUENA TOLERANCIA, CONTINUA EN VIGILANCIA DE ABDOMEN TÓRAX Y CONTROL NEUROLOGICO
+SE REVISAN RX (radiografia) DEL PACIENTE CON MEDICO ASISTENCIAL DE TURNO DE ORTOPEDIA NO SE ENCUENTRAN FRACTURAS, CON RX DENTRO DE LIMITES NORMALES.
+
+SE DA SALIDA CON RECOMENDACIONES Y SIGNOS DE ALARMA."
+13656,591,no_determinado,no_determinado,False,"Motivo de consulta: Lo cortaron con pico-botella
+
+Examen físico: Se aprecia lesion en 1/3 medial de antebrazo izquierdo, cara volar sin sangrado activo, hematoma estable, pulsos distales simetricos con disminucion en lunar, llenado capilar 3 seg. Limitacion para extension de mano izquierda, con sensibilidad aparentemente conservada, lesion profunda.
+
+Evolución y hospitalización: Se realiza el [FECHA] neurorrafia nervio interoseo posterior + miotenorrafia del braquioradial, extensor comun de los dedos, ulnar carpo y adia de carpo. Lavado + desbridamiento + curetaje + sutura de heridas."
+40077,283,caida,no_determinado,False,"Motivo de consulta: SE CAYÒ DE UN SEGUNDO PISO2
+
+Examen físico: DOLOR A LA PALPACIÒN CERVICAL
+DOLOR A LA PALPACIÒN DE DORSO Y REJA COSTAL
+
+Evolución y hospitalización: PACIENTE QUE PRESENTA FRACTURA POR APLASTAMIENTO DE L3 Y T12
+EVALUADA POR SERVICIO DE COLUMNA A LA ESPERA DE CORSÈ."
+14949,632,arma_de_fuego,fallecimiento,False,"Motivo de consulta: HAF (herida por arma de fuego) en craneo, contexto desconocido
+
+Examen físico: Pctevcon IOT (intubacion orotraqueal)
+HAF (herida por arma de fuego) en region occipital con exposicion de masa encefalica.
+Pupilas midriaticas fijas, glasgow posterior 3/15.
+
+Evolución y hospitalización: [FECHA]: pte (paciente) desde ayer en glasgow 3/15 sin esfuerzo spiratorio secundario a hpaf (herida por arma de fuego) conectado a ventilacion mecanica, con infarto en tallo cerebral, quien presenta paro cardiorespiratorio, ningun reflejo neurologico le realizan maniobras de reanimacion el cual no responde, pte fallece [HORA]"
+25592,531,caida,alta,False,"Motivo de consulta: Me cai de arbol
+
+Examen físico: Paciente que por caida desde un arbol, presenta dolor a la palpación en región inguinal izquierda, dolor a la flexión de cadera izquierda, dolor a la palpación dd gluteo izquierdo.
+
+Evolución y hospitalización: Paciete que por caida desde un arbol, presentasegun RXC de pelvis, fractura inucortical de rama isquiopubica izquierda., en valoración por ortodedia se decide, ar manejo con analgesia, reposo y control en 1 semana. Se da salida copn recomendaciones y signos de alarma."
+17668,650,arma_de_fuego,no_determinado,False,"Motivo de consulta: hpaf (herida por arma de fuego) carga multiples TMF
+
+Examen físico: Orificiode entrada de perdigones 1 linea media escapular derecho a nivel de t4
+2 linea medio escapular izq a nivel de t3
+3 region toracoabdominal a nivel de. T1 -2
+
+Evolución y hospitalización: [FECHA]: [HORA] uretrorragia profusa de 1800cc e hipotension.
+[FECHA] se realiza lavado de cavidad toraxica.
+Hallazgos operatorios:
+hemotorax sidual de 600cc
+Ventana negativa, lesion de pulmon grado II con sangrado activo.
+Lesion pared toraxica sangrante.
+Sangrado de 800cc.
+
+[FECHA] pte (paciente) con buena evolucion se le a de alta con ontrol por consulta externas."
+24671,611,accidente_transito,alta,False,"Motivo de consulta: Me atropeyaron
+
+Examen físico: Paciente que sufre accidente de transito, peaton vs motocicleta, con pedida de conciencia no cuantificada. Presenta hematoma fronto parietal derecho, escoraciones dorso nasal.
+
+Evolución y hospitalización: Paciente en accidente de transito, peaton vrs motocicleta, presenta hematoma fronto parietal derecho, herida y escoraciones en dorso nasal, se realiza sutura de herida, se toma TAC (tomografia axial computarizada) craneo simple sin anormalidades, y RX (radiografia) de torax: normal. Se decide dar salida con analgesia, recomendaciones y signos de alrma."
+52151,921,accidente_transito,cirugia,False,"Motivo de consulta: A""CCIDENTE DE TRANSITO - POR VOLCAMIENTO DE MOTO
+
+Examen físico: PUPILAS ISOCORICAS NORMOREACTIVAS
+CUELLO MOVIL NO DOLOROSO
+ESCORIACION EN CEJA IZQUIERDA
+RUIDOS CARDIACOS RITMICOS REGULARES
+AMBOS CAMPOS PULMONARES VENTILADOS, MURMULLO VESICULAR PRESENTE BILATERAL
+ABDOMEN BLANDO, DEPRESIBLE NO DOLOROSO, NO SIGNOS DE IRRITACION PERITONEAL
+EXT: DOLOR EN HOMBRO IZQUIERDO CON LIMITACION PARA EL MOVIMIENTO, DOLOR EN CODO IPSILATERAL CON ESCORIACION ASOCIADA
+SNC: ALERTA, ORIENTADO, NO FOCALIZADO
+
+Evolución y hospitalización: PACIENTE QUE PRESENTA LUXACION DE HOMBRO IZQUIERDO CON FRACTURA DE HUMERO IZQUIERDO POST REDUCCION, EL CUAL REQUIERE MANEJO QUIRURGICO REDUCCION ABIERTA + OST (A PESAR DE HABERSE REALIZADO REDUCCION CERRADA PREVIAMENTE LA CUAL NO FUE EXITOSA), POR LO QUE EL SERVICIO DE ORTOPEDIA MANEJARA DE MANERA AMBULATORIA. SE SOLICITAN PARACLINICOS PREQUIRURGICOS Y SE INDICA AL PACIENTE."
+31104,571,quemadura,alta,False,"Motivo de consulta: SE QUEMO CON AGUA CALIENTE
+
+Examen físico: PACIENTE QUIEN SUFRE QUEMADURA CON AGUA CALIENTE EN CARA, CUELLO Y TORAX, EN EL MOMENTO SE EVIDENCIA LESIONES EN CARA EN REGION FRONTAL PERIORBITARIA DE OJO CON 4% DE QUEMADURA, CUELLO LESIONES AL LADO DERECHO DEL 2% TORAX DERECHA 1/9 AREOLA DE PEZON CON 4% BRAZO DERECHO CON QUEMADURA DEL 2%
+
+Evolución y hospitalización: PACIENTE CON QUEMADURAS SUPERFICIALES DE TRONCO Y CARA DEL 5% SCT SE REALIZO LIMPIEZA DE HERIDAS ES VALORADA POR LA UNIDAD DE QUEMADOS QUIEN COSIDERA DARLE SALIDA CON MANEJO AMBULATORIO"
+47787,436,accidente_transito,alta,False,"Motivo de consulta: Accidente de tránsito
+
+Examen físico: Paciente en calidad de pasajero de bus sufre trauma en región dorsolumbosacra, paciente sordo, ingresa estable hemodinamicamente, sin compromiso ventilatorio.
+
+Evolución y hospitalización: Paciente en buenas condiciones generales, hemodinamicamente estable. Rx (radiografia) no evidencian lesiones, no hemo ni neumotórax, no trazos de fracturas por lo cual se decide dar egreso."
+45309,383,caida,hospitalizacion,False,"Motivo de consulta: Caída desde la terraza
+
+Examen físico: Paciente remitido del Hospital [INSTITUCION] por caída desde el segudo piso de la casa. Presenta dos episodios de emesis de contenido alimentario
+
+Evolución y hospitalización: Paciente valorado por Neurocirugía determinando concusión cerebral que requiere seguir en observación contínua.
+En el momento paciente Glasgow 15/15"
+31305,525,no_determinado,alta,False,"Motivo de consulta: ME CAYÓ UNA PERSIANA DE HIERRO EN LA CABEZA
+
+Examen físico: PACIENTE QUE INGRESA AL SERVICIO DE URGENCIAS POR PRESENTAR TRAUMA CONTUSO DIRECTO EN CRANEO, PERDIDA DE LA CONCIENCIA DE TIEMPO DESCONOCIDO.
+DOLOR A LA PALPACION EN HEMIABDOMEN INFERIOR.
+
+Evolución y hospitalización: PACIENTE VALORADA POR CIRUGIA GENERAL, SE TOMAN TAC (tomografia axial computarizada) CEREBRAL Y COLUMNA CERVICAL SIN EVIDENCIA DE LESIONES.
+EVOLUCION CLINICA ESTABLE. SE DECIDE DAR EGRESO CON RECOMENDACIONES Y SIGNOS DE ALARMA."
+36343,389,caida,alta,False,"Motivo de consulta: me caí de una moto
+
+Examen físico: abrasión en oído izquierdo de % cm aprox.
+presenta traumatismo con disminución funcional de hombro izquierdo.
+
+Evolución y hospitalización: paciente valorado por ortopedia, radiografías sin compromiso óseo anormal.
+paciente con evolución favorable, hemodinamicamnete estable y tolerando vía oral, se decide dar egreso con analgésicos."
+29432,706,cortopunzante,hospitalizacion,False,"Motivo de consulta: ME APUÑALARON
+
+Examen físico: TÓRAX: HPACP (herida por arma cortopunzante) EN 9 EIC (espacio intercostal) POSTERIOR, LINEA AXILAR, SIN SANGRADO ACTIVO, NO SOPLANTE.
+MSI (miembro superior izquierdo): HPACP EN ANTEBRAZO, DOLOR, DEFORMIDAD Y EDEMA.
+
+Evolución y hospitalización: PTE (paciente) QUE SUFRE HPACP (herida por arma cortopunzante) EN TÓRAX Y MSI (miembro superior izquierdo), SE REALIZAN PRUEBAS DIAGNOSTICAN QUE NO EVIDENCIAN LESIONES, SE DEJA EN OBSERVACIÓN DE ABDOMEN, ES REVISADO POR ORTOPEDIA Y ENCUENTRAN UNA FRACTURA ANTIGUA, CON PLACA BLOQUEADA SIN ALTERACIONES, SE DECIDE INMOVILIZAR MIEMBRO CON FÉRULA BRAUIOPALMAR.
+
+SE DECIDE DAR SALIDA CON RECOMENDACIONES GENERALES."
+39694,567,accidente_transito,hospitalizacion,False,"Motivo de consulta: ACCIDENTE DE TRANSITO
+
+Examen físico: cabeza con cefalohematoma frontal medial, codo izquierdo con abrasion y edema, codo derecho con equimosis y edema, rodilla izquierda con abrasion.
+
+Evolución y hospitalización: PACIENTE EN BUENAS CONDICIONES GENERALES ALERTA ORIENTADO NO FOCALIZADA SIN DETERIORO NEUROLOGICO HEMODINAMICAMENTE ESTABLE CON ESTUDIOS NEGATIVOS PARA FRACTURAS SCAN CEREBRAL SIN CAMBIOS SECUNDARIOS A TRAUMA, ASINTOMATICA, SE CONSIDERA QUE COMPLETA PERIODO DE OBSERVACION CLINICA, SE DA EGRESO CON RECOMENDACIONES SIGNOS DE ALARMA."
+5241,721,caida,hospitalizacion,False,"Motivo de consulta: Se cayo
+
+Examen físico: Dolor en region occipital sin heridas o fractura, dolor en region cervical posterior a la palpacion, tacto rectal no se evidencia sangrado
+
+Evolución y hospitalización: Paciente que ingresa al servicio de urgencias por caida de escaleras, se hace la valoracion inicial y se traslada a undad e trauma, donde se solicita valoracion por neurocx tac (tomografia axial computarizada) cerebral simple el cual no evidencia fx (fractura), contusiones ni hemorragias, no compromiso de la columna cervical y rx (radiografia) de torax
+refiere encontrarse con cefalea intensa, se deja observacion, tiempo en el cual tiene una buena evolucion sin deficit neurologico y se decide dar salida."
+40501,687,accidente_transito,hospitalizacion,False,"Motivo de consulta: accidente de transito
+
+Examen físico: hematoma + edema peri-orbitario derecho + herida de +/- 2cm sangrado escaso.
+hematoma en cuadrante superior izquierdo de mama izquierda.
+edema + dolor en rodilla derecha.
+
+Evolución y hospitalización: paciente genera reacción a analgésico.
+paciente se deja en observación.
+[FECHA]. bajo anestesia local se realiza desbridamiento y sutura en dos planos de la herida supraciliar y dermoabrasion a nivel malar.
+paciente con adecuada evolución clínica, se decide dar salida con recomendaciones, signos de alarma ademas de analgesia.
+cita control en 10 días.
+retiro de puntos en 6 dias.
+se da orden de ecografía de manera ambulatoria."
+5109,548,arma_de_fuego,fallecimiento,False,"Motivo de consulta: Multiples heridas por arma de fuego.
+
+Examen físico: Heridas de proyectil en cara, cuello y brazo derecho, igresa con IOT (intubacion orotraqueal) herida de proyectil en zona cigomatica derecho sin orifico de salida, equimosis en ojo izq
+
+Evolución y hospitalización: [FECHA] [HORA] paciente con movimientos de decorticacion al estimulo doloroso
+[HORA] paciente entre en paro respiratorio, se realizan maniobras de reanimacion, a los 7min con ritmo sinusal.
+Paciente ingresa nuevamente en paro respiratorio, fallece a las [HORA]"
+25558,549,caida,alta,False,"Motivo de consulta: Paciente que presenta sincope y caida.
+
+Examen físico: Paciente que presento caida de sus propia altura, sin perdida del conocimiento.
+
+Evolución y hospitalización: Paciente que ingresa por unidad de trauma por caida de su propia altura al parecer sincope, pero sin perdida del conocimieto y posterior a la caida. Paciente se levanta y deambula normalmente. Se toma TAC (tomografia axial computarizada) cerebral: normal. Se toma EKG (electrocardiograma) normal.
+Se da salida con formula medica, recomendaciones, signos de alarma."
+36439,623,accidente_transito,hospitalizacion,False,"Motivo de consulta: ACCIDENTE DE TRANSITO
+
+Examen físico: PIE IZQUIERDO CON HERIDA EN TALÓN QUE DESPRENDE LA REGIÓN PLANTAR POSTERIOR, CON EXPOSICIÓN DE TEJIDO OSEO Y TENDONES SIN COMPROMETERLOS.
+
+Evolución y hospitalización: PIE IZQUIERDO CON HERIDA DE TALÓN SUTURADA, APARENTEMENTE LIMPIA, SIN SIGNO SDE SOBREIFECCION LOCAL, SIN SECRECIONES PURULENTAS.
+PACTE QUE NO PRESENTO COMPLICACIONES RESPIRATORIAS, HEMODINAMICAS Y NEUROLOGICAS DURANTE SU OBSERVACIÓN, SEGUIMIENTO CLÍNICO Y MANEJO MEDICO.
+SE DECIDE MANEJO AMBULATORIO POR HERIDA COMPLEJA EN EL PIE IZQUIERDO, LAVADA Y SUTURADA POOR EL SERVICIO DE ORTOPEDIA- TRAUMA."
+37328,660,accidente_transito,alta,False,"Motivo de consulta: accidente de transito
+
+Examen físico: paciente en estado de alicoramiento, hematoma y laceracion en region frontal, equimosis y edema palpebral ojo derecho, restos de epistaxis en fosa nasal derecha. laceracion en flanco derecho por encima de la espina iliaca posterosuperior.
+
+Evolución y hospitalización: paciente con evolucion satisfactoria tolerando adecuadamente la via oral, con adecuada diuresis y deposiciones, ya valorado por oftalmologia. paciente quien ya completo observaciuon, quien ya fue valorado por oftalmologia por lo cual se decide dar alta.control en centro de salud en 15 dias se dan recomendaciones y signos de alarma."
+13684,328,caida,cirugia,False,"Motivo de consulta: Me cai
+
+Examen físico: Limitacion funcional cadera izq. Leve edema sin deficit neurovascular
+
+Evolución y hospitalización: Paciente con fractura transcervical de femur izquierdo, se decide progamar para reduccion abierta + osteosintesis con tornillos canulados de 6,5.PACIENTE ESTABLE CON ADECUADA EVOLUCION."
+25501,358,cortopunzante,remision,False,"Motivo de consulta: Me apuñalearon
+
+Examen físico: Herida por arma cortopunzante en 3er espacio intercostal izquierdo con linea axilar anterior en el momento sin sangrado activo. No se observan otras lesiones.
+
+Evolución y hospitalización: Se evidencia hemotorax izquierdo por lo cual se realiza toracostomia izquierda. Paciente estable, se remite a nivel II"
+38323,525,cortopunzante,hospitalizacion,False,"Motivo de consulta: SE TRAGO UN VIDRIO
+
+Examen físico: PTE (paciente) QUIE ACCIDENTALMENTE INGIERE TROZO DE VIDRIO EN EL TETERO.
+
+Evolución y hospitalización: SE REVISA PACIENTE QUIEN SE ENCUENTRA EN BUENAS CONDICIONES GENERALES, SIN DOLOR ABDOMINAL. ES VALORADO POR EL SERVICIO DE CX PEDIATRICA QUIEN INDICA ALTA POR EL SERVICIO Y CONTROL CON MEDICO GENERAL EN 1 SEMANA.
+PEDIATRIA NO ENCUENTRA CRITERIOS DE HOSPITALIZACION. DA EGRESO HOSPITALARIO Y CONTROL POR PEDIATRA EN 1 MES. RECOMENDACIONES GENERALES Y SIGNOS DE ALARMA"
+22489,147,no_determinado,alta,False,"Motivo de consulta: DOLOR DE CADERA
+
+Examen físico: NO PRESENTA DEFORMIDAD
+
+Evolución y hospitalización: SE DA SALIDA CON CONSULTA EXTERNA EN 1 MES"
+36579,399,accidente_transito,alta,False,"Motivo de consulta: ME ATROPELLO UNA MOTO
+
+Examen físico: PTES CON MÚLTIPLES CONTUSIONES EN CABEZA, COLUMNA LUMBAR Y MID (miembro inferior derecho)
+
+Evolución y hospitalización: PTE (paciente) CON MÚLTIPLES TRAUMAS EN CABEZA, ESPALDA Y MI, SE REALIZARON PRUEBAS DIAGNOSTICAS QUE NO EVIDENCIAN LESIONES OSEAS.
+
+PTE EN BUENAS CONDICIONES GENERALES, SE DA EGRESO CON RECOMENDACIONES Y SIGNOS DE ALARMA."
+23606,818,arma_de_fuego,fallecimiento,False,"Motivo de consulta: Remitido del Hospital [INSTITUCION], por HPAF (herida por arma de fuego) Cabeza y hombros.
+
+Examen físico: Paciente que ingresa remitido del [INSTITUCION] por presentar HPAF (herida por arma de fuego) a nivel temporoparietal izquierda y oricicios por proyectil, tangenciales a nivel de hombros.
+
+Evolución y hospitalización: Paciente que presenta HPAF (herida por arma de fuego) en región temporoparietal izquierda y em miembros superiores, ingreso al salad de emergencias con intubación orotraqueal con glasgow de 3/15, con mal pronostico, sin reflejo tusígeno, sin reflejo corneal, con ventilación mecánica, se comenta a familiares.
+[FECHA]: se realiza test de apnea positivo para muerte cerebral, se explica a la familia y se da diagnostico de muerte cerebral. Paciente que a las [HORA] fallece."
+56469,590,arma_de_fuego,cirugia,False,"Motivo de consulta: ME DISPARARON
+
+Examen físico: DOLOR A LA PALPACIÓN DE CUELLO
+ORIFICIO DE ENTRADA HERIDA POR ARMA DE FUEGO EN REGIÓN PERIUMBILICAL CON ABDOMEN AGUDO
+SIN ORIFICIO DE SALIDA
+
+Evolución y hospitalización: PACIENTE LLAMADA A QUIROFANO, SE ENCUENTRA LESIÓN DE VENA CAVA INFERIOR CERCA A LA BIFURCACIÓN DE LAS VENAS ILIACAS COMUNES, SE REALIZAN ANASTOMOSIS VASCULARES CON PROLENE 5-0 VASCULAR EXITOSAS, EN 2 REGIONES POR EQUIPO DE CIRUGIA GENERAL, SE REALIZA EXPLORACIÓN DE URETER DERECHO DESDE SU PORCIÓN DISTAL HASTA PROXIMAL EN LA ENTRADA DEL HILIO RENAL SIN LESIÓN URETRAL."
+41591,605,accidente_transito,alta,False,"Motivo de consulta: accidente de transito
+
+Examen físico: herida en tercio medio de antebrazo izquierdo, no deformidad.
+
+Evolución y hospitalización: bajo anestesia, buena asepsia y antisepsia, se realiza cierre de colgajo traumatico región frontal, puntos profundos vicryl 5-0 superficiales con nylon 5.0, se sutura herida glabelar nylon 5.0, se realiza dermoabrasion en areas descritas, se cubre con bactigras, gasas estériles y micropore, procedimiento sin complicaciones.
+egreso con:
+retiro de puntos en centro de salud en 5 dias, control en una semana, cefalexina, recomendaciones y signos de alarma."
+29230,579,contundente,alta,False,"Motivo de consulta: REMITIDO [INSTITUCION]
+
+Examen físico: PACIENTE QUE SUFRE MÚLTIPLES LESIONES EN LABIO SUPERIOR, OJO DERECHO, MENTÓN, Y TÓRAX POSTERIOR AL PARECER POR ARMA CORTO CONTUNDENTE ( PICO DE BOTELLA), AL EXAMEN FÍSICO SE OBSERVA EN ANTEBRAZO IZQUIERDO DE APRO. 5CM, HERIDA EN ALA NASAL IZQUIERDA, PARPADO DERECHO, HERIDA EN TÓRAX A NIVEL POSTERIOR, A NIVEL ESCAPULAR.
+
+Evolución y hospitalización: PACIENTE HEMODINAMICAMENTE ESTABLE, SE REALIZA SUTURA DE HERIDAS, SIN COMPLICACIONES, SE ORDENA SALIDA CON SIGNOS DE ALARMA, CITA DE CONTROL Y RECOMENDACIONES GENERALES."
+56039,560,accidente_transito,alta,False,"Motivo de consulta: ACCIDENTE DE TRANSITO - COLISION CARRO VS OBJETO FIJO
+
+Examen físico: TRAUMA CRANEOENCEFALICO LEVE SIN PERDIDA DE LA CONSCIENCIA Y TRAUMA CONTUNDENTE EN QUINTO DEDO DE MANO DERECHA, CON ESCORIACIONES SUPERFICIALES EN CARAS EXTERIORES DE REGIÓN TIBIAL + HEMATOMA ESTABLE BILATERAL.
+
+Evolución y hospitalización: PACIENTE BAJO VIGILANCIA NEUROLOGICA. IMAGENOLOGIA EN PARAMETROS NORMALES POR LO QUE SE BRINDA ALTA POR BUENA EVOLUCION. SE BRINDA RECOMENDACIONES, SIGNOS DE ALARMA Y ANALGESIA AMBULATORIA. CONTROL POR CONSULTA EXTERNA EN 72 HRS."
+3487,762,caida,no_determinado,False,"Motivo de consulta: caida de 2 mts de altura desde andamio
+
+Examen físico: Escoriaciones en dorso de pie izquierdo
+Dolor a la palpacion de proco espinoso cervical.
+Deficit motor MMSS (miembros superiores) distalmente para la extension, flexion y pronacion de las manos, parestesias en MMSS y MMII (miembros inferiores) no bipedestacion.
+
+Evolución y hospitalización: RESULTADO DE RESONANCIA (FEB/12/2012)
+1. Cambios del cuerpo vertebral c4 laterales izquierdo que sugieren compromete de edema trabecular por fractura recienter con discreto acuñamiento de dicha vertebra.
+2. Hay un canal raquideo medular estrecho adquirido que es moderado. C3, C4, C5, Y LEVE C5, C6.
+3. estenosis foramil C3, C4 DERECHA Y C4, C5 bilateral de tener presentacion clinica radicular."
+10901,398,no_determinado,no_determinado,False,"Motivo de consulta: Se corto con una pulidora
+
+Examen físico: Hx (herida) penetrante en cara anterior tercio medial de tibia der con exposicion de tejido celular subcutaneo, musculo y tendones, con limitacion para la dorsiflexion de pie der sin deficit neurovascular.
+
+Evolución y hospitalización: Hallazgos: lesion miotendinosa. Extensor largo Hallux tibial anterior y extensor corto de los dedos."
+41653,563,cuerpo_extrano,no_determinado,False,"Motivo de consulta: REMITIDO DEL [INSTITUCION] POR CUERPO EXTRAÑO EN FARINGE
+
+Examen físico: en cavidad oral se observa cuerpo extraño (cedra de cepillo) en amigdala derecha.
+
+Evolución y hospitalización: SE REALIZA EXTRACCIÓN DE CUERPO EXTRAÑO POR PARTE DE ORL (otorrinolaringologia) BAJO SEDACIÓN, SE SUMINISTRAN MIDAZOLAM A DOSIS DE 0.2 mg/Kg Y KETAMINA A DOSIS DE 1 mg/Kg. SIGNOS VITALES AL MOMENTO CON FC (frecuencia cardiaca): 132 LPM PA: 114/ 66 mmHg SaO2: 96%. SE REALIZARÁ MONITOREO DE SIGNOS VITALES Y DE ACUERDO A EVOLUCIÓN DEL PACIENTE SE DARÁ SALIDA."
+36435,612,accidente_transito,alta,False,"Motivo de consulta: ACCIDENTE DE TRANSITO POR VOLCAMIENTO DE MOTO
+
+Examen físico: PACIENTE QUE INGRESA 12 HORAS DESPUES DEL EVENTO PORQUE REFIERE DOLOR INTENSO ENLA RODILLA IZQUIERDA, NO EDEMA NO DEFORMIDAD.
+
+Evolución y hospitalización: SE REALIZO TAC (tomografia axial computarizada) DE RODILLA CON RESULTADOS DE NORMALIDAD.
+PACIENTE EN BUENAS CONDICIONES GENERALES VALORADA POR EL SERVICIO DE ORTOPEDIA QUIEN REFIERE QUE SE LE PUEDE DAR SALIDA Y MANEJO POR CONSULTA EXTERNA, EN EL MOMENTO SIN EDEMA SIN INESTABILIDAD DE LA RODILLA TAC NORMAL.
+PACIENTE QUE SE LE DA DE ALTA CON CITA EN 3 SEMANAS POR ORTOPEDIA."
+39470,266,accidente_transito,alta,False,"Motivo de consulta: ACCIDENTE DE TRANSITO.
+
+Examen físico: DOLO Y EDEMA EN REGION DORSAL DE LA MANO IZQ.
+DOLOR EN PIE IZQ CON LEVE EDEMA.
+
+Evolución y hospitalización: PTE (paciente) EN BUENAS CONDICIONES GENERALES, SE DARA CITA PARA CX POR CX PLASTICA. SE DA EGRESO"
+24858,318,accidente_transito,alta,False,"Motivo de consulta: me atropello un carro
+
+Examen físico: se evidencia escoriacion en dorso de 2do dedo mano derecha, edema dolor, e incapacidad para la movilizacion.
+
+Evolución y hospitalización: paciente con fx (fractura) de 3er metacarpiano se decide dar salida con cita de control por anestesia seordena analgesia."
+32166,581,arma_de_fuego,alta,False,"Motivo de consulta: ME DISPARARON
+
+Examen físico: PCTE (paciente) CON HERIDA EN HOMBRO DERECHO CON ORIFICIO DE ENTRADA EN CARA ANTERIOR, CON LIMITACIÓN PARA LA ABDUCCIÓN, DOLOR INTENSO A LA PALPACIÓN, SE PALPA LO QUE PODRÍA SER PROYECTIL EN CARA POSTERIOR DEL HOMBRO, SANGRADO ACTIVO ESCASO.
+
+Evolución y hospitalización: [FECHA]: Al presentar ausencia de compromiso articulación glenohumeral, ni compromiso neurovascular, se decide realizar L + D * extracción de proyectil de arma de fuego alojado en plano superficial de escapula derecha. Posterior al procedimiento se da salida."
+11749,638,arma_de_fuego,no_determinado,False,"Motivo de consulta: HPAF (herida por arma de fuego) transpelvica
+
+Examen físico: Pte (paciente) con hpaf (herida por arma de fuego) en region glutea con trayecto PA salida de orificio en cara lateral izquierda de pene con hematoma pelvico derecho no pulsatil, sin soplo, tacto rectal (-) sonda vesical sin hematoma.
+
+Evolución y hospitalización: [FECHA]: Rxploracion peno-escrotal
+Rafia cuerpo cavernoso izquierdo
+
+Testiculos y epididimo indemnes.
+Seccion completa del conducto deferente derecho, aprox. a 3 cm del epididimo.
+Lesion del cuerpo cavernoso izquierdode aprox. 2,3 cm de longitud.
+Cuerpo espongioso y uretra, no comprometidos."
+28846,691,caida,no_determinado,False,"Motivo de consulta: REMITIDO POR FX (fractura) RADIO IZQUIERDO
+
+Examen físico: EDEMA EN 1/3 DISTAL ANTEBRAZO IZQUIERDO CON HERIDA DE APROXIMADAMENTE 1CM SIN SANGRADO ACTIVO; LEION EN 3ER DEDO DE MANO IZQUIERDA SUPERFICIAL DE 1CM DE DIAMETRO
+
+Evolución y hospitalización: PACIENTE CON CAIDA DE 3 MTS DE ALTURA HACE 1 DIA CON FX (fractura) EXPUESTA RADIOULNAR IZQUIERDA CON CONDUCTA QUIRURGICA DEFINIDA, CON ANALGESIA, ESTABLE HEMODINAMICAMENTE, PENDIENTE LLAMADO A CX PARA RC + OTS CLAVOS CRUZADOS VS PLACA BLOQUEADA DE RADIO; FAMILIAR Y PACIENTE MANIFIESTAN VOLUNTAD DE SALIDA DEL HOSPITAL, SE EXPLICA NECESIDAD DE TRATAMIENTO PERO INSISTEN EN SOLICITAR ALTA VOLUNTARIA, SE FIRMA DECLARACION"
+35213,522,caida,alta,False,"Motivo de consulta: SE FRACTURO EL BRAZO
+
+Examen físico: PTE (paciente) QUE SUFRE CIADA CON POSTERIOR DOLOR Y LIMITACION FUNCIONAL DE ANTEBRAZO IZQUIERDO.
+TRAE RX (radiografia) DE PERIFERIA DONDE SE EVIDENCIA FX (fractura) DE RADIO.
+
+Evolución y hospitalización: PTE (paciente) QUE PRESENTO LUXACION DE CODO IZQ Y FRACTURA DE RADIO DISTAL SECUNDARIO A CAIDA DE 2MTS DE ALTURA, SE REALIZA REDUCCIÓN CERRADA E INMOVILIZACION CON YESO.
+
+PTE EN BUENAS CONDICIONES GENERALES SE DA EGRESO CON RECOMENDACIONES Y SIGNOS DE ALARMA."
+5117,513,contundente,no_determinado,False,"Motivo de consulta: Por que me pegaron 2 tiros
+
+Examen físico: Herida 1 region temporal izq y haf (herida por arma de fuego) en region temporoparietal con hematoma estable, sin trill, ni sangrado activo, no deformidad de craneo. Haf en cara anterior de extremo distal pierna derecha, irificio de 1*2cm, sangrado activo, no Hematoma
+
+Evolución y hospitalización: [FECHA]: el dia de hoy ingresa concambios faciales que sugieren paralisis facial de prigen central y disartria por lo cual se decide vloracion y manejo"
+34693,481,no_determinado,no_determinado,False,"Motivo de consulta: me golpee el dedo del pie
+
+Examen físico: se observa lesión del lecho y la matriz ungeal, herida a nivel del tercio distal del primer dedo del pie izquierdo.
+
+Evolución y hospitalización: PREVIA ASEOSIA Y ANTISEPSIA SE REALIZA BLOQUEO DE GRUESO ARTEJO PIE IZQUIERDO SE LAVA CON 1000 CC SE REALIZA CURETAJE + DESBRIDAMINETO CON SOLUCION DE YODOPOVIDONA SE REPARA MATRIZ UNGUEAL.
+SE TOMAN PUNTOS DE AFROTAMIENTO SE CUBRE CON GASA.
+PROCEDIMIENTO SIN COMPLICACIONES"
+25132,506,no_determinado,no_determinado,False,"Motivo de consulta: Remitido por trauma maxilofacial
+
+Examen físico: Deformidad en cigomatico izquierdo, sin crepitaciones, equimosis parpado inferior izquierdo
+
+Evolución y hospitalización: Se realizo Tac (tomografia axial computarizada) facial donde se observo fractura de pared lateral de órbita y seno maxilar izquierdo asociado a fractura de arco cigomatico izquierdo deprimida. Se realiza suturas de herida y se da alta por otorrinolaringologia con cita para reducción de fractura de arco cigomatico."
+14754,723,caida,no_determinado,False,"Motivo de consulta: Remitido por AT, con posterior caida a caño
+
+Examen físico: Pupilas isocoricas, reactivas a la luz, glasgow 14/15. Pero pte (paciente) bajo efectos de alcohol! No focalizado.
+Lesion profunda en region ciliar izq. Con exposicion osea, lesion profunda en region mandibular izq. Con exposicion osea, lesion profunda labio superior izq. Equimosis palpebral izq.
+
+Evolución y hospitalización: [FECHA]. Pte (paciente) con FR (frecuencia respiratoria) 60, FC (frecuencia cardiaca) 140, Sat 56%, FiO2 0.40 pte con agitacion psicomotris, no obedece ordenes, pte con hipotermia severa con criterios de intubacion.
+[FECHA]: monitoria sin respuesta por lo cual se inicia maniobras de reanimacion, se declara muerto."
+36806,448,accidente_transito,hospitalizacion,False,"Motivo de consulta: ACCIDENTE DE TRANSITO
+
+Examen físico: DOLOR A LA PALPACIÓN DE PROCESOS ESPINOSOS CERVICALES C2 Y C3.
+
+Evolución y hospitalización: PACIENTE QUE NO HA (hipertension arterial) PRESENTADO COMPLICACIONES RESPIRATORIA, HEMODINAMICAS Y NEUROLOGICAS DURANTE SU OBSERVACION Y MANEJO MEDICO, POR LO QUE SE DECIDE CONTINUAR MANEJO AMBULATORIO DE TCE (trauma craneoencefalico) TIPO CONCUSION CEREBRAL Y DE CERVICALGIA POST-TX (tratamiento)"
+4731,613,arma_de_fuego,alta,False,"Motivo de consulta: me hirieron
+
+Examen físico: HPAF (herida por arma de fuego) en tercer espacio intercostal izquierdo entre linea axilar anterior y linea medioclavicular, herida 2 segundo espacio intercostal derecha linea medio clavicular, herida 3 axilar derecha, herida 4 tercio distal antebrazo izquierdo cara anterolateral con orificio de salida en caramedial a nivel de retinaculo de los flexores.
+
+Evolución y hospitalización: Rx (radiografia) de torax sin alteraciones
+Paciente con conducta quirurgica definida para la extension y movilidad de artejos por dolor, se decide dar salida y manejo ambulatorio"
+54199,627,accidente_transito,alta,False,"Motivo de consulta: ACCIDENTE DE TRANSITO - MOTO VS MOTO
+
+Examen físico: PACIENTE CON CONTUSIÓN A NIVEL CRANEOFACIAL (CONTABA CON CASCO) - NO TUVO PERDIDA DE CONSCIENCIA, NO HAY ALTERACIÓN NEUROLÓGICA (SENSITIVA O MOTORA). SE EVIDENCIA CEFALOHEMATOMA FRONTAL IZQUIERDO, HEMATOMA A NIVEL CIGOMATICO IZQUIERDO, NO HAY SIGNOS DE FRACTURA, NO HAY DOLOR A LA PALPACIÓN DE PIRÁMIDE NASAL, NO HAY ESCALONAMIENTOS, APERTURA ORAL CONSERVADA.
+
+Evolución y hospitalización: COMPLETA VALORACION NEUROLOGICA POR 12 HRS SIN COMPLICACIONES, SE BRINDA ALTA CON RECOMENDACIONES Y SIGNOS DE ALARMA. CIRTA DE CONTROL POR CONSULTA EXTERNA NIVEL I."
+37297,424,accidente_transito,alta,False,"Motivo de consulta: LA ATROPELLO UNA MOTO
+
+Examen físico: LEVE EQUIMOSIS DE 2X2MM A NIVEL DE TERCIO SUPERIOR DE CARA ANTEROLATERAL DE PIERNA IZQ, CON LIMITACIÓN MARCADA PARA LA DEAMBULACION.
+
+Evolución y hospitalización: PACIENTE PRESENTA FRACTURA MARGINAL DE TIBIA PROXIMAL IZQUIERDA. NO SE EVIDENCIA COMPROMISO ARTICULAR, VASCULAR O NERVIOSO, SE REALIZA REDUCCIÓN CERRADA E INMOVILIZACION.SE DA SALIDA CON CITA DE CONTROL."
+57299,579,no_determinado,no_determinado,False,"Motivo de consulta: LO ARROLLÓ UNA MOTO
+
+Examen físico: POLITRAUMATISMO EN ABDOMEN, PELVIS Y REGION LUMBOSACRA
+
+Evolución y hospitalización: PACIENTE QUE INGRESA POR ACCIDENTE AUTOMOVILISTICO EN EL CUAL ES ARROLLADO POR UNA MOTO.
+MADRE REFIERE PERDIDA DE CONSCIENCIA DE 10 MINUTOS, AL MOMENTO INGRESA CON GLASGOW 15/15.
+
+SE REALIZA EXAMEN FISICO DONDE SE ENCUENTRAN MULTIPLES HERIDAS EN REGION MAXILOFACIAL, ABDOMINAL Y LUMBOSACRA.
+SE DECIDE LLEVAR A CIRUGÍA PARA HACER LAVADO DEBIDO A QUE LAS HERIDAS EVIDENCIAN CONTAMINACIÓN.
+
+SE LLEVA A CIRUGÍA EL [FECHA], SIN COMPLICACIONES."
+15983,234,accidente_transito,no_determinado,False,"Motivo de consulta: Accidente de transito
+
+Examen físico: Otorragia derecha, ahora sin sangrado activo
+Perdida de conocimiento, paciente ebrio GLASGO NO VALORADO
+
+Evolución y hospitalización: Pcte (paciente) hemodinamicamente estable."
+9831,693,arma_de_fuego,no_determinado,False,"Motivo de consulta: HPAF (herida por arma de fuego) en craneo, brazo.
+
+Examen físico: HAF (herida por arma de fuego) frontal derecho y orificio de salida parietal izq, orificio de salida suturado. Herida en MSI (miembro superior izquierdo) orificio de entrada en condilo medial con sangrado escaso
+
+Evolución y hospitalización: [FECHA]: otros procedimientos Qx (quirurgico): drenaje de hematoma epidural agudo, esquirlectomia, duroplastia, drenaje contusion cerebral.
+Hallazgos: fractura craneo frontal der conminuta y parietal conminuta. Hematoma epidural agudo 15cc.
+3 defectos de cobertura de duramadre frontal y parietal. Cerebro contusionado y maserado
+Ezquirlas oseas y metalicas escasas"
+23224,499,quemadura,no_determinado,False,"Motivo de consulta: me queme con aceite
+
+Examen físico: SE EVIDENCIAN MULTIPLES QUEMADURAS ASI:
+REGION OCULAR, MALAR, CUELLO ANTERIOR, REGION SUPERIOR DEL TORAX, TERCIO PROXIMAL DE MIEMBROS SUPERIORES, MUÑECA Y MANO DERECHA E IZQUIERDA, TERCIO DISTAL DE ANTEBRAZO DERECHO, REGION EPIGASTRICA.
+EXTREMIDADES MOVILES, PULSOS DISTALES POSITIVOS
+SIN DEFECIT NEUROLOGICO APARENTE
+
+Evolución y hospitalización: paciente con buena evolucion, sin dolorse decide dar de alta con cita el proximo lunes [FECHA]."
+12445,410,caida,alta,False,"Motivo de consulta: Remitido de timbiqui, caida de motor sobre pierna
+
+Examen físico: Presenta multiples heridas, suturadas a nivel de maleolo medial y cara lateral del pie y ademas a nivel de pierna y de pantorrilla.
+
+Evolución y hospitalización: pte (paciente) estable, afebril, sin signos de sirs, con adecuadaa evolucion. se decide dar salida con recomendaciones y sin signos de alarma. cita con ortopedia."
+28808,242,caida,no_determinado,False,"Motivo de consulta: SE CAYO
+
+Examen físico: DOLOR A LA MOVILIZACION DE CADERA DERECHA
+
+Evolución y hospitalización: PACIENTE QUIEN INGRESA POR CAIDA DE SU PROPIA ALTURA PRESENTADO CONTUSION DE CADERA POR LO CUAL SE DA CITA DE CONTROL Y SALIDA"
+56235,466,arma_de_fuego,alta,False,"Motivo de consulta: HPAF (herida por arma de fuego) EN GLUTEO IZQUIERDO
+
+Examen físico: PTE (paciente) EN ESTADO DE ALICORAMIENTO, REFIERE HABER FUMADO MARIHUANA MOMENTOS ANTES DEL INCIDENTE.
+HPAF (herida por arma de fuego) TRANSPELVICA POSTEROANTERIOR IZQUIERDA.
+
+Evolución y hospitalización: TAC (tomografia axial computarizada) SIN EVIDENCIA DE LESIÓN VASCULAR, HASTA EL MOMENTO 24 HORAS DE EVOLUCIÓN TOLERANDO VÍA ORAL, EN REVISTA CON [MEDICO] DECIDE DAR SALIDA."
+24008,649,arma_de_fuego,alta,False,"Motivo de consulta: CHPAF TORAX Y CARA
+
+Examen físico: PTE (paciente) QUE LLEGA CON MASCARA 02 Y BOLSA CONECTADA A BALA, NO TRAE COLLAR CERVICAL
+HIPOVENTILACION BASAL IZQUIERDA ENFISEMA SUBCUTANEO, HEMOTORAX ?
+SANGRADO ACTIVO EN REGION MANDIBULAR IZQUIERDA SOPLANTE
+
+HPAF1: RAMA MANDIBULAR INF
+HPAF (herida por arma de fuego) 2: TORACICA, ESCAPULAR SOPLANTE.
+
+Evolución y hospitalización: PACIENTE QUE LLEGA CON HPAF (herida por arma de fuego) EN CARA Y TORAX, ELO RX (radiografia) DE TORAX MUESTRA HEMONEUMOTORAX POR LO QUE SE REALIZA TORACOSTOMIA, PACIENTE CON PARALISIS DE LA CUERDA VOCAL IZQ, PACIENTE CON BUENA EVOLUCION POR LO QUE SE DA EGRESO"
+34850,423,cortopunzante,alta,False,"Motivo de consulta: me apuñalaron
+
+Examen físico: paciente presenta dolor en hombro derecho, niega parestesia.
+el arma tiene ingreso en región deltoidea posterior izquierda con trayecto aparentemente por encima de la clavícula y no hay orificio de salida de la punta del arma.
+
+Evolución y hospitalización: Salida
+-Recomendaciones generales, signos de alarma y reconsulta.
+-Acetaminofen 500mg cada 6 horas en caso de dolor."

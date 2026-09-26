@@ -1,0 +1,3 @@
+# Entorno compartido (.venv en la raíz) para las dos partes del proyecto.
+-r anonimizacion/requirements.txt
+-r rag_pipeline/requirements.txt

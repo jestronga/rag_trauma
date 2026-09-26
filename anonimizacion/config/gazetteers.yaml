@@ -1,0 +1,431 @@
+# ---------------------------------------------------------------------------
+# Gazetteers para la Capa B de anonimización.
+#
+# Generados por scripts/build_gazetteers.py a partir del propio corpus y luego
+# CURADOS A MANO. Todas las claves están normalizadas: minúsculas, sin tildes.
+#
+# Regla de oro: una entrada solo se anonimiza si va precedida de su *trigger*
+# (hospital/clínica/fundación para instituciones, dr/dra/doctor para médicos).
+# Por eso "clínica satisfactoria" o "antebrazo dr." no se tocan.
+# ---------------------------------------------------------------------------
+
+# Nombres propios de IPS. Se anonimizan como [INSTITUCION].
+# Ordenados por longitud descendente en tiempo de ejecución para que
+# "carlos holmes trujillo" gane sobre "carlos holmes".
+instituciones:
+  - amiga
+  - benjamin barney
+  - benjamin
+  - burgos
+  - comfenalco
+  - evaristo garcia
+  - evaristo
+  - isaias duarte cancino
+  - isaias
+  - jpb
+  - orejuela
+  - palerma
+  - palma real
+  - palma
+  - timbiqui
+  - tomas uribe
+  - tomas
+  - torres
+  - buena esperanza
+  - canaveralejo
+  - carlos carmona
+  - carlos holmes trujillo
+  - carlos holmes
+  - carmona
+  - club noel
+  - colombia
+  - comfandi
+  - cristo rey
+  - divino nino
+  - farallones
+  - imbanaco
+  - isaias duarte cancino
+  - joaquin paz borrero
+  - joaquin paz
+  - jose rufino vivas
+  - la buena esperanza
+  - lili
+  - maria angel
+  - mario correa rengifo
+  - mario correa
+  - nuestra senora de los remedios
+  - nuestra senora
+  - occidente
+  - piloto de jamundi
+  - piloto
+  - primitivo iglesias
+  - primitivo iglesia
+  - raul orejuela bueno
+  - raul orejuela
+  - remedios
+  - rey david
+  - san fernando
+  - san francisco
+  - san jorge
+  - san jose
+  - san juan de dios
+  - san juan
+  - san rafael
+  - san roque
+  - san vicente
+  - santa catalina
+  - santa margarita
+  - santa sofia
+  - sebastian
+  - universitario del valle
+  - valle del lili
+  - valle de lili
+  - versalles
+
+# Siglas de instituciones. Se anonimizan SIN trigger, pero solo con
+# límite de palabra y respetando mayúsculas/minúsculas exactas.
+instituciones_siglas:
+  - HUV
+
+# Nombres completos e inequívocos que aparecen SIN el trigger
+# ("es llevado al Club Noel", "remitido de Valle del Lili"). Solo entran aquí
+# nombres que no pueden confundirse con vocabulario clínico.
+instituciones_sin_trigger:
+  - club noel
+  - valle del lili
+  - carlos holmes trujillo
+  - isaias duarte cancino
+  - primitivo iglesias
+  - joaquin paz borrero
+  - mario correa rengifo
+  - raul orejuela bueno
+  - jose rufino vivas
+  - benjamin barney
+  - evaristo garcia
+  - san juan de dios
+  - canaveralejo
+  - imbanaco
+  - comfandi
+
+# Palabras que siguen a hospital/clínica/fundación pero NO son nombres propios.
+# Sin esta lista, "evolución clínica satisfactoria" u "hospital de periferia"
+# se anonimizarían y se perdería información clínica real.
+tipos_genericos:
+  - aceptable
+  - actual
+  - anotada
+  - debe
+  - estacionaria
+  - evaluado
+  - evolucion
+  - falleciendo
+  - neurologica
+  - oftalmologica
+  - pendiente
+  - puede
+  - quien
+  - refiriendo
+  - sastifactoria      # typo real del corpus
+  - satifactoria       # typo real del corpus
+  - significativa
+  - tras
+  - uroanalisis
+  - adecuada
+  - adecuado
+  - buena
+  - bueno
+  - cercano
+  - compatible
+  - critica
+  - critico
+  - de periferia
+  - descrita
+  - especializada
+  - estable
+  - estricta
+  - estricto
+  - favorable
+  - general
+  - hemodinamicamente
+  - infantil
+  - leve
+  - local
+  - mala
+  - manifestada
+  - moderada
+  - ni radiologica
+  - nivel
+  - observada
+  - oftalmologica
+  - periferia
+  - psiquiatrico
+  - referida
+  - regular
+  - remisor
+  - severa
+  - similar
+  - sugestiva
+  - sugestivo
+  - satisfactoria
+  - satisfactorio
+  - universitario
+
+# Asimetría del corpus: "hospital" casi siempre precede al nombre de una IPS,
+# mientras que "clínica" es adjetivo la mitad de las veces ("evolución clínica
+# satisfactoria"). Por eso:
+#   - clínica / fundación -> solo se anonimiza con nombre del gazetteer (whitelist)
+#   - hospital / ESE / IPS -> se anonimiza el token siguiente SALVO que esté aquí
+# Esta lista es la única puerta abierta, así que conviene mantenerla al día con
+# lo que reporte reports/residuo_phi.csv.
+hospital_genericos:
+  - basico
+  - cercano
+  - de menor complejidad
+  - de mayor complejidad
+  - general
+  - infantil
+  - local
+  - mas cercano
+  - municipal
+  - nivel
+  - periferia
+  - periferico
+  - psiquiatrico
+  - regional
+  - remisor
+  - remitente
+  - universitario
+  # detectados en reports/hospital_tokens_anonimizados.csv como
+  # sobre-anonimización: no son nombres de IPS
+  - cual
+  - cuadro
+  - dia
+  - dicho
+  - este
+  - esta
+  - lado
+  - mas
+  - mayor
+  - menor
+  - mismo
+  - momento
+  - motivo
+  - otro
+  - otra
+  - paciente
+  - presento
+  - primaria
+  - primer
+  - primera
+  - remision
+  - salud
+  - servicio
+  - tal
+  # formas verbales / conectores que aparecen tras "hospital" sin ser nombre
+  - a
+  - al
+  - con
+  - donde
+  - el
+  - en
+  - es
+  - fue
+  - la
+  - los
+  - las
+  - para
+  - por
+  - presenta
+  - que
+  - quien
+  - se
+  - sin
+  - un
+  - una
+  - y
+
+# Apellidos y nombres de profesionales detectados tras un trigger dr/dra/doctor.
+# Se usan como WHITELIST de alta precisión: si aparece "Dr. <algo>" que no está
+# aquí, no se reemplaza pero SÍ se registra en el reporte de revisión.
+# Esto evita destrozar "antebrazo dr." (dr = derecho) o "sin dr pero con...".
+medicos:
+  - abello
+  - alfredo
+  - alvarado
+  - balanta
+  - barbosa
+  - bedoya
+  - bermudez
+  - blanco
+  - boris
+  - caicedo
+  - calvache
+  - carbonell
+  - cardozo
+  - casas
+  - castillo
+  - castro
+  - catano
+  - cordoba
+  - dario
+  - daza
+  - delgado
+  - diana
+  - diego
+  - dominguez
+  - echandia
+  - fabian
+  - fernando
+  - florez
+  - franco
+  - fuertes
+  - gallego
+  - gamboa
+  - garcia
+  - gesrtner
+  - gerstner
+  - gomez
+  - gonzales
+  - gonzalez
+  - gonzalo
+  - guerra
+  - guillermo
+  - guillermos
+  - guzman
+  - hernandez
+  - herrera
+  - hugo
+  - humberto
+  - iliana
+  - iris
+  - isabel
+  - izquierdo
+  - jaime
+  - jhon
+  - julio
+  - laureano
+  - lemos
+  - lida
+  - luque
+  - manotas
+  - martinez
+  - mauris
+  - maurix
+  - mejia
+  - melo
+  - milla
+  - millan
+  - miranda
+  - mulnoz
+  - munoz
+  - olayo
+  - orlando
+  - ortiz
+  - ospina
+  - ossa
+  - perez
+  - pineros
+  - plaza
+  - plazas
+  - quintero
+  - rodrigue
+  - rodriguez
+  - romo
+  - ruiz
+  - salazar
+  - sandoval
+  - sandra
+  - sarmiento
+  - saulo
+  - segura
+  - suarez
+  - tabares
+  - tello
+  - valdes
+  - valdez
+  - varela
+  - vargas
+  - vasquez
+  - velasquez
+  - velazquez
+  - velsquez
+  - vidal
+  - vieda
+  - villarreal
+  - william
+  - zapata
+
+# Municipios. Se anonimizan como [MUNICIPIO] SIN trigger, pero se aplican
+# DESPUÉS de las instituciones para que "Carlos Holmes Trujillo" no pierda
+# su cola con el municipio de Trujillo, y con una lista de excepciones.
+municipios:
+  - alcala
+  - andalucia
+  - ansermanuevo
+  - argelia
+  - bogota
+  - bolivar
+  - buenaventura
+  - buenos aires
+  - buga
+  - bugalagrande
+  - caicedonia
+  - caloto
+  - candelaria
+  - cartago
+  - corinto
+  - dagua
+  - darien
+  - el aguila
+  - el cairo
+  - el cerrito
+  - el dovio
+  - florida
+  - ginebra
+  - guacari
+  - guadalajara de buga
+  - guapi
+  - ipiales
+  - istmina
+  - jamundi
+  - la cumbre
+  - la union
+  - la victoria
+  - medellin
+  - miranda
+  - obando
+  - padilla
+  - palmira
+  - pasto
+  - popayan
+  - pradera
+  - puerto tejada
+  - quibdo
+  - restrepo
+  - riofrio
+  - roldanillo
+  - san pedro
+  - santander de quilichao
+  - santiago de cali
+  - sevilla
+  - suarez
+  - tado
+  - timbio
+  - toro
+  - trujillo
+  - tulua
+  - tumaco
+  - ulloa
+  - vijes
+  - villa rica
+  - yotoco
+  - yumbo
+  - zarzal
+  - cali
+
+# Contextos en los que un "municipio" NO es un lugar y debe conservarse.
+# Se evalúan como regex sobre la ventana alrededor del match.
+municipios_excepciones:
+  - "carlos holmes\\s+trujillo"       # institución, no el municipio de Trujillo
+  - "signo de\\s+bolivar"
+  - "hospital\\s+de\\s+versalles"

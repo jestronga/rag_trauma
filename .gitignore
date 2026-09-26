@@ -1,0 +1,11 @@
+# Entorno virtual: guarda rutas absolutas del equipo; se recrea con requirements.txt
+.venv/
+
+# Índices del RAG: el de Qdrant pesa ~83 MB y crece con el corpus (GitHub
+# rechaza archivos de más de 100 MB). BM25 se excluye con él porque ambos se
+# regeneran juntos:  cd rag_pipeline && python -m rag.index
+rag_pipeline/indices/
+
+# Cachés de Python y pytest (se regeneran solas)
+__pycache__/
+.pytest_cache/

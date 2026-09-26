@@ -1,0 +1,641 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reporte de anonimización — trauma.csv</title><style>
+    :root{--bg:#fbfbfa;--fg:#1c1c1a;--mut:#6b6b66;--line:#e3e2df;--acc:#7a4a2b}
+    @media(prefers-color-scheme:dark){:root{--bg:#191917;--fg:#eceae6;--mut:#a0a09a;--line:#33322e;--acc:#d99a6c}}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+    .wrap{max-width:1000px;margin:0 auto;padding-block:48px;padding-left:20px;padding-right:20px}
+    h1{font-size:26px;margin:0 0 4px} h2{font-size:18px;margin:40px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+    .sub{color:var(--mut);margin:0 0 32px;font-size:14px}
+    .grid{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}
+    .kpi{flex:1 1 150px;border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+    .kpi b{display:block;font-size:22px;font-variant-numeric:tabular-nums}
+    .kpi span{color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+    .scroll{overflow-x:auto}
+    table.t{border-collapse:collapse;width:100%;font-size:13px;margin:8px 0}
+    table.t th{text-align:left;background:transparent;color:var(--mut);font-weight:600;
+      border-bottom:1px solid var(--line);padding:7px 10px;white-space:nowrap}
+    table.t td{border-bottom:1px solid var(--line);padding:7px 10px;vertical-align:top}
+    table.t tr:hover td{background:color-mix(in srgb,var(--acc) 7%,transparent)}
+    .ok{color:var(--mut);font-style:italic}
+    code{background:color-mix(in srgb,var(--fg) 8%,transparent);padding:1px 5px;border-radius:4px;font-size:12px}
+    </style></head><body><div class="wrap">
+<h1>Reporte de anonimización</h1>
+<p class="sub">Corpus <code>trauma.csv</code> · 22,176 documentos indexables · generado por <code>run_pipeline.py</code></p>
+
+<h2>1. Calidad del corpus</h2>
+<div class="scroll"><table class="dataframe t">
+  <thead>
+    <tr style="text-align: right;">
+      <th>metrica</th>
+      <th>n</th>
+      <th>pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>total</td>
+      <td>27157</td>
+      <td>100.00</td>
+    </tr>
+    <tr>
+      <td>empty</td>
+      <td>3684</td>
+      <td>13.57</td>
+    </tr>
+    <tr>
+      <td>too_short</td>
+      <td>1176</td>
+      <td>4.33</td>
+    </tr>
+    <tr>
+      <td>duplicate</td>
+      <td>671</td>
+      <td>2.47</td>
+    </tr>
+    <tr>
+      <td>truncated</td>
+      <td>4865</td>
+      <td>17.91</td>
+    </tr>
+    <tr>
+      <td>indexable</td>
+      <td>22176</td>
+      <td>81.66</td>
+    </tr>
+    <tr>
+      <td>indexable_y_truncado</td>
+      <td>4865</td>
+      <td>17.91</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<h2>2. Reemplazos aplicados (capas A y B)</h2>
+<div class="scroll"><table class="dataframe t">
+  <thead>
+    <tr style="text-align: right;">
+      <th>regla</th>
+      <th>n_reemplazos</th>
+      <th>n_registros</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>fecha</td>
+      <td>5049</td>
+      <td>3312</td>
+    </tr>
+    <tr>
+      <td>hora</td>
+      <td>1841</td>
+      <td>1222</td>
+    </tr>
+    <tr>
+      <td>edad</td>
+      <td>750</td>
+      <td>699</td>
+    </tr>
+    <tr>
+      <td>institucion</td>
+      <td>668</td>
+      <td>618</td>
+    </tr>
+    <tr>
+      <td>municipio</td>
+      <td>290</td>
+      <td>270</td>
+    </tr>
+    <tr>
+      <td>institucion_hospital</td>
+      <td>200</td>
+      <td>191</td>
+    </tr>
+    <tr>
+      <td>medico</td>
+      <td>191</td>
+      <td>180</td>
+    </tr>
+    <tr>
+      <td>institucion_sigla</td>
+      <td>157</td>
+      <td>148</td>
+    </tr>
+    <tr>
+      <td>anio</td>
+      <td>90</td>
+      <td>80</td>
+    </tr>
+    <tr>
+      <td>institucion_santoral</td>
+      <td>7</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <td>documento</td>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<h2>3. Residuo tras la anonimización</h2>
+<p class="sub">Detectores independientes de los que hicieron el reemplazo. Lo que aparece aquí es
+residuo real o un falso positivo que hay que documentar.</p>
+<div class="scroll"><table class="dataframe t">
+  <thead>
+    <tr style="text-align: right;">
+      <th>detector</th>
+      <th>n_matches</th>
+      <th>a_revisar</th>
+      <th>n_docs</th>
+      <th>pct_docs_revisar</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>trigger_institucion</td>
+      <td>351</td>
+      <td>69</td>
+      <td>69</td>
+      <td>0.311</td>
+    </tr>
+    <tr>
+      <td>anio</td>
+      <td>40</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <td>trigger_medico</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.000</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<h2>4. Ejemplos de residuo</h2>
+<div class="scroll"><table class="dataframe t">
+  <thead>
+    <tr style="text-align: right;">
+      <th>record_id</th>
+      <th>detector</th>
+      <th>match</th>
+      <th>veredicto</th>
+      <th>contexto</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>40484</td>
+      <td>trigger_institucion</td>
+      <td>CLÍNICA ESTRICT</td>
+      <td>revisar</td>
+      <td>TORIA. SE DECIDE CONTINUAR IGUAL MANEJO MÉDICO Y VIGILANCIA CLÍNICA ESTRICT&nbsp;&nbsp;[NOTA DEL CORPUS: el registro original está truncado en ev</td>
+    </tr>
+    <tr>
+      <td>41074</td>
+      <td>trigger_institucion</td>
+      <td>CLINICA DEL</td>
+      <td>revisar</td>
+      <td>SE DA INFORMACION A FAMILIARES, ESTAMOS ATENTOS A EVOLUCION CLINICA DEL PACIENTE". DURANTE LA NOCHE CURSO HIPOTENS&nbsp;&nbsp;[NOTA DEL CORPU</td>
+    </tr>
+    <tr>
+      <td>25142</td>
+      <td>trigger_institucion</td>
+      <td>CLINICA DEL</td>
+      <td>revisar</td>
+      <td>UE NO PUEDE SER ATENDIDA EN EL [INSTITUCION] SE REMITA A LA CLINICA DEL NORTE</td>
+    </tr>
+    <tr>
+      <td>1739</td>
+      <td>trigger_institucion</td>
+      <td>clinica colon</td>
+      <td>revisar</td>
+      <td>Cx, se ubica cupo UCI (unidad de cuidados intensivos) en la clinica colon donde es remitida</td>
+    </tr>
+    <tr>
+      <td>7575</td>
+      <td>trigger_institucion</td>
+      <td>clinica favorablese</td>
+      <td>revisar</td>
+      <td>hombro. [FECHA]: es valorado por cx general, con evolicion clinica favorablese retira tubo de torax sin complicaciones y dan salida. es va</td>
+    </tr>
+    <tr>
+      <td>33421</td>
+      <td>trigger_institucion</td>
+      <td>Clínica del</td>
+      <td>revisar</td>
+      <td>vio ulnar MSD (miembro superior derecho); pcte comnetado en Clínica del Rosario para continuar manejo médico.</td>
+    </tr>
+    <tr>
+      <td>40524</td>
+      <td>trigger_institucion</td>
+      <td>CLINICA DEL</td>
+      <td>revisar</td>
+      <td>QUIRURGICO AMBULATORIO, PACIENTE QUIEN COMPLETA OBSERVACION CLINICA DEL TRAUMA SE DECIDE DAR EGRESO CON RECOMENDACIONES SIGNOS DE A</td>
+    </tr>
+    <tr>
+      <td>40738</td>
+      <td>trigger_institucion</td>
+      <td>clinica hemodinamicameyte</td>
+      <td>revisar</td>
+      <td>Evolución y hospitalización: paciente con buena evolucion clinica hemodinamicameyte estable, con rx (radiografia) de rodilla izquierda normal c</td>
+    </tr>
+    <tr>
+      <td>41058</td>
+      <td>trigger_institucion</td>
+      <td>CLINICA HACIA</td>
+      <td>revisar</td>
+      <td>UROLOGICA COMPLETA SIN DETERIORO NEUROLOGICO, CON EVOLUCION CLINICA HACIA LA MEJORIA, PACIENTE CON FAMILIAR RECONOCE Y SE RELACION CO</td>
+    </tr>
+    <tr>
+      <td>23378</td>
+      <td>trigger_institucion</td>
+      <td>clínica del</td>
+      <td>revisar</td>
+      <td>tra fx (fractura) de calcaneo interarticular izquierdo, con clínica del dolor mas edema, deformidad, quien inicialmente se discute</td>
+    </tr>
+    <tr>
+      <td>25770</td>
+      <td>trigger_institucion</td>
+      <td>CLINICA DESFAVORABLE</td>
+      <td>revisar</td>
+      <td>CONDICIONES SIN MEJORIA DE ESTADO NEUROLOGICO CON EVOLUCION CLINICA DESFAVORABLE, HEMODINAMICAMENTE ESTEBRE PERO PESISTE CON SIRS PACIENTE E</td>
+    </tr>
+    <tr>
+      <td>20690</td>
+      <td>trigger_institucion</td>
+      <td>clinica valorado</td>
+      <td>revisar</td>
+      <td>Evolución y hospitalización: paciente con buena evolucion clinica valorado por ortopedia el cual decide dar salida hospitalaria.se dan</td>
+    </tr>
+    <tr>
+      <td>17252</td>
+      <td>trigger_institucion</td>
+      <td>clinica pos</td>
+      <td>revisar</td>
+      <td>volución y hospitalización: paciente con adecuada evolucion clinica pos operatoria por lo cual se decide dar salida HALLAZGOS OPERA</td>
+    </tr>
+    <tr>
+      <td>15844</td>
+      <td>trigger_institucion</td>
+      <td>clinica mejoria</td>
+      <td>revisar</td>
+      <td>a pericardica es traladado a salas donde presenta evolucion clinica mejoria con presion negativa sin dificultad respiratoria alerta tol</td>
+    </tr>
+    <tr>
+      <td>6563</td>
+      <td>trigger_institucion</td>
+      <td>clinica prenatal</td>
+      <td>revisar</td>
+      <td>alida de cirugia, pero se considera continuar en vigilancia clinica prenatal. [FECHA]&nbsp;&nbsp;[NOTA DEL CORPUS: el registro original está trunc</td>
+    </tr>
+    <tr>
+      <td>7863</td>
+      <td>trigger_institucion</td>
+      <td>clinica torpida</td>
+      <td>revisar</td>
+      <td>Evolución y hospitalización: [FECHA] Paciente con evolucion clinica torpida, continua con mucho dolor a pesar del tratamiento con analg</td>
+    </tr>
+    <tr>
+      <td>38907</td>
+      <td>trigger_institucion</td>
+      <td>CLINICA DEL</td>
+      <td>revisar</td>
+      <td>RAS. SE SOLICITAN PARACLINICOS. ESTAMOS ATENTOS A EVOLUCION CLINICA DEL PACIENTE. PACIENTE CON ALTO RIESGO DE COMPLICACIONES Y DE M</td>
+    </tr>
+    <tr>
+      <td>39327</td>
+      <td>trigger_institucion</td>
+      <td>clinica evidente</td>
+      <td>revisar</td>
+      <td>eriores.&nbsp;&nbsp;Evolución y hospitalización: paciente con mejoria clinica evidente, sin signos de irritacion peritoneal, tolero via oral, lect</td>
+    </tr>
+    <tr>
+      <td>36145</td>
+      <td>trigger_institucion</td>
+      <td>CLINICA HASTA</td>
+      <td>revisar</td>
+      <td>O NUEVOS EPISODIOS EMETICOS, SE DECIDE CONTINUAR VIGILANCIA CLINICA HASTA COMPLETAR 12 HORAS Y SI CONTINUA BUENA EVOLUCION SE DARA EG</td>
+    </tr>
+    <tr>
+      <td>37914</td>
+      <td>trigger_institucion</td>
+      <td>CLINICA MÍNIMA</td>
+      <td>revisar</td>
+      <td>PARÁMETROS DE NORMALIDAD, QUIEN YA COMPLETO LA OBSERVACIÓN CLINICA MÍNIMA, SE DECIDE DAR EGRESO CON RECOMENDACIONES Y SIGNOS DE ALARM</td>
+    </tr>
+    <tr>
+      <td>34124</td>
+      <td>trigger_institucion</td>
+      <td>CLINICA MANUAL</td>
+      <td>revisar</td>
+      <td>ORADO Y SUTURADO POR CIRUGIA PLASTICA (VER NOTA EN HISTORIA CLINICA MANUAL) SE CONSIDERA ENTONCES SALIDA PARA CONTINUAR MANEJO AMBULAT</td>
+    </tr>
+    <tr>
+      <td>30831</td>
+      <td>trigger_institucion</td>
+      <td>CLÍNICA VALORADO</td>
+      <td>revisar</td>
+      <td>Evolución y hospitalización: PACIENTE CON BUENA EVOLUCIÓN CLÍNICA VALORADO POR CX PEDIÁTRICA Y OFTALMOLOGIA QUE ORDENAN SALIDA CON MED</td>
+    </tr>
+    <tr>
+      <td>32717</td>
+      <td>trigger_institucion</td>
+      <td>Clínica Corporación</td>
+      <td>revisar</td>
+      <td>encuentran exposición osea, suturan afrontando y remiten a Clínica Corporación Comfenalco Unilibre, donde ingresa politraumatizado con FX</td>
+    </tr>
+    <tr>
+      <td>23870</td>
+      <td>trigger_institucion</td>
+      <td>clinica llama</td>
+      <td>revisar</td>
+      <td>antiguas por aplastamiento de L3-L4-L5. Durante vigilancia clinica llama la atencion que paciente permanece tranquilo pero al examin</td>
+    </tr>
+    <tr>
+      <td>24807</td>
+      <td>trigger_institucion</td>
+      <td>CLINICA TAC</td>
+      <td>revisar</td>
+      <td>Evolución y hospitalización: PACIENTE CON BUENA EVOLUCION CLINICA TAC (tomografia axial computarizada) CEREBRAL MUESTRA HSA (hemo</td>
+    </tr>
+    <tr>
+      <td>25978</td>
+      <td>trigger_institucion</td>
+      <td>CLÍNICA POCO</td>
+      <td>revisar</td>
+      <td>DAR SALIDA CON RECOMENDACIONES Y SIGNOS DE ALARMA. HISTORIA CLÍNICA POCO ESPECIFICADO.</td>
+    </tr>
+    <tr>
+      <td>37930</td>
+      <td>trigger_institucion</td>
+      <td>CLINICA POSTERIRO</td>
+      <td>revisar</td>
+      <td>ACIENTE EN BUENAS CONDICIONES GENERALES CON BUENA EVOLUCION CLINICA POSTERIRO AL TRAUMA, NO HA (hipertension arterial) TENIDO DETERIORO N</td>
+    </tr>
+    <tr>
+      <td>37560</td>
+      <td>trigger_institucion</td>
+      <td>CLINICA COMO</td>
+      <td>revisar</td>
+      <td>RIO O HEMODINAMICO CON FX (fractura) DE CLAVICULA IZQ TANTO CLINICA COMO RADIOGRAFICAMENTE, SE DECIDE DAR EGRESO CON INMOVILIZADOR D</td>
+    </tr>
+    <tr>
+      <td>25444</td>
+      <td>trigger_institucion</td>
+      <td>CLINICA MANIFIESTA</td>
+      <td>revisar</td>
+      <td>Evolución y hospitalización: PACIENTE CON BUENA EVOLUCION CLINICA MANIFIESTA QUE SE SIENTE MEJOR, PACIENTE COMENTADA CON ORTOPEDISTA QUI</td>
+    </tr>
+    <tr>
+      <td>14939</td>
+      <td>trigger_institucion</td>
+      <td>clinica glasgow</td>
+      <td>revisar</td>
+      <td>fia axial computarizada) de control muestra buena evolucion clinica glasgow 15/15, se da salida</td>
+    </tr>
+    <tr>
+      <td>13509</td>
+      <td>trigger_institucion</td>
+      <td>clinica signos</td>
+      <td>revisar</td>
+      <td>ión y hospitalización: paciente estable con buena evolucion clinica signos vitales en parametros normales, sin signos sugestivos, se d</td>
+    </tr>
+    <tr>
+      <td>55665</td>
+      <td>trigger_institucion</td>
+      <td>CLINICA DEL</td>
+      <td>revisar</td>
+      <td>AMENTO COLATERAL LATERAL Y LIGAMENTO CRUZADO POSTERIOR (POR CLINICA DEL PACIENTE). PIE CAIDO CON POSIBLE LESION DLE NERVIO PERONEO.</td>
+    </tr>
+    <tr>
+      <td>40046</td>
+      <td>trigger_institucion</td>
+      <td>CLINICA INFORMA</td>
+      <td>revisar</td>
+      <td>A, ANTICONVULSIVANTES, ANTIBIOTICO PROFILACTICO. SECRETARIA CLINICA INFORMA QUE EPS DEL PACIENTE COMFENALCO DIO INDICACIONES DE INICIAR</td>
+    </tr>
+    <tr>
+      <td>40537</td>
+      <td>trigger_institucion</td>
+      <td>CLÍNICA ALERTA</td>
+      <td>revisar</td>
+      <td>Evolución y hospitalización: PACIENTE CON BUENA EVOLUCIÓN CLÍNICA ALERTA ORIENTADO NO FOCALIZADA SIN DETERIORO NEUROLÓGICO, SIN DOLO</td>
+    </tr>
+    <tr>
+      <td>37211</td>
+      <td>trigger_institucion</td>
+      <td>CLINICA DESARROLLA</td>
+      <td>revisar</td>
+      <td>OS RADIOGRAFICOS NORMALES, SIN EMBARGO DURANTE SU EVOLUCION CLINICA DESARROLLA DOLOR ABDOMINAL A NIVEL DE FLANCO IZQUIERDO, POR LO CUAL EL</td>
+    </tr>
+    <tr>
+      <td>37898</td>
+      <td>trigger_institucion</td>
+      <td>CLINICA MINIMA</td>
+      <td>revisar</td>
+      <td>PARAMETROS DE NORMALIDAD, QUIEN YA COMPLETO LA OBSERVACIÓN CLINICA MINIMA, SE DECIDE DAR EGRESO CON RECOMENDACIONES Y SIGNOS DE ALARM</td>
+    </tr>
+    <tr>
+      <td>54458</td>
+      <td>trigger_institucion</td>
+      <td>CLINICA VALLE</td>
+      <td>revisar</td>
+      <td>ADES.&nbsp;&nbsp;Evolución y hospitalización: PACIENTE REMITIDO DE LA CLINICA VALLE SALUD POR ACCIDENTE DE TRANSITO, MECANISMO DE LESION AUTO V</td>
+    </tr>
+    <tr>
+      <td>47018</td>
+      <td>trigger_institucion</td>
+      <td>clinica colombial</td>
+      <td>revisar</td>
+      <td>paciente es remitido a UCI (unidad de cuidados intensivos) clinica colombial.</td>
+    </tr>
+    <tr>
+      <td>36646</td>
+      <td>trigger_institucion</td>
+      <td>CLINICA SATISFACYTORIA</td>
+      <td>revisar</td>
+      <td>ón: paciente valorado por ortopedia. PACIENTE CON EVOLUCION CLINICA SATISFACYTORIA POR LO QUE SE DARA SALIDA ANALGESIA INCAPACIDAD X 15 DIAS C</td>
+    </tr>
+    <tr>
+      <td>35170</td>
+      <td>trigger_institucion</td>
+      <td>clinica\nToma</td>
+      <td>revisar</td>
+      <td>ión se le podrá dar salida. Dieta comun Estricta vigilancia clinica Toma de TA (tension arterial) cada 6 horas. [FECHA]: 1. salida 2</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<h2>5. Tokens tras Dr/Dra fuera del whitelist</h2>
+<p class="sub">Revisar: si alguno es un apellido real, añadirlo a <code>config/gazetteers.yaml</code>
+en la clave <code>medicos</code> y volver a correr el pipeline.</p>
+<div class="scroll"><table class="dataframe t">
+  <thead>
+    <tr style="text-align: right;">
+      <th>token_tras_dr</th>
+      <th>n</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>enaje</td>
+      <td>264</td>
+    </tr>
+    <tr>
+      <td>ena</td>
+      <td>90</td>
+    </tr>
+    <tr>
+      <td>enando</td>
+      <td>39</td>
+    </tr>
+    <tr>
+      <td>enado</td>
+      <td>18</td>
+    </tr>
+    <tr>
+      <td>eno</td>
+      <td>13</td>
+    </tr>
+    <tr>
+      <td>echo</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <td>ogado</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <td>enan</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td>echa</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>ogas</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>ape</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>ogueria</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>oga</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>enage</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>enar</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>quien</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>ogue</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>naje</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>erecha</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>sangrado</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>epitos</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>recha</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>revision</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>ordena</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>enoplastia</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>amamine</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>eanaje</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>enajes</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>pino</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>enotomia</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>salasar</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>maria</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>enmaje</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>juan</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>edaje</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>andres</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>pero</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>enanado</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table></div>
+</div></body></html>

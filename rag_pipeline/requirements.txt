@@ -1,0 +1,26 @@
+# --- Comunes (evaluación e interfaz) ---
+pandas>=2.0
+PyYAML>=6.0
+
+# --- Prototipo RAG ---
+qdrant-client>=1.9           # modo local embebido: no necesita Docker
+rank_bm25>=0.2.2
+transformers>=4.40           # ruta densa por defecto (bge-m3 con pooling CLS)
+# sentence-transformers solo hace falta para el reranker (RERANKER=1).
+# Ojo con la 6.x: reestructuró la carga de modelos e intenta instanciar un
+# AutoProcessor para todo modelo, lo que rompe con bge-m3 (XLM-RoBERTa sin
+# processor). Por eso queda fijada por debajo de 6.
+sentence-transformers>=3.0,<6
+streamlit>=1.36
+
+# torch: instálalo ANTES que sentence-transformers, con soporte CUDA, y con el
+# índice que corresponda a tu versión de Python. Python 3.13 necesita torch 2.6
+# o posterior; el índice cu121 solo publica ruedas hasta Python 3.12.
+#
+#   pip install torch --index-url https://download.pytorch.org/whl/cu126
+#   (si no hay rueda: probar cu128, luego cu124)
+#
+# Sin CUDA también funciona: solo encarece la indexación una vez. Ollama trae
+# su propio runtime y usa la GPU aunque torch esté en CPU.
+torch>=2.6; python_version >= "3.13"
+torch>=2.2; python_version < "3.13"
