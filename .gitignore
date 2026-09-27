@@ -6,6 +6,10 @@
 # regeneran juntos:  cd rag_pipeline && python -m rag.index
 rag_pipeline/indices/
 
+# Planilla de revisión médica: se regenera con scripts/exportar_revision.py, y
+# clave.csv (qué respuesta es cuál) no debe viajar junto a la planilla.
+rag_pipeline/eval/revision/
+
 # Cachés de Python y pytest (se regeneran solas)
 __pycache__/
 .pytest_cache/

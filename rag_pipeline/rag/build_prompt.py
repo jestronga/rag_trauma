@@ -14,10 +14,12 @@ El asistente hace dos cosas, y las dos salen SOLO de los casos recuperados:
 Reparto de trabajo, pensado para un modelo pequeño (3B en CPU) que, probado,
 inventa detalles cuando resume casos o sugiere en libre:
 
-  · "Qué se hizo" lo arma el CÓDIGO (`seccion_que_se_hizo`): hallazgos
-    extraídos por reglas y el manejo citado textualmente del registro. Una
-    cita textual no se puede inventar. El 3B, resumiendo, atribuía una
-    laparoscopia al caso equivocado.
+  · La respuesta que lee el médico la arma el CÓDIGO: conclusión
+    (`conclusion_calculada`), tabla de casos (`tabla_casos`), contexto de
+    cada sugerencia (`contexto_elemento`), hallazgos que diferencian los
+    casos (`para_afinar`) y límites. Todo sale del léxico de hallazgos.py y
+    de los metadatos; el texto completo de cada caso queda en la app. El 3B,
+    resumiendo, atribuía una laparoscopia al caso equivocado.
   · Las sugerencias las redacta el MODELO, pero solo a partir de la lista de
     elementos documentados (hallazgos.py); después generate.py reescribe el
     conteo y las citas de cada viñeta desde esa lista y descarta las que no
@@ -34,14 +36,33 @@ import re
 from collections import Counter
 
 from . import config
-from .hallazgos import extraer, formatear, terminos
+from .hallazgos import (
+    PROCEDIMIENTOS_QUIRURGICOS, Elemento, extraer, formatear, normalizar, obvios, terminos,
+)
 from .retrieve import Resultado
 
+# Títulos del protocolo con el modelo: la plantilla se los pide y generate.py
+# los busca en su salida. No son los que ve el médico.
 TITULO_CASOS = "### Casos similares"
-TITULO_QUE_SE_HIZO = "### Qué se hizo"
 TITULO_SUGERENCIAS = "### Sugerencias basadas en los casos"
 TITULO_LIMITES = "### Lo que el registro no permite afirmar"
 SIN_SUGERENCIAS = "Sin sugerencias con respaldo en estos casos."
+
+# Lo que ve el médico. Es un asistente al diagnóstico: lo PRIMERO son las
+# sugerencias, cortas y accionables. Después, la base de cada una (síntesis,
+# tabla, citas), que el médico tiene que poder revisar por su cuenta.
+ROTULO_SUGERENCIAS = "**Sugerencias según casos similares**"
+ROTULO_SINTESIS = "**En síntesis.**"
+ROTULO_AFINAR = "**Para afinar la búsqueda**"
+
+# Cómo se muestra el desenlace. "cirugía" es un procedimiento, no un desenlace:
+# el clasificador de anonimización lo usa para "hospitalizado y operado".
+DESENLACE_VISIBLE = {
+    "alta": "alta", "hospitalizacion": "hospitalizado", "cirugia": "operado", "uci": "UCI",
+    "remision": "remitido", "fallecimiento": "falleció", "no_determinado": "sin clasificar",
+}
+# Gravedad para elegir qué escalada contar en la síntesis.
+_GRAVEDAD = {"fallecimiento": 3, "uci": 2, "cirugia": 1}
 
 _REGLAS_COMUNES = f"""\
 FUENTE ÚNICA
@@ -210,101 +231,205 @@ def _instruccion_salida() -> str:
             f"paréntesis por el contenido; no copies los paréntesis.\n\n{PLANTILLA}")
 
 
-def limites_calculados(casos: list[Resultado]) -> str:
-    """Límites verdaderos por construcción: cobertura, tamaño y desenlaces sin clasificar."""
-    n = len(casos)
-    sin_desenlace = sum(1 for c in casos if (c.metadata.get("desenlace") or "no_determinado") == "no_determinado")
-    frases = [f"Son {n} casos del registro ({config.COBERTURA_TEMPORAL}): los conteos describen "
-              f"estos casos, no frecuencias generales, y los protocolos de manejo pueden haber "
-              f"cambiado desde entonces."]
-    if sin_desenlace:
-        frases.append(f"En {sin_desenlace} de {n} casos el desenlace no quedó clasificado "
-                      f"automáticamente; el registro de manejo de cada caso tiene el detalle.")
-    return " ".join(frases)
+# ---------------------------------------------------------------------------
+# Respuesta para el médico: determinista, desde los casos
+# ---------------------------------------------------------------------------
+def desenlace_visible(caso: Resultado) -> str:
+    return DESENLACE_VISIBLE.get(caso.metadata.get("desenlace") or "no_determinado", "sin clasificar")
 
 
-def sintesis_calculada(casos: list[Resultado]) -> str:
-    """Síntesis de "Casos similares" armada con conteos: no puede inventar.
+def _citas(ids: list[str]) -> str:
+    return " ".join(f"[caso: {rid}]" for rid in ids)
 
-    Es la opción por defecto (config.SINTESIS_LLM apagado): el 3B, escribiendo
-    la síntesis en libre, atribuía manejos y desenlaces a casos que no los tenían.
+
+def _similitud(caso: Resultado) -> str:
+    # 0 = el caso lo trajo solo BM25 (por palabras), sin coseno denso
+    return f"{caso.score_norm:.2f}".replace(".", ",") if caso.score_norm > 0 else "—"
+
+
+def _conteo(pares: Counter) -> str:
+    """"alta 2, operado 1": de más a menos frecuente, "sin clasificar" al final."""
+    orden = sorted(pares.items(), key=lambda kv: (kv[0] == "sin clasificar", -kv[1]))
+    return ", ".join(f"{k} {v}" for k, v in orden)
+
+
+def _por_caso(casos: list[Resultado]) -> dict[str, dict[str, list[str]]]:
+    return {c.record_id: terminos(c.text) for c in casos}
+
+
+def _manejo_visible(ts: dict[str, list[str]]) -> list[str]:
+    """Manejo de un caso sin "cirugía" cuando ya consta el procedimiento concreto."""
+    if any(p in ts["Manejo"] for p in PROCEDIMIENTOS_QUIRURGICOS):
+        return [m for m in ts["Manejo"] if m != "cirugía"]
+    return ts["Manejo"]
+
+
+def _operado(caso: Resultado, ts: dict[str, list[str]]) -> bool:
+    return (caso.metadata.get("desenlace") == "cirugia") or "cirugía" in ts["Manejo"]
+
+
+def conclusion_calculada(casos: list[Resultado], consulta: str = "") -> str:
+    """Conclusión primero: qué casos son, qué se hizo más y la escalada más grave.
+
+    Todo sale de conteos y del léxico; cada caso concreto va citado. La última
+    línea dice sobre cuánto se apoya: n y rango de similitud.
     """
     n = len(casos)
+    por_caso = _por_caso(casos)
+    ya_dicho = obvios(consulta)
 
-    def contar(clave: str, mapa: dict) -> list[tuple[str, int]]:
-        conteo = Counter(c.metadata.get(clave) or "no_determinado" for c in casos)
-        return [("sin clasificar" if k == "no_determinado" else _etiqueta(mapa, k).lower(), v)
-                for k, v in conteo.most_common()]
-
-    mecanismos = contar("mecanismo_lesion", config.ETIQUETAS_MECANISMO)
+    mecanismos = Counter(_etiqueta(config.ETIQUETAS_MECANISMO, c.metadata.get("mecanismo_lesion") or "no_determinado").lower()
+                         for c in casos)
     if len(mecanismos) == 1:
-        frase_mec = f"{n} casos similares, todos por {mecanismos[0][0]}"
+        quienes = f"{n} casos similares, todos por {next(iter(mecanismos))}"
     else:
-        frase_mec = f"{n} casos similares: " + ", ".join(f"{m} en {k}" for m, k in mecanismos)
-
+        quienes = f"{n} casos similares ({_conteo(mecanismos)})"
     regiones = Counter(r for c in casos for r in (c.metadata.get("region_anatomica") or []))
-    frase_reg = ", ".join(f"{_etiqueta(config.ETIQUETAS_REGION, r).lower()} en {k}"
-                          for r, k in regiones.most_common(3))
+    if regiones:
+        region, k = regiones.most_common(1)[0]
+        quienes += f", {_etiqueta(config.ETIQUETAS_REGION, region).lower()} en {k}"
+    frases = [quienes + "."]
 
-    manejo = [e for e in extraer(casos, max_por_categoria=4) if e.categoria == "Manejo"]
-    frase_man = ", ".join(f"{e.termino} en {len(e.casos)}" for e in manejo)
-
-    frase_des = ", ".join(f"{d} en {k}" for d, k in contar("desenlace", config.ETIQUETAS_DESENLACE))
-
-    frases = [frase_mec + (f"; regiones: {frase_reg}" if frase_reg else "") + "."]
-    if frase_man:
-        frases.append(f"Manejo documentado: {frase_man}.")
-    frases.append(f"Desenlace: {frase_des}.")
-    return " ".join(frases)
-
-
-# ---------------------------------------------------------------------------
-# "Qué se hizo": determinista, desde el texto del registro
-# ---------------------------------------------------------------------------
-_RX_SECCION = re.compile(
-    r"(Motivo de consulta|Examen físico|Evolución y hospitalización):\s*(.*?)(?=\n\n(?:Motivo de consulta|"
-    r"Examen físico|Evolución y hospitalización):|\Z)",
-    re.DOTALL,
-)
-
-
-def _secciones(texto: str) -> dict[str, str]:
-    return {m.group(1): " ".join(m.group(2).split()) for m in _RX_SECCION.finditer(texto)}
-
-
-def _recortar(texto: str, maximo: int) -> str:
-    if len(texto) <= maximo:
-        return texto
-    corte = texto[:maximo].rsplit(" ", 1)[0]
-    return corte.rstrip(" ,;:.") + " …"
-
-
-def seccion_que_se_hizo(casos: list[Resultado], max_manejo: int = 260) -> str:
-    """Una viñeta por caso con el manejo CITADO TEXTUALMENTE del registro.
-
-    No pasa por el modelo: lo que se muestra es lo que dice el registro. El
-    texto completo está en las tarjetas de caso debajo de la respuesta.
-    """
-    lineas = [TITULO_QUE_SE_HIZO]
+    # La escalada más grave, con los hallazgos que tenían esos casos: es lo que
+    # un registro de casos aporta que una guía no.
+    graves: dict[int, list[Resultado]] = {}
     for c in casos:
-        meta = c.metadata
-        partes = [_etiqueta(config.ETIQUETAS_MECANISMO, meta.get("mecanismo_lesion") or "no_determinado")]
-        if meta.get("region_anatomica"):
-            partes.append(", ".join(_etiqueta(config.ETIQUETAS_REGION, r) for r in meta["region_anatomica"]))
-        desenlace = meta.get("desenlace") or "no_determinado"
-        if desenlace != "no_determinado":
-            partes.append(f"desenlace: {_etiqueta(config.ETIQUETAS_DESENLACE, desenlace).lower()}")
-        if meta.get("es_pediatrico"):
-            partes.append("pediátrico")
+        d = c.metadata.get("desenlace") or "no_determinado"
+        nivel = _GRAVEDAD.get(d, 1 if _operado(c, por_caso[c.record_id]) else 0)
+        if nivel:
+            graves.setdefault(nivel, []).append(c)
+    escalada = ""
+    if graves:
+        nivel = max(graves)
+        grupo = graves[nivel]
+        uno = len(grupo) == 1
+        verbo = {3: "falleció" if uno else "fallecieron",
+                 2: "pasó a UCI" if uno else "pasaron a UCI",
+                 1: "fue operado o tuvo indicación quirúrgica" if uno
+                 else "fueron operados o tuvieron indicación quirúrgica"}[nivel]
+        escalada = f"{len(grupo)} de {n} {verbo} {_citas([c.record_id for c in grupo])}"
+        con = Counter(h for c in grupo for h in por_caso[c.record_id]["Hallazgos"] if h not in ya_dicho)
+        if con:
+            escalada += "; " + ("tenía" if uno else "en ellos") + ": " + ", ".join(
+                h if uno else f"{h} ({k})" for h, k in con.most_common(3))
+        escalada += "."
 
-        lineas.append(f"- **[caso: {c.record_id}]** {' · '.join(partes)}")
-        hallazgos = terminos(c.text)["Hallazgos"]
-        if hallazgos:
-            lineas.append(f"  - Hallazgos: {', '.join(hallazgos)}")
-        manejo = _secciones(c.text).get("Evolución y hospitalización")
-        if manejo:
-            lineas.append(f"  - Registro de manejo: «{_recortar(manejo, max_manejo)}»")
-    return "\n".join(lineas)
+    # "cirugía" no se repite en "lo más documentado" si ya la cuenta la escalada
+    manejo = [e for e in extraer(casos) if e.categoria == "Manejo"
+              and not (e.termino == "cirugía" and graves and max(graves) == 1)]
+    if manejo:
+        top = ", ".join(f"**{e.termino}** ({len(e.casos)} de {n})" for e in manejo[:2])
+        frases.append(f"Lo más documentado: {top}.")
+    elif not escalada:
+        frases.append("No hay manejo reconocible en los registros: ver la tabla y los casos completos.")
+    if escalada:
+        frases.append(escalada)
+
+    sims = [c.score_norm for c in casos if c.score_norm > 0]
+    respaldo = f"Respaldo: {n} casos del registro"
+    if sims:
+        respaldo += f" · similitud {min(sims):.2f}–{max(sims):.2f}".replace(".", ",")
+    if len(sims) < n:
+        respaldo += f" · {n - len(sims)} hallado(s) solo por palabras clave"
+    salida = f"{ROTULO_SINTESIS} {' '.join(frases)}\n\n*{respaldo}.*"
+    if not sims or max(sims) < config.SIMILITUD_BAJA:
+        salida += ("\n\n**Similitud baja:** estos casos pueden no corresponder a la consulta. "
+                   "Revisar la tabla antes de usarlos.")
+    return salida
+
+
+def tabla_casos(casos: list[Resultado], consulta: str = "") -> str:
+    """Un caso por fila, celdas cortas con términos del léxico (no texto libre).
+
+    Los hallazgos que la consulta también menciona van en negrita: es lo que
+    hace parecido al caso. El texto completo queda en las tarjetas de la app.
+    """
+    ya_dicho = set(terminos(consulta)["Hallazgos"]) if consulta else set()
+    filas = ["| Caso | Similitud | Lesión | Hallazgos | Manejo | Desenlace |",
+             "|---|---|---|---|---|---|"]
+    for c in casos:
+        ts = terminos(c.text)
+        meta = c.metadata
+        lesion = _etiqueta(config.ETIQUETAS_MECANISMO, meta.get("mecanismo_lesion") or "no_determinado")
+        if meta.get("region_anatomica"):
+            lesion += " · " + ", ".join(_etiqueta(config.ETIQUETAS_REGION, r).lower()
+                                        for r in meta["region_anatomica"][:2])
+        if meta.get("es_pediatrico"):
+            lesion += " · pediátrico"
+        hallazgos = ", ".join(f"**{h}**" if h in ya_dicho else h for h in ts["Hallazgos"]) or "—"
+        hecho = ", ".join(ts["Estudios"] + _manejo_visible(ts)) or "—"
+        filas.append(f"| [caso: {c.record_id}] | {_similitud(c)} | {lesion} | {hallazgos} | {hecho} "
+                     f"| {desenlace_visible(c)} |")
+    return "\n".join(filas)
+
+
+def contexto_elemento(e: Elemento, casos: list[Resultado], consulta: str = "") -> str:
+    """Viñeta de "Para considerar": el elemento, en cuántos casos, y en qué casos.
+
+    Para un manejo o estudio: qué hallazgos tenían esos pacientes y cómo
+    terminaron. Para un hallazgo: qué se les hizo y cómo terminaron. Conteo y
+    citas salen de la lista, nunca del modelo.
+    """
+    n = len(casos)
+    ids = set(e.casos)
+    sub = [c for c in casos if c.record_id in ids]
+    por_caso = _por_caso(sub)
+    ya_dicho = obvios(consulta)
+    desenlaces = Counter(desenlace_visible(c) for c in sub)
+
+    # Línea 1: la acción, corta y en negrita, con su respaldo. Es lo que el
+    # médico tiene que poder leer de un vistazo.
+    if e.categoria == "Hallazgos":
+        cabeza = f"- **Valorar {e.termino}** — presente en {len(ids)} de {n} casos similares"
+        otros = Counter(t for c in sub for t in _manejo_visible(por_caso[c.record_id]))
+        contexto = f"En esos casos se hizo: {_conteo(otros)}" if otros else ""
+    else:
+        verbo = {"Estudios": "se solicitó", "Manejo": "se hizo"}[e.categoria]
+        if e.termino == "cirugía":
+            verbo = "se hizo o se indicó"
+        cabeza = f"- **Considerar {e.termino}** — {verbo} en {len(ids)} de {n} casos similares"
+        otros = Counter(t for c in sub for t in por_caso[c.record_id]["Hallazgos"] if t not in ya_dicho)
+        contexto = f"En esos casos: {_conteo(otros)}" if otros else ""
+    # Línea 2: el detalle y las citas, para quien quiera verificar.
+    detalle = " · ".join(([contexto] if contexto else []) + [f"desenlace: {_conteo(desenlaces)}"])
+    return f"{cabeza}  \n  {detalle[0].upper()}{detalle[1:]} {_citas(e.casos)}"
+
+
+def para_afinar(casos: list[Resultado], consulta: str = "", maximo: int = 4,
+                ya_sugeridos: set[str] | None = None) -> str:
+    """Hallazgos que DIFERENCIAN los casos y la consulta no dice.
+
+    Presentes en algunos casos y no en todos: son los que separan un manejo de
+    otro. Solo términos del léxico: no se sugiere preguntar nada que no esté
+    en los casos. Los que ya van como sugerencia no se repiten.
+    """
+    n = len(casos)
+    omitir = obvios(consulta) | (ya_sugeridos or set())
+    difieren = [e for e in extraer(casos) if e.categoria == "Hallazgos"
+                and 0 < len(e.casos) < n and e.termino not in omitir][:maximo]
+    if not difieren:
+        return ""
+    lista = ", ".join(f"{e.termino} ({len(e.casos)} de {n})" for e in difieren)
+    return (f"{ROTULO_AFINAR}: los casos se diferencian por {lista}. Si su paciente los tiene "
+            f"o no, agregarlo a la consulta acota los casos.")
+
+
+_RX_VITALES = re.compile(r"\b(t\.?a\.?|p\.?a\.?|f\.?c\.?|f\.?r\.?|sat\s?o2|spo2|tension arterial|presion arterial"
+                         r"|frecuencia cardiaca|signos vitales)\b")
+_RX_GLASGOW = re.compile(r"glasgow|\bgcs\b")
+
+
+def limites_calculados(casos: list[Resultado]) -> str:
+    """Límites de ESTOS casos, en una línea (el aviso general va fijo en la app)."""
+    n = len(casos)
+    textos = [normalizar(c.text) for c in casos]
+    partes = []
+    sin_desenlace = sum(1 for c in casos if (c.metadata.get("desenlace") or "no_determinado") == "no_determinado")
+    if sin_desenlace:
+        partes.append(f"{sin_desenlace} de {n} sin desenlace clasificado")
+    partes.append(f"signos vitales anotados en {sum(1 for t in textos if _RX_VITALES.search(t))} de {n}")
+    partes.append(f"Glasgow en {sum(1 for t in textos if _RX_GLASGOW.search(t))} de {n}")
+    return f"*Límites de estos casos: {' · '.join(partes)}.*"
 
 
 def resumen_de_caso(caso: Resultado) -> str:

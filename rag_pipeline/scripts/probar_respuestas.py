@@ -25,9 +25,16 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 warnings.filterwarnings("ignore")
 
-from rag import config  # noqa: E402
-from rag.build_prompt import PLANTILLA, resumen_calculado  # noqa: E402
+import inspect  # noqa: E402
+
+from rag import build_prompt, config, hallazgos  # noqa: E402
+from rag.build_prompt import resumen_calculado  # noqa: E402
 from rag.generate import responder  # noqa: E402
+
+# El texto fijo de la respuesta (rótulos, términos del léxico, etiquetas) lo
+# escribe el código: no cuenta como palabra nueva.
+VOCABULARIO_CODIGO = " ".join([inspect.getsource(build_prompt), inspect.getsource(hallazgos),
+                               *config.ETIQUETAS_MECANISMO.values(), *config.ETIQUETAS_REGION.values()])
 
 
 def _norm(texto: str) -> str:
@@ -48,7 +55,7 @@ def main(consultas: list[str]) -> None:
         print(r.texto)
         if r.casos:
             fuente = _norm(" ".join(c.text for c in r.casos) + " " + consulta + " "
-                           + PLANTILLA + " " + resumen_calculado(r.casos))
+                           + VOCABULARIO_CODIGO + " " + resumen_calculado(r.casos))
             nuevas = sorted({w for w in re.findall(r"[a-z]{6,}", _norm(r.texto))
                              if w[:5] not in fuente})
             print("-" * 90)

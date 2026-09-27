@@ -61,10 +61,11 @@ COLECCION = _env("COLECCION", "trauma")
 MODELO_EMBEDDING = _env("MODELO_EMBEDDING", "BAAI/bge-m3")
 DIM_EMBEDDING = _env_int("DIM_EMBEDDING", 1024)
 MODELO_RERANKER = _env("MODELO_RERANKER", "BAAI/bge-reranker-v2-m3")
-# 3B por defecto: sin GPU NVIDIA, Ollama carga el modelo entero en RAM. Con
-# 7,7 GB de RAM y ~2,3 GB libres, el 7B (~5 GB) no carga y Ollama responde
-# HTTP 500. Con GPU de 8 GB o RAM de sobra: MODELO_LLM=qwen2.5:7b-instruct-q4_K_M
-MODELO_LLM = _env("MODELO_LLM", "qwen2.5:3b")
+# Qwen3-4B-Instruct-2507: cabe entero en 4 GB de VRAM (ver NUM_GPU). OJO: la
+# etiqueta `qwen3:4b` es la variante Thinking, que razona siempre aunque se
+# pida "think": false; con 900 tokens no alcanzaba a escribir las sugerencias
+# y tardaba ~80 s. Sin GPU NVIDIA y poca RAM: MODELO_LLM=qwen2.5:3b.
+MODELO_LLM = _env("MODELO_LLM", "qwen3:4b-instruct")
 OLLAMA_URL = _env("OLLAMA_URL", "http://localhost:11434")
 
 # bge-m3 es un modelo de recuperación asimétrico: la consulta y el documento
@@ -93,18 +94,35 @@ DISPOSITIVO_RERANKER = _env("DISPOSITIVO_RERANKER", "cpu")
 # `scripts/calibrar_umbral.py` lo ajusta con las consultas de evaluación.
 UMBRAL_ABSTENCION = _env_float("UMBRAL_ABSTENCION", 0.45)
 MIN_CASOS = _env_int("MIN_CASOS", 2)
+# Por encima del umbral de abstención pero con el mejor caso por debajo de esto,
+# la respuesta avisa que los casos pueden no corresponder. Medido (26/09/2026):
+# consultas de trauma 0,58-0,72; "cetoacidosis diabética" (fuera de dominio) 0,47.
+SIMILITUD_BAJA = _env_float("SIMILITUD_BAJA", 0.55)
 
 # --- generación ------------------------------------------------------------
 TEMPERATURA = _env_float("TEMPERATURA", 0.1)   # baja: es un contexto clínico
-# Cuatro secciones de hasta ~350 palabras: ~600-800 tokens en español.
-MAX_TOKENS = _env_int("MAX_TOKENS", 900)
-# En CPU el 3B genera ~5 tokens/s: una respuesta completa tarda 2-3 minutos.
-TIMEOUT_LLM = _env_int("TIMEOUT_LLM", 400)
 # Quién escribe la síntesis de "Casos similares". Apagado: la arma el código
 # con conteos y manejo extraído (no puede inventar). Probado con el 3B, la
 # síntesis libre atribuía manejos y desenlaces a casos que no los tenían.
 # Encenderlo solo con un modelo mayor y revisando las respuestas.
 SINTESIS_LLM = _env_bool("SINTESIS_LLM", False)
+# Sin SINTESIS_LLM el modelo solo escribe 2-4 viñetas de sugerencias (~100
+# tokens medidos). Con SINTESIS_LLM escribe cuatro secciones: ~600-800.
+MAX_TOKENS = _env_int("MAX_TOKENS", 900 if SINTESIS_LLM else 250)
+MAX_TOKENS_RESUMEN = _env_int("MAX_TOKENS_RESUMEN", 700)
+# En CPU el 3B genera ~5 tokens/s: una respuesta completa tarda 2-3 minutos.
+TIMEOUT_LLM = _env_int("TIMEOUT_LLM", 400)
+# Ventana de contexto de Ollama. Con TOP_K=5 el prompt mide 1.400-2.050
+# tokens; 3.072 los cubre con la salida y deja VRAM para meter el modelo entero
+# en la GPU. Si un prompt no cabe (p. ej. 10 casos), generate.py agranda la
+# ventana solo para esa llamada: sin eso Ollama recorta el comienzo del
+# prompt, que es donde están las reglas.
+NUM_CTX = _env_int("NUM_CTX", 3072)
+# Capas en GPU (-1 = que decida Ollama). Ollama calcula de más y en la GTX 1650
+# dejaba 10 de 37 capas en CPU: 33 % CPU, 15 tok/s. Con todas: 100 % GPU,
+# 42 tok/s, ~3,0 GB de VRAM. Si da HTTP 500 por memoria (p. ej. el navegador
+# ocupa VRAM), NUM_GPU=-1. Solo se aplica con la ventana NUM_CTX.
+NUM_GPU = _env_int("NUM_GPU", 99)
 VENTANA_HISTORIAL = _env_int("VENTANA_HISTORIAL", 4)   # turnos para reescribir la consulta
 
 # --- corpus ----------------------------------------------------------------

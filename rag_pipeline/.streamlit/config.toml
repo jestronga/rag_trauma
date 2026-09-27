@@ -1,0 +1,9 @@
+[server]
+# Streamlit, al detectar un cambio en cualquier archivo vigilado, saca de
+# sys.modules TODOS los módulos del proyecto. rag.retrieve se reimporta con la
+# caché vacía y abre un segundo cliente Qdrant mientras el primero sigue vivo
+# con el candado de indices/qdrant ("already accessed by another instance");
+# además bge-m3 (~1 GB) se vuelve a cargar sin liberar el anterior.
+# Ignorar rag/ evita las dos cosas. Contrapartida: si editas rag/*.py hay que
+# reiniciar Streamlit; los cambios en app.py se siguen recargando solos.
+folderWatchBlacklist = ["**/rag"]

@@ -8,6 +8,7 @@ Requiere los índices construidos (`python -m rag.index`) y Ollama corriendo.
 from __future__ import annotations
 
 import re
+import time
 import warnings
 from pathlib import Path
 
@@ -17,7 +18,9 @@ import yaml
 warnings.filterwarnings("ignore")
 
 from rag import config                                    # noqa: E402
+from rag.build_prompt import desenlace_visible                 # noqa: E402
 from rag.generate import ollama_disponible, responder, resumir_caso   # noqa: E402
+from rag.hallazgos import resaltar_html                        # noqa: E402
 from rag.retrieve import RUTAS, Filtros                   # noqa: E402
 
 CONSULTAS_YAML = Path(__file__).resolve().parent / "eval" / "consultas.yaml"
@@ -35,7 +38,9 @@ CSS = """
   .caso-id  { font-weight:600; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
   .etq { display:inline-block; padding:1px 7px; border-radius:10px; font-size:0.72rem;
          border:1px solid rgba(128,128,128,.35); margin:2px 3px 2px 0; }
-  .trunc { border-color:#c9822f; color:#c9822f; }
+  .caso-box mark { background:rgba(255,200,0,.35); color:inherit; padding:0 2px; border-radius:3px; }
+  .tiempo { font-size:0.7rem; opacity:.45; text-align:right; margin-top:2px;
+            font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
   .aviso { font-size:0.78rem; opacity:.75; line-height:1.45; }
   .rotulo-demo { font-size:0.74rem; text-transform:uppercase; letter-spacing:.06em;
                  opacity:.6; margin:6px 0 4px; }
@@ -103,15 +108,11 @@ with st.sidebar:
                           format_func=lambda v: config.ETIQUETAS_REGION.get(v, v))
     desenlace = st.selectbox("Desenlace", ["(todos)"] + list(config.ETIQUETAS_DESENLACE),
                              format_func=lambda v: config.ETIQUETAS_DESENLACE.get(v, v))
-    solo_completos = st.checkbox("Excluir registros truncados", value=False,
-                                 help="El 22 % del corpus está cortado a 500 caracteres "
-                                      "por el export original.")
-
+    # El corpus ya no trae registros truncados (apto_rag): no hay filtro que ofrecer.
     filtros = Filtros(
         mecanismo=None if mecanismo == "(todos)" else mecanismo,
         region=None if region == "(todos)" else region,
         desenlace=None if desenlace == "(todos)" else desenlace,
-        excluir_truncados=solo_completos,
     )
 
     st.divider()
@@ -160,45 +161,70 @@ elif motivo:
     st.warning(f"Botones de demostración no disponibles — {motivo}")
 
 
-def tarjeta_caso(caso) -> str:
+AVISO_RESPUESTA = (f"Casos históricos del registro ({config.COBERTURA_TEMPORAL}): los conteos "
+                   f"describen estos casos, no frecuencias generales, y los protocolos pueden "
+                   f"haber cambiado. Apoyo a la decisión; no reemplaza el juicio clínico.")
+
+
+def tarjeta_caso(caso, consulta: str = "") -> str:
     m = caso.metadata
     etiquetas = []
     if m.get("mecanismo_lesion"):
         etiquetas.append(f"<span class='etq'>{config.ETIQUETAS_MECANISMO.get(m['mecanismo_lesion'], m['mecanismo_lesion'])}</span>")
     for r in (m.get("region_anatomica") or [])[:3]:
         etiquetas.append(f"<span class='etq'>{config.ETIQUETAS_REGION.get(r, r)}</span>")
-    if m.get("desenlace") and m["desenlace"] != "no_determinado":
-        etiquetas.append(f"<span class='etq'>{config.ETIQUETAS_DESENLACE.get(m['desenlace'], m['desenlace'])}</span>")
-    if m.get("truncado"):
-        etiquetas.append("<span class='etq trunc'>truncado</span>")
-    texto = caso.text.replace("\n", "<br>")
+    etiquetas.append(f"<span class='etq'>{desenlace_visible(caso)}</span>")
+    texto = resaltar_html(caso.text, consulta).replace("\n", "<br>")
     return (f"<div class='caso-box'><span class='caso-id'>caso {caso.record_id}</span> "
             f"· similitud {caso.score_norm:.2f}<br>{''.join(etiquetas)}<br><br>{texto}</div>")
 
 
-def pintar(rol: str, contenido: str, respuesta=None) -> None:
+def pie_tiempo(segundos: float | None) -> None:
+    """Tiempo hasta la respuesta, discreto, para medir modelos desde la interfaz."""
+    if segundos is None:
+        return
+    st.markdown(f"<div class='tiempo'>{segundos:.1f} s · {config.MODELO_LLM}</div>",
+                unsafe_allow_html=True)
+
+
+def detalle_respuesta(respuesta, segundos: float | None, consulta: str) -> None:
+    """Lo que va bajo el texto: tiempo, aviso fijo, alertas y los casos completos."""
+    pie_tiempo(segundos)
+    if respuesta.error:
+        return
+    if respuesta.casos and not respuesta.abstuvo:
+        st.caption(AVISO_RESPUESTA)
+    if respuesta.citas_invalidas:
+        st.warning("El modelo citó identificadores que no están entre los casos "
+                   f"recuperados: {', '.join(respuesta.citas_invalidas)}. "
+                   "Esa parte de la respuesta no está respaldada.")
+    if not respuesta.casos:
+        return
+    # El texto completo de cada caso es la base de cada afirmación: el médico
+    # tiene que poder revisarla por su cuenta.
+    etiqueta = f"Casos consultados ({len(respuesta.casos)}) · texto completo"
+    if respuesta.consulta_reescrita:
+        etiqueta += "  ·  consulta reescrita"
+    with st.expander(etiqueta):
+        if respuesta.consulta_reescrita:
+            st.caption(f"Búsqueda realizada: «{respuesta.consulta_reescrita}»")
+        st.caption(f"Confianza (coseno del mejor caso): {respuesta.confianza:.3f} · "
+                   f"resaltado: lo que coincide con la consulta")
+        for c in respuesta.casos:
+            st.markdown(tarjeta_caso(c, respuesta.consulta_reescrita or consulta),
+                        unsafe_allow_html=True)
+
+
+def pintar(rol: str, contenido: str, respuesta=None, segundos: float | None = None,
+           consulta: str = "") -> None:
     with st.chat_message(rol):
         st.markdown(contenido)
-        if respuesta is None:
-            return
-        if respuesta.citas_invalidas:
-            st.warning("El modelo citó identificadores que no están entre los casos "
-                       f"recuperados: {', '.join(respuesta.citas_invalidas)}. "
-                       "Esa parte de la respuesta no está respaldada.")
-        if respuesta.casos:
-            etiqueta = f"Casos consultados ({len(respuesta.casos)})"
-            if respuesta.consulta_reescrita:
-                etiqueta += "  ·  consulta reescrita"
-            with st.expander(etiqueta):
-                if respuesta.consulta_reescrita:
-                    st.caption(f"Búsqueda realizada: «{respuesta.consulta_reescrita}»")
-                st.caption(f"Confianza (coseno del mejor caso): {respuesta.confianza:.3f}")
-                for c in respuesta.casos:
-                    st.markdown(tarjeta_caso(c), unsafe_allow_html=True)
+        if respuesta is not None:
+            detalle_respuesta(respuesta, segundos, consulta)
 
 
 for m in st.session_state.mensajes:
-    pintar(m["role"], m["content"], m.get("respuesta"))
+    pintar(m["role"], m["content"], m.get("respuesta"), m.get("segundos"), m.get("consulta", ""))
 
 
 # ---------------------------------------------------------------------------
@@ -215,6 +241,7 @@ if pregunta:
                  for m in st.session_state.mensajes[:-1]]
 
     with st.chat_message("assistant"):
+        t0 = time.perf_counter()
         with st.spinner("Buscando casos…"):
             m = RX_ID.match(pregunta)
             if m:
@@ -225,6 +252,7 @@ if pregunta:
                 r = responder(pregunta, historial=historial, ruta=ruta, k=k,
                               filtros=filtros, umbral=umbral,
                               reescribir_consulta=escrita is not None)
+        segundos = time.perf_counter() - t0
 
         if r.error:
             st.error(r.error)
@@ -232,21 +260,9 @@ if pregunta:
         else:
             texto = r.texto
             st.markdown(texto)
-            if r.citas_invalidas:
-                st.warning("El modelo citó identificadores que no están entre los casos "
-                           f"recuperados: {', '.join(r.citas_invalidas)}. "
-                           "Esa parte de la respuesta no está respaldada.")
-            if r.casos:
-                etiqueta = f"Casos consultados ({len(r.casos)})"
-                if r.consulta_reescrita:
-                    etiqueta += "  ·  consulta reescrita"
-                with st.expander(etiqueta):
-                    if r.consulta_reescrita:
-                        st.caption(f"Búsqueda realizada: «{r.consulta_reescrita}»")
-                    st.caption(f"Confianza (coseno del mejor caso): {r.confianza:.3f}")
-                    for c in r.casos:
-                        st.markdown(tarjeta_caso(c), unsafe_allow_html=True)
+        detalle_respuesta(r, segundos, pregunta)
 
     st.session_state.mensajes.append(
-        {"role": "assistant", "content": texto, "respuesta": r}
+        {"role": "assistant", "content": texto, "respuesta": r, "segundos": segundos,
+         "consulta": pregunta}
     )
