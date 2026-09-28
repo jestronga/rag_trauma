@@ -15,8 +15,18 @@ mal, cuenta mal u ordena en vez de orientar, se muestra la versión armada por e
 código (sección 2.10). Regla de siempre: nada inventado, todo sale de los casos
 con `[caso: ID]`; el origen se revisa en "Casos consultados" de la app.
 
-**Estado del código:** lo del 26/09 está en el commit `a9f9f1c`. Todo lo del
-27–28/09 (secciones 2.8–2.10) está **sin commit**; el usuario no lo ha pedido.
+**Estado del código:** lo del 26/09 está en `a9f9f1c` y lo del 27–28/09
+(secciones 2.8–2.11) en `dfbc688`; los dos están en `origin/main` (el push de
+`dfbc688` lo hizo el usuario). En el PC de la demo: `git pull`. Esta
+actualización del contexto va en un commit local aparte, sin push.
+
+**Urgente, después de la demo — PHI en GitHub:** `anonimizacion/trauma.csv`
+(datos crudos), `outputs/log_reemplazos.csv` (texto original de cada
+reemplazo), `reports/residuo_phi.csv` y `reports/muestra_revision_manual.csv`
+están versionados desde `5c3a035` y ya están en `origin/main`
+(github.com/jestronga/rag_trauma). No se tocó antes de la demo: sacarlos de git
+haría que el `git pull` en el PC de la demo los borre del disco. Ver
+pendiente 0.
 
 **Primeros pasos, en el PC de 8 GB:**
 1. Tests: `cd rag_pipeline; ..\.venv\Scripts\python.exe -m pytest tests/ -q`
@@ -362,13 +372,22 @@ no pasa la verificación, versión determinista; `qwen3:4b-instruct` + reranker.
    Si falta `anonimizacion/outputs/`, antes: `cd ..\anonimizacion; python run_pipeline.py`.
 6. Tests: `python -m pytest tests/ -q` (46).
 7. Probar: `python scripts\probar_respuestas.py "herida por arma de fuego en tórax con hipoventilación"`
-8. Chatbot: `streamlit run app.py` (**desde `rag_pipeline\`**).
+8. Antes de una demo: `python scripts\preparar_demo.py` (debe decir "Todo
+   listo" y 100 % en GPU).
+9. Chatbot: `streamlit run app.py` (**desde `rag_pipeline\`**).
 
 ---
 
 ## 5. Pendientes, por prioridad
 
-1. **Revisión médica.** Entregar `eval/revision/revision.html` y
+0. **Sacar la PHI de git** (sección 0), cuando el usuario lo decida:
+   revisar si el repositorio es o fue público; `git rm --cached` de los
+   cuatro archivos y agregarlos a `.gitignore` (antes, copiarlos a salvo en
+   cada PC: el `pull` los borraría); reescribir el historial (`git
+   filter-repo`) y forzar el push. Si el repositorio fue público, tratar los
+   datos como expuestos. Mientras tanto, no hacer `git add` de esas rutas.
+1. **Revisión médica**, ahora con la prosa (sección 2.10: el verificador no ve
+   el razonamiento clínico). Entregar `eval/revision/revision.html` y
    `planilla.csv`, sin `clave.csv`. La rúbrica va de 1 a 5 en conteos y citas,
    omisiones, riesgo y utilidad, más si se lee en 30 s. Con la clave, comparar
    el formato anterior con el actual. **Cada error que marque se vuelve un
@@ -386,7 +405,8 @@ no pasa la verificación, versión determinista; `qwen3:4b-instruct` + reranker.
    - ~~medir cuántas veces el modelo elige solo manejo y cuántas completa el
      código~~ medido el 27/09 (sección 2.9): 4 y 1 de 25 con salida
      estructurada.
-3. **Commit** de todo lo del 26/09 (sección 0), cuando el usuario lo pida.
+3. **Push** del commit local con esta actualización del contexto, cuando el
+   usuario lo pida (antes, ver pendiente 0).
 4. **Resumen por identificador** (`resumir_caso`): todavía lo escribe el
    modelo y cambia términos: "neumoconiótico" por "neumógeno", y el 26/09
    "empema" por "Empiema". Hacerlo determinista, como el resto.
@@ -412,16 +432,16 @@ no pasa la verificación, versión determinista; `qwen3:4b-instruct` + reranker.
    leer el prompt (~1.700 tokens). En la GTX 1650 serían ~16 s + ~3–4 s. El
    "prompt corto" ya no sirve: la prosa necesita el texto de los casos. Medir
    en el PC de 8 GB con `comparar_modelos.py --modos prosa`.
-9. **Medir otros modelos en el PC de 8 GB:** el script ya existe (sección
-   2.10): `python scripts\comparar_modelos.py --modelos
+9. **Medir otros modelos en el PC de 8 GB:** el script ya existe
+   (`scripts/comparar_modelos.py`, secciones 2.9 y 2.10): `python scripts\comparar_modelos.py --modelos
    qwen3:4b-instruct,qwen3:8b --ruta rrf`. Con `--ruta rrf` los dos modelos
    ven los mismos casos y el reranker no ocupa VRAM (el 8B no cabe con él).
    Aparte, con la configuración real (`RUTA=auto`, reranker en GPU), correrlo
    sin `--modelos` para confirmar `gpu_pct` = 100 con el reranker cargado.
 10. **Revisar 33 hallazgos de datos personales** en
     `anonimizacion/reports/residuo_phi.csv`.
-11. **Restos de truncados:** `eval/consultas.yaml` (línea ~197) y el paso 6
-    del guion de demo en `SETUP.md`.
+11. ~~Restos de truncados en `consultas.yaml` y en el guion de `SETUP.md`~~
+    Hecho el 28/09 (sección 2.11).
 
 ---
 
