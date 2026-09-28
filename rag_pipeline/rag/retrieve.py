@@ -44,8 +44,11 @@ class Resultado:
     text: str
     metadata: dict
     score: float
-    score_norm: float = 0.0          # comparable entre consultas: coseno o prob. del reranker
+    score_norm: float = 0.0          # coseno denso: comparable entre consultas y rutas
     posiciones: dict = field(default_factory=dict)   # ruta -> posición, para depurar RRF
+    # Probabilidad del cross-encoder (solo ruta rerank). Va aparte del coseno:
+    # la interfaz y SIMILITUD_BAJA leen score_norm en escala de coseno.
+    relevancia: float | None = None
 
     @property
     def truncado(self) -> bool:
@@ -116,9 +119,56 @@ def _encoder():
 
 
 @lru_cache(maxsize=1)
+def vram_gb() -> float:
+    """VRAM total de la GPU NVIDIA, o 0 si no hay (o torch no la ve)."""
+    try:
+        import torch
+        if torch.cuda.is_available():
+            return torch.cuda.get_device_properties(0).total_memory / 1024 ** 3
+    except ImportError:
+        pass
+    return 0.0
+
+
+def _reranker_cabe() -> bool:
+    """El reranker en GPU (~1,3 GB) solo cabe junto al generador con 7 GB o más.
+    En la GTX 1650 (4 GB), qwen3:4b-instruct ya ocupa ~3,0: juntos, Ollama da HTTP 500."""
+    return vram_gb() >= config.VRAM_MIN_RERANK
+
+
+def ruta_por_defecto() -> str:
+    """RUTA=auto: rerank si el reranker cabe en la GPU; si no, rrf (en CPU tarda ~30 s)."""
+    if config.RUTA_DEFECTO != "auto":
+        return config.RUTA_DEFECTO
+    return "rerank" if _reranker_cabe() else "rrf"
+
+
+def dispositivo_reranker() -> str:
+    if config.DISPOSITIVO_RERANKER != "auto":
+        return config.DISPOSITIVO_RERANKER
+    return "cuda" if _reranker_cabe() else "cpu"
+
+
+@lru_cache(maxsize=1)
 def _reranker():
+    import torch
     from sentence_transformers import CrossEncoder
-    return CrossEncoder(config.MODELO_RERANKER, device=config.DISPOSITIVO_RERANKER, max_length=512)
+    dev = dispositivo_reranker()
+    kwargs = {"dtype": torch.float16} if dev.startswith("cuda") else {}
+    return CrossEncoder(config.MODELO_RERANKER, device=dev, max_length=512, model_kwargs=kwargs)
+
+
+def _probabilidades(pares: list[tuple[str, str]]) -> np.ndarray:
+    """Probabilidad de relevancia de cada par (consulta, caso).
+
+    sentence-transformers >= 4 ya aplica la sigmoide a los modelos de una
+    etiqueta; aplicarla otra vez comprimía todo a [0,5, 0,73]. Se piden los
+    logits crudos (Identity) y la sigmoide se aplica una sola vez aquí.
+    """
+    import torch
+    logits = _reranker().predict(pares, batch_size=16, show_progress_bar=False,
+                                 activation_fn=torch.nn.Identity())
+    return 1.0 / (1.0 + np.exp(-np.asarray(logits, dtype=float)))
 
 
 @lru_cache(maxsize=1)
@@ -237,17 +287,15 @@ def buscar_rrf(consulta: str, k: int, filtros: Filtros | None = None,
 
 def buscar_rerank(consulta: str, k: int, filtros: Filtros | None = None,
                   profundidad: int | None = None) -> list[Resultado]:
-    candidatos = buscar_rrf(consulta, profundidad or config.TOP_K_CANDIDATOS, filtros)
+    candidatos = buscar_rrf(consulta, profundidad or config.PROFUNDIDAD_RERANK, filtros)
     if not candidatos:
         return []
-    pares = [(consulta, c.text) for c in candidatos]
-    puntajes = _reranker().predict(pares, batch_size=16, show_progress_bar=False)
-    # El cross-encoder devuelve logits: sigmoide -> [0, 1] interpretable
-    probas = 1.0 / (1.0 + np.exp(-np.asarray(puntajes, dtype=float)))
+    probas = _probabilidades([(consulta, c.text) for c in candidatos])
     orden = np.argsort(probas)[::-1][:k]
     return [
         Resultado(candidatos[i].record_id, candidatos[i].text, candidatos[i].metadata,
-                  float(probas[i]), float(probas[i]), candidatos[i].posiciones)
+                  float(probas[i]), candidatos[i].score_norm, candidatos[i].posiciones,
+                  relevancia=float(probas[i]))
         for i in orden
     ]
 
@@ -262,7 +310,7 @@ _DESPACHO = {
 
 def buscar(consulta: str, k: int | None = None, ruta: str | None = None,
            filtros: Filtros | None = None) -> list[Resultado]:
-    ruta = (ruta or config.RUTA_DEFECTO).lower()
+    ruta = (ruta or ruta_por_defecto()).lower()
     if ruta not in _DESPACHO:
         raise ValueError(f"Ruta desconocida: {ruta!r}. Opciones: {', '.join(RUTAS)}")
     return _DESPACHO[ruta](consulta, k or config.TOP_K, filtros)

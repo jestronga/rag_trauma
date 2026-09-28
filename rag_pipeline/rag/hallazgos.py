@@ -78,7 +78,10 @@ LEXICO: list[tuple[str, str, str]] = [
      r"|p(os|ost) ?(operatori|quirurgic)|manejo (qx|quirurgico)|conducta quirurgica"
      r"|requiere (de )?(cx|qx|cirugia)|programa\w* (cx|cirugia)"
      r"|lapar[ao]tomia|laparoscopi|toracotomia|osteosintesis|reduccion abierta"),
-    ("Manejo", "sutura", r"sutur|rafia\b"),
+    # "-rafia" = reparación (arteriorrafia, blefarorrafia), pero no "-grafía":
+    # radiografía, tomografía y ecografía contaban como sutura en 1.209 de
+    # 2.426 casos (medido el 28/09/2026 sobre los 8.198 aptos).
+    ("Manejo", "sutura", r"sutur|(?<!g)rafia\b"),
     ("Manejo", "lavado / desbridamiento", r"lavado|desbrid"),
     # quemaduras: sin estos, una consulta de quemadura salía sin manejo
     ("Manejo", "curación", r"curacion\w*|nitrofurazona|sulfadiazina|silvadene"),
@@ -185,6 +188,25 @@ def extraer(casos: list[Resultado], max_por_categoria: int = 6) -> list[Elemento
         de_cat = sorted((e for e in elementos if e.categoria == cat), key=lambda e: -len(e.casos))
         salida.extend(de_cat[:max_por_categoria])
     return salida
+
+
+def elegibles(casos: list[Resultado], consulta: str = "") -> list[Elemento]:
+    """Lo que se puede sugerir: los elementos de los casos, menos el ruido.
+
+      · un hallazgo que la consulta ya dice o implica ("valorar hipoventilación"
+        a quien preguntó por hipoventilación);
+      · "cirugía" en los mismos casos que un procedimiento concreto: sería la
+        misma sugerencia dos veces.
+
+    Es la lista que ve el modelo y el `enum` de su salida estructurada: lo que
+    no está aquí, el modelo no lo puede elegir.
+    """
+    ya_dicho = obvios(consulta)
+    todos = extraer(casos)
+    concretos = [set(e.casos) for e in todos if e.termino in PROCEDIMIENTOS_QUIRURGICOS]
+    return [e for e in todos
+            if not (e.categoria == "Hallazgos" and e.termino in ya_dicho)
+            and not (e.termino == "cirugía" and set(e.casos) in concretos)]
 
 
 def _normalizar_alineado(texto: str) -> str:

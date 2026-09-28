@@ -194,7 +194,7 @@ consultas:
   - id: fin-04
     texto: herida por arma de fuego con desenlace fatal en sala de urgencias
     boton: '4 · Desenlace fatal'
-    muestra: 'Casos con desenlace fatal; suelen incluir registros truncados, donde el sistema declara que el texto se corta en vez de inventar el final.'
+    muestra: 'Casos graves: la sugerencia cita cada caso y todo se puede revisar en «Casos consultados». Si la redacción del modelo no pasa la verificación, se ve la versión armada desde los casos y el motivo.'
     categoria: fina
     mecanismo: arma_de_fuego
     regiones: [torax]
@@ -222,6 +222,58 @@ consultas:
 
   - id: neg-03
     texto: cuál es la capital de Colombia
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true
+
+  # Urgencias NO traumáticas: son las difíciles. Comparten vocabulario con el
+  # registro (dolor, abdomen, tórax, urgencias) y el coseno no las separa.
+  # Añadidas el 27/09/2026 para calibrar UMBRAL_RERANK.
+  - id: neg-04
+    texto: dolor torácico opresivo irradiado al brazo izquierdo, sospecha de infarto
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true
+
+  - id: neg-05
+    texto: apendicitis aguda con dolor en fosa ilíaca derecha y fiebre
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true
+
+  - id: neg-06
+    texto: crisis asmática severa en niño con sibilancias
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true
+
+  - id: neg-07
+    texto: neumonía adquirida en la comunidad en adulto mayor
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true
+
+  - id: neg-08
+    texto: cólico renal por litiasis ureteral
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true
+
+  - id: neg-09
+    texto: hemorragia digestiva alta por úlcera péptica
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true
+
+  - id: neg-10
+    texto: dosis de amoxicilina para otitis media aguda
     categoria: fuera_de_dominio
     mecanismo: null
     regiones: []

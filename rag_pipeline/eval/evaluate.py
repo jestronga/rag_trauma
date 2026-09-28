@@ -18,9 +18,19 @@ Por eso el script exporta `reports/validacion_manual.csv` con los top-5 de la
 ruta ganadora, para que un humano marque relevante/no relevante sobre una
 muestra y se pueda reportar la concordancia con la pre-anotación.
 
-Métricas: nDCG@10 (relevancia graduada), Recall@k y MRR. Se reportan POR
+Métricas: nDCG@10 (relevancia graduada), P@k, R@10 y MRR. Se reportan POR
 CATEGORÍA, no promediadas: cada categoría mide un fenómeno distinto y el
 promedio los oculta.
+
+Ideal común (pooling, como en TREC)
+-----------------------------------
+Sin qrels exhaustivos no hay ideal verdadero. Se aproxima con la UNIÓN de lo
+que traen todas las rutas evaluadas a la profundidad pedida: es el mismo ideal
+para todas, así que nDCG@10 y R@10 sí comparan rutas. Antes el ideal salía de
+la propia ruta: un nDCG que solo medía si la ruta ordenaba bien lo que ella
+misma traía (1 caso relevante en la posición 1 valía 1,0). Consecuencia: los
+números dependen de qué rutas se evalúan juntas; comparar solo corridas con
+las mismas rutas y la misma profundidad.
 
 Uso:
     python -m eval.evaluate
@@ -39,6 +49,7 @@ import yaml
 warnings.filterwarnings("ignore")
 
 from rag import config                      # noqa: E402
+from rag.generate import filtrar_relevantes         # noqa: E402
 from rag.retrieve import RUTAS, buscar, confianza   # noqa: E402
 
 RAIZ = Path(__file__).resolve().parents[1]
@@ -92,18 +103,40 @@ def precision_at(ganancias: list[int], k: int) -> float:
     return sum(1 for g in ganancias[:k] if g >= 2) / k
 
 
+def recall_at(ids: list[str], k: int, relevantes: set[str]) -> float:
+    """Fracción de los relevantes del pool (relevancia 2) que la ruta trae en su top-k."""
+    if not relevantes:
+        return 0.0
+    return len(set(ids[:k]) & relevantes) / len(relevantes)
+
+
+def ideal_comun(resultados: dict[str, list], consulta: dict) -> dict[str, int]:
+    """record_id -> relevancia, sobre la unión de lo que trajo cada ruta.
+
+    La relevancia depende solo del caso y la consulta, no de la ruta, así que
+    un caso que traen dos rutas cuenta una vez.
+    """
+    return {r.record_id: relevancia(consulta, r.metadata)
+            for res in resultados.values() for r in res}
+
+
 def evaluar(consultas: list[dict], rutas: list[str], k: int, profundidad: int):
     filas, detalle = [], []
     for c in consultas:
         fuera = bool(c.get("espera_abstencion"))
         # la confianza no depende de la ruta: es el coseno del mejor caso denso
         conf = confianza(c["texto"])
-        for ruta in rutas:
-            res = buscar(c["texto"], k=profundidad, ruta=ruta)
-            ganancias = [relevancia(c, r.metadata) for r in res]
-            # el ideal se aproxima con lo mejor visto por CUALQUIER ruta a esta
-            # profundidad: sin qrels exhaustivos no hay ideal verdadero
-            ideal = sorted(ganancias, reverse=True)
+        resultados = {ruta: buscar(c["texto"], k=profundidad, ruta=ruta) for ruta in rutas}
+        pool = ideal_comun(resultados, c)
+        ideal = list(pool.values())
+        relevantes = {rid for rid, g in pool.items() if g >= 2}
+        for ruta, res in resultados.items():
+            ganancias = [pool[r.record_id] for r in res]
+            ids = [r.record_id for r in res]
+            # misma regla que generate.responder: coseno y, con rerank, al menos
+            # MIN_CASOS casos del top-k sobre UMBRAL_RERANK
+            abstendria = conf < config.UMBRAL_ABSTENCION or len(
+                filtrar_relevantes(res[:config.TOP_K])) < config.MIN_CASOS
 
             filas.append({
                 "id": c["id"],
@@ -111,9 +144,11 @@ def evaluar(consultas: list[dict], rutas: list[str], k: int, profundidad: int):
                 "ruta": ruta,
                 "nDCG@10": ndcg_at(ganancias, 10, ideal),
                 f"P@{k}": precision_at(ganancias, k),
+                "R@10": recall_at(ids, 10, relevantes),
                 "MRR": mrr(ganancias),
+                "relevantes_pool": len(relevantes),
                 "confianza": conf,
-                "abstendria": conf < config.UMBRAL_ABSTENCION,
+                "abstendria": abstendria,
                 "espera_abstencion": fuera,
             })
             for pos, (r, g) in enumerate(zip(res[:k], ganancias[:k]), start=1):
@@ -151,8 +186,15 @@ def main() -> None:
     dentro = df[~df["espera_abstencion"]]
 
     print("=== Global (solo consultas en dominio) ===")
-    glob = dentro.groupby("ruta")[["nDCG@10", f"P@{args.k}", "MRR"]].mean().round(3)
+    glob = dentro.groupby("ruta")[["nDCG@10", f"P@{args.k}", "R@10", "MRR"]].mean().round(3)
     print(glob.sort_values("nDCG@10", ascending=False).to_string())
+    print(f"(ideal común: unión de {', '.join(rutas)} a profundidad {args.profundidad})")
+
+    # una consulta sin ningún caso de relevancia 2 en el pool no puede medir
+    # nada: o el corpus apto_rag ya no tiene casos así, o la anotación falla
+    vacias = sorted(dentro.loc[dentro["relevantes_pool"] == 0, "id"].unique())
+    if vacias:
+        print(f"\n[aviso] sin casos de relevancia 2 en el pool: {', '.join(vacias)}")
 
     print("\n=== nDCG@10 por categoría ===")
     piv = dentro.pivot_table(index="categoria", columns="ruta", values="nDCG@10").round(3)

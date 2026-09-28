@@ -111,6 +111,17 @@ def test_laparatomia_mal_escrita():
     assert "laparotomía / laparoscopia" in manejo(t)
 
 
+@pytest.mark.parametrize("estudio", ["SE TOMA RADIOGRAFIA", "TOMOGRAFIA DE CRANEO", "ECOGRAFIA FAST"])
+def test_grafia_no_es_sutura(estudio):
+    # "rafia\b" encontraba "-grafía": 1.209 casos contaban sutura sin tenerla
+    assert "sutura" not in manejo(caso("ME CAI", "DOLOR", estudio))
+
+
+@pytest.mark.parametrize("reparacion", ["SE REALIZA SUTURA", "ENTERORRAFIA", "BLEFARORRAFIA"])
+def test_rafia_de_reparacion_si_es_sutura(reparacion):
+    assert "sutura" in manejo(caso("HERIDA", "HERIDA", reparacion))
+
+
 def test_manejo_en_el_motivo_no_cuenta():
     # lo que se hizo antes de llegar no es manejo de este hospital
     t = caso("remitido con tubo de torax", "hipoventilacion", "se da salida")

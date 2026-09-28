@@ -64,7 +64,7 @@ pip install -r requirements.txt      # desde la raíz: instala ambas partes
 **Ollama** — descárgalo de [ollama.com](https://ollama.com) y luego:
 
 ```powershell
-ollama pull qwen2.5:7b-instruct-q4_K_M
+ollama pull qwen3:4b-instruct       # NO qwen3:4b (variante Thinking)
 ```
 
 Comprueba que todo está en su sitio:
@@ -83,17 +83,31 @@ Esta es la restricción que manda, y la configuración por defecto ya la respeta
 | Pieza | VRAM | Dónde corre por defecto |
 |---|---|---|
 | bge-m3 (indexación) | ~2,3 GB | **GPU**, una sola vez |
-| bge-m3 (consulta) | ~2,3 GB | **CPU** — embeber una consulta corta cuesta ~150 ms |
-| Qwen2.5 7B Q4 | ~4,7 GB | **GPU**, vía Ollama |
-| bge-reranker-v2-m3 | ~2,3 GB | **apagado** |
+| bge-m3 (consulta) | — | **CPU**: embeber una consulta corta cuesta ~150 ms |
+| `qwen3:4b-instruct` | ~3,0 GB con `NUM_CTX=3072` | **GPU**, vía Ollama |
+| bge-reranker-v2-m3 (fp16) | ~1,3 GB | **GPU** si torch ve CUDA (`RUTA=auto` → `rerank`) |
 
-Las tres piezas juntas no caben en 8 GB. Por eso bge-m3 sale de la GPU en
-cuanto termina de indexar y Ollama se queda con ella. El reranker se enciende
-así, y conviene dejarlo en CPU:
+Generador y reranker suman ~4,3 GB y caben en 8 GB con margen para Windows.
+bge-m3 sale de la GPU en cuanto termina de indexar.
+
+**El reranker necesita GPU.** En CPU tarda ~31 s por consulta (medido en un
+i5-12450H, 30 candidatos), así que sin CUDA `RUTA=auto` usa `rrf`. Descarga
+previa (~2,3 GB, una vez):
 
 ```powershell
-$env:RERANKER="1"       # añade ~1 s por consulta en CPU
+python -c "from huggingface_hub import snapshot_download; snapshot_download('BAAI/bge-reranker-v2-m3')"
 ```
+
+**Con un generador de 8B (`qwen3:8b`) el reranker no cabe:** Ollama se quedaría
+sin memoria (HTTP 500). En ese caso:
+
+```powershell
+$env:DISPOSITIVO_RERANKER="cpu"; $env:RUTA="rrf"
+```
+
+Ver que el reranker realmente corre en la GPU: `python scripts\calibrar_umbral.py`
+imprime el dispositivo y el tiempo de rerank por consulta (debería quedar por
+debajo de 1 s).
 
 Si el generador no arranca por falta de memoria, baja a un modelo de 3B:
 
@@ -173,41 +187,67 @@ Escribir solo un número (`40887`) recupera y resume ese caso concreto.
 
 ## 6. Guion sugerido para la demostración
 
-Ocho minutos, en este orden:
+**Antes (10 minutos antes, con el chatbot cerrado):**
+
+```powershell
+cd rag_pipeline
+python scripts\preparar_demo.py
+```
+
+Revisa la GPU, que Ollama tenga el modelo entero en la VRAM (100 %) y pasa los
+5 botones de la demo por el sistema completo. Debe terminar en "Todo listo".
+Después: `streamlit run app.py`. Al abrir, la app precarga los modelos (~30 s,
+una sola vez) y el modelo queda cargado 2 horas (`KEEP_ALIVE`).
+
+En la GTX 1650 (4 GB) el sistema elige solo `rrf` (el reranker no cabe junto al
+generador) y el umbral de abstención de coseno 0,52. Cada respuesta tarda
+**~20 s**: es buen momento para explicar qué está haciendo.
+
+Ocho minutos, en este orden (los botones 1-5 están en la app):
 
 **1 · Encuadre, antes de escribir nada.** El registro cubre atención de trauma
-**hasta 2018**. El sistema describe lo que se hizo en casos históricos; no
-indica conductas. Dicho por ti al principio es una limitación reconocida;
-dicho por alguien del público a mitad de la demo, es un agujero.
+**hasta 2018**. El sistema sugiere a partir de lo que se hizo en casos
+históricos; no indica conductas ni reemplaza el juicio clínico. Dicho por ti al
+principio es una limitación reconocida; dicho por alguien del público a mitad
+de la demo, es un agujero.
 
-**2 · Caso fácil** — *"herida por arma de fuego en tórax con hipoventilación"*.
-Muestra el funcionamiento normal. Abre el desplegable de casos: ahí se ven las
-citas y los metadatos.
+**2 · Caso directo** (botón 1) — *"herida por arma de fuego en tórax con
+hipoventilación"*. La sugerencia en prosa, con una cita `[caso: ID]` en cada
+afirmación. Abre **"Casos consultados"**: el texto completo de cada caso, con
+lo que coincide con la consulta resaltado. **Todo lo que dice la sugerencia se
+puede comprobar ahí.**
 
-**3 · Brecha de vocabulario** — *"paciente apuñalado en el pecho, herida penetrante"*.
-Ninguna de esas palabras está en el corpus, que dice `HPACP en tórax` o
-`ME APUÑALARON`. Es el momento de explicar por qué hay una ruta densa y no solo
-búsqueda por palabras.
+**3 · Cómo se evita que invente.** El modelo redacta, pero el código revisa cada
+oración antes de mostrarla: que lo que nombra esté en los casos, que el caso
+citado lo tenga, que no cuente mal y que oriente en vez de ordenar. Si no pasa,
+se muestra la versión armada desde los casos y una línea dice por qué (puede
+pasar en vivo con el botón 4: es una buena ocasión para mostrarlo).
 
-**4 · Abreviatura** — *"HPAF en cráneo con orificio de entrada parietal"*.
-Funciona en los dos sentidos gracias a la expansión aumentativa del corpus.
+**4 · Brecha de vocabulario** (botón 2) — *"paciente apuñalado en el pecho,
+herida penetrante"*. El corpus dice `HPACP en tórax` o `ME APUÑALARON`. Por eso
+hay búsqueda densa y no solo por palabras.
 
-**5 · Filtro por metadatos.** Con la misma consulta, activa mecanismo = arma de
-fuego y región = tórax en la barra lateral. Se ve cómo se acota el espacio de
-búsqueda.
+**5 · Abreviatura** (botón 3) — *"HPAF en cráneo con orificio de entrada
+parietal"*. Funciona en los dos sentidos gracias a la expansión de abreviaturas.
 
-**6 · Caso truncado.** Busca uno marcado `truncado` y muestra que el sistema
-declara que el registro se corta en vez de inventar el desenlace. El 22 % del
-corpus está cortado a 500 caracteres por el export original.
+**6 · Caso grave** (botón 4) — *"herida por arma de fuego con desenlace fatal"*.
+Con la barra lateral se puede filtrar por mecanismo, región o desenlace en vivo.
 
-**7 · Abstención** — *"manejo de cetoacidosis diabética en urgencias"*.
-El sistema dice que no encontró casos suficientemente similares. **Esta es la
-diapositiva que convence a un público clínico**, más que cualquier acierto:
-responde la pregunta que todos tienen en la cabeza, que es qué hace el sistema
-cuando no sabe.
+**7 · Abstención** (botón 5) — *"manejo de cetoacidosis diabética en
+urgencias"*. El sistema dice que no encontró casos suficientemente similares.
+**Esta es la diapositiva que convence a un público clínico**: responde qué hace
+el sistema cuando no sabe.
 
-**8 · Trazabilidad.** Escribe un identificador de caso y muestra el registro
-crudo detrás de la respuesta, con los marcadores de anonimización a la vista.
+**Cuidado con preguntas del público en este PC:** sin el reranker, el filtro es
+solo por similitud. Bloquea diabetes, apendicitis, asma o infarto, pero **no**
+"dolor torácico" ni "dolor de cabeza", que se parecen a casos de trauma (el
+reranker del PC de 8 GB sí los separa). Si alguien lo prueba, es un límite
+conocido: responde con los casos más cercanos y avisa si la similitud es baja.
+
+**Evitar en la demo:** escribir un número de caso para resumirlo. Ese resumen
+todavía lo escribe el modelo sin verificación y a veces cambia términos
+(pendiente 4 de `CONTEXTO_SESION.md`). Para mostrar trazabilidad, usar
+"Casos consultados".
 
 ---
 
@@ -215,13 +255,20 @@ crudo detrás de la respuesta, con los marcadores de anonimización a la vista.
 
 | Variable | Por defecto | Para qué |
 |---|---|---|
-| `RUTA` | `rrf` | ruta de recuperación: `bm25`, `densa`, `rrf`, `rerank` |
+| `RUTA` | `auto` | `rerank` con GPU NVIDIA, `rrf` sin ella; o fijar `bm25`, `densa`, `rrf`, `rerank` |
 | `TOP_K` | `5` | casos que se le pasan al generador |
-| `UMBRAL_ABSTENCION` | `0.45` | coseno mínimo para responder |
-| `MODELO_LLM` | `qwen2.5:3b` | generador en Ollama; según la VRAM, ver `MODELOS.md`. El 7B (`qwen2.5:7b-instruct-q4_K_M`) necesita GPU NVIDIA o ~5 GB de RAM libre |
+| `UMBRAL_ABSTENCION` | `0.52` | coseno mínimo para responder. Sin reranker es la única guarda: bloquea cetoacidosis (0,50) y deja pasar "TCE" (0,541) |
+| `UMBRAL_RERANK` | `0.2` | con `rerank`: probabilidad mínima por caso; con menos de 2 casos sobre ella, se abstiene. Calibrar con `scripts\calibrar_umbral.py` |
+| `PROFUNDIDAD_RERANK` | `30` | candidatos de RRF que se reordenan |
+| `SALIDA` | `prosa` | `prosa`: el modelo redacta la sugerencia con citas y `rag/verificar.py` la revisa; si no pasa, se muestra la versión armada desde los casos. `sugerencias`: siempre la versión armada desde los casos |
+| `MAX_TOKENS_PROSA` | `400` | tope de la sugerencia en prosa (usa ~150–250) |
+| `SALIDA_ESTRUCTURADA` | encendido | el modelo responde JSON restringido a la lista de elementos (campo `format` de Ollama, requiere Ollama ≥ 0.5). `0` = viñetas de texto como antes |
+| `DISPOSITIVO_RERANKER` | `auto` | `cuda` si hay GPU NVIDIA; `cpu` si el generador es de 8B |
+| `MODELO_LLM` | `qwen3:4b-instruct` | generador en Ollama; según la VRAM, ver `MODELOS.md`. Sin GPU NVIDIA y poca RAM: `qwen2.5:3b` |
+| `KEEP_ALIVE` | `2h` | cuánto deja Ollama el modelo cargado tras cada llamada (`-1` = siempre) |
+| `VRAM_MIN_RERANK` | `7` | GB de VRAM desde los que `RUTA=auto` usa el reranker en GPU |
 | `SINTESIS_LLM` | apagado | `1` para que el modelo escriba la síntesis y los límites. Apagado los arma el código con conteos: el 3B inventaba en esas secciones |
 | `PRECISION_CONSULTA` | `bf16` | precisión de bge-m3 en CPU: `bf16` ~1,1 GB de RAM, `fp32` ~2,3 GB |
-| `RERANKER` | apagado | `1` para encender el cross-encoder |
 | `DISPOSITIVO_CONSULTA` | `cpu` | dónde embeber la consulta |
 | `ENCODER` | `hf` | `hf` = transformers directo · `st` = sentence-transformers · `falso` = sustituto hash |
 
@@ -252,8 +299,9 @@ hacen falta `cu126` o posterior; `cu121` solo llega hasta Python 3.12.
 
 **`No se pudo generar la respuesta: HTTP Error 500`** → casi siempre es Ollama sin memoria para cargar el modelo. El detalle está en `%LOCALAPPDATA%\Ollama\server.log` (`failed to allocate buffer`). Sin GPU NVIDIA el modelo va entero a RAM: cierra aplicaciones o usa un modelo más pequeño.
 
-**El generador se queda sin memoria** → baja a `qwen2.5:3b-instruct-q4_K_M`, o
-apaga el reranker si lo encendiste.
+**El generador se queda sin memoria** → si el reranker está en la GPU,
+`$env:DISPOSITIVO_RERANKER="cpu"; $env:RUTA="rrf"`; si no, baja a
+`qwen2.5:3b-instruct-q4_K_M`.
 
 **`Unrecognized processing class in BAAI/bge-m3`** → sentence-transformers 6.x
 intenta instanciar un `AutoProcessor` para todo modelo, y bge-m3 no tiene uno.

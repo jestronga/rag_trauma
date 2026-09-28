@@ -28,8 +28,9 @@ def main() -> int:
                 print(f"{AVISO} Menos de 7 GB: usa un generador de 3B  →  "
                       f"MODELO_LLM=qwen2.5:3b-instruct-q4_K_M")
             elif gb < 11:
-                print(f"{AVISO} 8 GB: el reranker no cabe junto al generador. "
-                      f"Déjalo apagado o en CPU (es el valor por defecto).")
+                print(f"{AVISO} 8 GB: el reranker (~1,3 GB) cabe en GPU junto a "
+                      f"qwen3:4b-instruct, no junto a qwen3:8b. Con un 8B: "
+                      f"DISPOSITIVO_RERANKER=cpu y RUTA=rrf.")
         else:
             print(f"{AVISO} torch sin CUDA: la indexación irá por CPU "
                   f"(~40-60 min para 22k documentos)")

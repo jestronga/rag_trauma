@@ -81,18 +81,46 @@ PRECISION_CONSULTA = _env("PRECISION_CONSULTA", "bf16")   # bf16 | fp32
 LOTE_INDEXACION = _env_int("LOTE_INDEXACION", 32)
 
 # --- recuperación ----------------------------------------------------------
-RUTA_DEFECTO = _env("RUTA", "rrf")            # bm25 | densa | rrf | rerank
+# auto = rerank si torch ve una GPU NVIDIA, rrf si no (retrieve.ruta_por_defecto).
+# El reranker en CPU no es viable: medido en un i5-12450H, 31 s por consulta.
+RUTA_DEFECTO = _env("RUTA", "auto")           # auto | bm25 | densa | rrf | rerank
 TOP_K = _env_int("TOP_K", 5)                   # casos que se le pasan al generador
 TOP_K_CANDIDATOS = _env_int("TOP_K_CANDIDATOS", 50)   # profundidad antes de fusionar
 RRF_K = _env_int("RRF_K", 60)                  # constante estándar de Reciprocal Rank Fusion
-USAR_RERANKER = _env_bool("RERANKER", False)
-DISPOSITIVO_RERANKER = _env("DISPOSITIVO_RERANKER", "cpu")
+# auto = cuda si hay GPU NVIDIA; en CUDA se carga en fp16 (~1,1 GB de pesos).
+# Presupuesto en 8 GB: qwen3:4b-instruct (~3,0 GB con NUM_CTX=3072) + reranker
+# (~1,3 GB) + Windows (~0,5 GB) caben. Con qwen3:8b (~6 GB) NO: poner
+# DISPOSITIVO_RERANKER=cpu y RUTA=rrf, o Ollama se queda sin memoria (HTTP 500).
+DISPOSITIVO_RERANKER = _env("DISPOSITIVO_RERANKER", "auto")   # auto | cuda | cpu
+# RUTA=auto usa rerank solo con esta VRAM o más (GTX 1650 de 4 GB → rrf).
+VRAM_MIN_RERANK = _env_float("VRAM_MIN_RERANK", 7.0)
+# Candidatos de RRF que se reordenan. Cada par cuesta un pase del cross-encoder
+# (los casos miden 118 tokens de mediana, 371 como máximo): es la palanca de la
+# latencia.
+PROFUNDIDAD_RERANK = _env_int("PROFUNDIDAD_RERANK", 30)
+# Probabilidad mínima del reranker para que un caso llegue al generador. Si
+# pasan menos de MIN_CASOS, el sistema se abstiene: el cross-encoder lee la
+# consulta y el caso juntos y separa lo que el coseno de bge-m3 no separa
+# ("cetoacidosis diabética" sacaba 0,50 de coseno). Calibrado con
+# scripts/calibrar_umbral.py (27/09/2026, 25 consultas de trauma y 10 fuera de
+# dominio, profundidad 30), sobre la probabilidad del 2.º caso:
+#   0,1 → 0 abstenciones falsas, 2 respuestas falsas
+#   0,2 → 0 abstenciones falsas, 1 respuesta falsa (apendicitis aguda, 0,42)
+#   0,5 → 3 abstenciones falsas, 0 respuestas falsas
+# La consulta de trauma más baja: "agresión con objeto romo en región craneal",
+# 0,22. Con coseno solo, 8 de 10 fuera de dominio pasaban el umbral de 0,45.
+UMBRAL_RERANK = _env_float("UMBRAL_RERANK", 0.2)
 
 # --- abstención ------------------------------------------------------------
 # Si el mejor caso no supera este coseno, el sistema dice que no encontró nada
 # suficientemente parecido en vez de responder. Calibrado a ojo sobre bge-m3;
 # `scripts/calibrar_umbral.py` lo ajusta con las consultas de evaluación.
-UMBRAL_ABSTENCION = _env_float("UMBRAL_ABSTENCION", 0.45)
+# 0,52 desde el 28/09/2026: sin reranker (GTX 1650), el coseno es la única
+# guarda. Medido: trauma más bajo "TCE" 0,541 y "FX de radio distal" 0,551;
+# bloquea cetoacidosis 0,500, infarto 0,497, asma 0,493, apendicitis 0,489,
+# diabetes 0,464. NO separa "dolor torácico" (0,59) ni "dolor de cabeza"
+# (0,62): eso solo lo hace el reranker (UMBRAL_RERANK).
+UMBRAL_ABSTENCION = _env_float("UMBRAL_ABSTENCION", 0.52)
 MIN_CASOS = _env_int("MIN_CASOS", 2)
 # Por encima del umbral de abstención pero con el mejor caso por debajo de esto,
 # la respuesta avisa que los casos pueden no corresponder. Medido (26/09/2026):
@@ -106,6 +134,18 @@ TEMPERATURA = _env_float("TEMPERATURA", 0.1)   # baja: es un contexto clínico
 # síntesis libre atribuía manejos y desenlaces a casos que no los tenían.
 # Encenderlo solo con un modelo mayor y revisando las respuestas.
 SINTESIS_LLM = _env_bool("SINTESIS_LLM", False)
+# El modelo responde `{"sugerencias": [...]}` restringido por JSON Schema (campo
+# `format` de Ollama) a los términos de la lista de elementos: no puede elegir
+# algo sin respaldo. Apagado, vuelve a las viñetas de texto. No aplica con
+# SINTESIS_LLM, que necesita texto libre.
+SALIDA_ESTRUCTURADA = _env_bool("SALIDA_ESTRUCTURADA", True)
+# Qué ve el médico. prosa: el modelo redacta la sugerencia como un asistente
+# médico, con citas, y rag/verificar.py la revisa oración por oración; si no
+# pasa, se muestra la respuesta determinista. sugerencias: la respuesta
+# determinista siempre (el modelo solo elige de la lista).
+SALIDA = _env("SALIDA", "prosa")                 # prosa | sugerencias
+# La prosa son 3-5 oraciones con citas: ~150-250 tokens.
+MAX_TOKENS_PROSA = _env_int("MAX_TOKENS_PROSA", 400)
 # Sin SINTESIS_LLM el modelo solo escribe 2-4 viñetas de sugerencias (~100
 # tokens medidos). Con SINTESIS_LLM escribe cuatro secciones: ~600-800.
 MAX_TOKENS = _env_int("MAX_TOKENS", 900 if SINTESIS_LLM else 250)
@@ -124,6 +164,11 @@ NUM_CTX = _env_int("NUM_CTX", 3072)
 # ocupa VRAM), NUM_GPU=-1. Solo se aplica con la ventana NUM_CTX.
 NUM_GPU = _env_int("NUM_GPU", 99)
 VENTANA_HISTORIAL = _env_int("VENTANA_HISTORIAL", 4)   # turnos para reescribir la consulta
+# Cuánto deja Ollama el modelo cargado tras cada llamada. Su valor por defecto
+# son 5 min: en una demo, la pregunta después de una pausa recargaba el modelo
+# (25-35 s en la GTX 1650). Se envía en cada llamada: no hace falta
+# OLLAMA_KEEP_ALIVE ni reiniciar Ollama. "-1" = para siempre.
+KEEP_ALIVE = _env("KEEP_ALIVE", "2h")
 
 # --- corpus ----------------------------------------------------------------
 # El registro llega hasta 2018. Aparece en el prompt y en la interfaz: es una

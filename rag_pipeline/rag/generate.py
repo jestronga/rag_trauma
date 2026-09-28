@@ -21,23 +21,20 @@ vacíos, que son los que el generador tiende a completar inventando.
 from __future__ import annotations
 
 import json
-import re
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
 
 from . import config
 from .build_prompt import (
-    ROTULO_SINTESIS, ROTULO_SUGERENCIAS, SIN_SUGERENCIAS, SISTEMA, SISTEMA_RESUMEN, TITULO_CASOS,
-    TITULO_LIMITES, TITULO_SUGERENCIAS, conclusion_calculada, construir_prompt, contexto_elemento,
-    limites_calculados, linea_base, para_afinar, resumen_de_caso, tabla_casos,
+    ROTULO_SINTESIS, ROTULO_SUGERENCIA, ROTULO_SUGERENCIAS, SIN_SUGERENCIAS, SISTEMA, SISTEMA_PROSA,
+    SISTEMA_RESUMEN, TITULO_CASOS, TITULO_LIMITES, TITULO_SUGERENCIAS, conclusion_calculada,
+    construir_prompt, contexto_elemento, limites_calculados, linea_base, linea_respaldo, para_afinar,
+    resumen_de_caso, tabla_casos,
 )
-from .hallazgos import PROCEDIMIENTOS_QUIRURGICOS, Elemento, elemento_mencionado, extraer, obvios
+from .hallazgos import PROCEDIMIENTOS_QUIRURGICOS, Elemento, elegibles, elemento_mencionado, extraer
 from .retrieve import Filtros, Resultado, buscar, confianza
-
-# `[caso: 12345]` es el formato pedido; los modelos pequeños a veces escriben
-# `[12345]`. Si no se reconoce, una cita inventada pasaría sin marcarse.
-RX_CITA = re.compile(r"\[(?:caso[:\s]+)?([0-9]{1,8})\]", re.IGNORECASE)
+from .verificar import RX_CITA, suavizar, verificar_prosa
 
 
 @dataclass
@@ -50,6 +47,11 @@ class Respuesta:
     citas_invalidas: list[str] = field(default_factory=list)
     consulta_reescrita: str | None = None
     error: str | None = None
+    relevancia: float | None = None      # prob. máxima del reranker (solo ruta rerank)
+    # SALIDA=prosa: True si se mostró la prosa del modelo; False si no pasó la
+    # verificación y se mostró la versión determinista (con `motivos`).
+    prosa_verificada: bool | None = None
+    motivos: list[str] = field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
@@ -77,27 +79,58 @@ def _opciones_contexto(mensajes: list[dict], max_tokens: int) -> dict:
 
 
 def _ollama(mensajes: list[dict], modelo: str | None = None, temperatura: float | None = None,
-            max_tokens: int | None = None, timeout: int | None = None) -> str:
+            max_tokens: int | None = None, timeout: int | None = None,
+            formato: dict | None = None, metricas: dict | None = None) -> str:
+    """Una llamada a /api/chat. `formato` = JSON Schema que restringe la salida.
+    Si se pasa `metricas` (un dict), se llena con los tiempos y tokens de Ollama."""
     max_tokens = max_tokens or config.MAX_TOKENS
-    cuerpo = json.dumps({
+    peticion = {
         "model": modelo or config.MODELO_LLM,
         "messages": mensajes,
         "stream": False,
         # Los modelos con razonamiento (qwen3, qwen3.5) piensan antes de
         # responder y se comen los tokens y el tiempo; aquí no aporta nada.
         "think": False,
+        "keep_alive": config.KEEP_ALIVE,
         "options": {
             "temperature": config.TEMPERATURA if temperatura is None else temperatura,
             "num_predict": max_tokens,
             **_opciones_contexto(mensajes, max_tokens),
         },
-    }).encode("utf-8")
+    }
+    if formato is not None:
+        peticion["format"] = formato
     req = urllib.request.Request(
-        f"{config.OLLAMA_URL}/api/chat", data=cuerpo,
+        f"{config.OLLAMA_URL}/api/chat", data=json.dumps(peticion).encode("utf-8"),
         headers={"Content-Type": "application/json"}, method="POST",
     )
     with urllib.request.urlopen(req, timeout=timeout or config.TIMEOUT_LLM) as r:
-        return json.loads(r.read())["message"]["content"].strip()
+        datos = json.loads(r.read())
+    if metricas is not None:
+        # Ollama da las duraciones en nanosegundos
+        metricas.update({
+            "tokens_prompt": datos.get("prompt_eval_count", 0),
+            "tokens_salida": datos.get("eval_count", 0),
+            "s_prompt": datos.get("prompt_eval_duration", 0) / 1e9,
+            "s_salida": datos.get("eval_duration", 0) / 1e9,
+            "s_carga": datos.get("load_duration", 0) / 1e9,
+            "s_total": datos.get("total_duration", 0) / 1e9,
+        })
+    return datos["message"]["content"].strip()
+
+
+def porcentaje_gpu(modelo: str | None = None) -> int | None:
+    """% del modelo cargado en VRAM según /api/ps (la columna PROCESSOR de
+    `ollama ps`). None si no está cargado o Ollama no responde."""
+    modelo = modelo or config.MODELO_LLM
+    try:
+        with urllib.request.urlopen(f"{config.OLLAMA_URL}/api/ps", timeout=5) as r:
+            for m in json.loads(r.read()).get("models", []):
+                if m.get("name") == modelo or m.get("model") == modelo:
+                    return round(100 * m.get("size_vram", 0) / max(m.get("size", 1), 1))
+    except OSError:
+        pass
+    return None
 
 
 def ollama_disponible() -> tuple[bool, str]:
@@ -178,6 +211,7 @@ def responder(
     filtros: Filtros | None = None,
     umbral: float | None = None,
     reescribir_consulta: bool = True,
+    umbral_rerank: float | None = None,
 ) -> Respuesta:
     historial = historial or []
     umbral = config.UMBRAL_ABSTENCION if umbral is None else umbral
@@ -197,26 +231,103 @@ def responder(
         )
 
     casos = buscar(consulta, k=k or config.TOP_K, ruta=ruta, filtros=filtros)
+    relevancia = max((c.relevancia for c in casos if c.relevancia is not None), default=None)
+    casos = filtrar_relevantes(casos, umbral_rerank)
     if len(casos) < config.MIN_CASOS:
         return Respuesta(
             texto=MENSAJE_ABSTENCION.format(cobertura=config.COBERTURA_TEMPORAL),
             casos=casos, confianza=conf, abstuvo=True, consulta_reescrita=reescrita,
+            relevancia=relevancia,
         )
 
-    mensajes = [{"role": "system", "content": SISTEMA},
-                {"role": "user", "content": construir_prompt(consulta, casos)}]
+    prosa_verificada, motivos = None, []
     try:
-        texto = _ollama(mensajes)
+        if config.SALIDA == "prosa" and not config.SINTESIS_LLM:
+            prosa = generar_prosa(consulta, casos)
+            prosa_verificada, motivos = verificar_prosa(prosa, casos, consulta)
+            # Si no pasa, la versión determinista con la elección de las reglas
+            # del código: una segunda llamada al modelo duplicaría la espera.
+            texto = ensamblar_prosa(prosa, casos) if prosa_verificada else ensamblar("", casos, consulta)
+        else:
+            texto = ensamblar(generar_eleccion(consulta, casos), casos, consulta)
     except Exception as e:
         return Respuesta(texto="", casos=casos, confianza=conf,
                          consulta_reescrita=reescrita,
                          error=f"No se pudo generar la respuesta: {e}")
 
-    texto = ensamblar(texto, casos, consulta)
     validas, invalidas = verificar_citas(texto, casos)
     return Respuesta(texto=texto, casos=casos, confianza=conf,
                      citas_validas=validas, citas_invalidas=invalidas,
-                     consulta_reescrita=reescrita)
+                     consulta_reescrita=reescrita, relevancia=relevancia,
+                     prosa_verificada=prosa_verificada, motivos=motivos)
+
+
+def generar_prosa(consulta: str, casos: list[Resultado], metricas: dict | None = None) -> str:
+    """La sugerencia en prosa que escribe el modelo, sin verificar.
+
+    Salida estructurada `{"sugerencia": "..."}`: evita preámbulos, títulos y
+    razonamientos alrededor. Sin elementos elegibles no hay nada que el modelo
+    pueda nombrar con respaldo: no se le llama y la respuesta es determinista.
+    """
+    elementos = elegibles(casos, consulta)
+    if not elementos:
+        return ""
+    mensajes = [{"role": "system", "content": SISTEMA_PROSA},
+                {"role": "user", "content": construir_prompt(consulta, casos, elementos, prosa=True)}]
+    formato = {"type": "object", "properties": {"sugerencia": {"type": "string"}},
+               "required": ["sugerencia"]}
+    salida = _ollama(mensajes, formato=formato, max_tokens=config.MAX_TOKENS_PROSA, metricas=metricas)
+    try:
+        datos = json.loads(salida)
+        prosa = str(datos.get("sugerencia", "")).strip() if isinstance(datos, dict) else ""
+        prosa = suavizar(prosa)
+        return prosa[:1].upper() + prosa[1:]   # el 4B suele empezar con "conviene…"
+    except json.JSONDecodeError:
+        # cortado por MAX_TOKENS_PROSA, o un modelo que ignora el formato
+        return ""
+
+
+def ensamblar_prosa(prosa: str, casos: list[Resultado]) -> str:
+    """Prosa verificada + sobre cuánto se apoya. El detalle de cada caso está en
+    el apartado de casos de la app."""
+    return f"{ROTULO_SUGERENCIA}\n\n{prosa}\n\n{linea_respaldo(casos, 'los casos consultados')}"
+
+
+def generar_eleccion(consulta: str, casos: list[Resultado], estructurada: bool | None = None,
+                     metricas: dict | None = None) -> str:
+    """Salida cruda del modelo: la elección de sugerencias (y, con SINTESIS_LLM,
+    la síntesis y los límites).
+
+    Estructurada (por defecto): el modelo ve solo los elementos elegibles y
+    responde `{"sugerencias": [...]}` restringido por JSON Schema a esa lista.
+    Si no hay nada elegible, no se llama al modelo: no hay qué elegir.
+    En texto (SALIDA_ESTRUCTURADA=0, o SINTESIS_LLM): viñetas bajo
+    TITULO_SUGERENCIAS, como antes del 27/09/2026.
+    """
+    if estructurada is None:
+        estructurada = config.SALIDA_ESTRUCTURADA and not config.SINTESIS_LLM
+    if estructurada:
+        elementos = elegibles(casos, consulta)
+        if not elementos:
+            return ""
+        prompt = construir_prompt(consulta, casos, elementos, estructurada=True)
+        formato = esquema_sugerencias(elementos)
+    else:
+        prompt, formato = construir_prompt(consulta, casos), None
+    mensajes = [{"role": "system", "content": SISTEMA}, {"role": "user", "content": prompt}]
+    return _ollama(mensajes, formato=formato, metricas=metricas)
+
+
+def filtrar_relevantes(casos: list[Resultado], umbral: float | None = None) -> list[Resultado]:
+    """Con la ruta rerank, solo pasan los casos que el cross-encoder juzga relevantes.
+
+    Es la segunda guarda de abstención: el coseno filtra lo que no se parece
+    a nada del corpus ("capital de Colombia"); el reranker, lo que se parece de
+    palabra pero no de caso ("cetoacidosis diabética en urgencias"). Las demás
+    rutas no traen relevancia y pasan intactas.
+    """
+    umbral = config.UMBRAL_RERANK if umbral is None else umbral
+    return [c for c in casos if c.relevancia is None or c.relevancia >= umbral]
 
 
 MIN_SUGERENCIAS = 3
@@ -236,6 +347,57 @@ def _seccion(texto: str, titulo: str) -> str | None:
     cuerpo = ini + len(titulo)
     fin = texto.find("\n### ", cuerpo)
     return texto[cuerpo:len(texto) if fin < 0 else fin].strip()
+
+
+def esquema_sugerencias(elementos: list[Elemento]) -> dict:
+    """JSON Schema para el campo `format` de Ollama: la salida SOLO puede ser
+    una lista de términos de `elementos`. Ollama lo compila a una gramática, así
+    que el modelo no puede escribir un término fuera de la lista ni texto libre.
+    Los repetidos (la gramática no impone unicidad) se quitan al leer."""
+    terminos = [e.termino for e in elementos]
+    return {
+        "type": "object",
+        "properties": {"sugerencias": {
+            "type": "array",
+            "items": {"type": "string", "enum": terminos},
+            "minItems": min(MIN_SUGERENCIAS, len(terminos)),
+            # con menos términos que MAX_SUGERENCIAS, el modelo rellenaba
+            # repitiendo (medido: "laparotomía" 4 veces con 1 elegible)
+            "maxItems": min(MAX_SUGERENCIAS, len(terminos)),
+        }},
+        "required": ["sugerencias"],
+    }
+
+
+def eleccion_modelo(texto_modelo: str, elementos: list[Elemento]) -> tuple[list[Elemento], int]:
+    """(elementos que eligió el modelo y están en la lista, cuántos propuso).
+
+    Lee la salida estructurada (`{"sugerencias": [...]}`) y, si no lo es, las
+    viñetas bajo TITULO_SUGERENCIAS (modo texto y SINTESIS_LLM). La diferencia
+    entre propuestos y elegidos son las sugerencias descartadas por no tener
+    respaldo: lo que mide scripts/comparar_modelos.py.
+    """
+    try:
+        datos = json.loads(texto_modelo)
+        propuestas = datos.get("sugerencias") if isinstance(datos, dict) else None
+    except (json.JSONDecodeError, TypeError):
+        propuestas = None
+    if isinstance(propuestas, list):
+        por_termino = {e.termino: e for e in elementos}
+        # exacto primero (el enum lo garantiza); si un modelo sin gramática
+        # escribió algo parecido, la coincidencia del modo texto
+        candidatos = [por_termino.get(str(p)) or elemento_mencionado(str(p), elementos)
+                      for p in propuestas]
+    else:
+        cuerpo = _seccion(texto_modelo, TITULO_SUGERENCIAS) or ""
+        vinetas = [l for l in cuerpo.split("\n") if l.lstrip().startswith(("-", "*", "•"))]
+        propuestas = vinetas
+        candidatos = [elemento_mencionado(l, elementos) for l in vinetas]
+    elegidos: list[Elemento] = []
+    for e in candidatos:
+        if e is not None and e not in elegidos:
+            elegidos.append(e)
+    return elegidos, len(propuestas)
 
 
 def elegir_sugerencias(texto_modelo: str, casos: list[Resultado], consulta: str = "") -> list[Elemento]:
@@ -258,20 +420,9 @@ def elegir_sugerencias(texto_modelo: str, casos: list[Resultado], consulta: str 
         que escalaron (operados, UCI, fallecidos): el modelo tendía a elegir
         solo manejo y dejaba fuera la irritación peritoneal de los operados.
     """
-    ya_dicho = obvios(consulta)
     todos = extraer(casos)
-    # "cirugía" en los mismos casos que un procedimiento concreto es la misma sugerencia dos veces
-    concretos = [set(e.casos) for e in todos if e.termino in PROCEDIMIENTOS_QUIRURGICOS]
-    elementos = [e for e in todos
-                 if not (e.categoria == "Hallazgos" and e.termino in ya_dicho)
-                 and not (e.termino == "cirugía" and set(e.casos) in concretos)]
-    cuerpo = _seccion(texto_modelo, TITULO_SUGERENCIAS) or ""
-    elegidos: list[Elemento] = []
-    for linea in cuerpo.split("\n"):
-        if linea.lstrip().startswith(("-", "*", "•")):
-            e = elemento_mencionado(linea, elementos)
-            if e is not None and e not in elegidos:
-                elegidos.append(e)
+    elementos = elegibles(casos, consulta)
+    elegidos, _ = eleccion_modelo(texto_modelo, elementos)
     resto = sorted((e for e in elementos if e not in elegidos),
                    key=lambda e: (_PRIORIDAD[e.categoria], -len(e.casos)))
     elegidos.extend(resto[:max(0, MIN_SUGERENCIAS - len(elegidos))])

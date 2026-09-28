@@ -21,7 +21,7 @@ from rag import config                                    # noqa: E402
 from rag.build_prompt import desenlace_visible                 # noqa: E402
 from rag.generate import ollama_disponible, responder, resumir_caso   # noqa: E402
 from rag.hallazgos import resaltar_html                        # noqa: E402
-from rag.retrieve import RUTAS, Filtros                   # noqa: E402
+from rag.retrieve import RUTAS, Filtros, ruta_por_defecto  # noqa: E402
 
 CONSULTAS_YAML = Path(__file__).resolve().parent / "eval" / "consultas.yaml"
 
@@ -83,6 +83,32 @@ def consultas_demo(_mtime: float) -> tuple[list[dict], str | None]:
     return conb, None
 
 
+@st.cache_resource(show_spinner=False)
+def preparar_modelos() -> bool:
+    """Carga todo antes de la primera pregunta: bge-m3, el índice, el reranker
+    si se usa, y el generador en Ollama con el prompt de sistema en su caché.
+
+    Sin esto, la primera pregunta de una demo tardaba 25-35 s más que las
+    demás. Corre una vez por proceso de Streamlit. Si falla, lanza: Streamlit
+    no cachea excepciones y vuelve a intentarlo (p. ej. tras abrir Ollama).
+    """
+    from rag.build_prompt import SISTEMA_PROSA
+    from rag.generate import _ollama
+    from rag.retrieve import buscar
+    buscar("herida en mano", k=1, ruta=ruta_por_defecto())
+    _ollama([{"role": "system", "content": SISTEMA_PROSA},
+             {"role": "user", "content": "ok"}], max_tokens=1, timeout=180)
+    return True
+
+
+error_preparacion = None
+with st.spinner("Cargando modelos (solo la primera vez, ~30 s)…"):
+    try:
+        preparar_modelos()
+    except Exception as e:           # Ollama apagado, índice ausente: lo dice la barra lateral
+        error_preparacion = f"{type(e).__name__}: {e}"
+
+
 # ---------------------------------------------------------------------------
 # Barra lateral
 # ---------------------------------------------------------------------------
@@ -91,15 +117,24 @@ with st.sidebar:
 
     ok_ollama, msg_ollama = ollama_disponible()
     (st.success if ok_ollama else st.error)(msg_ollama)
+    if error_preparacion:
+        st.warning(f"No se pudieron precargar los modelos: {error_preparacion}")
 
     ruta = st.selectbox("Ruta de recuperación", RUTAS,
-                        index=RUTAS.index(config.RUTA_DEFECTO) if config.RUTA_DEFECTO in RUTAS else 2,
-                        help="rrf fusiona BM25 y densa por posición. rerank añade "
-                             "un cross-encoder (más VRAM).")
+                        index=RUTAS.index(ruta_por_defecto()) if ruta_por_defecto() in RUTAS else 2,
+                        help="rrf fusiona BM25 y densa por posición. rerank reordena "
+                             "los candidatos de rrf con un cross-encoder y descarta "
+                             "los que no juzga relevantes.")
     k = st.slider("Casos recuperados", 3, 10, config.TOP_K)
     umbral = st.slider("Umbral de abstención", 0.0, 0.9, config.UMBRAL_ABSTENCION, 0.05,
                        help="Coseno mínimo del mejor caso para que el sistema responda. "
                             "Más alto = más conservador.")
+    umbral_rerank = None
+    if ruta == "rerank":
+        umbral_rerank = st.slider("Relevancia mínima por caso", 0.0, 0.95, config.UMBRAL_RERANK, 0.05,
+                                  help="Probabilidad del reranker para que un caso llegue a la "
+                                       f"respuesta. Con menos de {config.MIN_CASOS} casos, "
+                                       "el sistema se abstiene.")
 
     st.markdown("### Filtros")
     mecanismo = st.selectbox("Mecanismo", ["(todos)"] + list(config.ETIQUETAS_MECANISMO),
@@ -194,6 +229,13 @@ def detalle_respuesta(respuesta, segundos: float | None, consulta: str) -> None:
         return
     if respuesta.casos and not respuesta.abstuvo:
         st.caption(AVISO_RESPUESTA)
+    if respuesta.prosa_verificada is False:
+        # Se muestra la versión armada desde los casos; se dice por qué, para
+        # que no parezca un cambio de formato sin razón.
+        motivo = respuesta.motivos[0] if respuesta.motivos else "sin detalle"
+        extra = f" (y {len(respuesta.motivos) - 1} más)" if len(respuesta.motivos) > 1 else ""
+        st.caption(f"La redacción del modelo no pasó la verificación ({motivo}{extra}): "
+                   f"se muestran las sugerencias armadas desde los casos.")
     if respuesta.citas_invalidas:
         st.warning("El modelo citó identificadores que no están entre los casos "
                    f"recuperados: {', '.join(respuesta.citas_invalidas)}. "
@@ -208,7 +250,9 @@ def detalle_respuesta(respuesta, segundos: float | None, consulta: str) -> None:
     with st.expander(etiqueta):
         if respuesta.consulta_reescrita:
             st.caption(f"Búsqueda realizada: «{respuesta.consulta_reescrita}»")
-        st.caption(f"Confianza (coseno del mejor caso): {respuesta.confianza:.3f} · "
+        relevancia = (f" · relevancia del reranker: {respuesta.relevancia:.2f}"
+                      if respuesta.relevancia is not None else "")
+        st.caption(f"Confianza (coseno del mejor caso): {respuesta.confianza:.3f}{relevancia} · "
                    f"resaltado: lo que coincide con la consulta")
         for c in respuesta.casos:
             st.markdown(tarjeta_caso(c, respuesta.consulta_reescrita or consulta),
@@ -250,7 +294,7 @@ if pregunta:
                 # Las consultas de botón ya son autónomas: reescribirlas contra
                 # el historial solo puede estropearlas a mitad de una demo.
                 r = responder(pregunta, historial=historial, ruta=ruta, k=k,
-                              filtros=filtros, umbral=umbral,
+                              filtros=filtros, umbral=umbral, umbral_rerank=umbral_rerank,
                               reescribir_consulta=escrita is not None)
         segundos = time.perf_counter() - t0
 

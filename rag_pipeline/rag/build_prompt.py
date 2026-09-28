@@ -20,10 +20,12 @@ inventa detalles cuando resume casos o sugiere en libre:
     casos (`para_afinar`) y límites. Todo sale del léxico de hallazgos.py y
     de los metadatos; el texto completo de cada caso queda en la app. El 3B,
     resumiendo, atribuía una laparoscopia al caso equivocado.
-  · Las sugerencias las redacta el MODELO, pero solo a partir de la lista de
-    elementos documentados (hallazgos.py); después generate.py reescribe el
-    conteo y las citas de cada viñeta desde esa lista y descarta las que no
-    corresponden a ningún elemento.
+  · Las sugerencias las ELIGE el modelo de la lista de elementos elegibles
+    (hallazgos.elegibles). Por defecto responde JSON restringido por esquema
+    a esa lista (INSTRUCCION_ESTRUCTURADA), así que no puede elegir nada sin
+    respaldo; generate.ensamblar escribe el texto, el conteo y las citas. Con
+    SALIDA_ESTRUCTURADA=0 vuelve a las viñetas de PLANTILLA, de las que
+    generate.py descarta las que no corresponden a ningún elemento.
   · Los conteos de mecanismo, región y desenlace se calculan aquí y se le
     entregan hechos: un 3B cuenta mal.
   · La plantilla va al final del mensaje del usuario, con los títulos
@@ -206,22 +208,86 @@ def _bloque_caso(caso: Resultado, indice: int) -> str:
     return f"{cabecera}\n{caso.text}{aviso}"
 
 
-def construir_prompt(consulta: str, casos: list[Resultado]) -> str:
+def construir_prompt(consulta: str, casos: list[Resultado], elementos: list[Elemento] | None = None,
+                     estructurada: bool = False, prosa: bool = False) -> str:
+    """`elementos`: la lista que el modelo puede elegir. Por defecto, todo lo que
+    extrae hallazgos.py; con salida estructurada o prosa, `hallazgos.elegibles`
+    (la misma lista que el enum del esquema).
+
+    En prosa no van los DATOS CALCULADOS: son conteos, y la prosa no debe
+    tenerlos (el verificador rechaza los que no cuadran)."""
+    if elementos is None:
+        elementos = extraer(casos)
     bloques = "\n\n".join(_bloque_caso(c, i) for i, c in enumerate(casos, start=1))
+    datos = ("" if prosa else
+             f"DATOS CALCULADOS SOBRE ESTOS CASOS (úsalos tal cual para los conteos):\n"
+             f"{resumen_calculado(casos)}\n\n")
     return (
         f"CONSULTA:\n{consulta}\n\n"
         f"CASOS SIMILARES DEL REGISTRO ({len(casos)}):\n\n{bloques}\n\n"
-        f"DATOS CALCULADOS SOBRE ESTOS CASOS (úsalos tal cual para los conteos):\n"
-        f"{resumen_calculado(casos)}\n\n"
+        f"{datos}"
         f"ELEMENTOS DOCUMENTADOS EN LOS CASOS (única fuente de las sugerencias):\n"
-        f"{formatear(extraer(casos), len(casos))}\n\n"
-        f"{_instruccion_salida()}"
+        f"{formatear(elementos, len(casos))}\n\n"
+        f"{_instruccion_salida(estructurada, prosa)}"
     )
 
 
-def _instruccion_salida() -> str:
+# Con salida estructurada el modelo solo ELIGE: el texto de cada sugerencia, el
+# conteo y las citas los escribe generate.ensamblar. Las reglas de "al menos un
+# hallazgo y un manejo" las vuelve a imponer el código; decírselas al modelo
+# evita que el código tenga que corregir su elección.
+INSTRUCCION_ESTRUCTURADA = """\
+Elige qué elementos de la lista sugerir a quien consulta y responde SOLO con JSON:
+{"sugerencias": ["elemento", "elemento", "elemento"]}
+- Entre 3 y 4 elementos, escritos exactamente como en la lista (sin conteos ni citas).
+- En orden de utilidad para la consulta: primero lo que más orienta el diagnóstico.
+- Si la lista los tiene, incluye al menos un hallazgo a valorar y al menos un manejo."""
+
+
+# --- Sugerencia en prosa (SALIDA=prosa) ---------------------------------------
+# El modelo redacta la sugerencia como un asistente médico; verificar.py la
+# revisa oración por oración y, si no pasa, se muestra la versión determinista.
+# Por eso las reglas piden exactamente lo que el verificador comprueba: solo
+# elementos de la lista, cita en cada oración que los nombra, sin conteos.
+ROTULO_SUGERENCIA = "**Sugerencia**"
+
+SISTEMA_PROSA = f"""Eres un asistente de apoyo al diagnóstico en trauma para personal de salud. \
+Ante una presentación clínica, comparas con casos similares del registro y redactas una \
+sugerencia breve basada en lo que se hizo en ellos. No reemplazas el juicio clínico de quien \
+consulta.
+
+{_REGLAS_COMUNES}
+
+CÓMO REDACTAR
+- Solo puedes nombrar hallazgos, estudios y manejos que estén en la lista "ELEMENTOS \
+DOCUMENTADOS EN LOS CASOS". Nada más, aunque lo sepas.
+- Cada oración que nombra un hallazgo, un estudio o un manejo lleva al final las citas de los \
+casos donde consta, copiadas de la lista.
+- No escribas cantidades ("dos de ellos", "3 de 5", "la mayoría", "todos"): quien lee tiene \
+los casos a la vista.
+- Redacta como orientación ("conviene valorar", "en casos similares se hizo"), nunca como \
+orden ("se debe", "hay que")."""
+
+INSTRUCCION_PROSA = """\
+Redacta la sugerencia para quien consulta y responde SOLO con JSON:
+{"sugerencia": "texto"}
+- Entre 3 y 5 oraciones, en este orden: qué hallazgos valorar, qué estudios considerar y qué \
+manejo se hizo en los casos similares.
+- Empieza por lo que más orienta el diagnóstico en esta consulta.
+- Cada oración que nombra un elemento de la lista termina con sus citas [caso: ID].
+- Usa "conviene" o "se puede considerar"; nunca "se debe", "debe" ni "hay que".
+- No agregues razones, condiciones ni detalles que no estén escritos en los casos \
+("si no hay…", "por presentar…").
+- Sin títulos, viñetas ni cantidades."""
+
+
+def _instruccion_salida(estructurada: bool = False, prosa: bool = False) -> str:
     """Con SINTESIS_LLM apagado el modelo solo elige sugerencias; síntesis y
     límites los arma el código (sintesis_calculada, limites_calculados)."""
+    if prosa:
+        return INSTRUCCION_PROSA
+    if estructurada:
+        return INSTRUCCION_ESTRUCTURADA
     if config.SINTESIS_LLM:
         return (f"Responde con EXACTAMENTE estas tres secciones y estos títulos. Reemplaza "
                 f"lo que está entre paréntesis por el contenido; no copies los paréntesis. "
@@ -325,16 +391,24 @@ def conclusion_calculada(casos: list[Resultado], consulta: str = "") -> str:
     if escalada:
         frases.append(escalada)
 
+    return f"{ROTULO_SINTESIS} {' '.join(frases)}\n\n{linea_respaldo(casos)}"
+
+
+def linea_respaldo(casos: list[Resultado], revisar: str = "la tabla") -> str:
+    """Sobre cuánto se apoya la respuesta: n y rango de similitud, y el aviso de
+    similitud baja si el mejor caso no llega a SIMILITUD_BAJA. `revisar` dice
+    dónde mirar los casos: la tabla, o el apartado de casos de la app."""
+    n = len(casos)
     sims = [c.score_norm for c in casos if c.score_norm > 0]
     respaldo = f"Respaldo: {n} casos del registro"
     if sims:
         respaldo += f" · similitud {min(sims):.2f}–{max(sims):.2f}".replace(".", ",")
     if len(sims) < n:
         respaldo += f" · {n - len(sims)} hallado(s) solo por palabras clave"
-    salida = f"{ROTULO_SINTESIS} {' '.join(frases)}\n\n*{respaldo}.*"
+    salida = f"*{respaldo}.*"
     if not sims or max(sims) < config.SIMILITUD_BAJA:
         salida += ("\n\n**Similitud baja:** estos casos pueden no corresponder a la consulta. "
-                   "Revisar la tabla antes de usarlos.")
+                   f"Revisar {revisar} antes de usarlos.")
     return salida
 
 

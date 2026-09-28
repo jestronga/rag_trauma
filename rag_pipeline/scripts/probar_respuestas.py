@@ -15,34 +15,21 @@ correrlo, o apunta a una copia de los índices con INDICE_DIR.
 """
 from __future__ import annotations
 
-import re
 import sys
 import time
-import unicodedata
 import warnings
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 warnings.filterwarnings("ignore")
 
-import inspect  # noqa: E402
-
-from rag import build_prompt, config, hallazgos  # noqa: E402
-from rag.build_prompt import resumen_calculado  # noqa: E402
+from rag import config  # noqa: E402
 from rag.generate import responder  # noqa: E402
-
-# El texto fijo de la respuesta (rótulos, términos del léxico, etiquetas) lo
-# escribe el código: no cuenta como palabra nueva.
-VOCABULARIO_CODIGO = " ".join([inspect.getsource(build_prompt), inspect.getsource(hallazgos),
-                               *config.ETIQUETAS_MECANISMO.values(), *config.ETIQUETAS_REGION.values()])
-
-
-def _norm(texto: str) -> str:
-    return unicodedata.normalize("NFD", texto.lower()).encode("ascii", "ignore").decode()
+from rag.verificar import palabras_sin_raiz  # noqa: E402
 
 
 def main(consultas: list[str]) -> None:
-    print(f"modelo: {config.MODELO_LLM} · sintesis_llm: {config.SINTESIS_LLM}")
+    print(f"modelo: {config.MODELO_LLM} · salida: {config.SALIDA} · sintesis_llm: {config.SINTESIS_LLM}")
     for consulta in consultas:
         t0 = time.time()
         r = responder(consulta)
@@ -51,16 +38,16 @@ def main(consultas: list[str]) -> None:
         print(f"{time.time() - t0:.0f}s | confianza {r.confianza:.2f} | abstuvo {r.abstuvo} | "
               f"error {r.error}")
         print(f"citas válidas {r.citas_validas} | inválidas {r.citas_invalidas}")
+        if r.prosa_verificada is not None:
+            estado = "verificada" if r.prosa_verificada else "NO pasó → versión determinista"
+            print(f"prosa del modelo: {estado}")
+            for m in r.motivos:
+                print(f"  · {m}")
         print("-" * 90)
         print(r.texto)
         if r.casos:
-            fuente = _norm(" ".join(c.text for c in r.casos) + " " + consulta + " "
-                           + VOCABULARIO_CODIGO + " " + resumen_calculado(r.casos))
-            nuevas = sorted({w for w in re.findall(r"[a-z]{6,}", _norm(r.texto))
-                             if w[:5] not in fuente})
             print("-" * 90)
-            print("palabras sin raíz en los casos:", nuevas)
-
+            print("palabras sin raíz en los casos:", palabras_sin_raiz(r.texto, r.casos, consulta))
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

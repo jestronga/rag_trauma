@@ -8,40 +8,25 @@ el PC nuevo (GTX 1650). **Empezar por la sección 0**, después 1, 5 y 6.
 ## 0. Para retomar mañana
 
 **Principio que manda sobre todo lo demás:** es un **asistente al
-diagnóstico**. Lo más importante de la respuesta es la **sugerencia**: va
-primero, corta y fácil de usar. El respaldo (conteos, citas, tabla) va después.
-Y la regla de siempre: nada inventado, todo sale de los casos con `[caso: ID]`.
+diagnóstico**. Desde el 28/09 la respuesta es una **sugerencia en prosa**, como
+la daría un asistente médico: **el modelo redacta, el código verifica**
+(`rag/verificar.py`). Si la prosa nombra algo que no consta en los casos, cita
+mal, cuenta mal u ordena en vez de orientar, se muestra la versión armada por el
+código (sección 2.10). Regla de siempre: nada inventado, todo sale de los casos
+con `[caso: ID]`; el origen se revisa en "Casos consultados" de la app.
 
-**Estado del código:** todo lo de la sesión del 26/09 está **sin commit**. El
-único commit es `5c3a035` (el prototipo anterior). Cambios pendientes de
-commit:
+**Estado del código:** lo del 26/09 está en el commit `a9f9f1c`. Todo lo del
+27–28/09 (secciones 2.8–2.10) está **sin commit**; el usuario no lo ha pedido.
 
-```
-M  .gitignore                     (+ rag_pipeline/eval/revision/)
-M  CONTEXTO_SESION.md
-M  rag_pipeline/MODELOS.md
-M  rag_pipeline/app.py            (tiempo de respuesta, aviso fijo, tarjetas resaltadas, sin truncados)
-M  rag_pipeline/rag/build_prompt.py   (formato nuevo de la respuesta)
-M  rag_pipeline/rag/config.py     (qwen3:4b-instruct, NUM_GPU, NUM_CTX, MAX_TOKENS, SIMILITUD_BAJA)
-M  rag_pipeline/rag/generate.py   (think:false, ventana dinámica, ensamblar, elegir_sugerencias)
-M  rag_pipeline/rag/hallazgos.py  (extractor corregido, obvios, resaltar_html)
-M  rag_pipeline/scripts/probar_respuestas.py
-?? rag_pipeline/.streamlit/config.toml
-?? rag_pipeline/scripts/exportar_revision.py
-?? rag_pipeline/tests/            (test_hallazgos.py, test_ensamblar.py: 46 tests)
-```
-
-**Primeros pasos mañana:**
-1. Comprobar que todo sigue verde: `cd rag_pipeline; ..\.venv\Scripts\python.exe -m pytest tests/ -q`
-   (deben pasar los 46) y en `anonimizacion\` los 83.
-2. Decidir si se hace commit de lo del 26/09 (el usuario no lo ha pedido aún).
-   `exportar_revision.py` compara contra `5c3a035`, así que sigue sirviendo
-   después del commit.
-3. Abrir el chatbot desde `rag_pipeline\`: `streamlit run app.py`. Si en esa
-   terminal quedó `$env:MODELO_LLM = "qwen3:4b"`, borrarla
-   (`Remove-Item Env:MODELO_LLM`): el valor por defecto ya es el correcto.
-4. Seguir con los pendientes de la sección 5. Lo más importante: la
-   **revisión médica** (pendiente 1) y seguir mejorando **las sugerencias**.
+**Primeros pasos, en el PC de 8 GB:**
+1. Tests: `cd rag_pipeline; ..\.venv\Scripts\python.exe -m pytest tests/ -q`
+   (93) y en `anonimizacion\` los 83.
+2. Modelos: `ollama pull qwen3:4b-instruct` y bajar el reranker (`SETUP.md`,
+   sección 2).
+3. `python scripts\calibrar_umbral.py` → debe decir `cuda` y < 1 s por consulta.
+4. `python scripts\comparar_modelos.py --modos prosa` → tiempos reales,
+   `gpu_pct` = 100 y cuántas prosas pasan la verificación.
+5. Revisión médica (pendiente 1), ahora con la prosa: regenerar la planilla.
 
 ---
 
@@ -51,8 +36,9 @@ Un RAG local que sirve como **asistente de apoyo al diagnóstico en trauma**.
 Recupera casos similares de un registro hospitalario anonimizado (hasta 2018),
 sugiere qué valorar y muestra qué se hizo en ellos. **Regla central: no
 inventar nada.** Todo tiene que salir de los casos recuperados, con cita
-`[caso: ID]`. **El código pone los datos; el modelo solo elige** qué
-sugerencias mostrar.
+`[caso: ID]`. **El modelo redacta la sugerencia; el código la verifica** y, si
+no pasa, pone él los datos (antes del 28/09 el modelo solo elegía qué
+sugerencias mostrar; sigue así con `SALIDA=sugerencias`).
 
 ```
 rag_trauma/
@@ -227,13 +213,129 @@ recuperación y la misma elección del modelo. Ya está generada en
 `rag_pipeline/eval/revision/`: `revision.html` y `planilla.csv` son para el
 médico; **`clave.csv` no se le entrega**.
 
+### 2.8 Evaluación corregida y reranker (27/09)
+Inspirado en `medical_RAG_system` (Stuhlmann et al., SDS 2025): reranker como
+filtro y evaluación por etapas. Análisis completo en la página "Análisis RAG
+trauma vs medical_RAG_system" (claude.ai).
+
+- **Error en `eval/evaluate.py`:** el ideal del nDCG salía de la propia ruta,
+  así que las rutas no eran comparables. Ahora el ideal es la unión de lo que
+  traen todas las rutas evaluadas (pooling). Nuevas columnas `R@10` y
+  `relevantes_pool`.
+- **Doble sigmoide en `buscar_rerank`:** sentence-transformers >= 4 ya aplica
+  la sigmoide; aplicarla otra vez apiñaba todo en [0,5, 0,73]. Ahora se piden
+  logits crudos (`_probabilidades`).
+- **`Resultado.relevancia`** guarda la probabilidad del reranker;
+  `score_norm` sigue siendo el coseno (lo leen `SIMILITUD_BAJA` y la tabla).
+- **Segunda guarda de abstención** (`generate.filtrar_relevantes`): solo
+  pasan los casos con relevancia >= `UMBRAL_RERANK`; con menos de
+  `MIN_CASOS`, se abstiene.
+- **Calibración** (`scripts/calibrar_umbral.py`, 10 consultas fuera de dominio
+  nuevas en `consultas.yaml`, `neg-04`…`neg-10`): con 0,2, 0 de 25 consultas
+  de trauma se abstienen y 1 de 10 fuera de dominio responde (apendicitis,
+  0,42). Solo con coseno respondían 8 de 10.
+- **Latencia:** en CPU (i5-12450H) el reranker tarda ~31 s por consulta; no es
+  viable. `RUTA=auto` lo usa solo si hay CUDA.
+- `RERANKER=1` estaba documentado pero ningún código lo leía: eliminado.
+
+### 2.9 Salida estructurada (27/09)
+El modelo ya no escribe viñetas: responde `{"sugerencias": [...]}` y el
+campo `format` de Ollama (JSON Schema con `enum`) le impide elegir algo que no
+esté en la lista (`generate.esquema_sugerencias`, `generar_eleccion`).
+- **La lista que ve el modelo = el `enum`** = `hallazgos.elegibles`: sin lo
+  que la consulta ya dice ni "cirugía" repetida. Antes el modelo veía todo y el
+  código descartaba después.
+- **Sin elementos elegibles no se llama al modelo** (no hay qué elegir).
+- `SALIDA_ESTRUCTURADA=0` vuelve a las viñetas; con `SINTESIS_LLM` también.
+  `exportar_revision.py` sigue en modo texto, a propósito: el código de
+  `5c3a035` no sabe leer JSON.
+- **Medido** (25 consultas, mismos casos, `qwen3:4b-instruct`,
+  `reports/comparar_salida.csv`; hoy se repite con
+  `scripts/comparar_modelos.py --modos texto,json`):
+
+  | | texto | JSON |
+  |---|---|---|
+  | propuestas descartadas | 13 de 83 | 4 de 99 (todas repeticiones) |
+  | sugerencias completadas por el código | 11 | 1 |
+  | tokens de salida (mediana) | 109 | 31 |
+  | JSON inválido | — | 0 de 25 |
+  | el modelo no eligió ningún hallazgo | 5 | 4 |
+
+  En texto el modelo inventaba elementos ("abrasión en región frontal",
+  "fijación maxilar") y sugería lo obvio ("hipoventilación"). Los tiempos de
+  esa corrida no sirven: PC anterior sin GPU y con 0,1 GB de RAM libre.
+- **Cambio visible:** el modelo propone siempre 4 (el máximo) y las
+  sugerencias finales coinciden con las del modo texto solo en 7 de 25
+  consultas. Tiende a elegir más hallazgos "Valorar…" de 1 caso. **Que lo
+  juzgue el médico** en la revisión (pendiente 1).
+- `maxItems` = mínimo entre 4 y los elegibles: con 1 elegible el modelo lo
+  repetía 4 veces.
+
+### 2.10 Sugerencia en prosa, verificada (28/09)
+Pedido del usuario: que responda como medical_RAG_system, en prosa de
+asistente médico; el origen ya se ve en "Casos consultados". Reemplazó el
+paso de "prompt corto". Decisiones del usuario: prosa + línea de respaldo; si
+no pasa la verificación, versión determinista; `qwen3:4b-instruct` + reranker.
+- **Flujo** (`SALIDA=prosa`, por defecto): `generate.generar_prosa` (JSON
+  `{"sugerencia": …}`, `SISTEMA_PROSA` + `INSTRUCCION_PROSA`, sin datos
+  calculados) → `verificar.suavizar` ("Se debe considerar" → "Conviene
+  considerar") → `verificar.verificar_prosa` → `ensamblar_prosa` (prosa +
+  `linea_respaldo`) o, si falla, `ensamblar("")` con la elección de las reglas
+  (sin segunda llamada). `Respuesta.prosa_verificada` / `motivos`; la app dice
+  por qué se muestra la versión determinista.
+- **Reglas del verificador** (`rag/verificar.py`): citas existentes, términos
+  del léxico presentes en los casos, atribución por oración, conteos ("dos de
+  ellos", "en dos casos", "todos", "la mayoría"), tono (sin "se debe", "hay
+  que") y palabras sin raíz en los casos (el chequeo que vivía en
+  `probar_respuestas.py`).
+- **Medido** (25 consultas, `scripts/comparar_modelos.py --modos prosa`):
+  11/25 con el primer prompt → 19/25 con el prompt ajustado → **18/25 (72 %)**
+  tras corregir el léxico (abajo). Los 7 rechazos finales son justos
+  (radiografías que ningún caso tiene, "sangrado activo" sin respaldo,
+  condiciones agregadas: "signos de infección", "profundidad").
+- **Límite conocido:** el verificador comprueba términos, citas y conteos, no
+  el razonamiento. Entre las verificadas hubo deslices menores: una condición
+  quizá agregada ("sangrado abundante"), un caso poco pertinente citado y
+  redacción torpe ("Glasgow con [caso: …]"). **La revisión médica tiene que
+  ver la prosa** (regenerar la planilla con `exportar_revision.py`; hoy compara
+  solo formatos deterministas).
+- `PALABRAS_COMUNES` (en `verificar.py`) se amplía solo con falsos rechazos
+  medidos; nunca con términos clínicos. Ojo: toda palabra que aparezca en el
+  código de `build_prompt.py` o `hallazgos.py` queda permitida, así que no
+  poner ejemplos clínicos en los prompts.
+- **Error del léxico corregido:** `sutura` era `sutur|rafia\b` y encontraba
+  "-grafía": **1.209 de 2.426 casos contaban sutura sin tenerla** (solo tenían
+  radiografía, tomografía o ecografía). Ahora `(?<!g)rafia\b`; tests en
+  `test_hallazgos.py`. Afectaba los conteos de sutura de toda la respuesta
+  determinista y la lista de elementos del prompt.
+
+### 2.11 Preparado para la demo en la GTX 1650 (28/09)
+- `RUTA=auto` mira la VRAM (`retrieve.vram_gb`): rerank solo con ≥ 7 GB. Antes
+  bastaba con que hubiera CUDA, y en la 1650 el reranker (~1,3 GB) junto a
+  `qwen3:4b-instruct` (~3,0 GB) habría dejado a Ollama sin memoria.
+- `UMBRAL_ABSTENCION` 0,45 → 0,52: sin reranker, el botón "5 · Fuera de
+  alcance" (cetoacidosis, coseno 0,500) no se abstenía. Medido con preguntas
+  cortas: trauma más bajo "TCE" 0,541; bloquea diabetes, apendicitis, asma e
+  infarto; **no** separa "dolor torácico" (0,59) ni "dolor de cabeza" (0,62).
+- `KEEP_ALIVE=2h` en cada llamada y **precarga al abrir la app**
+  (`preparar_modelos`, `st.cache_resource`): la primera pregunta no espera la
+  carga de bge-m3 ni del modelo.
+- `scripts/preparar_demo.py`: GPU, % en VRAM y los 5 botones por el pipeline
+  completo. Corrido en el PC sin GPU: los 5 correctos (4 responden, el 5 se
+  abstiene), 0 citas inválidas. **Falta correrlo en la 1650.**
+- Texto del botón 4 sin "registros truncados"; guion de `SETUP.md` §6 al día.
+
 ---
 
-## 3. Equipo actual
+## 3. Equipos
 
-Windows 11, **16 GB de RAM, GPU GTX 1650 de 4 GB**. Ollama 0.34.4 con
-`qwen3:4b-instruct` (también está `qwen3:4b`, la variante Thinking, que no
-sirve). Respuesta típica ~16 s; la primera tras cargar el modelo ~25–35 s.
+- **GTX 1650 (demo):** Windows 11, 16 GB de RAM, 4 GB de VRAM. Ollama 0.34.4
+  con `qwen3:4b-instruct` (también está `qwen3:4b`, la variante Thinking, que
+  no sirve). Con salida estructurada ~16 s; con la prosa, ~20 s estimados.
+  Ruta `rrf` (el reranker no cabe).
+- **PC sin GPU** (Intel UHD, 7,7 GB de RAM): donde se trabajó el 27–28/09. Todo
+  corre en CPU (~2 min por respuesta); sus tiempos no representan a los otros.
+- **PC de 8 GB de VRAM:** destino final, con reranker en GPU.
 
 ---
 
@@ -281,15 +383,17 @@ sirve). Respuesta típica ~16 s; la primera tras cargar el modelo ~25–35 s.
      como se hizo el 26/09;
    - que "Valorar…" priorice los hallazgos asociados a escalada con más
      señal: ver si el médico lo encuentra útil;
-   - medir cuántas veces el modelo elige solo manejo y cuántas completa el
-     código.
+   - ~~medir cuántas veces el modelo elige solo manejo y cuántas completa el
+     código~~ medido el 27/09 (sección 2.9): 4 y 1 de 25 con salida
+     estructurada.
 3. **Commit** de todo lo del 26/09 (sección 0), cuando el usuario lo pida.
 4. **Resumen por identificador** (`resumir_caso`): todavía lo escribe el
    modelo y cambia términos: "neumoconiótico" por "neumógeno", y el 26/09
    "empema" por "Empiema". Hacerlo determinista, como el resto.
-5. **Recalibrar `UMBRAL_ABSTENCION`** (0,45). "Manejo de cetoacidosis
-   diabética" (fuera de dominio) obtiene 0,47 y no se abstiene; por ahora
-   sale el aviso de similitud baja (< 0,55). Correr `python -m eval.evaluate`.
+5. ~~Recalibrar `UMBRAL_ABSTENCION`~~ **Hecho el 27/09 con el reranker**
+   (sección 2.8). Falta **medirlo en el PC de 8 GB**: `python
+   scripts\calibrar_umbral.py` debe decir `cuda` y < 1 s por consulta, y
+   `ollama ps` seguir en `100% GPU` con el reranker cargado.
 6. **Errores del pipeline de anonimización** encontrados al revisar
    respuestas:
    - el clasificador de mecanismo pone el caso 24012 ("me pegaron un
@@ -304,12 +408,16 @@ sirve). Respuesta típica ~16 s; la primera tras cargar el modelo ~25–35 s.
 7. **Desenlace sin clasificar:** 35 % de los casos aptos quedan como
    `no_determinado`. Mejorar `clasificar_desenlace` en
    `anonimizacion/src/enrich.py`.
-8. **Bajar de 16 s a menos de 15 s:** la única palanca es acortar el prompt,
-   con menos texto por caso en `construir_prompt`, porque el modelo solo elige
-   de la lista. Antes, medir si cambian las sugerencias elegidas.
-9. **Medir otros modelos:** crear `scripts/comparar_modelos.py` con las 28
-   consultas: tiempo típico y peor caso, sugerencias descartadas. Verificar
-   `100% GPU` con `ollama ps`.
+8. **Latencia con la prosa:** ~150 tokens de salida (mediana 145) además de
+   leer el prompt (~1.700 tokens). En la GTX 1650 serían ~16 s + ~3–4 s. El
+   "prompt corto" ya no sirve: la prosa necesita el texto de los casos. Medir
+   en el PC de 8 GB con `comparar_modelos.py --modos prosa`.
+9. **Medir otros modelos en el PC de 8 GB:** el script ya existe (sección
+   2.10): `python scripts\comparar_modelos.py --modelos
+   qwen3:4b-instruct,qwen3:8b --ruta rrf`. Con `--ruta rrf` los dos modelos
+   ven los mismos casos y el reranker no ocupa VRAM (el 8B no cabe con él).
+   Aparte, con la configuración real (`RUTA=auto`, reranker en GPU), correrlo
+   sin `--modelos` para confirmar `gpu_pct` = 100 con el reranker cargado.
 10. **Revisar 33 hallazgos de datos personales** en
     `anonimizacion/reports/residuo_phi.csv`.
 11. **Restos de truncados:** `eval/consultas.yaml` (línea ~197) y el paso 6
@@ -361,7 +469,12 @@ sirve). Respuesta típica ~16 s; la primera tras cargar el modelo ~25–35 s.
 | `MAX_TOKENS_RESUMEN` | `700` | resumen de un caso por identificador |
 | `TIMEOUT_LLM` | `400` | |
 | `SINTESIS_LLM` | apagado | no encender sin revisar respuestas |
-| `UMBRAL_ABSTENCION` | `0.45` | pendiente: recalibrar |
+| `UMBRAL_ABSTENCION` | `0.52` | primera guarda: coseno del mejor caso (0,45 hasta el 28/09; sin reranker no bloqueaba cetoacidosis) |
+| `KEEP_ALIVE` | `2h` | se envía en cada llamada a Ollama: el modelo no se descarga entre preguntas |
+| `UMBRAL_RERANK` | `0.2` | segunda guarda (ruta rerank): prob. mínima por caso; < 2 casos → abstención |
+| `RUTA` | `auto` | `rerank` con ≥ 7 GB de VRAM (`VRAM_MIN_RERANK`); `rrf` en la GTX 1650 y sin GPU |
+| `DISPOSITIVO_RERANKER` | `auto` | `cuda` con ≥ 7 GB; con `qwen3:8b` en 8 GB poner `cpu` y `RUTA=rrf` |
+| `PROFUNDIDAD_RERANK` | `30` | candidatos de RRF que se reordenan |
 | `SIMILITUD_BAJA` | `0.55` | por debajo, la respuesta avisa que los casos pueden no corresponder |
 | `TOP_K` | `5` | con 10 el prompt no cabe en 3.072 y se vuelve lento (~55 s) |
 | `PRECISION_CONSULTA` | `bf16` | con 16 GB de RAM se puede usar `fp32` |

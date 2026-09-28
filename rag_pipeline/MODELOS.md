@@ -60,6 +60,14 @@ pequeña pesa 7,2 GB.
 
 Modelos de 7 a 9B parámetros. Tiempo estimado por respuesta: **5 – 12 s**.
 
+> **Decisión desde el 27/09/2026: en 8 GB, `qwen3:4b-instruct` + reranker en
+> GPU.** El reranker (bge-reranker-v2-m3, ~1,3 GB en fp16) es la guarda de
+> abstención: con él, solo 1 de las 10 consultas fuera de dominio de prueba
+> (apendicitis aguda) recibe respuesta, contra 8 de 10 solo con coseno. No cabe junto a un 8B.
+> Como el modelo solo elige sugerencias de una lista, el 8B aporta menos que
+> el reranker. Los 8B de la tabla quedan para usarse con
+> `DISPOSITIVO_RERANKER=cpu` y `RUTA=rrf`, sin esa guarda.
+
 | # | Modelo | Descarga | Por qué | Cuidado con |
 |---|---|---|---|---|
 | 1 | **`qwen3:8b`** | 5,2 GB | Mejor equilibrio: calidad clara sobre los 4B y margen para el contexto | Razonamiento activo: hay que apagarlo |
@@ -120,11 +128,24 @@ exentos.
    # $env:MODELO_LLM = "<modelo>"
    ```
 
-2. Hacer una consulta en el chatbot y correr `ollama ps`. La columna
-   `PROCESSOR` debe decir **`100% GPU`**. Si muestra un reparto como
-   `20%/80% CPU/GPU`, el modelo no cabe: bajar al siguiente de la tabla.
-3. Medir el tiempo de varias consultas, sin contar la primera (carga del
-   modelo). Si alguna pasa de 15 s, bajar al siguiente de la tabla.
+2. Con el chatbot cerrado, desde `rag_pipeline\`:
+
+   ```powershell
+   python scripts\comparar_modelos.py                                   # modelo de config
+   python scripts\comparar_modelos.py --modelos qwen3:4b-instruct,qwen3:8b
+   ```
+
+   Corre las 25 consultas de `eval/consultas.yaml` con los mismos casos para
+   todos los modelos y deja `reports/comparar_modelos.csv`. Imprime, por
+   modelo:
+   - **tiempo total** (mediana y peor) y por etapa: recuperación, lectura del
+     prompt, salida. Cada respuesta se mide sin la caché de Ollama (el script
+     descarga el modelo antes) y sin contar la recarga;
+   - **`gpu_pct`**: debe ser **100**. Menos significa que el modelo no cabe y
+     Ollama pasa capas a la CPU: bajar al siguiente de la tabla;
+   - sugerencias descartadas y completadas por el código, y **casos citados
+     frente a recuperados**.
+3. Si la mediana pasa de 15 s, bajar al siguiente de la tabla.
 
 ---
 
