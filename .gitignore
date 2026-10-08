@@ -10,6 +10,13 @@ rag_pipeline/indices/
 # clave.csv (qué respuesta es cuál) no debe viajar junto a la planilla.
 rag_pipeline/eval/revision/
 
+# Fuentes crudas: trauma.csv tiene PHI y los libros tienen derechos de autor y
+# pesan más de lo que admite GitHub (el manual pesa 185 MB).
+anonimizacion/data/
+# Texto extraído de los libros: solo se versiona el perfil de extracción.
+rag_pipeline/guias/*
+!rag_pipeline/guias/perfiles.yaml
+
 # Cachés de Python y pytest (se regeneran solas)
 __pycache__/
 .pytest_cache/

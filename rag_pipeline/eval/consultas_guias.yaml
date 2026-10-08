@@ -1,0 +1,653 @@
+# ---------------------------------------------------------------------------
+# Consultas para evaluar la recuperación de los LIBROS (fase 2 de
+# PLAN_INDEXAR_LIBROS.md): qué secciones de guias/secciones.jsonl responden
+# cada consulta. Se anota por SECCIÓN, no por fragmento, para que todas las
+# configuraciones de fragmentación se midan con la misma vara.
+#
+#     2 = la sección responde la consulta
+#     1 = relacionada (contexto útil, no la respuesta)
+#
+# Propuesta de Claude (07/10/2026) a partir del índice de secciones.
+# PENDIENTE: validación del usuario o del médico. Al validar, mover, quitar
+# o agregar IDs; el comentario de cada línea es el título de la sección.
+#
+# Las de trauma repiten el `id` y el texto de eval/consultas.yaml. Las de
+# procedimiento (proc-*) son nuevas: preguntas que responde un libro y no un
+# caso. Las fuera de dominio (neg-*) no tienen relevantes.
+# ---------------------------------------------------------------------------
+
+consultas:
+
+  - id: lex-01
+    texto: herida por arma de fuego en tórax con hipoventilación
+    categoria: lexica
+    relevantes:
+      ATLS-05-011: 2   # Breathing and Ventilation Assessment and › ASSESSMENT FOR COMMON INJURIES › SIMPLE, TENSION, AND OPEN
+      ATLS-05-012: 2   # Breathing and Ventilation Assessment and › ASSESSMENT FOR COMMON INJURIES › PNEUMOTHORAX ASSESSMENT
+      ATLS-05-013: 2   # Breathing and Ventilation Assessment and › ASSESSMENT FOR COMMON INJURIES › HEMOTHORAX ASSESSMENT
+      ATLS-22-009: 2   # Penetrating Trauma › PENETRATING THORACIC TRAUMA
+      HUV-11-003: 2   # Trauma torácico penetrante › EVALUACIÓN CLÍNICA
+      HUV-11-007: 2   # Trauma torácico penetrante › TRATAMIENTO › ● Neumotórax a tensión
+      HUV-11-010: 2   # Trauma torácico penetrante › TRATAMIENTO › • Neumotórax
+      HUV-11-011: 2   # Trauma torácico penetrante › TRATAMIENTO › ● Hemotórax
+      ATLS-01-011: 1   # Initial Assessment: Primary Survey › PRIMARY SURVEY WITH SIMULTANEOUS RESUSCITATION › BREATHING AND VENTILATIO
+      ATLS-05-028: 1   # Breathing and Ventilation Assessment and › PNEUMOTHORAX MANAGEMENT › SYMPTOMATIC SIMPLE AND TENSION PNEUMOTHOR
+      ATLS-05-031: 1   # Breathing and Ventilation Assessment and › INTERVENTIONS AND TREATMENTS › HEMOTHORAX MANAGEMENT
+      HUV-04-006: 1   # Paciente politraumatizado. Atención inic › CINEMATICA DEL TRAUMA EN EL POLITRAUMATIZADO › ● Arma de Fuego (AF)
+      HUV-11-001: 1   # Trauma torácico penetrante › DEFINICIÓN
+      HUV-11-004: 1   # Trauma torácico penetrante › AYUDAS DIAGNÓSTICAS › ● Radiografía de Tórax (Rx Tórax)
+      HUV-11-009: 1   # Trauma torácico penetrante › TRATAMIENTO › ● Hemotórax masivo y requerimiento de toracotomía
+      HUV-11-016: 1   # Trauma torácico penetrante › CONCLUSIONES
+
+  - id: lex-02
+    texto: fractura de cadera por caída de propia altura en paciente anciano
+    categoria: lexica
+    relevantes:
+      ATLS-10-042: 2   # Musculoskeletal Trauma › SPECIAL POPULATIONS
+      ATLS-12-005: 2   # Trauma in the Older Adult › MECHANISM OF INJURY › FALLS
+      ATLS-12-025: 2   # Trauma in the Older Adult › SPECIFIC INJURIES › PELVIC FRACTURES
+      HUV-07-005: 2   # Trauma en el adulto mayor. Un manejo dif › PROCESO DE ATENCIÓN
+      ATLS-12-003: 1   # Trauma in the Older Adult › EFFECTS OF AGING
+      ATLS-12-019: 1   # Trauma in the Older Adult › ADJUNCTS › FRAILTY
+      ATLS-12-026: 1   # Trauma in the Older Adult › SPECIAL CIRCUMSTANCES › MEDICATIONS
+      ATLS-12-030: 1   # Trauma in the Older Adult › CHAPTER SUMMARY › KEY LEARNING POINTS
+      HUV-07-004: 1   # Trauma en el adulto mayor. Un manejo dif › FISIOLOGÍA DEL ADULTO MAYOR
+      HUV-07-006: 1   # Trauma en el adulto mayor. Un manejo dif › EXÁMENES E IMÁGENES DIAGNÓSTICAS.
+      HUV-07-007: 1   # Trauma en el adulto mayor. Un manejo dif › EVALUACIÓN DE LA FRAGILIDAD DEL PACIENTE GERIATRICO
+      HUV-07-009: 1   # Trauma en el adulto mayor. Un manejo dif › RESUMEN
+
+  - id: lex-03
+    texto: trauma craneoencefálico severo con Glasgow menor de 9
+    categoria: lexica
+    relevantes:
+      ATLS-07-018: 2   # Disability: Neurological Assessment and  › ANATOMY, PHYSIOLOGY, AND PATHOLOGY OF TBI AND SCI › DISABILITY ASSE
+      ATLS-07-022: 2   # Disability: Neurological Assessment and  › IMAGING ADJUNCTS TO ASSESSMENT › TRAUMATIC BRAIN INJURY
+      ATLS-07-033: 2   # Disability: Neurological Assessment and  › INTERVENTIONS AND TREATMENTS › HOSPITAL
+      ATLS-07-034: 2   # Disability: Neurological Assessment and  › HOSPITAL › AIRWAY AND BREATHING
+      ATLS-07-041: 2   # Disability: Neurological Assessment and  › HOSPITAL › HYPEROSMOLAR THERAPY
+      ATLS-07-042: 2   # Disability: Neurological Assessment and  › HOSPITAL › STEPWISE MANAGEMENT OF NEUROWORSENING
+      HUV-05-010: 2   # Vía aérea en trauma. Manejo inicial de l › CONSIDERACIONES ESPECIALES › ● Alteración de la conciencia
+      ATLS-04-048: 1   # Airway Assessment and Management › SPECIAL POPULATION CONSIDERATIONS › TRAUMATIC BRAIN INJURY
+      ATLS-07-009: 1   # Disability: Neurological Assessment and  › PATHOPHYSIOLOGY OF BRAIN INJURIES › Intracranial Pressure and Herni
+      ATLS-07-035: 1   # Disability: Neurological Assessment and  › HOSPITAL › CIRCULATION
+      ATLS-07-038: 1   # Disability: Neurological Assessment and  › TRANSFUSION GOALS AND COAGULOPATHY › Tranexamic Acid
+      ATLS-07-040: 1   # Disability: Neurological Assessment and  › HOSPITAL › CRITICAL NEUROWORSENING
+      ATLS-07-044: 1   # Disability: Neurological Assessment and  › SURGICAL MANAGEMENT FOR TBI › Indications for Surgical Intervention
+      ATLS-07-050: 1   # Disability: Neurological Assessment and  › INTERVENTIONS AND TREATMENTS › TREATMENTS TO AVOID
+      ATLS-07-059: 1   # Disability: Neurological Assessment and  › CHAPTER SUMMARY
+      HUV-04-014: 1   # Paciente politraumatizado. Atención inic › MANEJO DEFINITIVO
+
+  - id: lex-04
+    texto: quemadura de segundo grado en miembro superior
+    categoria: lexica
+    relevantes:
+      ATLS-09-011: 2   # Thermal Injuries › BURN PRIORITIES IN THE SECONDARY SURVEY › BODY SURFACE AREA AND DEPTH
+      ATLS-09-014: 2   # Thermal Injuries › BURN PRIORITIES IN THE SECONDARY SURVEY › PERIPHERAL CIRCULATION IN CIRCUMFERENTIAL EXTREMI
+      ATLS-09-016: 2   # Thermal Injuries › BURN PRIORITIES IN THE SECONDARY SURVEY › WOUND CARE
+      HUV-08-004: 2   # Manejo inicial del paciente quemado. Rea › CLASIFICACIÓN
+      HUV-08-005: 2   # Manejo inicial del paciente quemado. Rea › VALORACIÓN INICIAL
+      HUV-08-009: 2   # Manejo inicial del paciente quemado. Rea › MANEJO DE LAS HERIDAS
+      ATLS-09-003: 1   # Thermal Injuries › STOP THE BURNING PROCESS
+      ATLS-09-012: 1   # Thermal Injuries › BURN PRIORITIES IN THE SECONDARY SURVEY › CALCULATE THE ADJUSTED FLUID RATE
+      ATLS-09-019: 1   # Thermal Injuries › BURN PRIORITIES IN THE SECONDARY SURVEY › PATIENT TRANSFER
+      HUV-08-006: 1   # Manejo inicial del paciente quemado. Rea › VALORACIÓN INICIAL
+      HUV-08-007: 1   # Manejo inicial del paciente quemado. Rea › CRITERIOS DE HOSPITALIZACIÓN
+      HUV-08-008: 1   # Manejo inicial del paciente quemado. Rea › MANEJO INICIAL
+      HUV-08-012: 1   # Manejo inicial del paciente quemado. Rea › Flujograma
+
+  - id: lex-05
+    texto: accidente de tránsito en motociclista con politraumatismo
+    categoria: lexica
+    relevantes:
+      ATLS-14-003: 2   # Initial Assessment: Secondary Survey › MECHANISM OF INJURY
+      ATLS-21-005: 2   # Thoracic, Abdominopelvic, and Genitourin › MECHANISM OF INJURY › BLUNT MECHANISMS
+      HUV-04-001: 2   # Paciente politraumatizado. Atención inic › Definiciones
+      HUV-04-005: 2   # Paciente politraumatizado. Atención inic › CINEMATICA DEL TRAUMA EN EL POLITRAUMATIZADO › ● Trauma Cerrado
+      HUV-04-013: 2   # Paciente politraumatizado. Atención inic › MANEJO EN URGENCIAS
+      ATLS-01-002: 1   # Initial Assessment: Primary Survey › INTRODUCTION
+      ATLS-06-014: 1   # Circulation Assessment and Volume Resusc › ASSESSMENT › PRIMARY SURVEY
+      ATLS-10-004: 1   # Musculoskeletal Trauma › INJURY MECHANISM
+      HUV-02-003: 1   # Paciente traumatizado. ABCDE y triage du › PROCESO DE ATENCIÓN
+      HUV-04-002: 1   # Paciente politraumatizado. Atención inic › Introducción
+      HUV-04-003: 1   # Paciente politraumatizado. Atención inic › EPIDEMIOLOGÍA
+      HUV-04-012: 1   # Paciente politraumatizado. Atención inic › MANEJO PREHOSPITALARIO
+      HUV-04-014: 1   # Paciente politraumatizado. Atención inic › MANEJO DEFINITIVO
+
+  - id: lex-06
+    texto: herida por arma cortopunzante en abdomen con laparotomía
+    categoria: lexica
+    relevantes:
+      ATLS-21-026: 2   # Thoracic, Abdominopelvic, and Genitourin › EVALUATION OF SPECIFIC PENETRATING INJURIES › ANTERIOR ABDOMINAL WO
+      ATLS-22-010: 2   # Penetrating Trauma › PENETRATING ABDOMINAL/PELVIC TRAUMA
+      HUV-15-004: 2   # Trauma abdominal penetrante › DIAGNÓSTICO Y TRATAMIENTO
+      HUV-15-009: 2   # Trauma abdominal penetrante › Precauciones
+      HUV-15-010: 2   # Trauma abdominal penetrante › Conclusiones
+      ATLS-21-024: 1   # Thoracic, Abdominopelvic, and Genitourin › EVALUATION OF SPECIFIC PENETRATING INJURIES
+      ATLS-21-027: 1   # Thoracic, Abdominopelvic, and Genitourin › EVALUATION OF SPECIFIC PENETRATING INJURIES › FLANK AND BACK INJURI
+      HUV-04-007: 1   # Paciente politraumatizado. Atención inic › CINEMATICA DEL TRAUMA EN EL POLITRAUMATIZADO › ● Arma Corto Punzant
+      HUV-15-001: 1   # Trauma abdominal penetrante › DEFINICIÓN
+      HUV-15-003: 1   # Trauma abdominal penetrante › EVOLUCIÓN HISTÓRICA.
+      HUV-15-005: 1   # Trauma abdominal penetrante › DIAGNÓSTICO Y TRATAMIENTO › Paso 5. Solicitud de estudios adicionales.
+      HUV-15-008: 1   # Trauma abdominal penetrante › IMAGENES DIAGNÓSTICAS › ● AngioTAC
+      HUV-23-001: 1   # Exploración de la herida traumática. ¿Cu › Introducción:
+
+  - id: voc-01
+    texto: paciente apuñalado en el pecho, herida penetrante
+    categoria: vocabulario
+    relevantes:
+      ATLS-22-009: 2   # Penetrating Trauma › PENETRATING THORACIC TRAUMA
+      HUV-11-001: 2   # Trauma torácico penetrante › DEFINICIÓN
+      HUV-11-003: 2   # Trauma torácico penetrante › EVALUACIÓN CLÍNICA
+      HUV-11-016: 2   # Trauma torácico penetrante › CONCLUSIONES
+      ATLS-05-012: 1   # Breathing and Ventilation Assessment and › ASSESSMENT FOR COMMON INJURIES › PNEUMOTHORAX ASSESSMENT
+      HUV-04-007: 1   # Paciente politraumatizado. Atención inic › CINEMATICA DEL TRAUMA EN EL POLITRAUMATIZADO › ● Arma Corto Punzant
+      HUV-11-004: 1   # Trauma torácico penetrante › AYUDAS DIAGNÓSTICAS › ● Radiografía de Tórax (Rx Tórax)
+      HUV-11-005: 1   # Trauma torácico penetrante › AYUDAS DIAGNÓSTICAS › ● Ultrasonido de Tórax
+      HUV-11-010: 1   # Trauma torácico penetrante › TRATAMIENTO › • Neumotórax
+      HUV-11-011: 1   # Trauma torácico penetrante › TRATAMIENTO › ● Hemotórax
+      HUV-11-015: 1   # Trauma torácico penetrante › TRATAMIENTO › Empalamiento torácico
+      HUV-13-001: 1   # Trauma precordial penetrante. Evaluación › DEFINICION EPIDEMIOLOGIA
+      HUV-13-002: 1   # Trauma precordial penetrante. Evaluación › ENFOQUE DIAGNOSTICO
+
+  - id: voc-02
+    texto: sujeto baleado en extremidad inferior
+    categoria: vocabulario
+    relevantes:
+      ATLS-10-008: 2   # Musculoskeletal Trauma › MAJOR ARTERIAL INJURY AND TRAUMATIC AMPUTATION › ASSESSMENT
+      ATLS-10-015: 2   # Musculoskeletal Trauma › POTENTIALLY LIMB-THREATENING MUSCULOSKELETAL INJURIES › VASCULAR INJURIES
+      ATLS-22-011: 2   # Penetrating Trauma › PENETRATING EXTREMITY TRAUMA
+      HUV-20-003: 2   # Trauma vascular periférico. Primero cont › DIAGNÓSTICO › Cuadro Clínico
+      HUV-20-005: 2   # Trauma vascular periférico. Primero cont › DIAGNÓSTICO › Paso 4. Identificar los pacientes que requieren imáge
+      ATLS-03-005: 1   # x: Control of eXsanguinating External He › MANAGEMENT › TOURNIQUET APPLICATION
+      ATLS-10-009: 1   # Musculoskeletal Trauma › MAJOR ARTERIAL INJURY AND TRAUMATIC AMPUTATION › MANAGEMENT
+      ATLS-10-013: 1   # Musculoskeletal Trauma › OPEN FRACTURES AND PENETRATING JOINT INJURIES › ASSESSMENT
+      ATLS-10-014: 1   # Musculoskeletal Trauma › OPEN FRACTURES AND PENETRATING JOINT INJURIES › MANAGEMENT
+      ATLS-10-016: 1   # Musculoskeletal Trauma › VASCULAR INJURIES › ASSESSMENT
+      ATLS-10-017: 1   # Musculoskeletal Trauma › VASCULAR INJURIES › MANAGEMENT
+      HUV-04-006: 1   # Paciente politraumatizado. Atención inic › CINEMATICA DEL TRAUMA EN EL POLITRAUMATIZADO › ● Arma de Fuego (AF)
+      HUV-20-001: 1   # Trauma vascular periférico. Primero cont › DEFINICIÓN
+      HUV-20-004: 1   # Trauma vascular periférico. Primero cont › DIAGNÓSTICO › Paso 3. Identificar pacientes que requieren cirugía i
+      HUV-20-006: 1   # Trauma vascular periférico. Primero cont › DIAGNÓSTICO › Paso 5. Seleccione los pacientes para observación.
+      HUV-20-010: 1   # Trauma vascular periférico. Primero cont › Conclusiones
+
+  - id: voc-03
+    texto: peatón arrollado por vehículo automotor
+    categoria: vocabulario
+    relevantes:
+      ATLS-14-003: 2   # Initial Assessment: Secondary Survey › MECHANISM OF INJURY
+      ATLS-21-005: 2   # Thoracic, Abdominopelvic, and Genitourin › MECHANISM OF INJURY › BLUNT MECHANISMS
+      HUV-04-005: 2   # Paciente politraumatizado. Atención inic › CINEMATICA DEL TRAUMA EN EL POLITRAUMATIZADO › ● Trauma Cerrado
+      ATLS-06-006: 1   # Circulation Assessment and Volume Resusc › PATHOPHYSIOLOGY › CARDIOGENIC SHOCK
+      ATLS-10-004: 1   # Musculoskeletal Trauma › INJURY MECHANISM
+      ATLS-11-003: 1   # Trauma in the Pediatric Patient › TYPES AND PATTERNS OF INJURY
+      ATLS-21-030: 1   # Thoracic, Abdominopelvic, and Genitourin › EVALUATION OF OTHER SPECIFIC INJURIES › BLUNT AORTIC INJURY
+      ATLS-21-040: 1   # Thoracic, Abdominopelvic, and Genitourin › PELVIC FRACTURES AND ASSOCIATED INJURIES › MECHANISM OF INJURY AND 
+      HUV-04-013: 1   # Paciente politraumatizado. Atención inic › MANEJO EN URGENCIAS
+
+  - id: voc-04
+    texto: precipitación desde altura con trauma de columna
+    categoria: vocabulario
+    relevantes:
+      ATLS-07-014: 2   # Disability: Neurological Assessment and  › SPINAL CORD INJURY › PATHOPHYSIOLOGY
+      ATLS-07-017: 2   # Disability: Neurological Assessment and  › ANATOMY, PHYSIOLOGY, AND PATHOLOGY OF TBI AND SCI › SPINAL MOTION R
+      ATLS-07-024: 2   # Disability: Neurological Assessment and  › SPINE INJURY › Clinical Clearance of the Cervical Spine
+      ATLS-07-025: 2   # Disability: Neurological Assessment and  › SPINE INJURY › Methods of Spine Imaging
+      ATLS-14-019: 2   # Initial Assessment: Secondary Survey › COMPREHENSIVE PHYSICAL EXAMINATION › BACK
+      HUV-05-009: 2   # Vía aérea en trauma. Manejo inicial de l › CONSIDERACIONES ESPECIALES › ● Sospecha de Trauma de columna cervic
+      ATLS-01-024: 1   # Initial Assessment: Primary Survey › OTHER INTERVENTIONS IN THE PRIMARY SURVEY › SPINAL MOTION RESTRICTION
+      ATLS-06-025: 1   # Circulation Assessment and Volume Resusc › MANAGEMENT › NEUROGENIC SHOCK AND OTHER DISTRIBUTIVE ETIOLOGIES
+      ATLS-07-013: 1   # Disability: Neurological Assessment and  › SPINAL CORD INJURY › ANATOMY
+      ATLS-07-015: 1   # Disability: Neurological Assessment and  › PATHOPHYSIOLOGY › Neurogenic Shock
+      ATLS-07-019: 1   # Disability: Neurological Assessment and  › DISABILITY ASSESSMENT DURING SECONDARY SURVEY
+      ATLS-07-026: 1   # Disability: Neurological Assessment and  › SPINE INJURY › Interpretation of Cervical Spine CT Scans
+      ATLS-07-036: 1   # Disability: Neurological Assessment and  › HOSPITAL › NEUROGENIC SHOCK
+      ATLS-07-047: 1   # Disability: Neurological Assessment and  › HOSPITAL › SURGICAL MANAGEMENT FOR SPINAL INJURIES
+      ATLS-07-052: 1   # Disability: Neurological Assessment and  › REASSESSMENT › SPINAL INJURY
+      ATLS-14-003: 1   # Initial Assessment: Secondary Survey › MECHANISM OF INJURY
+
+  - id: voc-05
+    texto: lesión ocular penetrante por cuerpo extraño metálico
+    categoria: vocabulario
+    relevantes:
+      ATLS-23-004: 2   # Ocular Trauma › PHYSICAL EXAMINATION
+      ATLS-23-008: 2   # Ocular Trauma › ASSESSMENT OF OCULAR AND PERIOCULAR TRAUMA
+      ATLS-23-012: 2   # Ocular Trauma › OPEN GLOBE
+      ATLS-14-011: 1   # Initial Assessment: Secondary Survey › COMPREHENSIVE PHYSICAL EXAMINATION › EYES
+      ATLS-23-005: 1   # Ocular Trauma › VISION
+      ATLS-23-007: 1   # Ocular Trauma › PUPILS
+      ATLS-23-016: 1   # Ocular Trauma › SPECIAL CONSIDERATIONS: OCULAR INJURIES IN CHILDREN
+      ATLS-23-017: 1   # Ocular Trauma › TRANSFER
+      ATLS-23-019: 1   # Ocular Trauma › CHAPTER SUMMARY
+      ATLS-23-020: 1   # Ocular Trauma › CHAPTER SUMMARY › KEY LEARNING POINTS
+
+  - id: voc-06
+    texto: agresión física con objeto romo en región craneal
+    categoria: vocabulario
+    relevantes:
+      ATLS-07-004: 2   # Disability: Neurological Assessment and  › PATHOLOGIC ANATOMY OF COMMON BRAIN INJURIES › Extradural Hematoma
+      ATLS-07-018: 2   # Disability: Neurological Assessment and  › ANATOMY, PHYSIOLOGY, AND PATHOLOGY OF TBI AND SCI › DISABILITY ASSE
+      ATLS-07-019: 2   # Disability: Neurological Assessment and  › DISABILITY ASSESSMENT DURING SECONDARY SURVEY
+      ATLS-07-022: 2   # Disability: Neurological Assessment and  › IMAGING ADJUNCTS TO ASSESSMENT › TRAUMATIC BRAIN INJURY
+      ATLS-07-023: 2   # Disability: Neurological Assessment and  › IMAGING ADJUNCTS TO ASSESSMENT › INTERPRETATION OF HEAD CT SCANS
+      ATLS-14-010: 2   # Initial Assessment: Secondary Survey › COMPREHENSIVE PHYSICAL EXAMINATION › HEAD AND FACE
+      ATLS-07-005: 1   # Disability: Neurological Assessment and  › PATHOLOGIC ANATOMY OF COMMON BRAIN INJURIES › Subdural Hematoma
+      ATLS-07-007: 1   # Disability: Neurological Assessment and  › PATHOLOGIC ANATOMY OF COMMON BRAIN INJURIES › Cerebral Contusion
+      ATLS-07-045: 1   # Disability: Neurological Assessment and  › SURGICAL MANAGEMENT FOR TBI › Open Skull Fractures
+      ATLS-07-051: 1   # Disability: Neurological Assessment and  › REASSESSMENT › TRAUMATIC BRAIN INJURY
+      ATLS-14-012: 1   # Initial Assessment: Secondary Survey › COMPREHENSIVE PHYSICAL EXAMINATION › NEUROLOGICAL EXAM
+      HUV-04-014: 1   # Paciente politraumatizado. Atención inic › MANEJO DEFINITIVO
+
+  - id: abr-01
+    texto: HPAF en cráneo con orificio de entrada parietal
+    categoria: abreviatura
+    relevantes:
+      ATLS-07-055: 2   # Disability: Neurological Assessment and  › PENETRATING INJURIES › TRAUMATIC BRAIN INJURY
+      ATLS-22-006: 2   # Penetrating Trauma › HEAD AND NECK › PENETRATING HEAD TRAUMA
+      ATLS-07-018: 1   # Disability: Neurological Assessment and  › ANATOMY, PHYSIOLOGY, AND PATHOLOGY OF TBI AND SCI › DISABILITY ASSE
+      ATLS-07-022: 1   # Disability: Neurological Assessment and  › IMAGING ADJUNCTS TO ASSESSMENT › TRAUMATIC BRAIN INJURY
+      ATLS-07-023: 1   # Disability: Neurological Assessment and  › IMAGING ADJUNCTS TO ASSESSMENT › INTERPRETATION OF HEAD CT SCANS
+      ATLS-07-045: 1   # Disability: Neurological Assessment and  › SURGICAL MANAGEMENT FOR TBI › Open Skull Fractures
+      ATLS-07-049: 1   # Disability: Neurological Assessment and  › OTHER MANAGEMENT CONSIDERATIONS › SEIZURE PROPHYLAXIS AND TREATMENT
+      HUV-04-006: 1   # Paciente politraumatizado. Atención inic › CINEMATICA DEL TRAUMA EN EL POLITRAUMATIZADO › ● Arma de Fuego (AF)
+
+  - id: abr-02
+    texto: HPACP en zona II de cuello
+    categoria: abreviatura
+    relevantes:
+      ATLS-22-008: 2   # Penetrating Trauma › HEAD AND NECK › PENETRATING NECK TRAUMA
+      HUV-09-001: 2   # Trauma penetrante de cuello. El valor de › DEFINICIÓN: ANATOMÍA
+      HUV-09-006: 2   # Trauma penetrante de cuello. El valor de › EVALUACIÓN CLÍNICA INICIAL › ● Paso 3. Identificar lesiones específ
+      HUV-09-008: 2   # Trauma penetrante de cuello. El valor de › MANEJO INICIAL
+      HUV-09-011: 2   # Trauma penetrante de cuello. El valor de › MANEJO INICIAL › ● Paso 3. Estudie las lesiones que no requieran ci
+      HUV-09-002: 1   # Trauma penetrante de cuello. El valor de › NTRODUCCIÓN
+      HUV-09-003: 1   # Trauma penetrante de cuello. El valor de › EPIDEMIOLOGÍA
+      HUV-09-004: 1   # Trauma penetrante de cuello. El valor de › EVALUACIÓN CLÍNICA INICIAL › ● Paso 1. Identificar lesiones que pue
+      HUV-09-005: 1   # Trauma penetrante de cuello. El valor de › EVALUACIÓN CLÍNICA INICIAL › ● Paso 2. Identificar sangrado activo.
+      HUV-09-007: 1   # Trauma penetrante de cuello. El valor de › EVALUACIÓN CLÍNICA INICIAL › ● Paso 4. Identifique pacientes con he
+      HUV-09-009: 1   # Trauma penetrante de cuello. El valor de › MANEJO INICIAL › ● Paso 1. Proteja la vía aérea.
+      HUV-09-010: 1   # Trauma penetrante de cuello. El valor de › MANEJO INICIAL › ● Paso 2. Controle el sangrado.
+      HUV-09-012: 1   # Trauma penetrante de cuello. El valor de › RESUMEN
+
+  - id: abr-03
+    texto: TCE leve con pérdida de conciencia transitoria
+    categoria: abreviatura
+    relevantes:
+      ATLS-07-018: 2   # Disability: Neurological Assessment and  › ANATOMY, PHYSIOLOGY, AND PATHOLOGY OF TBI AND SCI › DISABILITY ASSE
+      ATLS-07-022: 2   # Disability: Neurological Assessment and  › IMAGING ADJUNCTS TO ASSESSMENT › TRAUMATIC BRAIN INJURY
+      ATLS-07-051: 2   # Disability: Neurological Assessment and  › REASSESSMENT › TRAUMATIC BRAIN INJURY
+      ATLS-14-012: 2   # Initial Assessment: Secondary Survey › COMPREHENSIVE PHYSICAL EXAMINATION › NEUROLOGICAL EXAM
+      ATLS-07-019: 1   # Disability: Neurological Assessment and  › DISABILITY ASSESSMENT DURING SECONDARY SURVEY
+      ATLS-07-023: 1   # Disability: Neurological Assessment and  › IMAGING ADJUNCTS TO ASSESSMENT › INTERPRETATION OF HEAD CT SCANS
+      ATLS-07-053: 1   # Disability: Neurological Assessment and  › SPECIAL POPULATION CONSIDERATION › TRAUMATIC BRAIN INJURY
+      ATLS-11-035: 1   # Trauma in the Pediatric Patient › HEAD TRAUMA › ASSESSMENT
+      ATLS-12-023: 1   # Trauma in the Older Adult › SPECIFIC INJURIES › TRAUMATIC BRAIN INJURY
+      HUV-04-014: 1   # Paciente politraumatizado. Atención inic › MANEJO DEFINITIVO
+
+  - id: abr-04
+    texto: FX de radio distal con inmovilización
+    categoria: abreviatura
+    relevantes:
+      ATLS-10-032: 2   # Musculoskeletal Trauma › ISOLATED FRACTURES › MANAGEMENT
+      ATLS-10-033: 2   # Musculoskeletal Trauma › ADJUNCTS › FRACTURE IMMOBILIZATION
+      ATLS-10-034: 2   # Musculoskeletal Trauma › FRACTURE IMMOBILIZATION › PRINCIPLES OF SPLINTING AND IMMOBILIZATION
+      ATLS-10-036: 2   # Musculoskeletal Trauma › FRACTURE IMMOBILIZATION › OTHER FRACTURES
+      ATLS-10-024: 1   # Musculoskeletal Trauma › NEUROLOGICAL INJURY SECONDARY TO FRACTURE OR DISLOCATION
+      ATLS-10-025: 1   # Musculoskeletal Trauma › NEUROLOGICAL INJURY SECONDARY TO FRACTURE OR DISLOCATION › ASSESSMENT
+      ATLS-10-026: 1   # Musculoskeletal Trauma › NEUROLOGICAL INJURY SECONDARY TO FRACTURE OR DISLOCATION › MANAGEMENT
+      ATLS-10-030: 1   # Musculoskeletal Trauma › ISOLATED FRACTURES
+      ATLS-10-031: 1   # Musculoskeletal Trauma › ISOLATED FRACTURES › ASSESSMENT
+      ATLS-10-037: 1   # Musculoskeletal Trauma › ADJUNCTS › X-RAY EXAMINATION
+      ATLS-10-039: 1   # Musculoskeletal Trauma › SECONDARY SURVEY › PAIN CONTROL
+
+  - id: abr-05
+    texto: paciente con IOT y manejo en UCI por trauma de tórax
+    categoria: abreviatura
+    relevantes:
+      ATLS-04-044: 2   # Airway Assessment and Management › INTERVENTIONS/TREATMENTS › POST-INTUBATION MANAGEMENT
+      ATLS-05-027: 2   # Breathing and Ventilation Assessment and › INTERVENTIONS AND TREATMENTS › PULMONARY CONTUSION MANAGEMENT
+      ATLS-05-032: 2   # Breathing and Ventilation Assessment and › INTERVENTIONS AND TREATMENTS › RIB FRACTURES AND FLAIL CHEST MANAGE
+      HUV-05-017: 2   # Vía aérea en trauma. Manejo inicial de l › TRATAMIENTO › Paso 5. Intubación
+      HUV-12-008: 2   # Trauma cerrado de tórax › ENFOQUE TERAPÉUTICO › ● Lesiones torácicas mayores que ameritan tratamiento temprano
+      ATLS-04-024: 1   # Airway Assessment and Management › INTERVENTIONS/TREATMENTS › RAPID-SEQUENCE TRACHEAL INTUBATION
+      ATLS-04-032: 1   # Airway Assessment and Management › EQUIPMENT FOR RSI › Mechanical Ventilator
+      ATLS-04-043: 1   # Airway Assessment and Management › MEDICATIONS FOR RSI › Confirmation of Intubation and Post-intubation Assess
+      ATLS-05-034: 1   # Breathing and Ventilation Assessment and › INTERVENTIONS AND TREATMENTS › TRACHEOBRONCHIAL INJURY MANAGEMENT
+      ATLS-05-035: 1   # Breathing and Ventilation Assessment and › REASSESSMENT
+      ATLS-05-036: 1   # Breathing and Ventilation Assessment and › TRANSFER CONSIDERATIONS
+      HUV-12-004: 1   # Trauma cerrado de tórax › DIAGNÓSTICO › Evaluación primaria
+      HUV-12-007: 1   # Trauma cerrado de tórax › ENFOQUE TERAPÉUTICO › ● Lesiones torácicas críticas. Ponen en riesgo inmediato la vi
+      HUV-22-007: 1   # Toracostomía cerrada. Técnica quirúrgica › CUIDADOS DEL PACIENTE CON TUBO DE TÓRAX
+
+  - id: ort-01
+    texto: pcte con heridad por arma de fuego en torax
+    categoria: ortografica
+    relevantes:
+      ATLS-22-009: 2   # Penetrating Trauma › PENETRATING THORACIC TRAUMA
+      HUV-11-001: 2   # Trauma torácico penetrante › DEFINICIÓN
+      HUV-11-003: 2   # Trauma torácico penetrante › EVALUACIÓN CLÍNICA
+      HUV-11-016: 2   # Trauma torácico penetrante › CONCLUSIONES
+      ATLS-05-012: 1   # Breathing and Ventilation Assessment and › ASSESSMENT FOR COMMON INJURIES › PNEUMOTHORAX ASSESSMENT
+      ATLS-05-013: 1   # Breathing and Ventilation Assessment and › ASSESSMENT FOR COMMON INJURIES › HEMOTHORAX ASSESSMENT
+      HUV-04-006: 1   # Paciente politraumatizado. Atención inic › CINEMATICA DEL TRAUMA EN EL POLITRAUMATIZADO › ● Arma de Fuego (AF)
+      HUV-11-007: 1   # Trauma torácico penetrante › TRATAMIENTO › ● Neumotórax a tensión
+      HUV-11-010: 1   # Trauma torácico penetrante › TRATAMIENTO › • Neumotórax
+      HUV-11-011: 1   # Trauma torácico penetrante › TRATAMIENTO › ● Hemotórax
+      HUV-11-014: 1   # Trauma torácico penetrante › TRATAMIENTO › ● Lesiones transmediastinales
+
+  - id: ort-02
+    texto: traumatismo craneoencefalico sin tildes en region parietal
+    categoria: ortografica
+    relevantes:
+      ATLS-07-002: 2   # Disability: Neurological Assessment and  › INTRODUCTION
+      ATLS-07-018: 2   # Disability: Neurological Assessment and  › ANATOMY, PHYSIOLOGY, AND PATHOLOGY OF TBI AND SCI › DISABILITY ASSE
+      ATLS-07-022: 2   # Disability: Neurological Assessment and  › IMAGING ADJUNCTS TO ASSESSMENT › TRAUMATIC BRAIN INJURY
+      ATLS-07-033: 2   # Disability: Neurological Assessment and  › INTERVENTIONS AND TREATMENTS › HOSPITAL
+      ATLS-07-004: 1   # Disability: Neurological Assessment and  › PATHOLOGIC ANATOMY OF COMMON BRAIN INJURIES › Extradural Hematoma
+      ATLS-07-019: 1   # Disability: Neurological Assessment and  › DISABILITY ASSESSMENT DURING SECONDARY SURVEY
+      ATLS-07-023: 1   # Disability: Neurological Assessment and  › IMAGING ADJUNCTS TO ASSESSMENT › INTERPRETATION OF HEAD CT SCANS
+      ATLS-07-059: 1   # Disability: Neurological Assessment and  › CHAPTER SUMMARY
+      HUV-04-014: 1   # Paciente politraumatizado. Atención inic › MANEJO DEFINITIVO
+
+  - id: ort-03
+    texto: luxacion de hombro por caida
+    categoria: ortografica
+    relevantes:
+      ATLS-10-024: 2   # Musculoskeletal Trauma › NEUROLOGICAL INJURY SECONDARY TO FRACTURE OR DISLOCATION
+      ATLS-10-025: 2   # Musculoskeletal Trauma › NEUROLOGICAL INJURY SECONDARY TO FRACTURE OR DISLOCATION › ASSESSMENT
+      ATLS-10-027: 2   # Musculoskeletal Trauma › JOINT AND LIGAMENT INJURIES
+      ATLS-10-028: 2   # Musculoskeletal Trauma › JOINT AND LIGAMENT INJURIES › ASSESSMENT
+      ATLS-10-029: 2   # Musculoskeletal Trauma › JOINT AND LIGAMENT INJURIES › MANAGEMENT
+      ATLS-10-016: 1   # Musculoskeletal Trauma › VASCULAR INJURIES › ASSESSMENT
+      ATLS-10-026: 1   # Musculoskeletal Trauma › NEUROLOGICAL INJURY SECONDARY TO FRACTURE OR DISLOCATION › MANAGEMENT
+      ATLS-10-034: 1   # Musculoskeletal Trauma › FRACTURE IMMOBILIZATION › PRINCIPLES OF SPLINTING AND IMMOBILIZATION
+      ATLS-10-037: 1   # Musculoskeletal Trauma › ADJUNCTS › X-RAY EXAMINATION
+
+  - id: ort-04
+    texto: qemadura por gasolina en cara y cuello
+    categoria: ortografica
+    relevantes:
+      ATLS-04-005: 2   # Airway Assessment and Management › PATHOPHYSIOLOGY › AIRWAY BURNS
+      ATLS-09-003: 2   # Thermal Injuries › STOP THE BURNING PROCESS
+      ATLS-09-004: 2   # Thermal Injuries › BURN CARE PRIORITIES WITHIN THE PRIMARY SURVEY › AIRWAY
+      HUV-08-005: 2   # Manejo inicial del paciente quemado. Rea › VALORACIÓN INICIAL
+      HUV-08-008: 2   # Manejo inicial del paciente quemado. Rea › MANEJO INICIAL
+      ATLS-09-005: 1   # Thermal Injuries › BURN CARE PRIORITIES WITHIN THE PRIMARY SURVEY › BREATHING
+      ATLS-09-011: 1   # Thermal Injuries › BURN PRIORITIES IN THE SECONDARY SURVEY › BODY SURFACE AREA AND DEPTH
+      ATLS-09-017: 1   # Thermal Injuries › BURN PRIORITIES IN THE SECONDARY SURVEY › CHEMICAL BURNS
+      HUV-08-004: 1   # Manejo inicial del paciente quemado. Rea › CLASIFICACIÓN
+      HUV-08-007: 1   # Manejo inicial del paciente quemado. Rea › CRITERIOS DE HOSPITALIZACIÓN
+      HUV-08-010: 1   # Manejo inicial del paciente quemado. Rea › CASOS ESPECIALES
+
+  - id: fin-01
+    texto: mordedura de perro en mano con pérdida de tejido
+    categoria: fina
+    relevantes:
+      ATLS-10-023: 2   # Musculoskeletal Trauma › COMMON MUSCULOSKELETAL CAUSES OF PERMANENT IMPAIRMENT › CONTUSIONS AND LACERATIONS
+      ATLS-14-028: 2   # Initial Assessment: Secondary Survey › OTHER ASSESSMENT AND TREATMENT ADJUNCTS › OTHER TREATMENTS
+      ATLS-10-014: 1   # Musculoskeletal Trauma › OPEN FRACTURES AND PENETRATING JOINT INJURIES › MANAGEMENT
+      HUV-23-001: 1   # Exploración de la herida traumática. ¿Cu › Introducción:
+
+  - id: fin-02
+    texto: trauma abdominal cerrado con lesión esplénica
+    categoria: fina
+    relevantes:
+      ATLS-21-028: 2   # Thoracic, Abdominopelvic, and Genitourin › INDICATIONS FOR LAPAROTOMY FOLLOWING BLUNT TRAUMA
+      ATLS-21-038: 2   # Thoracic, Abdominopelvic, and Genitourin › EVALUATION OF OTHER SPECIFIC INJURIES › SOLID ORGAN INJURIES
+      HUV-16-004: 2   # Trauma cerrado de abdomen › IMÁGENES DIAGNÓSTICAS
+      HUV-16-005: 2   # Trauma cerrado de abdomen › ENFOQUE TERAPEUTICO
+      HUV-16-006: 2   # Trauma cerrado de abdomen › CONCLUSIONES
+      ATLS-11-032: 1   # Trauma in the Pediatric Patient › ABDOMINAL TRAUMA › NONOPERATIVE MANAGEMENT
+      ATLS-21-019: 1   # Thoracic, Abdominopelvic, and Genitourin › ADJUNCTS TO PHYSICAL EXAMINATION › FOCUSED ASSESSMENT WITH SONOGRAP
+      ATLS-21-021: 1   # Thoracic, Abdominopelvic, and Genitourin › ADJUNCTS TO PHYSICAL EXAMINATION › COMPUTED TOMOGRAPHY
+      HUV-16-001: 1   # Trauma cerrado de abdomen › DEFINICIÓN CUADRO CLÍNICO
+      HUV-16-002: 1   # Trauma cerrado de abdomen › EPIDEMIOLOGÍA
+
+  - id: fin-03
+    texto: lactante con trauma craneal por caída de la cama
+    categoria: fina
+    relevantes:
+      ATLS-11-034: 2   # Trauma in the Pediatric Patient › HEAD TRAUMA
+      ATLS-11-035: 2   # Trauma in the Pediatric Patient › HEAD TRAUMA › ASSESSMENT
+      ATLS-11-036: 2   # Trauma in the Pediatric Patient › HEAD TRAUMA › MANAGEMENT
+      ATLS-07-053: 1   # Disability: Neurological Assessment and  › SPECIAL POPULATION CONSIDERATION › TRAUMATIC BRAIN INJURY
+      ATLS-11-003: 1   # Trauma in the Pediatric Patient › TYPES AND PATTERNS OF INJURY
+      ATLS-11-005: 1   # Trauma in the Pediatric Patient › GENERAL CONSIDERATIONS › SIZE, SHAPE, AND SURFACE AREA
+      ATLS-11-047: 1   # Trauma in the Pediatric Patient › CHAPTER SUMMARY
+      ATLS-18-014: 1   # Injury Prevention › INJURY PREVENTION SCREENING TOOLS › CHILD ABUSE AND NEGLECT
+
+  - id: fin-04
+    texto: herida por arma de fuego con desenlace fatal en sala de urgencias
+    categoria: fina
+    relevantes:
+      ATLS-06-028: 2   # Circulation Assessment and Volume Resusc › MANAGEMENT › TRAUMATIC CARDIAC ARREST
+      ATLS-22-009: 2   # Penetrating Trauma › PENETRATING THORACIC TRAUMA
+      ATLS-02-024: 1   # Resuscitation Team Function and Communic › GOALS OF CARE AND COMMUNICATION OF SERIOUS NEWS
+      ATLS-20-004: 1   # Communicating Serious News in the Acute  › COMMUNICATING SERIOUS NEWS
+      HUV-11-009: 1   # Trauma torácico penetrante › TRATAMIENTO › ● Hemotórax masivo y requerimiento de toracotomía
+      HUV-13-002: 1   # Trauma precordial penetrante. Evaluación › ENFOQUE DIAGNOSTICO
+
+  - id: proc-01
+    texto: ¿cuándo está indicado colocar un tubo de tórax en trauma?
+    categoria: procedimiento
+    relevantes:
+      ATLS-05-028: 2   # Breathing and Ventilation Assessment and › PNEUMOTHORAX MANAGEMENT › SYMPTOMATIC SIMPLE AND TENSION PNEUMOTHOR
+      ATLS-05-031: 2   # Breathing and Ventilation Assessment and › INTERVENTIONS AND TREATMENTS › HEMOTHORAX MANAGEMENT
+      HUV-11-010: 2   # Trauma torácico penetrante › TRATAMIENTO › • Neumotórax
+      HUV-11-011: 2   # Trauma torácico penetrante › TRATAMIENTO › ● Hemotórax
+      HUV-22-002: 2   # Toracostomía cerrada. Técnica quirúrgica › INTRODUCCIÓN
+      ATLS-05-029: 1   # Breathing and Ventilation Assessment and › PNEUMOTHORAX MANAGEMENT › ASYMPTOMATIC AND OCCULT PNEUMOTHORAX MANA
+      HUV-11-013: 1   # Trauma torácico penetrante › TRATAMIENTO › ● Neumo o hemotórax manejado conservadoramente. ¿Cuánto tiempo Obse
+      HUV-22-001: 1   # Toracostomía cerrada. Técnica quirúrgica › DEFINICIÓN
+      HUV-22-006: 1   # Toracostomía cerrada. Técnica quirúrgica › TÉCNICA QUIRÚRGICA Paso a Paso
+
+  - id: proc-02
+    texto: técnica de la toracostomía cerrada paso a paso
+    categoria: procedimiento
+    relevantes:
+      HUV-22-003: 2   # Toracostomía cerrada. Técnica quirúrgica › PREPARACIÓN
+      HUV-22-004: 2   # Toracostomía cerrada. Técnica quirúrgica › EQUIPO REQUERIDO
+      HUV-22-006: 2   # Toracostomía cerrada. Técnica quirúrgica › TÉCNICA QUIRÚRGICA Paso a Paso
+      ATLS-05-028: 1   # Breathing and Ventilation Assessment and › PNEUMOTHORAX MANAGEMENT › SYMPTOMATIC SIMPLE AND TENSION PNEUMOTHOR
+      HUV-22-005: 1   # Toracostomía cerrada. Técnica quirúrgica › EQUIPO REQUERIDO › Sistema de drenaje.
+      HUV-22-007: 1   # Toracostomía cerrada. Técnica quirúrgica › CUIDADOS DEL PACIENTE CON TUBO DE TÓRAX
+      HUV-22-009: 1   # Toracostomía cerrada. Técnica quirúrgica › COMPLICACIONES
+
+  - id: proc-03
+    texto: dosis y momento de administración del ácido tranexámico en trauma
+    categoria: procedimiento
+    relevantes:
+      ATLS-06-022: 2   # Circulation Assessment and Volume Resusc › MANAGEMENT › TRANEXAMIC ACID IN HEMORRHAGE RESUSCITATION
+      ATLS-07-038: 2   # Disability: Neurological Assessment and  › TRANSFUSION GOALS AND COAGULOPATHY › Tranexamic Acid
+      ATLS-06-028: 1   # Circulation Assessment and Volume Resusc › MANAGEMENT › TRAUMATIC CARDIAC ARREST
+      ATLS-13-023: 1   # Trauma in the Pregnant Patient › APPROACH TO THE PREGNANT TRAUMA PATIENT: INITIAL ASSESSMENT PRIMARY SURVEY › 
+      HUV-06-004: 1   # Shock hemorrágico traumático. Primero pa › INTRODUCCIÓN › Paso 3. Fluidoterapia inicial.
+
+  - id: proc-04
+    texto: criterios para solicitar radiografía de tórax en trauma cerrado de tórax
+    categoria: procedimiento
+    relevantes:
+      HUV-12-005: 2   # Trauma cerrado de tórax › Imágenes Diagnosticas
+      ATLS-05-018: 1   # Breathing and Ventilation Assessment and › IMAGING › CHEST RADIOGRAPHY
+      HUV-12-004: 1   # Trauma cerrado de tórax › DIAGNÓSTICO › Evaluación primaria
+
+  - id: proc-05
+    texto: cómo calcular la reposición de líquidos en un paciente quemado
+    categoria: procedimiento
+    relevantes:
+      ATLS-09-012: 2   # Thermal Injuries › BURN PRIORITIES IN THE SECONDARY SURVEY › CALCULATE THE ADJUSTED FLUID RATE
+      ATLS-09-013: 2   # Thermal Injuries › CALCULATE THE ADJUSTED FLUID RATE › EXAMPLE OF ADJUSTED FLUID CALCULATION
+      HUV-08-008: 2   # Manejo inicial del paciente quemado. Rea › MANEJO INICIAL
+      ATLS-09-006: 1   # Thermal Injuries › BURN CARE PRIORITIES WITHIN THE PRIMARY SURVEY › CIRCULATION
+      ATLS-09-011: 1   # Thermal Injuries › BURN PRIORITIES IN THE SECONDARY SURVEY › BODY SURFACE AREA AND DEPTH
+
+  - id: proc-06
+    texto: indicaciones de intubación orotraqueal en el paciente traumatizado
+    categoria: procedimiento
+    relevantes:
+      ATLS-04-007: 2   # Airway Assessment and Management › ASSESSMENT › INDICATIONS FOR AIRWAY INTERVENTION
+      ATLS-04-024: 2   # Airway Assessment and Management › INTERVENTIONS/TREATMENTS › RAPID-SEQUENCE TRACHEAL INTUBATION
+      ATLS-04-026: 2   # Airway Assessment and Management › RAPID-SEQUENCE TRACHEAL INTUBATION › DECISION TO PERFORM AND TIMING OF RSI
+      HUV-05-010: 2   # Vía aérea en trauma. Manejo inicial de l › CONSIDERACIONES ESPECIALES › ● Alteración de la conciencia
+      HUV-05-017: 2   # Vía aérea en trauma. Manejo inicial de l › TRATAMIENTO › Paso 5. Intubación
+      ATLS-07-034: 1   # Disability: Neurological Assessment and  › HOSPITAL › AIRWAY AND BREATHING
+      ATLS-11-012: 1   # Trauma in the Pediatric Patient › PEDIATRIC ANATOMIC CONSIDERATIONS › OROTRACHEAL INTUBATION
+
+  - id: proc-07
+    texto: cricotiroidotomía cuando no se logra intubar ni oxigenar
+    categoria: procedimiento
+    relevantes:
+      ATLS-04-043: 2   # Airway Assessment and Management › MEDICATIONS FOR RSI › Confirmation of Intubation and Post-intubation Assess
+      HUV-05-018: 2   # Vía aérea en trauma. Manejo inicial de l › Cricotiroidotomía
+      ATLS-11-013: 1   # Trauma in the Pediatric Patient › PEDIATRIC ANATOMIC CONSIDERATIONS › LARYNGEAL MASK AIRWAY AND CRICOTHYROIDOT
+      HUV-05-019: 1   # Vía aérea en trauma. Manejo inicial de l › Traqueostomía. Vía aérea Quirúrgica en paciente con Trauma Maxilofa
+      HUV-05-020: 1   # Vía aérea en trauma. Manejo inicial de l › Vía aérea Quirúrgica con lesión laringotraqueal.
+
+  - id: proc-08
+    texto: manejo del neumotórax a tensión
+    categoria: procedimiento
+    relevantes:
+      ATLS-05-012: 2   # Breathing and Ventilation Assessment and › ASSESSMENT FOR COMMON INJURIES › PNEUMOTHORAX ASSESSMENT
+      ATLS-05-028: 2   # Breathing and Ventilation Assessment and › PNEUMOTHORAX MANAGEMENT › SYMPTOMATIC SIMPLE AND TENSION PNEUMOTHOR
+      HUV-11-007: 2   # Trauma torácico penetrante › TRATAMIENTO › ● Neumotórax a tensión
+      ATLS-05-006: 1   # Breathing and Ventilation Assessment and › PATHOPHYSIOLOGY OF COMMON INJURIES › PNEUMOTHORAX PATHOPHYSIOLOGY
+      ATLS-06-026: 1   # Circulation Assessment and Volume Resusc › MANAGEMENT › OBSTRUCTIVE ETIOLOGIES
+      HUV-12-007: 1   # Trauma cerrado de tórax › ENFOQUE TERAPÉUTICO › ● Lesiones torácicas críticas. Ponen en riesgo inmediato la vi
+
+  - id: proc-09
+    texto: cuándo activar el protocolo de transfusión masiva
+    categoria: procedimiento
+    relevantes:
+      ATLS-06-018: 2   # Circulation Assessment and Volume Resusc › MANAGEMENT › RESTORATION OF VASCULAR VOLUME
+      ATLS-22-010: 2   # Penetrating Trauma › PENETRATING ABDOMINAL/PELVIC TRAUMA
+      HUV-06-006: 2   # Shock hemorrágico traumático. Primero pa › INTRODUCCIÓN › Paso 5. Identifique tempranamente los candidatos a t
+      ATLS-06-019: 1   # Circulation Assessment and Volume Resusc › MANAGEMENT › RESUSCITATION TARGETS IN HEMORRHAGIC SHOCK
+      ATLS-06-020: 1   # Circulation Assessment and Volume Resusc › MANAGEMENT › ASSESSING RESPONSES TO RESUSCITATION
+      HUV-17-010: 1   # Trauma pélvico severo › TRATAMIENTO
+
+  - id: proc-10
+    texto: uso del torniquete en hemorragia de una extremidad
+    categoria: procedimiento
+    relevantes:
+      ATLS-03-005: 2   # x: Control of eXsanguinating External He › MANAGEMENT › TOURNIQUET APPLICATION
+      ATLS-24-011: 2   # Injury in Combat Zones and Austere Envir › SPECIFIC ADJUNCTS AND TREATMENTS › TOURNIQUETS
+      HUV-06-003: 2   # Shock hemorrágico traumático. Primero pa › INTRODUCCIÓN › Paso 1. Control de la hemorragia externa o compresib
+      ATLS-01-009: 1   # Initial Assessment: Primary Survey › PRIMARY SURVEY WITH SIMULTANEOUS RESUSCITATION › CONTROL OF EXSANGUINATIN
+      ATLS-03-004: 1   # x: Control of eXsanguinating External He › MANAGEMENT
+      ATLS-10-009: 1   # Musculoskeletal Trauma › MAJOR ARTERIAL INJURY AND TRAUMATIC AMPUTATION › MANAGEMENT
+
+  - id: proc-11
+    texto: estabilización pélvica con faja en fractura de pelvis con inestabilidad hemodinámica
+    categoria: procedimiento
+    relevantes:
+      ATLS-01-025: 2   # Initial Assessment: Primary Survey › OTHER INTERVENTIONS IN THE PRIMARY SURVEY › PELVIC STABILIZATION
+      ATLS-06-017: 2   # Circulation Assessment and Volume Resusc › MANAGEMENT › CONTROL OF BLEEDING
+      ATLS-10-006: 2   # Musculoskeletal Trauma › PELVIC FRACTURES › HEMORRHAGE CAUSED BY PELVIC FRACTURES
+      ATLS-21-041: 2   # Thoracic, Abdominopelvic, and Genitourin › PELVIC FRACTURES AND ASSOCIATED INJURIES › MANAGEMENT
+      HUV-17-010: 2   # Trauma pélvico severo › TRATAMIENTO
+      ATLS-21-012: 1   # Thoracic, Abdominopelvic, and Genitourin › PHYSICAL EXAMINATION › PELVIC ASSESSMENT
+      ATLS-21-040: 1   # Thoracic, Abdominopelvic, and Genitourin › PELVIC FRACTURES AND ASSOCIATED INJURIES › MECHANISM OF INJURY AND 
+      HUV-17-003: 1   # Trauma pélvico severo › ENFOQUE DIAGNÓSTICO
+      HUV-17-011: 1   # Trauma pélvico severo › TRATAMIENTO › Paso 7. Angioembolización.
+
+  - id: proc-12
+    texto: ventana pericárdica o ultrasonido en herida precordial
+    categoria: procedimiento
+    relevantes:
+      HUV-13-002: 2   # Trauma precordial penetrante. Evaluación › ENFOQUE DIAGNOSTICO
+      HUV-13-004: 2   # Trauma precordial penetrante. Evaluación › AYUDAS DIAGNÓSTICAS › Ventana Pericárdica
+      HUV-13-005: 2   # Trauma precordial penetrante. Evaluación › AYUDAS DIAGNÓSTICAS › Ultrasonido cardiácp en el servicio de urgenc
+      ATLS-22-009: 1   # Penetrating Trauma › PENETRATING THORACIC TRAUMA
+      HUV-13-006: 1   # Trauma precordial penetrante. Evaluación › ENFOQUE TERAPEUTICO › ● AngioTAC de tórax
+      HUV-13-009: 1   # Trauma precordial penetrante. Evaluación › Flujograma
+      HUV-21-003: 1   # Ultrasonido en trauma. Una extensión del › PASO A PASO DEL ULTRASONIDO US EN TRAUMA
+
+  - id: proc-13
+    texto: cuándo y cómo explorar una herida traumática
+    categoria: procedimiento
+    relevantes:
+      HUV-23-001: 2   # Exploración de la herida traumática. ¿Cu › Introducción:
+      ATLS-21-026: 1   # Thoracic, Abdominopelvic, and Genitourin › EVALUATION OF SPECIFIC PENETRATING INJURIES › ANTERIOR ABDOMINAL WO
+      ATLS-22-005: 1   # Penetrating Trauma › ASSESSMENT
+      HUV-15-004: 1   # Trauma abdominal penetrante › DIAGNÓSTICO Y TRATAMIENTO
+
+  - id: proc-14
+    texto: protocolo E-FAST paso a paso en trauma
+    categoria: procedimiento
+    relevantes:
+      ATLS-21-019: 2   # Thoracic, Abdominopelvic, and Genitourin › ADJUNCTS TO PHYSICAL EXAMINATION › FOCUSED ASSESSMENT WITH SONOGRAP
+      HUV-21-003: 2   # Ultrasonido en trauma. Una extensión del › PASO A PASO DEL ULTRASONIDO US EN TRAUMA
+      ATLS-05-019: 1   # Breathing and Ventilation Assessment and › IMAGING › ULTRASOUND
+      ATLS-14-023: 1   # Initial Assessment: Secondary Survey › IMAGING › ULTRASOUND
+      HUV-12-005: 1   # Trauma cerrado de tórax › Imágenes Diagnosticas
+      HUV-21-004: 1   # Ultrasonido en trauma. Una extensión del › PRECAUCIONES Y RECOMENDACIONES
+      HUV-21-005: 1   # Ultrasonido en trauma. Una extensión del › Flujograma
+
+  - id: proc-15
+    texto: prevención de la hipotermia en el paciente traumatizado
+    categoria: procedimiento
+    relevantes:
+      ATLS-08-004: 2   # Exposure and Environmental Threats in th › INTERVENTIONS/TREATMENTS
+      HUV-03-008: 2   # Cómo prevenir la hipotermia durante el p › MANTENIENDO EL CALOR DEL PACIENTE CON TRAUMA
+      ATLS-01-016: 1   # Initial Assessment: Primary Survey › PRIMARY SURVEY WITH SIMULTANEOUS RESUSCITATION › EXPOSURE AND ENVIRONMENT
+      ATLS-08-003: 1   # Exposure and Environmental Threats in th › PATHOPHYSIOLOGY
+      ATLS-11-023: 1   # Trauma in the Pediatric Patient › CIRCULATION AND SHOCK › THERMOREGULATION
+      HUV-03-001: 1   # Cómo prevenir la hipotermia durante el p › DEFINICIÓN
+      HUV-03-005: 1   # Cómo prevenir la hipotermia durante el p › FACTORES DE RIESGO ASOCIADOS A HIPOTERMIA
+
+  - id: proc-16
+    texto: cómo se puntúa la escala de coma de Glasgow
+    categoria: procedimiento
+    relevantes:
+      ATLS-07-018: 2   # Disability: Neurological Assessment and  › ANATOMY, PHYSIOLOGY, AND PATHOLOGY OF TBI AND SCI › DISABILITY ASSE
+      ATLS-01-015: 1   # Initial Assessment: Primary Survey › PRIMARY SURVEY WITH SIMULTANEOUS RESUSCITATION › DISABILITY
+      ATLS-14-012: 1   # Initial Assessment: Secondary Survey › COMPREHENSIVE PHYSICAL EXAMINATION › NEUROLOGICAL EXAM
+
+  - id: neg-01
+    texto: manejo de cetoacidosis diabética en urgencias
+    categoria: fuera_de_dominio
+    relevantes: {}
+
+  - id: neg-02
+    texto: protocolo de vacunación infantil contra el sarampión
+    categoria: fuera_de_dominio
+    relevantes: {}
+
+  - id: neg-03
+    texto: cuál es la capital de Colombia
+    categoria: fuera_de_dominio
+    relevantes: {}
+
+  - id: neg-04
+    texto: dolor torácico opresivo irradiado al brazo izquierdo, sospecha de infarto
+    categoria: fuera_de_dominio
+    relevantes: {}
+
+  - id: neg-05
+    texto: apendicitis aguda con dolor en fosa ilíaca derecha y fiebre
+    categoria: fuera_de_dominio
+    relevantes: {}
+
+  - id: neg-06
+    texto: crisis asmática severa en niño con sibilancias
+    categoria: fuera_de_dominio
+    relevantes: {}
+
+  - id: neg-07
+    texto: neumonía adquirida en la comunidad en adulto mayor
+    categoria: fuera_de_dominio
+    relevantes: {}
+
+  - id: neg-08
+    texto: cólico renal por litiasis ureteral
+    categoria: fuera_de_dominio
+    relevantes: {}
+
+  - id: neg-09
+    texto: hemorragia digestiva alta por úlcera péptica
+    categoria: fuera_de_dominio
+    relevantes: {}
+
+  - id: neg-10
+    texto: dosis de amoxicilina para otitis media aguda
+    categoria: fuera_de_dominio
+    relevantes: {}

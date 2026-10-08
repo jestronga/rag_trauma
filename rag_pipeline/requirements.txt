@@ -12,6 +12,11 @@ transformers>=4.40           # ruta densa por defecto (bge-m3 con pooling CLS)
 # processor). Por eso queda fijada por debajo de 6.
 sentence-transformers>=3.0,<6
 streamlit>=1.36
+# Extracción del texto de los libros de trauma (scripts/extraer_guias.py).
+# Licencia AGPL: sirve para uso local; no se redistribuye. Versión fija: otra
+# podría extraer distinto y correr los IDs de sección que usa
+# eval/consultas_guias.yaml (CONTEXTO_SESION.md, sección 00).
+pymupdf==1.28.2
 
 # torch: instálalo ANTES que sentence-transformers, con soporte CUDA, y con el
 # índice que corresponda a tu versión de Python. Python 3.13 necesita torch 2.6

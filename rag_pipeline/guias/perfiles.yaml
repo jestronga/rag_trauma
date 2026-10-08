@@ -1,0 +1,129 @@
+# Perfil de extracción de cada libro (rag/guias.py, scripts/extraer_guias.py).
+#
+# Cada bloque de texto del PDF recibe un rol según su fuente dominante (la que
+# más caracteres tiene). Las reglas de `roles` se prueban en orden y gana la
+# primera que calza; un bloque sin regla es "material" (texto de figuras,
+# tablas y flujogramas) y solo se conserva si queda debajo o encima de un pie
+# ("Table 7-4: …", "Tabla 1. …"), según `pie_posicion`.
+#
+# El material que queda sin pie se agrupa en recuadros por cercanía y se
+# conserva si se lee como lista o tabla ("Indicaciones de dren pleural"); los
+# flujogramas, hechos de rótulos cortos ("¿Penetra?", "SI", "NO"), se
+# descartan (rag/guias.py, recuadros).
+#
+# Roles: titulo1..titulo4 (jerarquía de secciones), cuerpo, descartar.
+# Medido sobre los PDF el 07/10/2026 con scratchpad/bloques.py.
+
+atls:
+  archivo: ATLS_11thEdition_CourseManual_ENG_17.pdf
+  fuente: ATLS
+  libro: "Advanced Trauma Life Support (ATLS), 11.ª ed. — Course Manual. American College of Surgeons"
+  idioma: en
+  # Página impresa = página del PDF - 19 (p. ej. PDF 119 → p. 100).
+  desfase_pagina: 19
+  # Encabezado "COURSE MANUAL | Chapter N | …" (y < 30) y pie con número de página (y > 752).
+  margen_sup: 30
+  margen_inf: 752
+  # "intra-/abdominal" → "intra-abdominal": en inglés el guion de fin de línea
+  # es parte de la palabra (el corte de sílaba usa guion blando, U+00AD).
+  guion_corta_palabra: false
+  pie: '^(Figure|Table|Box)\s+\d+-\d+'
+  pie_posicion: arriba
+  referencias: '^REFERENCES$'
+  roles:
+    - {rol: titulo1, fuente: 'OpenSans-Bold$', tam: [11.5, 12.5], color: 'ffffff', mayusculas: true}
+    - {rol: titulo2, fuente: 'OpenSans-Bold$', tam: [11.5, 12.5], mayusculas: true}
+    - {rol: titulo3, fuente: 'OpenSans-Bold$', tam: [9.5, 10.5], mayusculas: true}
+    - {rol: titulo4, fuente: 'OpenSans-BoldItalic', tam: [9.5, 10.5]}
+    - {rol: cuerpo, fuente: 'Minion3'}
+    # Viñetas de "KEY LEARNING POINTS" al final de cada capítulo: en Arial
+    # (p. 81) o en OpenSans (p. 36).
+    - {rol: cuerpo, fuente: 'Arial-BoldMT|OpenSans-Bold$', tam: [8.5, 9.5], empieza: '^•'}
+  # Índice y portada de las secciones II y III.
+  saltar: [259, 260, 261, 305, 306, 307]
+  # La primera página de cada capítulo es la portada con los objetivos.
+  saltar_portada: true
+  # [número, título, primera página del PDF]. El capítulo termina donde
+  # empieza el siguiente; el último, en `fin`. ATLS-OE (p. 351+) y el índice
+  # alfabético (p. 356+) quedan fuera.
+  fin: 350
+  # Capítulos sin contenido diagnóstico: se extraen igual y la fase 4 decide
+  # con mediciones si se filtran.
+  no_clinicos: [2, 16, 18, 19, 20]
+  capitulos:
+    - [1, "Initial Assessment: Primary Survey", 22]
+    - [2, "Resuscitation Team Function and Communication", 38]
+    - [3, "x: Control of eXsanguinating External Hemorrhage", 56]
+    - [4, "Airway Assessment and Management", 60]
+    - [5, "Breathing and Ventilation Assessment and Management", 84]
+    - [6, "Circulation Assessment and Volume Resuscitation", 98]
+    - [7, "Disability: Neurological Assessment and Management", 118]
+    - [8, "Exposure and Environmental Threats in the Primary Survey", 148]
+    - [9, "Thermal Injuries", 154]
+    - [10, "Musculoskeletal Trauma", 166]
+    - [11, "Trauma in the Pediatric Patient", 190]
+    - [12, "Trauma in the Older Adult", 210]
+    - [13, "Trauma in the Pregnant Patient", 224]
+    - [14, "Initial Assessment: Secondary Survey", 240]
+    - [15, "Transfer to Definitive Care", 252]
+    - [16, "Trauma Systems", 262]
+    - [17, "Triage and Disaster Management", 268]
+    - [18, "Injury Prevention", 276]
+    - [19, "Trauma-Informed Care and Social Determinants of Health", 288]
+    - [20, "Communicating Serious News in the Acute Trauma Setting", 298]
+    - [21, "Thoracic, Abdominopelvic, and Genitourinary Trauma", 308]
+    - [22, "Penetrating Trauma", 324]
+    - [23, "Ocular Trauma", 336]
+    - [24, "Injury in Combat Zones and Austere Environments", 346]
+
+huv:
+  archivo: LIBRO PACIENTE TRAUMATIZADO MANUAL DE MANEJO INICIAL.pdf
+  fuente: HUV
+  libro: "Paciente Traumatizado — Manual de Manejo Inicial. Hospital Universitario del Valle / Universidad del Valle"
+  idioma: es
+  desfase_pagina: 0
+  margen_sup: 30
+  margen_inf: 752
+  # En español el guion de fin de línea corta la palabra ("desorgani-/zados").
+  guion_corta_palabra: true
+  pie: '^(Tabla|Figura|Gr[aá]fic[oa]|Cuadro|Algoritmo)\s*\d*[.:]'
+  # "Tabla 1." va debajo de la tabla (p. 12).
+  pie_posicion: abajo
+  referencias: '^(BIBLIOGRAF[IÍ]A|REFERENCIAS|LECTURAS RECOMENDADAS)\.?$'
+  roles:
+    - {rol: titulo1, fuente: 'Montserrat-Bold', tam: [15.5, 16.5], color: '00bae3'}
+    - {rol: titulo3, fuente: 'FuturaBT-BookItalic', tam: [12.5, 13.5]}
+    # Referencias sueltas fuera de la sección de bibliografía (p. 21).
+    - {rol: descartar, fuente: 'FuturaBT-BookItalic', tam: [11.5, 12.4]}
+    - {rol: titulo2, fuente: 'Tahoma-Bold', tam: [11.5, 12.5], no_color: '000000'}
+    - {rol: cuerpo, fuente: 'Tahoma'}
+  saltar: []
+  # El capítulo 23 termina en la p. 299; la 300 es la contraportada.
+  fin: 299
+  # Capítulo 1: programa de prevención de violencia juvenil (TCV).
+  no_clinicos: [1]
+  # Del índice (pp. 6-7). Las portadas de capítulo son imágenes.
+  capitulos:
+    - [1, "¿Es posible prevenir la violencia juvenil desde los hospitales? Experiencia del programa TCV del HUV", 10]
+    - [2, "Paciente traumatizado. ABCDE y triage durante la atención", 22]
+    - [3, "Cómo prevenir la hipotermia durante el proceso de atención", 35]
+    - [4, "Paciente politraumatizado. Atención inicial", 44]
+    - [5, "Vía aérea en trauma. Manejo inicial de lo simple a lo complejo", 67]
+    - [6, "Shock hemorrágico traumático. Primero parar el sangrado", 89]
+    - [7, "Trauma en el adulto mayor. Un manejo diferencial", 100]
+    - [8, "Manejo inicial del paciente quemado. Reanimación y cuidados básicos de la piel", 111]
+    - [9, "Trauma penetrante de cuello. El valor de la evaluación clínica", 126]
+    - [10, "Trauma del opérculo torácico. ¿Cuándo sospecharlo y cómo diagnosticarlo?", 138]
+    - [11, "Trauma torácico penetrante", 148]
+    - [12, "Trauma cerrado de tórax", 162]
+    - [13, "Trauma precordial penetrante. Evaluación con base en la clínica y el ultrasonido", 175]
+    - [14, "Trauma toracoabdominal penetrante", 185]
+    - [15, "Trauma abdominal penetrante", 193]
+    - [16, "Trauma cerrado de abdomen", 205]
+    - [17, "Trauma pélvico severo", 217]
+    - [18, "Trauma urológico", 232]
+    - [19, "Trauma genital masculino", 242]
+    - [20, "Trauma vascular periférico. Primero controlar el sangrado", 256]
+    - [21, "Ultrasonido en trauma. Una extensión del examen físico", 272]
+    - [22, "Toracostomía cerrada. Técnica quirúrgica", 283]
+    - [23, "Exploración de la herida traumática. ¿Cuándo y cómo?", 292]

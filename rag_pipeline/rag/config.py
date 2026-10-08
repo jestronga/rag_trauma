@@ -56,6 +56,12 @@ QDRANT_PATH = INDICE_DIR / "qdrant"          # modo local embebido: sin Docker
 BM25_PATH = INDICE_DIR / "bm25.pkl"
 META_PATH = INDICE_DIR / "meta.json"
 COLECCION = _env("COLECCION", "trauma")
+# Libros de trauma (PLAN_INDEXAR_LIBROS.md): los PDF viven junto a trauma.csv,
+# fuera de git; el texto extraído también queda fuera (derechos de autor).
+LIBROS_DIR = Path(_env("LIBROS_DIR", str(RAIZ_ANONIMIZACION / "data")))
+GUIAS_DIR = RAIZ / "guias"
+GUIAS_PERFILES = GUIAS_DIR / "perfiles.yaml"
+GUIAS_SECCIONES = Path(_env("GUIAS_SECCIONES", str(GUIAS_DIR / "secciones.jsonl")))
 
 # --- modelos ---------------------------------------------------------------
 MODELO_EMBEDDING = _env("MODELO_EMBEDDING", "BAAI/bge-m3")

@@ -9,7 +9,8 @@ rag_trauma/
   requirements.txt    instala ambas partes (-r a cada carpeta)
   anonimizacion/      pipeline de limpieza y anonimización de trauma.csv
     run_pipeline.py, src/, config/, tests/, scripts/build_gazetteers.py
-    trauma.csv        datos crudos
+    data/             fuentes crudas, fuera de git: trauma.csv (PHI) y los dos
+                      libros de trauma (ATLS 11.ª ed., manual del HUV)
     outputs/          corpus anonimizado  ← lo consume el RAG
     reports/          reportes de anonimización
   rag_pipeline/       prototipo RAG (índices, evaluación y chatbot)

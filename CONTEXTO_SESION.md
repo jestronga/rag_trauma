@@ -1,11 +1,79 @@
 # Contexto de trabajo — rag_trauma
 
-Resumen para retomar el trabajo. Última sesión: **26 de septiembre de 2026**, en
-el PC nuevo (GTX 1650). **Empezar por la sección 0**, después 1, 5 y 6.
+Resumen para retomar el trabajo. Última sesión: **7 de octubre de 2026**, en el
+PC sin GPU. **Empezar por la sección 00** (libros de trauma), después 0, 1, 5 y 6.
 
 ---
 
-## 0. Para retomar mañana
+## 00. Libros de trauma (desde el 07/10) — lo que sigue, en la GTX 1650
+
+En la reunión de la semana del 30/09 pidieron no indexar solo casos (sesgo):
+se agregan dos libros como segunda fuente, **con el mismo peso que los casos**
+(decisión del usuario). Todo el plan y su estado están en
+**`PLAN_INDEXAR_LIBROS.md`** (raíz). Resumen:
+- **Fase 1, extracción (hecha):** `rag/guias.py` + `guias/perfiles.yaml` →
+  `guias/secciones.jsonl`, con 926 secciones (ATLS 676, HUV 250). Falta
+  revisar a mano `guias/muestra_revision.md` contra el PDF.
+- **Fase 2, fragmentación (en curso):** 7 configuraciones en
+  `rag/fragmentar.py`, 51 consultas anotadas en `eval/consultas_guias.yaml`
+  (**falta que el usuario o el médico las valide**) y la comparación en
+  `scripts/comparar_fragmentacion.py`. La corrida real va en la 1650: en el
+  PC sin GPU, bge-m3 tarda decenas de minutos por configuración.
+
+**Qué NO viaja por git** (está en `.gitignore`):
+- `anonimizacion/data/`: `trauma.csv` (PHI) y los dos PDF (80 y 185 MB, con
+  derechos de autor). Desde el 07/10 `trauma.csv` vive ahí, no en
+  `anonimizacion/`.
+- `rag_pipeline/guias/*` salvo `perfiles.yaml`: el texto extraído se
+  regenera en cada PC.
+
+**Pasos en la 1650, en orden:**
+1. **ANTES del `git pull`**, copiar `trauma.csv` a su carpeta nueva. El
+   commit del 07/10 lo saca de git (lo mueve a `data/`, fuera de git) y, para
+   git, eso es un borrado: el pull lo eliminaría del disco.
+   ```powershell
+   mkdir anonimizacion\data
+   copy anonimizacion\trauma.csv anonimizacion\data\
+   ```
+2. Copiar los dos PDF (USB o red) a `anonimizacion\data\`:
+   `ATLS_11thEdition_CourseManual_ENG_17.pdf` y
+   `LIBRO PACIENTE TRAUMATIZADO MANUAL DE MANEJO INICIAL.pdf`.
+3. `git pull`.
+4. Instalar y extraer:
+   ```powershell
+   cd rag_pipeline
+   ..\.venv\Scripts\python.exe -m pip install "pymupdf==1.28.2"
+   ..\.venv\Scripts\python.exe scripts\extraer_guias.py
+   ..\.venv\Scripts\python.exe -m pytest tests/ -q        # deben pasar los 168
+   ```
+   **Versión exacta de PyMuPDF a propósito:** otra versión podría extraer
+   distinto, los IDs de sección (`ATLS-07-019`) se correrían y
+   `eval/consultas_guias.yaml` quedaría apuntando a otras secciones.
+5. Comprobar que la extracción es idéntica a la del PC sin GPU; debe
+   imprimir **`926 1937563090e0`**:
+   ```powershell
+   ..\.venv\Scripts\python.exe -c "import json,hashlib; ids=[json.loads(l)['id']+'|'+' > '.join(json.loads(l)['titulos']) for l in open('guias/secciones.jsonl',encoding='utf-8')]; print(len(ids), hashlib.sha1('\n'.join(ids).encode()).hexdigest()[:12])"
+   ```
+6. Las corridas:
+   ```powershell
+   ..\.venv\Scripts\python.exe scripts\generar_preguntas_guias.py      # Ollama abierto
+   # cerrar Ollama: libera la VRAM para el reranker
+   ..\.venv\Scripts\python.exe scripts\comparar_fragmentacion.py --rutas densa,bm25,rrf,rerank
+   ```
+   Salida: `reports/comparar_fragmentacion.csv` y la tabla en consola. Decide
+   la columna **R@ppto**: secciones correctas que caben en los 1.400 tokens
+   del prompt.
+7. La validación de las anotaciones puede ir antes o después: si cambian,
+   se repite el paso 6. Los embeddings quedan en `guias/cache/` y la
+   repetición tarda segundos.
+
+**PHI:** el commit del 07/10 saca `trauma.csv` del repo de aquí en adelante,
+pero sigue en el historial de GitHub. Limpiar el historial sigue pendiente
+(pendiente 0).
+
+---
+
+## 0. Para retomar (estado al 28/09)
 
 **Principio que manda sobre todo lo demás:** es un **asistente al
 diagnóstico**. Desde el 28/09 la respuesta es una **sugerencia en prosa**, como
@@ -57,7 +125,8 @@ rag_trauma/
   README.md              visión general
   CONTEXTO_SESION.md     este archivo
   anonimizacion/         pipeline de limpieza y anonimización
-    trauma.csv           DATOS CRUDOS CON PHI — cuidado al copiarlo
+    data/                fuera de git (07/10): trauma.csv (DATOS CRUDOS CON PHI) y los
+                         dos libros (ATLS 11.ª ed., manual del HUV) — ver PLAN_INDEXAR_LIBROS.md
     outputs/             corpus_indexable.jsonl (8.198 casos), corpus.parquet, excluidos_rag.csv
     reports/             residuo_phi.csv, muestra_revision_manual.csv, reporte HTML
   rag_pipeline/          índices, evaluación y chatbot
@@ -352,7 +421,7 @@ no pasa la verificación, versión determinista; `qwen3:4b-instruct` + reranker.
 ## 4. Cómo instalar en un PC nuevo
 
 1. **Copiar el proyecto sin `.venv/`**, porque tiene rutas absolutas.
-   `anonimizacion/trauma.csv` tiene datos personales: transferirlo por un
+   `anonimizacion/data/trauma.csv` tiene datos personales: transferirlo por un
    medio seguro, o copiar solo `outputs/`.
 2. Crear el entorno:
    ```powershell
@@ -379,6 +448,9 @@ no pasa la verificación, versión determinista; `qwen3:4b-instruct` + reranker.
 ---
 
 ## 5. Pendientes, por prioridad
+
+**Nuevo desde el 07/10, antes que todo lo demás:** libros de trauma, sección 00
+y `PLAN_INDEXAR_LIBROS.md` (fase 2 en la 1650, después fases 3 a 7).
 
 0. **Sacar la PHI de git** (sección 0), cuando el usuario lo decida:
    revisar si el repositorio es o fue público; `git rm --cached` de los
