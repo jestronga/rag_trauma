@@ -150,6 +150,10 @@ SALIDA_ESTRUCTURADA = _env_bool("SALIDA_ESTRUCTURADA", True)
 # pasa, se muestra la respuesta determinista. sugerencias: la respuesta
 # determinista siempre (el modelo solo elige de la lista).
 SALIDA = _env("SALIDA", "prosa")                 # prosa | sugerencias
+# Demo 28/09: muestra la prosa aunque no pase la verificación (se sigue
+# verificando y queda en Respuesta.motivos). Va contra "nada inventado":
+# volver a PROSA_SIEMPRE=0 después de la demo.
+PROSA_SIEMPRE = _env_bool("PROSA_SIEMPRE", True)
 # La prosa son 3-5 oraciones con citas: ~150-250 tokens.
 MAX_TOKENS_PROSA = _env_int("MAX_TOKENS_PROSA", 400)
 # Sin SINTESIS_LLM el modelo solo escribe 2-4 viñetas de sugerencias (~100

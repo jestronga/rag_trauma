@@ -10,10 +10,8 @@ from __future__ import annotations
 import re
 import time
 import warnings
-from pathlib import Path
 
 import streamlit as st
-import yaml
 
 warnings.filterwarnings("ignore")
 
@@ -23,64 +21,39 @@ from rag.generate import ollama_disponible, responder, resumir_caso   # noqa: E4
 from rag.hallazgos import resaltar_html                        # noqa: E402
 from rag.retrieve import RUTAS, Filtros, ruta_por_defecto  # noqa: E402
 
-CONSULTAS_YAML = Path(__file__).resolve().parent / "eval" / "consultas.yaml"
-
-st.set_page_config(page_title="Registro de trauma — consulta de casos",
+st.set_page_config(page_title="Asistente Clínico de Trauma",
                    page_icon="🩺", layout="wide")
 
 RX_ID = re.compile(r"^\s*(?:caso|id|registro)?\s*#?\s*(\d{3,8})\s*$", re.IGNORECASE)
 
 CSS = """
 <style>
-  .stChatMessage { font-size: 0.95rem; }
+  .cabecera { display:flex; gap:16px; align-items:center; padding:18px 22px;
+              border-left:6px solid #C8102E; border-radius:10px; background:#FCEEEF;
+              margin-bottom:18px; }
+  .cabecera h1 { color:#C8102E; margin:0; padding:0; font-size:2rem; }
+  .cab-icono { flex:none; width:54px; height:54px; border-radius:50%; background:#C8102E;
+               color:#FFFFFF; font-size:1.9rem; display:flex; align-items:center;
+               justify-content:center; }
+  .cab-lema { font-size:1.1rem; opacity:.8; margin:2px 0 0; }
+  .bienvenida { display:flex; flex-wrap:wrap; gap:12px; margin:6px 0 10px; }
+  .bv-item { flex:1 1 220px; padding:12px 14px; border-radius:8px; font-size:0.98rem;
+             border:1px solid rgba(200,16,46,.22); line-height:1.45; }
+  .bv-item b { color:#C8102E; }
+  .stChatMessage { font-size: 1.05rem; line-height: 1.6; }
+  .stChatInput textarea { font-size: 1.05rem; }
   .caso-box { border:1px solid rgba(128,128,128,.28); border-radius:8px;
-              padding:10px 12px; margin-bottom:10px; font-size:0.82rem; }
+              padding:10px 12px; margin-bottom:10px; font-size:0.95rem; line-height:1.55; }
   .caso-id  { font-weight:600; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
-  .etq { display:inline-block; padding:1px 7px; border-radius:10px; font-size:0.72rem;
+  .etq { display:inline-block; padding:1px 7px; border-radius:10px; font-size:0.82rem;
          border:1px solid rgba(128,128,128,.35); margin:2px 3px 2px 0; }
   .caso-box mark { background:rgba(255,200,0,.35); color:inherit; padding:0 2px; border-radius:3px; }
-  .tiempo { font-size:0.7rem; opacity:.45; text-align:right; margin-top:2px;
+  .tiempo { font-size:0.8rem; opacity:.45; text-align:right; margin-top:2px;
             font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
-  .aviso { font-size:0.78rem; opacity:.75; line-height:1.45; }
-  .rotulo-demo { font-size:0.74rem; text-transform:uppercase; letter-spacing:.06em;
-                 opacity:.6; margin:6px 0 4px; }
-  div[data-testid="column"] .stButton > button { font-size:0.8rem; padding:6px 4px;
-                                                 white-space:normal; height:100%; }
+  .aviso { font-size:0.9rem; opacity:.75; line-height:1.45; }
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
-
-
-@st.cache_data
-def consultas_demo(_mtime: float) -> tuple[list[dict], str | None]:
-    """Las consultas con `boton` en eval/consultas.yaml.
-
-    Se leen del mismo archivo que usa el arnés de evaluación para que no haya
-    dos listas de consultas que mantener por separado: si cambias una consulta
-    ahí, cambia también el botón.
-
-    `_mtime` no se usa dentro: existe para que la caché se invalide sola cuando
-    editas el YAML, sin reiniciar Streamlit.
-
-    Devuelve (consultas, motivo_del_fallo). El motivo se pinta en la interfaz:
-    si los botones no aparecen, hay que poder ver POR QUÉ en vez de mirar un
-    hueco en blanco.
-    """
-    if not CONSULTAS_YAML.exists():
-        return [], f"No encuentro {CONSULTAS_YAML}"
-    try:
-        datos = yaml.safe_load(CONSULTAS_YAML.read_text(encoding="utf-8")) or {}
-    except yaml.YAMLError as e:
-        return [], f"{CONSULTAS_YAML.name} no es YAML válido: {e}"
-
-    todas = datos.get("consultas") or []
-    conb = [c for c in todas if c.get("boton")]
-    if not todas:
-        return [], f"{CONSULTAS_YAML.name} no tiene la clave «consultas»"
-    if not conb:
-        return [], (f"{CONSULTAS_YAML.name} tiene {len(todas)} consultas pero ninguna "
-                    f"con el campo «boton». ¿Es una versión anterior del archivo?")
-    return conb, None
 
 
 @st.cache_resource(show_spinner=False)
@@ -172,28 +145,27 @@ with st.sidebar:
 if "mensajes" not in st.session_state:
     st.session_state.mensajes = []
 
-st.title("Consulta de casos de trauma")
-st.caption("Describe una presentación clínica: el sistema recupera casos análogos del "
-           "registro, muestra su manejo y desenlace, y sugiere qué valorar según esos "
-           "casos. También acepta un identificador de caso.")
-
-# --- Consultas de demostración ---------------------------------------------
-# Un clic = una consulta. El orden reproduce el guion de SETUP.md: caso fácil,
-# brecha de vocabulario, abreviatura, desenlace y truncamiento, y abstención.
-# El tooltip de cada botón dice qué demuestra: sirve de chuleta en vivo.
-demo, motivo = consultas_demo(
-    CONSULTAS_YAML.stat().st_mtime if CONSULTAS_YAML.exists() else 0.0
+st.markdown(
+    f"<div class='cabecera'>"
+    f"<div class='cab-icono'>✚</div>"
+    f"<div><h1>Asistente Clínico de Trauma</h1>"
+    f"<div class='cab-lema'>Apoyo al diagnóstico basado en casos similares del registro de trauma</div>"
+    f"</div></div>",
+    unsafe_allow_html=True,
 )
-pregunta_boton = None
-if demo:
-    st.markdown("<div class='rotulo-demo'>Consultas de demostración</div>",
-                unsafe_allow_html=True)
-    for col, c in zip(st.columns(len(demo)), demo):
-        if col.button(c["boton"], key=f"demo-{c['id']}", use_container_width=True,
-                      help=f"«{c['texto']}»\n\n{c.get('muestra', '')}"):
-            pregunta_boton = c["texto"]
-elif motivo:
-    st.warning(f"Botones de demostración no disponibles — {motivo}")
+
+if not st.session_state.mensajes:
+    st.markdown(
+        "<div class='bienvenida'>"
+        "<div class='bv-item'><b>1 · Describa el caso</b><br>Mecanismo, región y hallazgos: "
+        "«herida por arma cortopunzante en abdomen con irritación peritoneal».</div>"
+        "<div class='bv-item'><b>2 · Revise la sugerencia</b><br>Qué valorar y qué se hizo "
+        "en los casos similares, con la cita de cada uno.</div>"
+        "<div class='bv-item'><b>3 · Verifique el origen</b><br>El texto completo de cada caso "
+        "está en «Casos consultados». También acepta un número de caso.</div>"
+        "</div>",
+        unsafe_allow_html=True,
+    )
 
 
 AVISO_RESPUESTA = (f"Casos históricos del registro ({config.COBERTURA_TEMPORAL}): los conteos "
@@ -229,7 +201,7 @@ def detalle_respuesta(respuesta, segundos: float | None, consulta: str) -> None:
         return
     if respuesta.casos and not respuesta.abstuvo:
         st.caption(AVISO_RESPUESTA)
-    if respuesta.prosa_verificada is False:
+    if respuesta.prosa_verificada is False and not config.PROSA_SIEMPRE:
         # Se muestra la versión armada desde los casos; se dice por qué, para
         # que no parezca un cambio de formato sin razón.
         motivo = respuesta.motivos[0] if respuesta.motivos else "sin detalle"
@@ -259,6 +231,15 @@ def detalle_respuesta(respuesta, segundos: float | None, consulta: str) -> None:
                         unsafe_allow_html=True)
 
 
+def escribir_de_a_poco(texto: str, segundos_max: float = 2.0):
+    """El texto ya está completo: se muestra letra por letra solo por estética.
+    Los trozos crecen con el largo para que nunca tarde más de `segundos_max`."""
+    paso = max(1, len(texto) // int(segundos_max / 0.008))
+    for i in range(0, len(texto), paso):
+        yield texto[i:i + paso]
+        time.sleep(0.008)
+
+
 def pintar(rol: str, contenido: str, respuesta=None, segundos: float | None = None,
            consulta: str = "") -> None:
     with st.chat_message(rol):
@@ -275,7 +256,7 @@ for m in st.session_state.mensajes:
 # Turno
 # ---------------------------------------------------------------------------
 escrita = st.chat_input("Ej.: varón joven con herida por arma cortopunzante en cuello, estable")
-pregunta = escrita or pregunta_boton
+pregunta = escrita
 
 if pregunta:
     st.session_state.mensajes.append({"role": "user", "content": pregunta})
@@ -286,16 +267,13 @@ if pregunta:
 
     with st.chat_message("assistant"):
         t0 = time.perf_counter()
-        with st.spinner("Buscando casos…"):
+        with st.spinner("Pensando…"):
             m = RX_ID.match(pregunta)
             if m:
                 r = resumir_caso(m.group(1))
             else:
-                # Las consultas de botón ya son autónomas: reescribirlas contra
-                # el historial solo puede estropearlas a mitad de una demo.
                 r = responder(pregunta, historial=historial, ruta=ruta, k=k,
-                              filtros=filtros, umbral=umbral, umbral_rerank=umbral_rerank,
-                              reescribir_consulta=escrita is not None)
+                              filtros=filtros, umbral=umbral, umbral_rerank=umbral_rerank)
         segundos = time.perf_counter() - t0
 
         if r.error:
@@ -303,7 +281,7 @@ if pregunta:
             texto = f"_{r.error}_"
         else:
             texto = r.texto
-            st.markdown(texto)
+            st.write_stream(escribir_de_a_poco(texto))
         detalle_respuesta(r, segundos, pregunta)
 
     st.session_state.mensajes.append(

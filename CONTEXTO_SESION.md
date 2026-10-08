@@ -84,9 +84,19 @@ código (sección 2.10). Regla de siempre: nada inventado, todo sale de los caso
 con `[caso: ID]`; el origen se revisa en "Casos consultados" de la app.
 
 **Estado del código:** lo del 26/09 está en `a9f9f1c` y lo del 27–28/09
-(secciones 2.8–2.11) en `dfbc688`; los dos están en `origin/main` (el push de
-`dfbc688` lo hizo el usuario). En el PC de la demo: `git pull`. Esta
-actualización del contexto va en un commit local aparte, sin push.
+(secciones 2.8–2.11) en `dfbc688`; los dos están en `origin/main`. `71214d9`
+(contexto) es local, sin push. **Los cambios del día de la demo (sección 2.12)
+no están commiteados**: `app.py`, `.streamlit/config.toml`, `rag/config.py`,
+`rag/generate.py`, y los nuevos `CONSULTAS_DEMO.md` y `PREGUNTAS_DEMO.md`. No
+agregar a git la captura de pantalla ni `desktop.ini`.
+
+**Lo primero después de la demo:**
+1. **Pasar a limpio las notas de `PREGUNTAS_DEMO.md`** (respuestas, consultas que
+   escribieron los asistentes, acuerdos) y convertirlas en pendientes aquí.
+2. **Decidir `PROSA_SIEMPRE`** (sección 2.12): hoy muestra la prosa aunque no
+   pase la verificación, lo que va contra "nada inventado". Volver a `False`
+   salvo que el usuario decida otra cosa con lo que digan los médicos.
+3. Commit de los cambios de la demo (cuando el usuario lo pida).
 
 **Urgente, después de la demo — PHI en GitHub:** `anonimizacion/trauma.csv`
 (datos crudos), `outputs/log_reemplazos.csv` (texto original de cada
@@ -124,6 +134,8 @@ rag_trauma/
   requirements.txt       instala las dos partes (-r a cada carpeta)
   README.md              visión general
   CONTEXTO_SESION.md     este archivo
+  CONSULTAS_DEMO.md      6 consultas con prosa verificada para la demo, reservas y cuáles evitar
+  PREGUNTAS_DEMO.md      preguntas para los médicos en la demo, con espacio para notas y acuerdos
   anonimizacion/         pipeline de limpieza y anonimización
     data/                fuera de git (07/10): trauma.csv (DATOS CRUDOS CON PHI) y los
                          dos libros (ATLS 11.ª ed., manual del HUV) — ver PLAN_INDEXAR_LIBROS.md
@@ -134,7 +146,7 @@ rag_trauma/
     .streamlit/          config.toml: no recargar rag/ en caliente (ver sección 6)
     rag/                 config, encoder, retrieve, index, build_prompt, hallazgos, generate
     indices/             BM25 + Qdrant local (8.198 puntos) — no está en git
-    tests/               46 tests del extractor y de la respuesta (sin Ollama ni índices)
+    tests/               93 tests del extractor, la respuesta y el verificador (sin Ollama ni índices)
     scripts/             revisar_entorno, probar_respuestas, exportar_revision
     eval/                consultas.yaml (28 consultas), evaluate.py, revision/ (planilla médica, no en git)
     MODELOS.md           modelos recomendados para 4 GB y 8 GB de VRAM (con mediciones)
@@ -404,6 +416,44 @@ no pasa la verificación, versión determinista; `qwen3:4b-instruct` + reranker.
   abstiene), 0 citas inválidas. **Falta correrlo en la 1650.**
 - Texto del botón 4 sin "registros truncados"; guion de `SETUP.md` §6 al día.
 
+### 2.12 Día de la demo: prosa siempre e interfaz nueva (28/09, sin commit)
+El usuario corrió el chatbot en la 1650 y una consulta ("arma de fuego en
+abdomen") salió con la versión determinista: la prosa no pasó la verificación y
+el motivo solo aparecía en un caption gris al pie, que no se veía. Pidió, para
+la demo, **solo prosa y debajo los casos consultados**.
+- **`PROSA_SIEMPRE`** (`rag/config.py`, por defecto `True`): `generate.responder`
+  muestra la prosa aunque `verificar_prosa` la rechace. La verificación se sigue
+  corriendo y queda en `Respuesta.prosa_verificada` / `motivos`. Si no hay prosa
+  (sin elementos elegibles o JSON cortado), sale la determinista.
+  `app.py` oculta el aviso de "no pasó la verificación" con `PROSA_SIEMPRE`.
+  **Temporal: va contra la regla de nada inventado** (sección 0).
+- **Interfaz (`app.py`):**
+  - título "Asistente Clínico de Trauma" (también el de la pestaña), en una
+    cabecera con franja rosada, borde e ícono rojos y el lema "Apoyo al
+    diagnóstico basado en casos similares del registro de trauma";
+  - **se quitaron los botones de demostración** (y `consultas_demo`, el import
+    de `yaml` y su CSS) y el subtítulo. Los botones siguen en
+    `eval/consultas.yaml` (campo `boton`) por si se vuelven a poner;
+    `preparar_demo.py` los sigue usando. Toda consulta escrita se reescribe con
+    el historial (antes los botones lo evitaban);
+  - tres tarjetas de bienvenida (describa / revise / verifique) solo mientras no
+    hay conversación;
+  - la respuesta nueva aparece letra por letra (`escribir_de_a_poco`,
+    `st.write_stream`, como máximo ~2 s; el texto ya está completo) y el
+    spinner dice "Pensando…";
+  - letra más grande: `baseFontSize = 18` en el tema y los textos pequeños
+    (casos, etiquetas, avisos, tiempo) subidos.
+- **Tema (`.streamlit/config.toml`, `[theme]`):** claro, blanco con rojo
+  `#C8102E`, fondo secundario `#FCEEEF`. Cambios del tema requieren reiniciar
+  Streamlit.
+- **`SETUP.md` §6 quedó desactualizado:** el guion habla de "botones 1-5". Las
+  consultas de la demo están ahora en `CONSULTAS_DEMO.md`: elegidas de
+  `reports/comparar_modelos.csv` (prosa verificada, similitud ≥ 0,57, 3-5 casos
+  citados), con reservas y las que conviene evitar (se abstienen con 0,52 o su
+  prosa no pasa).
+- El usuario pidió **no correr pruebas extra** en estos cambios: no se corrieron
+  tests ni la app. Si falla algo al abrirla, empezar por `app.py`.
+
 ---
 
 ## 3. Equipos
@@ -439,7 +489,7 @@ no pasa la verificación, versión determinista; `qwen3:4b-instruct` + reranker.
 4. Comprobar el entorno: `cd rag_pipeline; python scripts\revisar_entorno.py`
 5. Índices (no están en git): `python -m rag.index` desde `rag_pipeline\`.
    Si falta `anonimizacion/outputs/`, antes: `cd ..\anonimizacion; python run_pipeline.py`.
-6. Tests: `python -m pytest tests/ -q` (46).
+6. Tests: `python -m pytest tests/ -q` (93).
 7. Probar: `python scripts\probar_respuestas.py "herida por arma de fuego en tórax con hipoventilación"`
 8. Antes de una demo: `python scripts\preparar_demo.py` (debe decir "Todo
    listo" y 100 % en GPU).
@@ -514,6 +564,13 @@ y `PLAN_INDEXAR_LIBROS.md` (fase 2 en la 1650, después fases 3 a 7).
     `anonimizacion/reports/residuo_phi.csv`.
 11. ~~Restos de truncados en `consultas.yaml` y en el guion de `SETUP.md`~~
     Hecho el 28/09 (sección 2.11).
+12. **Después de la demo (sección 2.12):** notas de `PREGUNTAS_DEMO.md` →
+    pendientes; decidir `PROSA_SIEMPRE`; actualizar el guion de `SETUP.md` §6
+    (ya no hay botones); correr los 93 tests y abrir la app para confirmar los
+    cambios de interfaz; commit.
+13. **Motivo visible si vuelve la versión determinista:** con
+    `PROSA_SIEMPRE=0`, el aviso de por qué no pasó la prosa es un caption gris
+    al pie que nadie ve. Si se vuelve a usar, mostrarlo arriba de la respuesta.
 
 ---
 
@@ -561,6 +618,8 @@ y `PLAN_INDEXAR_LIBROS.md` (fase 2 en la 1650, después fases 3 a 7).
 | `MAX_TOKENS_RESUMEN` | `700` | resumen de un caso por identificador |
 | `TIMEOUT_LLM` | `400` | |
 | `SINTESIS_LLM` | apagado | no encender sin revisar respuestas |
+| `SALIDA` | `prosa` | `sugerencias` = siempre la respuesta determinista |
+| `PROSA_SIEMPRE` | `1` | demo 28/09: prosa aunque no pase la verificación; volver a `0` (sección 2.12) |
 | `UMBRAL_ABSTENCION` | `0.52` | primera guarda: coseno del mejor caso (0,45 hasta el 28/09; sin reranker no bloqueaba cetoacidosis) |
 | `KEEP_ALIVE` | `2h` | se envía en cada llamada a Ollama: el modelo no se descarga entre preguntas |
 | `UMBRAL_RERANK` | `0.2` | segunda guarda (ruta rerank): prob. mínima por caso; < 2 casos → abstención |

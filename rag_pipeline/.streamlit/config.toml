@@ -7,3 +7,13 @@
 # Ignorar rag/ evita las dos cosas. Contrapartida: si editas rag/*.py hay que
 # reiniciar Streamlit; los cambios en app.py se siguen recargando solos.
 folderWatchBlacklist = ["**/rag"]
+
+[theme]
+# Paleta blanca con rojo.
+base = "light"
+primaryColor = "#C8102E"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#FCEEEF"
+textColor = "#1F1F1F"
+# Letra más grande para que se lea bien (por defecto 16).
+baseFontSize = 18

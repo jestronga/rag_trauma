@@ -247,7 +247,9 @@ def responder(
             prosa_verificada, motivos = verificar_prosa(prosa, casos, consulta)
             # Si no pasa, la versión determinista con la elección de las reglas
             # del código: una segunda llamada al modelo duplicaría la espera.
-            texto = ensamblar_prosa(prosa, casos) if prosa_verificada else ensamblar("", casos, consulta)
+            # Con PROSA_SIEMPRE se muestra aunque no pase; sin prosa no hay qué mostrar.
+            mostrar = prosa and (prosa_verificada or config.PROSA_SIEMPRE)
+            texto = ensamblar_prosa(prosa, casos) if mostrar else ensamblar("", casos, consulta)
         else:
             texto = ensamblar(generar_eleccion(consulta, casos), casos, consulta)
     except Exception as e:
