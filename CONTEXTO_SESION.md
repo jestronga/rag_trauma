@@ -1,11 +1,29 @@
 # Contexto de trabajo — rag_trauma
 
-Resumen para retomar el trabajo. Última sesión: **7 de octubre de 2026**, en el
-PC sin GPU. **Empezar por la sección 00** (libros de trauma), después 0, 1, 5 y 6.
+Resumen para retomar el trabajo. Última sesión: **8 de octubre de 2026**, en la
+GTX 1650 (con el reranker en Kaggle). **Empezar por la sección 00** (libros de
+trauma: la próxima sesión arranca la fase 3), después 0, 1, 5 y 6.
 
 ---
 
-## 00. Libros de trauma (desde el 07/10) — lo que sigue, en la GTX 1650
+## 00. Libros de trauma (desde el 07/10)
+
+**Próxima sesión: implementar los libros en el RAG (fases 3 a 6 de
+`PLAN_INDEXAR_LIBROS.md`), empezando por la fase 3.** Con lo decidido en la
+fase 2:
+- **Fragmentación `fijo-256`** (`rag/fragmentar.py`), con la ruta de
+  títulos al inicio de cada fragmento.
+- **Fase 3:** colección `guias` en el mismo Qdrant local, `python -m
+  rag.index --fuente guias` (sin reindexar los casos), `meta.json` con las
+  dos fuentes; config `GUIAS_JSONL`, `COLECCION_GUIAS`, `TOP_K_GUIAS`, `GUIAS=1`.
+  **Sin BM25 para los libros.**
+- **Fase 4:** `retrieve.buscar_guias` con **densa**. En el PC de 8 GB,
+  reranker sobre los 30 primeros de la densa (`rerank-densa`) como guarda
+  `UMBRAL_GUIAS` (~0,2 de partida). En la 1650 la guarda tiene que salir del
+  coseno, que separa mal: calibrar con `calibrar_umbral.py` y las 10
+  consultas fuera de dominio.
+- Validar las 51 consultas anotadas puede ir en paralelo. Si cambian el
+  ganador, solo cambia el nombre de la configuración.
 
 En la reunión de la semana del 30/09 pidieron no indexar solo casos (sesgo):
 se agregan dos libros como segunda fuente, **con el mismo peso que los casos**
@@ -14,11 +32,28 @@ se agregan dos libros como segunda fuente, **con el mismo peso que los casos**
 - **Fase 1, extracción (hecha):** `rag/guias.py` + `guias/perfiles.yaml` →
   `guias/secciones.jsonl`, con 926 secciones (ATLS 676, HUV 250). Falta
   revisar a mano `guias/muestra_revision.md` contra el PDF.
-- **Fase 2, fragmentación (en curso):** 7 configuraciones en
-  `rag/fragmentar.py`, 51 consultas anotadas en `eval/consultas_guias.yaml`
-  (**falta que el usuario o el médico las valide**) y la comparación en
-  `scripts/comparar_fragmentacion.py`. La corrida real va en la 1650: en el
-  PC sin GPU, bge-m3 tarda decenas de minutos por configuración.
+- **Fase 2, fragmentación (hecha el 08/10, provisional):** 7
+  configuraciones en `rag/fragmentar.py`, comparadas con
+  `scripts/comparar_fragmentacion.py` sobre 51 consultas anotadas
+  (`eval/consultas_guias.yaml`, **falta que el usuario o el médico las
+  valide**) y 89 sintéticas (`eval/preguntas_sinteticas_guias.jsonl`). Dos
+  corridas: densa, bm25 y rrf en la 1650; el reranker en **Kaggle** (en la
+  1650 tardaba más de 20 h). Resultados en `reports/comparar_fragmentacion*.csv`
+  y en `PLAN_INDEXAR_LIBROS.md`, fase 2. Resumen:
+  - **`fijo-256` + densa** es lo mejor en las anotadas (R@ppto 0,401);
+  - **`rerank-densa`** gana en las sintéticas (0,876) y empata dentro del
+    ruido en las anotadas. Es la mejor guarda: ninguna consulta fuera de
+    dominio pasa de 0,173;
+  - BM25 sobre los libros (en una lista fusionada) saca al ATLS del
+    presupuesto: **descartado**.
+
+**Kaggle** (dataset privado `kaggle-rerank`): sube solo `rag/`, `eval/*.py`,
+`consultas_guias.yaml`, `preguntas_sinteticas_guias.jsonl`,
+`scripts/comparar_fragmentacion.py`, `guias/secciones.jsonl`,
+`perfiles.yaml` y `guias/cache/*.npy`. **Nunca `indices/`, `eval/revision/`
+ni nada de `anonimizacion/`**, porque ahí hay casos. El zip se arma con
+`tar.exe -a -c -f <zip> -C <carpeta> rag_pipeline`: `Compress-Archive` (PS
+5.1) escribe las rutas con `\` y Kaggle lo rechaza.
 
 **Qué NO viaja por git** (está en `.gitignore`):
 - `anonimizacion/data/`: `trauma.csv` (PHI) y los dos PDF (80 y 185 MB, con
@@ -27,7 +62,8 @@ se agregan dos libros como segunda fuente, **con el mismo peso que los casos**
 - `rag_pipeline/guias/*` salvo `perfiles.yaml`: el texto extraído se
   regenera en cada PC.
 
-**Pasos en la 1650, en orden:**
+**Pasos para preparar los libros en un PC nuevo, en orden** (hechos en la 1650
+el 08/10; sirven para el PC de 8 GB):
 1. **ANTES del `git pull`**, copiar `trauma.csv` a su carpeta nueva. El
    commit del 07/10 lo saca de git (lo mueve a `data/`, fuera de git) y, para
    git, eso es un borrado: el pull lo eliminaría del disco.
@@ -500,7 +536,7 @@ la demo, **solo prosa y debajo los casos consultados**.
 ## 5. Pendientes, por prioridad
 
 **Nuevo desde el 07/10, antes que todo lo demás:** libros de trauma, sección 00
-y `PLAN_INDEXAR_LIBROS.md` (fase 2 en la 1650, después fases 3 a 7).
+y `PLAN_INDEXAR_LIBROS.md` (fases 1 y 2 hechas; sigue la fase 3, después 4 a 7).
 
 0. **Sacar la PHI de git** (sección 0), cuando el usuario lo decida:
    revisar si el repositorio es o fue público; `git rm --cached` de los

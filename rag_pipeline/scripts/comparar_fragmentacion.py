@@ -5,6 +5,8 @@ PLAN_INDEXAR_LIBROS.md): cuál recupera mejor las secciones correctas.
     python scripts/comparar_fragmentacion.py                        # todas las configuraciones
     python scripts/comparar_fragmentacion.py --configs seccion,parrafos-350
     python scripts/comparar_fragmentacion.py --rutas densa,bm25,rrf,rerank   # reranker: GPU, Ollama cerrado
+    python scripts/comparar_fragmentacion.py --rutas rrf-huv,rerank-densa,rerank-huv
+        # -huv: BM25 solo sobre el manual del HUV; rerank-densa: reordena la densa
     python scripts/comparar_fragmentacion.py --limite 150           # prueba rápida con pocas secciones
     ENCODER=falso python scripts/comparar_fragmentacion.py ...      # valida la tubería sin bge-m3
 
@@ -131,25 +133,40 @@ def rrf(listas: list[list[int]], k: int = config.RRF_K) -> list[int]:
     return sorted(puntaje, key=puntaje.get, reverse=True)
 
 
+# Rutas con reranker → ranking del que salen sus candidatos. "rerank" sobre
+# rrf pierde el ATLS: BM25 no encuentra nada en inglés y RRF baja lo que trae
+# la densa (corrida del 08/10). "-huv": BM25 solo sobre el manual del HUV.
+BASE_RERANK = {"rerank": "rrf", "rerank-densa": "densa", "rerank-huv": "rrf-huv"}
+RUTAS = ["densa", "bm25", "rrf", "bm25-huv", "rrf-huv", *BASE_RERANK]
+
+
+def es_huv(frag: dict) -> bool:
+    return frag["seccion_id"].startswith("HUV-")
+
+
 def rankings(texto: str, qv: np.ndarray, frags: list[dict], matriz: np.ndarray, bm25,
              rutas: list[str]) -> tuple[dict[str, list[int]], dict[str, float]]:
     """Índices de fragmentos ordenados por cada ruta, y el puntaje del primero
-    (coseno en densa, probabilidad en rerank): sirve para la abstención."""
+    (coseno en densa, probabilidad en las rutas rerank): sirve para la abstención."""
     cos = matriz @ qv
     densa = list(np.argsort(-cos)[:PROFUNDIDAD])
     salida = {"densa": densa}
     tope = {"densa": float(cos[densa[0]])}
-    if {"bm25", "rrf", "rerank"} & set(rutas):
+    pedidas = set(rutas) | {BASE_RERANK[r] for r in rutas if r in BASE_RERANK}
+    if pedidas & {"bm25", "rrf", "bm25-huv", "rrf-huv"}:
         s = bm25.get_scores(tokenizar(texto))
-        salida["bm25"] = [int(i) for i in np.argsort(-s)[:PROFUNDIDAD] if s[i] > 0]
+        orden_bm25 = [int(i) for i in np.argsort(-s) if s[i] > 0]
+        salida["bm25"] = orden_bm25[:PROFUNDIDAD]
         salida["rrf"] = rrf([densa, salida["bm25"]])[:PROFUNDIDAD]
-    if "rerank" in rutas:
+        salida["bm25-huv"] = [i for i in orden_bm25 if es_huv(frags[i])][:PROFUNDIDAD]
+        salida["rrf-huv"] = rrf([densa, salida["bm25-huv"]])[:PROFUNDIDAD]
+    for ruta in BASE_RERANK.keys() & set(rutas):
         from rag.retrieve import _probabilidades
-        cand = salida["rrf"][:config.PROFUNDIDAD_RERANK]
+        base = salida[BASE_RERANK[ruta]]
+        cand = base[:config.PROFUNDIDAD_RERANK]
         p = _probabilidades([(texto, frags[i]["texto"]) for i in cand])
-        orden = [cand[j] for j in np.argsort(-p)]
-        salida["rerank"] = orden + salida["rrf"][config.PROFUNDIDAD_RERANK:]
-        tope["rerank"] = float(p.max())
+        salida[ruta] = [cand[j] for j in np.argsort(-p)] + base[config.PROFUNDIDAD_RERANK:]
+        tope[ruta] = float(p.max())
     return {r: salida[r] for r in rutas}, tope
 
 
@@ -220,6 +237,8 @@ def main() -> None:
     for c in consultas:
         c["relevantes"] = {s: g for s, g in c["relevantes"].items() if s in ids}
     rutas = args.rutas.split(",")
+    if desconocidas := [r for r in rutas if r not in RUTAS]:
+        ap.error(f"rutas desconocidas {desconocidas}; válidas: {','.join(RUTAS)}")
     print(f"{len(secciones)} secciones · {len(consultas)} consultas · rutas {rutas}")
 
     contar = fr.contador_bge()
@@ -269,11 +288,11 @@ def resumen(df: pd.DataFrame) -> None:
     if len(neg):
         print("\n--- puntaje del mejor fragmento: trauma vs fuera de dominio (para UMBRAL_GUIAS) ---")
         dentro = df[(df["conjunto"] == "anotado") & (df["categoria"] != "fuera_de_dominio")]
-        for ruta in sorted(set(neg["ruta"]) & {"densa", "rerank"}):
+        for ruta in sorted(set(neg["ruta"]) & {"densa", *BASE_RERANK}):
             for nombre in sorted(set(neg["config"])):
                 a = dentro[(dentro["ruta"] == ruta) & (dentro["config"] == nombre)]["puntaje_top"]
                 b = neg[(neg["ruta"] == ruta) & (neg["config"] == nombre)]["puntaje_top"]
-                print(f"  {ruta:6s} {nombre:24s} trauma mín {a.min():.3f} · fuera de dominio máx {b.max():.3f}")
+                print(f"  {ruta:12s} {nombre:24s} trauma mín {a.min():.3f} · fuera de dominio máx {b.max():.3f}")
 
 
 if __name__ == "__main__":

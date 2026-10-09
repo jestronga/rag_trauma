@@ -136,11 +136,100 @@ Pasos para la 1650: `CONTEXTO_SESION.md`, sección 00.
   correrse y la anotación queda desalineada. El script avisa si falta un ID
   anotado, pero no si apunta a otra sección.
 
-**Falta (en la GTX 1650):**
-1. `python scripts\generar_preguntas_guias.py` (Ollama abierto).
-2. Cerrar Ollama y correr `python scripts\comparar_fragmentacion.py --rutas
-   densa,bm25,rrf,rerank`. En el PC sin GPU, bge-m3 tarda decenas de
-   minutos por configuración: no es viable allí.
+**Corrida 1 (07–08/10).** 89 preguntas sintéticas generadas. densa, bm25
+y rrf en la GTX 1650 → `reports/comparar_fragmentacion.csv`. rerank en
+**Kaggle** (T4) → `reports/comparar_fragmentacion_rerank.csv`. En la 1650
+el reranker llevaba 3 h sin terminar la primera configuración (más de 20 h
+en total) y se cortó. Notebook: `scripts/kaggle_chunking_rerank.ipynb`;
+dataset privado `kaggle-rerank` con el código, `secciones.jsonl` y
+`guias/cache/`, nunca índices ni casos. El zip se arma con `tar.exe -a`:
+`Compress-Archive` escribe `\` en las rutas y Kaggle lo rechaza.
+
+R@ppto, sin las consultas fuera de dominio (anotado: 41 consultas;
+sintético: 89):
+
+| Configuración | densa anot. | rerank anot. | rrf anot. | bm25 anot. | densa sint. | rerank sint. |
+|---|---|---|---|---|---|---|
+| fijo-256 | **0,401** | 0,348 | 0,297 | 0,266 | 0,787 | 0,809 |
+| semantico | 0,380 | **0,358** | 0,304 | 0,261 | **0,809** | 0,764 |
+| parrafos-350-sin-ruta | 0,380 | 0,306 | 0,281 | 0,232 | 0,787 | 0,787 |
+| fijo-512 | 0,349 | 0,299 | 0,272 | 0,261 | 0,730 | 0,730 |
+| seccion | 0,347 | 0,299 | 0,279 | 0,244 | 0,753 | 0,764 |
+| parrafos-350 | 0,337 | 0,335 | 0,277 | 0,249 | 0,764 | 0,775 |
+| oraciones-128 | 0,302 | 0,322 | 0,293 | 0,217 | 0,787 | **0,831** |
+
+Conclusiones:
+- **La densa es la mejor ruta en el conjunto anotado.** BM25 casi no
+  encuentra nada en el ATLS (R@ppto_ATLS ≈ 0,04: consultas en español,
+  texto en inglés), y RRF sobre los dos libros baja el ATLS a ~0,07.
+- **El rerank queda limitado por sus candidatos.** Reordena los 30
+  primeros de RRF, que casi no traen secciones del ATLS: en el ATLS cae a
+  ~0,17 (densa ~0,31), pero en el HUV es lo mejor (0,69 en `semantico`,
+  frente a 0,57 de la densa). Confirma la decisión de la fase 4: BM25 solo
+  sobre el HUV.
+- **Para la abstención sirve el rerank, no el coseno.** Con la densa, las
+  consultas fuera de dominio llegan a 0,589 y la de trauma más baja está en
+  0,48–0,51: se pisan. Con el rerank, ninguna fuera de dominio pasa de 0,31
+  y la mediana de trauma es ~0,70. Pero 12 de 41 consultas de trauma
+  (coloquiales, abreviaturas, ortografía) también quedan bajo 0,31, y además
+  se recuperan mal. Con la decisión 3 los libros se abstienen y responden
+  los casos.
+- **Configuración candidata: `fijo-256`**, primera o segunda en casi todas
+  las combinaciones y la más simple. Las diferencias con `semantico` están
+  dentro del ruido: con 41 consultas, una sola mueve unos 2,4 puntos.
+  `oraciones-128` queda última con la densa en el anotado. Sacar la ruta de
+  títulos no empeora (parrafos-350-sin-ruta 0,380 contra 0,337).
+- Categorías débiles en todas las configuraciones: "fina" (≈0,05–0,18),
+  "ortográfica" (≈0,1) y "vocabulario". Procedimiento va bien (0,54–0,71).
+
+**Corrida 2 (08/10, Kaggle T4)** → `reports/comparar_fragmentacion_rerank2.csv`.
+Rutas nuevas en `comparar_fragmentacion.py`: `rrf-huv` (densa + BM25 solo
+sobre el HUV), `rerank-densa` (el reranker reordena los 30 primeros de la
+densa) y `rerank-huv` (reordena `rrf-huv`), con `fijo-256` y `semantico`. La
+`densa` repetida da exactamente lo mismo que en la corrida 1, así que las dos
+corridas se pueden comparar. El notebook trae su propia copia del script
+(`%%writefile`) y comprueba la salida antes de descargarla.
+
+| Ruta | fijo-256 anot. | semantico anot. | fijo-256 sint. | semantico sint. |
+|---|---|---|---|---|
+| **densa** | **0,401** | **0,380** | 0,787 | 0,809 |
+| **rerank-densa** | 0,374 | 0,371 | **0,876** | **0,888** |
+| rerank (sobre rrf) | 0,348 | 0,358 | 0,809 | 0,764 |
+| rerank-huv | 0,334 | 0,333 | 0,809 | 0,764 |
+| rrf | 0,297 | 0,304 | 0,494 | 0,506 |
+| rrf-huv | 0,254 | 0,255 | 0,461 | 0,472 |
+
+- **rerank-densa gana claramente en las sintéticas** (en el ATLS sube de 0,74
+  a 0,84). Darle al reranker los candidatos de la densa resolvió el
+  problema del ATLS.
+- **En las anotadas no supera a la densa.** Con fijo-256, consulta por
+  consulta, mejora 6 y empeora 10; con semantico, 7 y 7. Está dentro del
+  ruido. Explicación probable: las sintéticas las escribió el modelo leyendo
+  la sección y comparten su vocabulario, lo que favorece al reranker. Las
+  anotadas tienen consultas coloquiales, abreviaturas y errores de
+  ortografía, más parecidas al uso real (en "ortográfica", rerank-densa da
+  0,00).
+- **BM25 solo sobre el HUV no sirve en una lista fusionada:** con `rrf-huv`,
+  R@ppto_ATLS cae a 0,014. Los fragmentos del HUV suben porque los traen las
+  dos listas, y llenan el presupuesto. Si se quiere BM25 para el HUV, cada
+  libro necesita su propio espacio en el prompt. **Descartadas `rrf-huv` y
+  `rerank-huv`.**
+- **Abstención:** rerank-densa con fijo-256 es la que mejor separa: ninguna
+  consulta fuera de dominio pasa de **0,173** (0,31 con el rerank sobre rrf;
+  0,589 con el coseno). Aun así, 10 de 41 consultas de trauma quedan por
+  debajo: las coloquiales y con errores.
+
+**Decisión de la fase 2 (08/10, provisional hasta validar las anotaciones):**
+- **Configuración: `fijo-256`**, la más estable en las dos corridas.
+- **Ruta:** `densa` en la GTX 1650, porque el reranker no cabe junto al
+  generador. `rerank-densa` en el PC de 8 GB, sobre todo como **guarda de
+  abstención de los libros** (umbral de partida ~0,2, a calibrar). Si
+  también ordena, se decide con las anotaciones validadas.
+- Sin BM25 en los libros por ahora.
+
+**Falta de la fase 2:** validar las 51 consultas anotadas (usuario o
+médico). Si cambian, repetir la densa tarda segundos con la caché;
+rerank-densa se repite en Kaggle (`scripts/kaggle_chunking_rerank.ipynb`).
 
 Diseño original:
 - Por sección, sin cruzar capítulos. De 250 a 450 tokens de bge-m3, con un
@@ -164,9 +253,10 @@ Diseño original:
   para encender o apagar todo (ablación y demo).
 
 ### Fase 4 — Recuperación y evaluación
-- `retrieve.buscar_guias(consulta, k)`: densa sobre las dos, BM25 solo sobre
-  el manual del HUV (decisión 2a), fusión RRF; reranker cuando haya ≥ 7 GB.
-  Umbral propio de relevancia: un fragmento flojo no entra.
+- `retrieve.buscar_guias(consulta, k)`: **densa sobre los dos libros**
+  (fase 2: BM25 en una lista fusionada saca al ATLS del presupuesto). Con ≥ 7
+  GB, el reranker sobre los 30 primeros de la densa (`rerank-densa`). Umbral
+  propio de relevancia: un fragmento flojo no entra.
 - Abstención: `UMBRAL_GUIAS` para los libros, al lado de `UMBRAL_ABSTENCION`
   y `UMBRAL_RERANK` para los casos (decisión 3).
 - Evaluación: agregar a `eval/consultas.yaml` el capítulo esperado de cada
