@@ -1,9 +1,10 @@
 # Contexto de trabajo — rag_trauma
 
 Resumen para retomar el trabajo. Última sesión: **17 de octubre de 2026**, en
-el **PC de 8 GB** (RTX 4060), preparado desde un clon limpio. **Empezar por la
-sección 00** (libros de trauma: la próxima sesión arranca la fase 6), después
-0, 1, 5 y 6.
+el **PC de 8 GB** (RTX 4060), preparado desde un clon limpio. **Desde el 17/10
+solo se mide en la RTX 4060** (decisión del usuario): la GTX 1650 ya no es
+objetivo. **Empezar por la sección 00** (libros de trauma: fases 3 a 6 hechas;
+sigue decidir `PROSA_SIEMPRE` y la revisión médica, fase 7), después 0, 1, 5 y 6.
 
 ---
 
@@ -20,9 +21,9 @@ anotadas, 0,787 en las sintéticas).
 los casos) hasta `PRESUPUESTO_GUIAS` (1.400 tokens), o nada si el mejor
 fragmento no pasa la guarda. En el PC de 8 GB, `rerank` con `UMBRAL_GUIAS`
 0,2: ninguna fuera de dominio pasa, las 16 de procedimiento responden y 11 de
-25 de trauma se quedan sin libros (les responden los casos). En la 1650,
-`densa` con `UMBRAL_GUIAS_COSENO` 0,60, que deja sin libros a 16 de 25.
-Calibración: `scripts/calibrar_guias.py`; las dos guardas juntas:
+25 de trauma se quedan sin libros (les responden los casos). Sin el reranker
+en GPU, `densa` con `UMBRAL_GUIAS_COSENO` 0,60 (respaldo; deja sin libros a
+16 de 25). Calibración: `scripts/calibrar_guias.py`; las dos guardas juntas:
 `calibrar_umbral.py`.
 
 **Decisión abierta para el usuario o el médico: ¿cuota por libro?** Con el
@@ -48,18 +49,32 @@ manuales (juzgaba la atención y nunca pasaba); lo dice el código, en general:
 `True` desde la demo). Con los libros, la prosa sin verificar puede citar la
 sección equivocada o agregar detalles clínicos.
 
-**Próxima sesión: fase 6** (la app):
-- Expander "Fragmentos de los manuales consultados", con libro, capítulo,
-  sección, página y el texto (el ATLS en inglés, tal cual). Hoy la respuesta
-  ya trae `[guía: ID]` pero la app no muestra los fragmentos.
-- El aviso fijo y la barra lateral nombran las dos fuentes; un control para
-  `GUIAS` (ablación en vivo).
-- `preparar_modelos` (app) y `preparar_demo.py`: calentar también la
-  búsqueda en los libros; `SISTEMA_PROSA_GUIAS` en el calentamiento de Ollama.
-- Medir en la GTX 1650: VRAM con `NUM_CTX=6144`.
-- Validar las 51 consultas anotadas puede ir en paralelo. Si cambian,
-  repetir `calibrar_guias.py` (segundos) y, si cambia la fragmentación,
-  `FRAGMENTACION_GUIAS` y reindexar (~20 s).
+**Fase 6 hecha el 17/10** (`PLAN_INDEXAR_LIBROS.md`, fase 6): la app tiene
+el apartado "Fragmentos de los manuales" (cada pasaje con libro, capítulo,
+sección, página y texto; el ATLS en inglés), el interruptor "Manuales de
+trauma" en la barra lateral, los textos con las dos fuentes y **la nota de
+verificación arriba de la respuesta** (pendiente 13), que dice qué parte va
+armada desde las fuentes y por qué. `preparar_demo.py` revisa los manuales y
+pasa 6 consultas (la nueva, `6 · Solo manuales`, es `proc-09` de
+`consultas_guias.yaml`); el 17/10 terminó en "Todo listo". Guion de la demo
+en `SETUP.md` §6, al día (sin botones, PC de 8 GB, dos fuentes).
+
+**Lo que sigue con los libros:**
+1. **Decidir `PROSA_SIEMPRE`** (arriba).
+2. **Fase 7, revisión médica:** planilla con la prosa nueva y la pregunta "¿la
+   guía citada corresponde a la situación?"; mirar las oraciones del ATLS
+   (solo se verifican cita y cifras) y la decisión abierta de la cuota por
+   libro.
+3. Validar las 51 consultas anotadas (usuario o médico). Si cambian, repetir
+   `calibrar_guias.py` (segundos) y, si cambia la fragmentación,
+   `FRAGMENTACION_GUIAS` y reindexar (~20 s).
+4. Revisar a mano `guias/muestra_revision.md` (fase 1). Visto el 17/10: un
+   "Recuadro: Foto. Herida por arma de fuego…" del HUV (cap. 23) entra como
+   pasaje; es un pie de foto que la extracción no quitó.
+5. Ideas medibles: expandir abreviaturas de la consulta solo para los libros
+   (11 de 25 de trauma quedan sin libros, casi todas por abreviaturas u
+   ortografía); "ocluar"/"ocluye" y "quinto"/"5to" rechazan oraciones del
+   HUV por la forma de la palabra.
 
 En la reunión de la semana del 30/09 pidieron no indexar solo casos (sesgo):
 se agregan dos libros como segunda fuente, **con el mismo peso que los casos**
@@ -535,7 +550,7 @@ la demo, **solo prosa y debajo los casos consultados**.
 
 ## 3. Equipos
 
-- **GTX 1650 (demo):** Windows 11, 16 GB de RAM, 4 GB de VRAM. Ollama 0.34.4
+- **GTX 1650 (demo del 28/09; desde el 17/10 ya no se mide en ella):** Windows 11, 16 GB de RAM, 4 GB de VRAM. Ollama 0.34.4
   con `qwen3:4b-instruct` (también está `qwen3:4b`, la variante Thinking, que
   no sirve). Con salida estructurada ~16 s; con la prosa, ~20 s estimados.
   Ruta `rrf` (el reranker no cabe).
@@ -586,7 +601,7 @@ la demo, **solo prosa y debajo los casos consultados**.
 ## 5. Pendientes, por prioridad
 
 **Nuevo desde el 07/10, antes que todo lo demás:** libros de trauma, sección 00
-y `PLAN_INDEXAR_LIBROS.md` (fases 1 a 5 hechas; sigue la fase 6, después la 7).
+y `PLAN_INDEXAR_LIBROS.md` (fases 1 a 6 hechas; sigue la 7, revisión médica).
 
 **`CONSULTAS_DEMO.md` y `PREGUNTAS_DEMO.md` nunca entraron a git** (el commit
 `45662e9` llevó `app.py`, `config.py` y `generate.py`, no esos dos): solo
@@ -656,12 +671,12 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
 11. ~~Restos de truncados en `consultas.yaml` y en el guion de `SETUP.md`~~
     Hecho el 28/09 (sección 2.11).
 12. **Después de la demo (sección 2.12):** notas de `PREGUNTAS_DEMO.md` →
-    pendientes; decidir `PROSA_SIEMPRE`; actualizar el guion de `SETUP.md` §6
-    (ya no hay botones); correr los 93 tests y abrir la app para confirmar los
-    cambios de interfaz; commit.
-13. **Motivo visible si vuelve la versión determinista:** con
-    `PROSA_SIEMPRE=0`, el aviso de por qué no pasó la prosa es un caption gris
-    al pie que nadie ve. Si se vuelve a usar, mostrarlo arriba de la respuesta.
+    pendientes; decidir `PROSA_SIEMPRE`. ~~Actualizar el guion de `SETUP.md`
+    §6; correr los tests y abrir la app~~ hecho el 17/10 (fase 6 de los libros:
+    220 tests, app probada con `AppTest`, `preparar_demo.py` en "Todo listo").
+13. ~~**Motivo visible si vuelve la versión determinista**~~ hecho el 17/10:
+    con `PROSA_SIEMPRE=0`, una nota arriba de la respuesta dice qué parte va
+    armada desde las fuentes y por qué (`app.nota_verificacion`).
 
 ---
 
@@ -729,4 +744,4 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
 | `RUTA_GUIAS` | `auto` | libros: `rerank` con ≥ 7 GB de VRAM, si no `densa` |
 | `PRESUPUESTO_GUIAS` | `1400` | tokens de fragmentos de los libros para el prompt |
 | `UMBRAL_GUIAS` | `0.2` | ruta `rerank`: prob. mínima del mejor fragmento (fuera de dominio máx. 0,173) |
-| `UMBRAL_GUIAS_COSENO` | `0.60` | ruta `densa` (1650): coseno mínimo del mejor fragmento; separa mal |
+| `UMBRAL_GUIAS_COSENO` | `0.60` | ruta `densa` (sin reranker en GPU): coseno mínimo del mejor fragmento; separa mal |

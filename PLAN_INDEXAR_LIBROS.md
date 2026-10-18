@@ -454,10 +454,8 @@ una tabla que no lo tiene, pega "independientemente del patrón de fractura"
 a otra oración, y dice "el ATLS recomienda" para datos descriptivos
 (epidemiología de caídas). **Para la revisión médica (fase 7).**
 
-**Pendiente de la fase 5:**
-- Medir en la GTX 1650: VRAM con `NUM_CTX=6144` (allá el 4B ocupaba 3,0 GB
-  de 4) y la guarda de coseno de los libros. Si no cabe, `NUM_CTX=5120` y
-  `PRESUPUESTO_GUIAS=1000`.
+**Pendiente de la fase 5** (desde el 17/10 solo se mide en la RTX 4060; la
+GTX 1650 ya no es objetivo):
 - **`PROSA_SIEMPRE` sigue en `True`** (demo del 28/09): muestra la prosa
   aunque no pase. Con los libros el riesgo crece (citas a la sección
   equivocada, detalles agregados). Decidirlo antes de usar la app con libros.
@@ -479,7 +477,37 @@ Plan original:
 - Respaldo determinista: si la prosa no pasa, se muestra lo de siempre más
   "Según las guías", con título y página de cada fragmento (sin parafrasear).
 
-### Fase 6 — Aplicación
+### Fase 6 — Aplicación (hecha el 17/10/2026)
+
+**Resultado** (`app.py`, probado con `streamlit.testing.v1.AppTest`: abre sin
+errores, responde con los dos apartados y, con el interruptor apagado, sin
+manuales ni citas `[guía]`):
+- **"Fragmentos de los manuales (n) · texto completo"**, bajo "Casos
+  consultados": una tarjeta por pasaje (sección) con libro, capítulo,
+  títulos, páginas impresas, relevancia del reranker, marca "en inglés" para
+  el ATLS y el texto tal cual (`texto_guia`), con lo que coincide con la
+  consulta resaltado.
+- **Interruptor "Manuales de trauma (ATLS y HUV)"** en la barra lateral
+  (`responder(..., guias=)`): ablación en vivo; deshabilitado si la colección
+  no está indexada.
+- **Las dos fuentes en los textos**: lema de la cabecera, tarjetas de
+  bienvenida, "Alcance" de la barra lateral (que pueden no coincidir y el
+  sistema no elige) y el aviso bajo cada respuesta (lo del ATLS va resumido
+  en español; el original, en el apartado).
+- **Nota de verificación arriba de la respuesta** (pendiente 13 de
+  `CONTEXTO_SESION.md`): con `PROSA_SIEMPRE=0`, dice qué parte (casos,
+  manuales) va armada desde las fuentes y el primer motivo.
+- `preparar_modelos` calienta también la búsqueda en los manuales y carga el
+  modelo con `SISTEMA_PROSA_GUIAS` y la ventana `NUM_CTX` de una vez.
+- **`preparar_demo.py`**: revisa la configuración de los manuales y pasa 6
+  consultas (`boton` en `consultas.yaml` y en `consultas_guias.yaml`; la
+  nueva, `6 · Solo manuales`, es `proc-09`), con qué fuentes respondieron y
+  qué quedó en prosa. 17/10 en la RTX 4060: "Todo listo"; 6-10 s por
+  consulta (la primera, 35 s, carga los modelos).
+- Guion de la demo (`SETUP.md` §6) al día: sin botones, PC de 8 GB, dos
+  fuentes, el paso "Solo los manuales".
+
+Plan original:
 - Expander "Fragmentos de guía consultados", con libro, capítulo, página y
   texto.
 - El aviso fijo nombra las fuentes: ATLS 11.ª ed. y el manual del HUV.
