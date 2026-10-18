@@ -244,13 +244,46 @@ Diseño original:
 - **Verificación:** distribución de tamaños, 0 fragmentos > 512 tokens, cada
   página con texto cubierta.
 
-### Fase 3 — Indexación
-- Colección `guias` en el mismo Qdrant local (un solo cliente; ver trampa
-  de Qdrant en `CONTEXTO_SESION.md` §6) y `indices/bm25_guias.pkl`.
-- `python -m rag.index --fuente guias` (los casos no se reindexan).
-  `meta.json` registra las dos fuentes.
-- Config: `GUIAS_JSONL`, `COLECCION_GUIAS`, `TOP_K_GUIAS` (2–3), `GUIAS=1`
-  para encender o apagar todo (ablación y demo).
+### Fase 3 — Indexación (hecha el 17/10/2026, en el PC de 8 GB)
+
+**Resultado:** `python -m rag.index --fuente guias` → colección `guias` en
+el mismo Qdrant local, con **2.272 fragmentos `fijo-256`** (ATLS 1.632, HUV
+640; 562 de tablas), mediana de 214 y 168 tokens, máximo 256. Todas las
+secciones tienen al menos un fragmento. Embeber tarda 17 s en la RTX 4060.
+
+Cómo quedó (`rag/index.py`):
+- **Cada fuente reemplaza solo su colección** (`delete_collection`). Antes
+  `construir_denso` borraba la carpeta entera de Qdrant: reindexar los casos
+  habría borrado los libros.
+- `--fuente casos | guias | todas`. Por defecto `casos`, como antes. Sin
+  BM25 para los libros (fase 2), así que `--solo` es solo para los casos.
+- Payload de cada fragmento: `record_id` (ID del fragmento,
+  `ATLS-07-019-02`) y `text` (lo que se embebe, con la ruta de títulos),
+  como en los casos, más `seccion_id`, `fuente`, `libro`, `capitulo`,
+  `titulos`, `pagina_ini`/`pagina_fin` (páginas impresas, para citar),
+  `tipo` (texto | tabla), `texto_contexto`, `n_tokens` e `idioma`.
+  **`clinico` se guarda para que la fase 4 decida con mediciones** si se
+  filtran los capítulos no clínicos (111 secciones; están indexadas).
+- La indexación **falla** si algún fragmento pasa de 510 tokens: el
+  encoder lo truncaría sin avisar.
+- `meta.json` tiene una entrada por fuente (`fuentes.casos`,
+  `fuentes.guias`) y migra el formato anterior.
+- Config: `COLECCION_GUIAS` (`guias`) y `FRAGMENTACION_GUIAS` (`fijo-256`).
+  La ruta de las secciones es el `GUIAS_SECCIONES` que ya existía (el
+  `GUIAS_JSONL` del plan). **`TOP_K_GUIAS` y `GUIAS` entran en la fase 4**,
+  con el código que los lee (no repetir lo de `RERANKER=1`, documentado sin
+  que nada lo leyera).
+- Tests: `tests/test_index.py` (6): reindexar una fuente no borra la otra,
+  payload con la cita, el límite de tokens y `meta.json`.
+
+**Verificado:**
+- Extracción idéntica a la de los otros PC (`926 1937563090e0`).
+- `comparar_fragmentacion.py --configs fijo-256 --rutas densa,rerank-densa`
+  reproduce **exactamente** la fase 2: 0,401 y 0,374 (anotadas), 0,787 y
+  0,876 (sintéticas), máximo fuera de dominio 0,173 con el reranker.
+- **Leyendo de Qdrant**, con la consulta embebida como en el chatbot (CPU,
+  bf16): R@ppto densa 0,406 en las anotadas y 0,787 en las sintéticas.
+  `trauma` sigue con 8.198 puntos.
 
 ### Fase 4 — Recuperación y evaluación
 - `retrieve.buscar_guias(consulta, k)`: **densa sobre los dos libros**

@@ -1,29 +1,32 @@
 # Contexto de trabajo — rag_trauma
 
-Resumen para retomar el trabajo. Última sesión: **8 de octubre de 2026**, en la
-GTX 1650 (con el reranker en Kaggle). **Empezar por la sección 00** (libros de
-trauma: la próxima sesión arranca la fase 3), después 0, 1, 5 y 6.
+Resumen para retomar el trabajo. Última sesión: **17 de octubre de 2026**, en
+el **PC de 8 GB** (RTX 4060), preparado desde un clon limpio. **Empezar por la
+sección 00** (libros de trauma: la próxima sesión arranca la fase 4), después
+0, 1, 5 y 6.
 
 ---
 
 ## 00. Libros de trauma (desde el 07/10)
 
-**Próxima sesión: implementar los libros en el RAG (fases 3 a 6 de
-`PLAN_INDEXAR_LIBROS.md`), empezando por la fase 3.** Con lo decidido en la
-fase 2:
-- **Fragmentación `fijo-256`** (`rag/fragmentar.py`), con la ruta de
-  títulos al inicio de cada fragmento.
-- **Fase 3:** colección `guias` en el mismo Qdrant local, `python -m
-  rag.index --fuente guias` (sin reindexar los casos), `meta.json` con las
-  dos fuentes; config `GUIAS_JSONL`, `COLECCION_GUIAS`, `TOP_K_GUIAS`, `GUIAS=1`.
-  **Sin BM25 para los libros.**
-- **Fase 4:** `retrieve.buscar_guias` con **densa**. En el PC de 8 GB,
-  reranker sobre los 30 primeros de la densa (`rerank-densa`) como guarda
-  `UMBRAL_GUIAS` (~0,2 de partida). En la 1650 la guarda tiene que salir del
-  coseno, que separa mal: calibrar con `calibrar_umbral.py` y las 10
-  consultas fuera de dominio.
+**Fase 3 hecha el 17/10** (`PLAN_INDEXAR_LIBROS.md`, fase 3): colección
+`guias` en el mismo Qdrant, 2.272 fragmentos `fijo-256`, con
+`python -m rag.index --fuente guias`. Reindexar una fuente ya no borra la
+otra. Leyendo de Qdrant reproduce la fase 2 (R@ppto densa 0,406 en las
+anotadas, 0,787 en las sintéticas).
+
+**Próxima sesión: fase 4** (y después 5 y 6). Con lo decidido en la fase 2:
+- **Fase 4:** `retrieve.buscar_guias` con **densa** sobre la colección
+  `guias`. En el PC de 8 GB, reranker sobre los 30 primeros de la densa
+  (`rerank-densa`) como guarda `UMBRAL_GUIAS` (~0,2 de partida; ninguna
+  consulta fuera de dominio pasa de 0,173). En la 1650 la guarda tiene que
+  salir del coseno, que separa mal (trauma mín. 0,506, fuera de dominio
+  máx. 0,589): calibrar con `calibrar_umbral.py` y las 10 consultas fuera de
+  dominio. Config nueva junto con el código que la lee: `TOP_K_GUIAS`,
+  `GUIAS=1`, `UMBRAL_GUIAS`. Decidir con mediciones si se filtran los
+  capítulos no clínicos (`clinico` está en el payload).
 - Validar las 51 consultas anotadas puede ir en paralelo. Si cambian el
-  ganador, solo cambia el nombre de la configuración.
+  ganador, solo cambia `FRAGMENTACION_GUIAS` y se reindexa (~20 s).
 
 En la reunión de la semana del 30/09 pidieron no indexar solo casos (sesgo):
 se agregan dos libros como segunda fuente, **con el mismo peso que los casos**
@@ -80,8 +83,13 @@ el 08/10; sirven para el PC de 8 GB):
    cd rag_pipeline
    ..\.venv\Scripts\python.exe -m pip install "pymupdf==1.28.2"
    ..\.venv\Scripts\python.exe scripts\extraer_guias.py
-   ..\.venv\Scripts\python.exe -m pytest tests/ -q        # deben pasar los 168
+   ..\.venv\Scripts\python.exe -m pytest tests/ -q        # 174 desde el 17/10 (ver nota)
    ```
+   **Nota:** con `PROSA_SIEMPRE=True` (cambio de la demo, sección 2.12)
+   falla `test_responder_vuelve_a_la_version_determinista`; con
+   `$env:PROSA_SIEMPRE = "0"` pasan todos. Se arregla al decidir
+   `PROSA_SIEMPRE` (pendiente 12).
+   Después de extraer: `..\.venv\Scripts\python.exe -m rag.index --fuente guias`.
    **Versión exacta de PyMuPDF a propósito:** otra versión podría extraer
    distinto, los IDs de sección (`ATLS-07-019`) se correrían y
    `eval/consultas_guias.yaml` quedaría apuntando a otras secciones.
@@ -121,10 +129,10 @@ con `[caso: ID]`; el origen se revisa en "Casos consultados" de la app.
 
 **Estado del código:** lo del 26/09 está en `a9f9f1c` y lo del 27–28/09
 (secciones 2.8–2.11) en `dfbc688`; los dos están en `origin/main`. `71214d9`
-(contexto) es local, sin push. **Los cambios del día de la demo (sección 2.12)
-no están commiteados**: `app.py`, `.streamlit/config.toml`, `rag/config.py`,
-`rag/generate.py`, y los nuevos `CONSULTAS_DEMO.md` y `PREGUNTAS_DEMO.md`. No
-agregar a git la captura de pantalla ni `desktop.ini`.
+(contexto) también está en `origin/main`. Los cambios del día de la demo
+(sección 2.12) entraron en `45662e9`, **salvo `CONSULTAS_DEMO.md` y
+`PREGUNTAS_DEMO.md`**, que siguen solo en la GTX 1650. No agregar a git la
+captura de pantalla ni `desktop.ini`.
 
 **Lo primero después de la demo:**
 1. **Pasar a limpio las notas de `PREGUNTAS_DEMO.md`** (respuestas, consultas que
@@ -500,7 +508,16 @@ la demo, **solo prosa y debajo los casos consultados**.
   Ruta `rrf` (el reranker no cabe).
 - **PC sin GPU** (Intel UHD, 7,7 GB de RAM): donde se trabajó el 27–28/09. Todo
   corre en CPU (~2 min por respuesta); sus tiempos no representan a los otros.
-- **PC de 8 GB de VRAM:** destino final, con reranker en GPU.
+- **PC de 8 GB de VRAM (RTX 4060, 16 GB de RAM):** destino final, con
+  reranker en GPU. Preparado el 17/10 desde un clon limpio: `.venv` con
+  **Python 3.12** (no el 3.13 de la Store), torch 2.14.1+cu126, Ollama 0.40.6
+  con `qwen3:4b-instruct`. Dependencias más nuevas que en los otros PC
+  (transformers 5.20, pandas 3.0, qdrant-client 1.19) y pasan todos los tests.
+  Medido: casos indexados en 53 s y libros en 17 s; reranker 0,56 s de mediana
+  (`calibrar_umbral.py`, `cuda`, mismos números que el 27/09); **una respuesta
+  con prosa, ~5 s** con todo cargado (3 de 3 verificadas); generador 100 % en
+  VRAM (3,0 GB) con el reranker cargado. La primera consulta de un proceso
+  tarda ~45 s por la carga de bge-m3 y del reranker (la app los precarga).
 
 ---
 
@@ -536,7 +553,11 @@ la demo, **solo prosa y debajo los casos consultados**.
 ## 5. Pendientes, por prioridad
 
 **Nuevo desde el 07/10, antes que todo lo demás:** libros de trauma, sección 00
-y `PLAN_INDEXAR_LIBROS.md` (fases 1 y 2 hechas; sigue la fase 3, después 4 a 7).
+y `PLAN_INDEXAR_LIBROS.md` (fases 1 a 3 hechas; sigue la fase 4, después 5 a 7).
+
+**`CONSULTAS_DEMO.md` y `PREGUNTAS_DEMO.md` nunca entraron a git** (el commit
+`45662e9` llevó `app.py`, `config.py` y `generate.py`, no esos dos): solo
+existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
 
 0. **Sacar la PHI de git** (sección 0), cuando el usuario lo decida:
    revisar si el repositorio es o fue público; `git rm --cached` de los
@@ -569,9 +590,9 @@ y `PLAN_INDEXAR_LIBROS.md` (fases 1 y 2 hechas; sigue la fase 3, después 4 a 7)
    modelo y cambia términos: "neumoconiótico" por "neumógeno", y el 26/09
    "empema" por "Empiema". Hacerlo determinista, como el resto.
 5. ~~Recalibrar `UMBRAL_ABSTENCION`~~ **Hecho el 27/09 con el reranker**
-   (sección 2.8). Falta **medirlo en el PC de 8 GB**: `python
-   scripts\calibrar_umbral.py` debe decir `cuda` y < 1 s por consulta, y
-   `ollama ps` seguir en `100% GPU` con el reranker cargado.
+   (sección 2.8). **Medido en el PC de 8 GB el 17/10:** `cuda`, 0,56 s de
+   mediana, y el generador sigue 100 % en VRAM con el reranker cargado
+   (sección 3).
 6. **Errores del pipeline de anonimización** encontrados al revisar
    respuestas:
    - el clasificador de mecanismo pone el caso 24012 ("me pegaron un
@@ -588,8 +609,9 @@ y `PLAN_INDEXAR_LIBROS.md` (fases 1 y 2 hechas; sigue la fase 3, después 4 a 7)
    `anonimizacion/src/enrich.py`.
 8. **Latencia con la prosa:** ~150 tokens de salida (mediana 145) además de
    leer el prompt (~1.700 tokens). En la GTX 1650 serían ~16 s + ~3–4 s. El
-   "prompt corto" ya no sirve: la prosa necesita el texto de los casos. Medir
-   en el PC de 8 GB con `comparar_modelos.py --modos prosa`.
+   "prompt corto" ya no sirve: la prosa necesita el texto de los casos.
+   **En el PC de 8 GB, ~5 s por respuesta** con todo cargado (17/10, 3
+   consultas). Falta la corrida completa: `comparar_modelos.py --modos prosa`.
 9. **Medir otros modelos en el PC de 8 GB:** el script ya existe
    (`scripts/comparar_modelos.py`, secciones 2.9 y 2.10): `python scripts\comparar_modelos.py --modelos
    qwen3:4b-instruct,qwen3:8b --ruta rrf`. Con `--ruta rrf` los dos modelos
