@@ -2,7 +2,7 @@
 
 Resumen para retomar el trabajo. Última sesión: **17 de octubre de 2026**, en
 el **PC de 8 GB** (RTX 4060), preparado desde un clon limpio. **Empezar por la
-sección 00** (libros de trauma: la próxima sesión arranca la fase 4), después
+sección 00** (libros de trauma: la próxima sesión arranca la fase 5), después
 0, 1, 5 y 6.
 
 ---
@@ -15,18 +15,33 @@ sección 00** (libros de trauma: la próxima sesión arranca la fase 4), despué
 otra. Leyendo de Qdrant reproduce la fase 2 (R@ppto densa 0,406 en las
 anotadas, 0,787 en las sintéticas).
 
-**Próxima sesión: fase 4** (y después 5 y 6). Con lo decidido en la fase 2:
-- **Fase 4:** `retrieve.buscar_guias` con **densa** sobre la colección
-  `guias`. En el PC de 8 GB, reranker sobre los 30 primeros de la densa
-  (`rerank-densa`) como guarda `UMBRAL_GUIAS` (~0,2 de partida; ninguna
-  consulta fuera de dominio pasa de 0,173). En la 1650 la guarda tiene que
-  salir del coseno, que separa mal (trauma mín. 0,506, fuera de dominio
-  máx. 0,589): calibrar con `calibrar_umbral.py` y las 10 consultas fuera de
-  dominio. Config nueva junto con el código que la lee: `TOP_K_GUIAS`,
-  `GUIAS=1`, `UMBRAL_GUIAS`. Decidir con mediciones si se filtran los
-  capítulos no clínicos (`clinico` está en el payload).
-- Validar las 51 consultas anotadas puede ir en paralelo. Si cambian el
-  ganador, solo cambia `FRAGMENTACION_GUIAS` y se reindexa (~20 s).
+**Fase 4 hecha el 17/10** (`PLAN_INDEXAR_LIBROS.md`, fase 4):
+`retrieve.buscar_guias(consulta)` devuelve `FragmentoGuia` (tipo aparte de
+los casos) hasta `PRESUPUESTO_GUIAS` (1.400 tokens), o nada si el mejor
+fragmento no pasa la guarda. En el PC de 8 GB, `rerank` con `UMBRAL_GUIAS`
+0,2: ninguna fuera de dominio pasa, las 16 de procedimiento responden y 11 de
+25 de trauma se quedan sin libros (les responden los casos). En la 1650,
+`densa` con `UMBRAL_GUIAS_COSENO` 0,60, que deja sin libros a 16 de 25.
+Calibración: `scripts/calibrar_guias.py`; las dos guardas juntas:
+`calibrar_umbral.py`.
+
+**Decisión abierta para el usuario o el médico: ¿cuota por libro?** Con el
+reranker, el ATLS se lleva el 34 % de los fragmentos (la consulta en español
+prefiere el HUV). La mitad del presupuesto para cada libro sube el ATLS
+(0,203 → 0,318) y baja el HUV (0,572 → 0,494); el total no cambia más allá
+del ruido. Tabla en el plan, fase 4.
+
+**Próxima sesión: fase 5** (generación y verificación, y después la 6):
+- El prompt con dos bloques ("Casos similares" y "Fragmentos de los
+  manuales"); si solo pasó una fuente, solo esa, y la respuesta lo dice.
+- `GUIAS=1` para encender o apagar los libros, leído por `generate.responder`.
+- `NUM_CTX` a 4.096 (1.400 tokens de libros + casos + reglas): medir VRAM y
+  tiempo. ¿`TOP_K` de casos de 5 a 4?
+- `verificar.py`: citas `[guía: ID]`, números de la oración presentes en el
+  fragmento, no atribuir a un caso lo que dice la guía ni al revés.
+- Validar las 51 consultas anotadas puede ir en paralelo. Si cambian,
+  repetir `calibrar_guias.py` (segundos) y, si cambia la fragmentación,
+  `FRAGMENTACION_GUIAS` y reindexar (~20 s).
 
 En la reunión de la semana del 30/09 pidieron no indexar solo casos (sesgo):
 se agregan dos libros como segunda fuente, **con el mismo peso que los casos**
@@ -83,7 +98,7 @@ el 08/10; sirven para el PC de 8 GB):
    cd rag_pipeline
    ..\.venv\Scripts\python.exe -m pip install "pymupdf==1.28.2"
    ..\.venv\Scripts\python.exe scripts\extraer_guias.py
-   ..\.venv\Scripts\python.exe -m pytest tests/ -q        # 174 desde el 17/10 (ver nota)
+   ..\.venv\Scripts\python.exe -m pytest tests/ -q        # 189 desde el 17/10 (ver nota)
    ```
    **Nota:** con `PROSA_SIEMPRE=True` (cambio de la demo, sección 2.12)
    falla `test_responder_vuelve_a_la_version_determinista`; con
@@ -553,7 +568,7 @@ la demo, **solo prosa y debajo los casos consultados**.
 ## 5. Pendientes, por prioridad
 
 **Nuevo desde el 07/10, antes que todo lo demás:** libros de trauma, sección 00
-y `PLAN_INDEXAR_LIBROS.md` (fases 1 a 3 hechas; sigue la fase 4, después 5 a 7).
+y `PLAN_INDEXAR_LIBROS.md` (fases 1 a 4 hechas; sigue la fase 5, después 6 y 7).
 
 **`CONSULTAS_DEMO.md` y `PREGUNTAS_DEMO.md` nunca entraron a git** (el commit
 `45662e9` llevó `app.py`, `config.py` y `generate.py`, no esos dos): solo
@@ -689,3 +704,9 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
 | `PRECISION_CONSULTA` | `bf16` | con 16 GB de RAM se puede usar `fp32` |
 | `DISPOSITIVO_CONSULTA` | `cpu` | dejar en CPU: la VRAM es para el generador |
 | `INDICE_DIR` | `rag_pipeline/indices` | apuntar a una copia para correr scripts con el chatbot abierto |
+| `COLECCION_GUIAS` | `guias` | colección de Qdrant con los libros (17/10) |
+| `FRAGMENTACION_GUIAS` | `fijo-256` | configuración de `rag/fragmentar.py` al indexar los libros |
+| `RUTA_GUIAS` | `auto` | libros: `rerank` con ≥ 7 GB de VRAM, si no `densa` |
+| `PRESUPUESTO_GUIAS` | `1400` | tokens de fragmentos de los libros para el prompt |
+| `UMBRAL_GUIAS` | `0.2` | ruta `rerank`: prob. mínima del mejor fragmento (fuera de dominio máx. 0,173) |
+| `UMBRAL_GUIAS_COSENO` | `0.60` | ruta `densa` (1650): coseno mínimo del mejor fragmento; separa mal |

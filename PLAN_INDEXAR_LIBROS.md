@@ -285,7 +285,77 @@ Cómo quedó (`rag/index.py`):
   bf16): R@ppto densa 0,406 en las anotadas y 0,787 en las sintéticas.
   `trauma` sigue con 8.198 puntos.
 
-### Fase 4 — Recuperación y evaluación
+### Fase 4 — Recuperación y evaluación (hecha el 17/10/2026, en el PC de 8 GB)
+
+**Resultado:** `retrieve.buscar_guias(consulta)` devuelve los fragmentos de
+los libros para el prompt, o una lista vacía si los libros no tratan la
+consulta. Medido con `scripts/calibrar_guias.py`, leyendo de Qdrant:
+
+| Ruta (equipo) | Guarda | R@ppto anot. | R@ppto sint. | Trauma sin libros | Proc. sin libros | Fuera de dominio que pasan |
+|---|---|---|---|---|---|---|
+| `rerank` (8 GB) | prob. ≥ 0,2 | 0,331 | 0,854 | 11/25 | 0/16 | 0/10 |
+| `densa` (1650) | coseno ≥ 0,60 | 0,335 | 0,787 | 16/25 | 0/16 | 0/10 |
+| (sin guarda, rerank) | — | 0,374 | 0,876 | 0/25 | 0/16 | 10/10 |
+
+Las dos guardas juntas (`calibrar_umbral.py`, decisión 3, ruta rerank): las
+25 consultas de trauma reciben respuesta (14 con las dos fuentes, 11 solo con
+casos). De las fuera de dominio responde 1 de 10, `neg-05` (apendicitis), y
+**solo por los casos**: es el problema conocido desde el 27/09 (0,423 en el
+reranker de casos). Los libros no agregan ningún fallo nuevo.
+
+Cómo quedó (`rag/retrieve.py`):
+- `FragmentoGuia`: tipo aparte de `Resultado`, para que un fragmento no
+  pueda entrar en la lista de casos. Trae libro, capítulo, títulos, páginas
+  impresas, tipo, idioma, `texto_contexto` (va al prompt), coseno y
+  relevancia.
+- `candidatos_guias(consulta, ruta)`: los 30 primeros de la densa
+  (`PROFUNDIDAD_RERANK`); con `rerank`, reordenados por el cross-encoder.
+  `seleccionar_guias(candidatos, umbral, presupuesto)`: guarda y presupuesto,
+  sin modelos (testeable, y la calibración prueba umbrales sin repetir la
+  búsqueda). `buscar_guias` = las dos con la configuración.
+- **Guarda por el mejor fragmento:** si no llega al umbral, los libros se
+  abstienen; si llega, el presupuesto se llena en orden. Filtrar fragmento
+  por fragmento recuperaba menos (0,297 contra 0,331) y la precisión por
+  tramo de probabilidad no muestra un corte limpio.
+- `RUTA_GUIAS=auto`: `rerank` si el reranker cabe en la GPU (≥ 7 GB), si no
+  `densa`. Latencia en la RTX 4060: 0,88 s por consulta con rerank.
+- **`PRESUPUESTO_GUIAS` (1.400 tokens) en lugar de `TOP_K_GUIAS`:** lo que
+  mide R@ppto y lo que pide la decisión 3. Con el umbral: 1.000 → 0,286,
+  1.400 → 0,331, 1.800 → 0,354.
+- **Capítulos no clínicos: no se filtran.** Medido: ±0,005 de R@ppto y una
+  consulta fuera de dominio. No vale una variable.
+- `index.py` guarda `n_tokens_contexto`: lo que cuenta para el presupuesto
+  (difiere de `n_tokens` solo en small-to-big).
+- `calibrar_umbral.py` agrega la columna "libros" y la cuenta de las dos
+  guardas juntas. `scripts/calibrar_guias.py` calibra la de los libros.
+- Tests: `tests/test_buscar_guias.py` (14) y uno más en `test_index.py`.
+- `GUIAS=1` (encender o apagar los libros) entra en la fase 5, con
+  `generate.responder`, que es quien lo lee.
+
+**Decisión abierta (usuario o médico): ¿cuota por libro?** Con el
+reranker, el ATLS se lleva el 34 % de los fragmentos aunque es el 72 % del
+índice: una consulta en español prefiere el texto en español. Medido con la
+mitad del presupuesto para cada libro (lo que uno no usa pasa al otro):
+
+| rerank | R@ppto anot. | sint. | anot. ATLS | anot. HUV | % fragmentos ATLS |
+|---|---|---|---|---|---|
+| presupuesto común (actual) | 0,331 | 0,854 | 0,203 | 0,572 | 34 % |
+| cuota por libro | 0,345 | 0,843 | 0,318 | 0,494 | 50 % |
+
+El total no cambia más allá del ruido: es un balance entre el protocolo
+local (HUV) y el estándar internacional (ATLS), no una mejora. Se queda el
+presupuesto común hasta que se decida.
+
+**Ideas para medir después:**
+- 11 de 25 consultas de trauma quedan sin libros: abreviaturas ("HPAF",
+  "FX", "TCE"), ortografía ("qemadura", "luxacion") y coloquiales ("sujeto
+  baleado"). Expandir las abreviaturas de la consulta solo para los libros
+  (hay un diccionario en `anonimizacion/config/abreviaturas.yaml`).
+- La fuera de dominio más alta en el reranker de los libros es "cuál es la
+  capital de Colombia" (0,173): el margen con el umbral de 0,2 es corto.
+  Agregar más consultas fuera de dominio antes de bajar el umbral.
+
+Plan original:
 - `retrieve.buscar_guias(consulta, k)`: **densa sobre los dos libros**
   (fase 2: BM25 en una lista fusionada saca al ATLS del presupuesto). Con ≥ 7
   GB, el reranker sobre los 30 primeros de la densa (`rerank-densa`). Umbral
