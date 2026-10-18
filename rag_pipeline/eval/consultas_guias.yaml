@@ -516,6 +516,8 @@ consultas:
   - id: proc-09
     texto: cuándo activar el protocolo de transfusión masiva
     categoria: procedimiento
+    # demo (scripts/preparar_demo.py): responden solo los manuales
+    boton: '6 · Solo manuales'
     relevantes:
       ATLS-06-018: 2   # Circulation Assessment and Volume Resusc › MANAGEMENT › RESTORATION OF VASCULAR VOLUME
       ATLS-22-010: 2   # Penetrating Trauma › PENETRATING ABDOMINAL/PELVIC TRAUMA

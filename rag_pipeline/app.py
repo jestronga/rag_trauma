@@ -3,10 +3,12 @@ Chatbot de consulta sobre el registro de trauma.
 
     streamlit run app.py
 
-Requiere los índices construidos (`python -m rag.index`) y Ollama corriendo.
+Requiere los índices construidos (`python -m rag.index`; los manuales, con
+`--fuente guias`) y Ollama corriendo.
 """
 from __future__ import annotations
 
+import html
 import re
 import time
 import warnings
@@ -16,10 +18,10 @@ import streamlit as st
 warnings.filterwarnings("ignore")
 
 from rag import config                                    # noqa: E402
-from rag.build_prompt import desenlace_visible                 # noqa: E402
-from rag.generate import ollama_disponible, responder, resumir_caso   # noqa: E402
+from rag.build_prompt import agrupar_guias, cabecera_guia, desenlace_visible, texto_guia  # noqa: E402
+from rag.generate import ollama_disponible, responder, resumir_caso, usar_guias   # noqa: E402
 from rag.hallazgos import resaltar_html                        # noqa: E402
-from rag.retrieve import RUTAS, Filtros, ruta_por_defecto  # noqa: E402
+from rag.retrieve import RUTAS, Filtros, hay_guias, ruta_por_defecto  # noqa: E402
 
 st.set_page_config(page_title="Asistente Clínico de Trauma",
                    page_icon="🩺", layout="wide")
@@ -48,6 +50,9 @@ CSS = """
   .etq { display:inline-block; padding:1px 7px; border-radius:10px; font-size:0.82rem;
          border:1px solid rgba(128,128,128,.35); margin:2px 3px 2px 0; }
   .caso-box mark { background:rgba(255,200,0,.35); color:inherit; padding:0 2px; border-radius:3px; }
+  .guia-box { border-left:4px solid #1F6FB2; }
+  .nota { font-size:0.95rem; padding:8px 12px; margin-bottom:10px; border-radius:6px;
+          border-left:4px solid #B26B00; background:rgba(178,107,0,.08); line-height:1.45; }
   .tiempo { font-size:0.8rem; opacity:.45; text-align:right; margin-top:2px;
             font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
   .aviso { font-size:0.9rem; opacity:.75; line-height:1.45; }
@@ -65,13 +70,25 @@ def preparar_modelos() -> bool:
     demás. Corre una vez por proceso de Streamlit. Si falla, lanza: Streamlit
     no cachea excepciones y vuelve a intentarlo (p. ej. tras abrir Ollama).
     """
-    from rag.build_prompt import SISTEMA_PROSA
+    from rag.build_prompt import SISTEMA_PROSA, SISTEMA_PROSA_GUIAS
     from rag.generate import _ollama
-    from rag.retrieve import buscar
+    from rag.retrieve import buscar, buscar_guias
     buscar("herida en mano", k=1, ruta=ruta_por_defecto())
-    _ollama([{"role": "system", "content": SISTEMA_PROSA},
+    sistema = SISTEMA_PROSA
+    if usar_guias():
+        buscar_guias("herida en mano")
+        sistema = SISTEMA_PROSA_GUIAS
+    # carga el modelo con la ventana NUM_CTX: si después cambiara, Ollama lo recargaría
+    _ollama([{"role": "system", "content": sistema},
              {"role": "user", "content": "ok"}], max_tokens=1, timeout=180)
     return True
+
+
+def manuales_indexados() -> bool:
+    try:
+        return hay_guias()
+    except Exception:        # Qdrant abierto por otro proceso: lo dice la precarga
+        return False
 
 
 error_preparacion = None
@@ -109,7 +126,18 @@ with st.sidebar:
                                        f"respuesta. Con menos de {config.MIN_CASOS} casos, "
                                        "el sistema se abstiene.")
 
-    st.markdown("### Filtros")
+    st.markdown("### Fuentes")
+    hay_manuales = manuales_indexados()
+    con_guias = st.toggle(
+        "Manuales de trauma (ATLS y HUV)", value=config.GUIAS and hay_manuales,
+        disabled=not hay_manuales,
+        help="Segunda fuente, con el mismo peso que los casos: lo que recomiendan el ATLS "
+             "11.ª ed. y el manual de manejo inicial del HUV. Apagado, la respuesta sale solo "
+             "de los casos del registro.")
+    if not hay_manuales:
+        st.caption("Los manuales no están indexados: `python -m rag.index --fuente guias`.")
+
+    st.markdown("### Filtros (casos)")
     mecanismo = st.selectbox("Mecanismo", ["(todos)"] + list(config.ETIQUETAS_MECANISMO),
                              format_func=lambda v: config.ETIQUETAS_MECANISMO.get(v, v))
     region = st.selectbox("Región anatómica", ["(todos)"] + list(config.ETIQUETAS_REGION),
@@ -124,12 +152,16 @@ with st.sidebar:
     )
 
     st.divider()
+    manuales = (" · <b>Manuales</b>: ATLS 11.ª ed. (en inglés) y el manual de manejo inicial "
+                "del HUV, lo que recomiendan. Lo hecho en los casos y lo que recomiendan los "
+                "manuales puede no coincidir: el sistema muestra las dos miradas y no elige."
+                if con_guias else "")
     st.markdown(
-        f"<div class='aviso'><b>Alcance del registro</b><br>"
-        f"Atención de trauma, {config.COBERTURA_TEMPORAL}. Los protocolos de manejo "
-        f"cambian con el tiempo: el sistema muestra lo que se hizo en casos "
-        f"históricos y sugiere solo lo que esos casos respaldan. No reemplaza el "
-        f"juicio clínico.<br><br>"
+        f"<div class='aviso'><b>Alcance</b><br>"
+        f"<b>Casos</b>: atención de trauma del registro, {config.COBERTURA_TEMPORAL}, lo que se "
+        f"hizo en casos históricos{manuales}<br><br>"
+        f"Sugiere solo lo que esas fuentes respaldan, con la cita de cada afirmación. Los "
+        f"protocolos cambian con el tiempo. No reemplaza el juicio clínico.<br><br>"
         f"Los datos personales están reemplazados por marcadores "
         f"(<code>[FECHA]</code>, <code>[EDAD:30-39]</code>).</div>",
         unsafe_allow_html=True,
@@ -149,28 +181,43 @@ st.markdown(
     f"<div class='cabecera'>"
     f"<div class='cab-icono'>✚</div>"
     f"<div><h1>Asistente Clínico de Trauma</h1>"
-    f"<div class='cab-lema'>Apoyo al diagnóstico basado en casos similares del registro de trauma</div>"
+    f"<div class='cab-lema'>Apoyo al diagnóstico basado en casos similares del registro de trauma"
+    f"{' y en los manuales ATLS y HUV' if con_guias else ''}</div>"
     f"</div></div>",
     unsafe_allow_html=True,
 )
 
 if not st.session_state.mensajes:
+    revise = ("Qué valorar y qué se hizo en los casos similares, y qué recomiendan los manuales, "
+              "con la cita de cada afirmación." if con_guias else
+              "Qué valorar y qué se hizo en los casos similares, con la cita de cada uno.")
+    verifique = ("El texto completo de cada caso y de cada pasaje está en «Casos consultados» y "
+                 "«Fragmentos de los manuales»." if con_guias else
+                 "El texto completo de cada caso está en «Casos consultados».")
     st.markdown(
         "<div class='bienvenida'>"
         "<div class='bv-item'><b>1 · Describa el caso</b><br>Mecanismo, región y hallazgos: "
         "«herida por arma cortopunzante en abdomen con irritación peritoneal».</div>"
-        "<div class='bv-item'><b>2 · Revise la sugerencia</b><br>Qué valorar y qué se hizo "
-        "en los casos similares, con la cita de cada uno.</div>"
-        "<div class='bv-item'><b>3 · Verifique el origen</b><br>El texto completo de cada caso "
-        "está en «Casos consultados». También acepta un número de caso.</div>"
+        f"<div class='bv-item'><b>2 · Revise la sugerencia</b><br>{revise}</div>"
+        f"<div class='bv-item'><b>3 · Verifique el origen</b><br>{verifique} "
+        "También acepta un número de caso.</div>"
         "</div>",
         unsafe_allow_html=True,
     )
 
 
-AVISO_RESPUESTA = (f"Casos históricos del registro ({config.COBERTURA_TEMPORAL}): los conteos "
-                   f"describen estos casos, no frecuencias generales, y los protocolos pueden "
-                   f"haber cambiado. Apoyo a la decisión; no reemplaza el juicio clínico.")
+def aviso_respuesta(respuesta) -> str:
+    """El aviso fijo bajo cada respuesta: qué es cada fuente y sus límites."""
+    partes = []
+    if respuesta.casos:
+        partes.append(f"Casos históricos del registro ({config.COBERTURA_TEMPORAL}): los conteos "
+                      f"describen estos casos, no frecuencias generales, y los protocolos pueden "
+                      f"haber cambiado.")
+    if respuesta.guias:
+        partes.append("Pasajes del ATLS 11.ª ed. y del manual del HUV: lo del ATLS (en inglés) va "
+                      "resumido en español; el texto original está en «Fragmentos de los manuales».")
+    partes.append("Apoyo a la decisión; no reemplaza el juicio clínico.")
+    return " ".join(partes)
 
 
 def tarjeta_caso(caso, consulta: str = "") -> str:
@@ -186,6 +233,40 @@ def tarjeta_caso(caso, consulta: str = "") -> str:
             f"· similitud {caso.score_norm:.2f}<br>{''.join(etiquetas)}<br><br>{texto}</div>")
 
 
+def tarjeta_guia(seccion: str, fragmentos, consulta: str = "") -> str:
+    """Un pasaje de un manual: libro, capítulo, sección y páginas impresas, y su
+    texto tal cual (el ATLS en inglés)."""
+    f = fragmentos[0]
+    escala = "relevancia" if f.relevancia is not None else "similitud"
+    puntaje = max(x.puntaje for x in fragmentos)
+    idioma = "<span class='etq'>en inglés</span>" if f.idioma == "en" else ""
+    texto = resaltar_html(texto_guia(fragmentos), consulta).replace("\n", "<br>")
+    return (f"<div class='caso-box guia-box'><span class='caso-id'>guía {seccion}</span> "
+            f"· {escala} {puntaje:.2f}<br><span class='etq'>{html.escape(cabecera_guia(fragmentos))}"
+            f"</span>{idioma}<br><br>{texto}</div>")
+
+
+def nota_verificacion(respuesta) -> None:
+    """Qué parte de la respuesta armó el código porque la redacción del modelo
+    no pasó la verificación (o no la hubo). Va arriba de la respuesta: como
+    caption gris al pie nadie la veía (pendiente 13 de CONTEXTO_SESION.md)."""
+    if respuesta is None or respuesta.prosa_verificada is not False or config.PROSA_SIEMPRE:
+        return
+    nombres = {"casos": "los casos", "guias": "los manuales"}
+    presentes = [n for n, hay in (("casos", respuesta.casos), ("guias", respuesta.guias)) if hay]
+    armadas = [nombres[n] for n in presentes if n not in respuesta.fuentes_en_prosa]
+    if not armadas:
+        return
+    motivo = respuesta.motivos[0] if respuesta.motivos else "sin detalle"
+    extra = f" y {len(respuesta.motivos) - 1} más" if len(respuesta.motivos) > 1 else ""
+    if motivo.startswith("no hay prosa"):
+        porque = "el modelo no redactó una sugerencia con respaldo"
+    else:
+        porque = f"la redacción del modelo no pasó la verificación: {motivo}{extra}"
+    st.markdown(f"<div class='nota'>Lo de {' y '.join(armadas)} va armado desde las fuentes, sin "
+                f"redactar ({html.escape(porque)}).</div>", unsafe_allow_html=True)
+
+
 def pie_tiempo(segundos: float | None) -> None:
     """Tiempo hasta la respuesta, discreto, para medir modelos desde la interfaz."""
     if segundos is None:
@@ -195,40 +276,40 @@ def pie_tiempo(segundos: float | None) -> None:
 
 
 def detalle_respuesta(respuesta, segundos: float | None, consulta: str) -> None:
-    """Lo que va bajo el texto: tiempo, aviso fijo, alertas y los casos completos."""
+    """Lo que va bajo el texto: tiempo, aviso fijo, alertas y el texto completo
+    de los casos y de los pasajes de los manuales."""
     pie_tiempo(segundos)
     if respuesta.error:
         return
-    if respuesta.casos and not respuesta.abstuvo:
-        st.caption(AVISO_RESPUESTA)
-    if respuesta.prosa_verificada is False and not config.PROSA_SIEMPRE:
-        # Se muestra la versión armada desde los casos; se dice por qué, para
-        # que no parezca un cambio de formato sin razón.
-        motivo = respuesta.motivos[0] if respuesta.motivos else "sin detalle"
-        extra = f" (y {len(respuesta.motivos) - 1} más)" if len(respuesta.motivos) > 1 else ""
-        st.caption(f"La redacción del modelo no pasó la verificación ({motivo}{extra}): "
-                   f"se muestran las sugerencias armadas desde los casos.")
+    if (respuesta.casos or respuesta.guias) and not respuesta.abstuvo:
+        st.caption(aviso_respuesta(respuesta))
     if respuesta.citas_invalidas:
-        st.warning("El modelo citó identificadores que no están entre los casos "
+        st.warning("El modelo citó identificadores que no están entre los casos ni los pasajes "
                    f"recuperados: {', '.join(respuesta.citas_invalidas)}. "
                    "Esa parte de la respuesta no está respaldada.")
-    if not respuesta.casos:
-        return
-    # El texto completo de cada caso es la base de cada afirmación: el médico
-    # tiene que poder revisarla por su cuenta.
-    etiqueta = f"Casos consultados ({len(respuesta.casos)}) · texto completo"
-    if respuesta.consulta_reescrita:
-        etiqueta += "  ·  consulta reescrita"
-    with st.expander(etiqueta):
+    buscada = respuesta.consulta_reescrita or consulta
+    # El texto completo de cada caso y de cada pasaje es la base de cada
+    # afirmación: el médico tiene que poder revisarla por su cuenta.
+    if respuesta.casos:
+        etiqueta = f"Casos consultados ({len(respuesta.casos)}) · texto completo"
         if respuesta.consulta_reescrita:
-            st.caption(f"Búsqueda realizada: «{respuesta.consulta_reescrita}»")
-        relevancia = (f" · relevancia del reranker: {respuesta.relevancia:.2f}"
-                      if respuesta.relevancia is not None else "")
-        st.caption(f"Confianza (coseno del mejor caso): {respuesta.confianza:.3f}{relevancia} · "
-                   f"resaltado: lo que coincide con la consulta")
-        for c in respuesta.casos:
-            st.markdown(tarjeta_caso(c, respuesta.consulta_reescrita or consulta),
-                        unsafe_allow_html=True)
+            etiqueta += "  ·  consulta reescrita"
+        with st.expander(etiqueta):
+            if respuesta.consulta_reescrita:
+                st.caption(f"Búsqueda realizada: «{respuesta.consulta_reescrita}»")
+            relevancia = (f" · relevancia del reranker: {respuesta.relevancia:.2f}"
+                          if respuesta.relevancia is not None else "")
+            st.caption(f"Confianza (coseno del mejor caso): {respuesta.confianza:.3f}{relevancia} · "
+                       f"resaltado: lo que coincide con la consulta")
+            for c in respuesta.casos:
+                st.markdown(tarjeta_caso(c, buscada), unsafe_allow_html=True)
+    if respuesta.guias:
+        grupos = agrupar_guias(respuesta.guias)
+        with st.expander(f"Fragmentos de los manuales ({len(grupos)}) · texto completo"):
+            st.caption("Pasajes que pasaron la guarda de los manuales, del más al menos relevante. "
+                       "Páginas impresas del libro; el ATLS, en su idioma original.")
+            for seccion, fragmentos in grupos.items():
+                st.markdown(tarjeta_guia(seccion, fragmentos, buscada), unsafe_allow_html=True)
 
 
 def escribir_de_a_poco(texto: str, segundos_max: float = 2.0):
@@ -243,6 +324,7 @@ def escribir_de_a_poco(texto: str, segundos_max: float = 2.0):
 def pintar(rol: str, contenido: str, respuesta=None, segundos: float | None = None,
            consulta: str = "") -> None:
     with st.chat_message(rol):
+        nota_verificacion(respuesta)
         st.markdown(contenido)
         if respuesta is not None:
             detalle_respuesta(respuesta, segundos, consulta)
@@ -273,7 +355,8 @@ if pregunta:
                 r = resumir_caso(m.group(1))
             else:
                 r = responder(pregunta, historial=historial, ruta=ruta, k=k,
-                              filtros=filtros, umbral=umbral, umbral_rerank=umbral_rerank)
+                              filtros=filtros, umbral=umbral, umbral_rerank=umbral_rerank,
+                              guias=con_guias)
         segundos = time.perf_counter() - t0
 
         if r.error:
@@ -281,6 +364,7 @@ if pregunta:
             texto = f"_{r.error}_"
         else:
             texto = r.texto
+            nota_verificacion(r)
             st.write_stream(escribir_de_a_poco(texto))
         detalle_respuesta(r, segundos, pregunta)
 

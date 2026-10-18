@@ -193,8 +193,15 @@ streamlit run app.py
 ```
 
 Abre `http://localhost:8501`. La barra lateral permite cambiar de ruta, ajustar
-el umbral de abstención y filtrar por mecanismo, región y desenlace en vivo —
+el umbral de abstención, encender o apagar los manuales (interruptor "Manuales
+de trauma") y filtrar los casos por mecanismo, región y desenlace en vivo —
 útil para responder preguntas durante la demostración sin salir de la interfaz.
+
+Bajo cada respuesta: "Casos consultados" (texto completo de cada caso) y
+"Fragmentos de los manuales" (cada pasaje con libro, capítulo, sección y página
+impresa; el ATLS en inglés, tal cual). Si una parte de la redacción del modelo
+no pasó la verificación, una nota arriba de la respuesta dice cuál y por qué, y
+esa parte se muestra armada desde las fuentes.
 
 Escribir solo un número (`40887`) recupera y resume ese caso concreto.
 
@@ -209,16 +216,17 @@ cd rag_pipeline
 python scripts\preparar_demo.py
 ```
 
-Revisa la GPU, que Ollama tenga el modelo entero en la VRAM (100 %) y pasa los
-5 botones de la demo por el sistema completo. Debe terminar en "Todo listo".
-Después: `streamlit run app.py`. Al abrir, la app precarga los modelos (~30 s,
-una sola vez) y el modelo queda cargado 2 horas (`KEEP_ALIVE`).
+Revisa la GPU, la configuración de los manuales, que Ollama tenga el modelo
+entero en la VRAM (100 %) y pasa las 6 consultas de la demo por el sistema
+completo (campo `boton` de `eval/consultas.yaml` y `eval/consultas_guias.yaml`).
+Debe terminar en "Todo listo". Después: `streamlit run app.py`. Al abrir, la
+app precarga los modelos (~30 s, una sola vez) y el modelo queda cargado 2 horas
+(`KEEP_ALIVE`).
 
-En la GTX 1650 (4 GB) el sistema elige solo `rrf` (el reranker no cabe junto al
-generador) y el umbral de abstención de coseno 0,52. Cada respuesta tarda
-**~20 s**: es buen momento para explicar qué está haciendo.
+En el PC de 8 GB (RTX 4060) corre el reranker para casos y manuales. Cada
+respuesta con las dos fuentes tarda **~8 s** (solo casos, ~5 s).
 
-Ocho minutos, en este orden (los botones 1-5 están en la app):
+Las consultas ya no son botones de la app: se escriben. Ocho minutos, en este orden:
 
 **1 · Encuadre, antes de escribir nada.** El registro cubre atención de trauma
 **hasta 2018**. El sistema sugiere a partir de lo que se hizo en casos
@@ -226,38 +234,48 @@ históricos; no indica conductas ni reemplaza el juicio clínico. Dicho por ti a
 principio es una limitación reconocida; dicho por alguien del público a mitad
 de la demo, es un agujero.
 
-**2 · Caso directo** (botón 1) — *"herida por arma de fuego en tórax con
-hipoventilación"*. La sugerencia en prosa, con una cita `[caso: ID]` en cada
-afirmación. Abre **"Casos consultados"**: el texto completo de cada caso, con
-lo que coincide con la consulta resaltado. **Todo lo que dice la sugerencia se
-puede comprobar ahí.**
+**2 · Caso directo** (1) — *"herida por arma de fuego en tórax con
+hipoventilación"*. Dos miradas: lo que se hizo en casos similares, con
+`[caso: ID]`, y lo que recomiendan los manuales, con `[guía: ID]`. Abre
+**"Casos consultados"** y **"Fragmentos de los manuales"**: el texto completo
+de cada caso y de cada pasaje (libro, capítulo, página). **Todo lo que dice la
+sugerencia se puede comprobar ahí.** Los casos son de hasta 2018 y pueden no
+coincidir con los manuales: el sistema lo dice y no elige.
 
 **3 · Cómo se evita que invente.** El modelo redacta, pero el código revisa cada
-oración antes de mostrarla: que lo que nombra esté en los casos, que el caso
-citado lo tenga, que no cuente mal y que oriente en vez de ordenar. Si no pasa,
-se muestra la versión armada desde los casos y una línea dice por qué (puede
-pasar en vivo con el botón 4: es una buena ocasión para mostrarlo).
+oración antes de mostrarla contra su fuente: que lo que nombra esté en los
+casos o en el pasaje citado, que el caso o el pasaje citado lo tenga, que las
+cifras estén en el manual, que no cuente mal y que oriente en vez de ordenar.
+La parte que no pasa se muestra armada desde las fuentes y una nota arriba dice
+por qué (pasa seguido con las consultas 1, 2 y 4: buena ocasión para mostrarlo).
 
-**4 · Brecha de vocabulario** (botón 2) — *"paciente apuñalado en el pecho,
+**4 · Brecha de vocabulario** (2) — *"paciente apuñalado en el pecho,
 herida penetrante"*. El corpus dice `HPACP en tórax` o `ME APUÑALARON`. Por eso
 hay búsqueda densa y no solo por palabras.
 
-**5 · Abreviatura** (botón 3) — *"HPAF en cráneo con orificio de entrada
-parietal"*. Funciona en los dos sentidos gracias a la expansión de abreviaturas.
+**5 · Abreviatura** (3) — *"HPAF en cráneo con orificio de entrada
+parietal"*. Funciona gracias a la expansión de abreviaturas. Aquí los manuales
+no responden (la abreviatura no la entiende su búsqueda): la respuesta lo dice y
+sale solo de los casos.
 
-**6 · Caso grave** (botón 4) — *"herida por arma de fuego con desenlace fatal"*.
+**6 · Caso grave** (4) — *"herida por arma de fuego con desenlace fatal"*.
 Con la barra lateral se puede filtrar por mecanismo, región o desenlace en vivo.
 
-**7 · Abstención** (botón 5) — *"manejo de cetoacidosis diabética en
-urgencias"*. El sistema dice que no encontró casos suficientemente similares.
-**Esta es la diapositiva que convence a un público clínico**: responde qué hace
-el sistema cuando no sabe.
+**7 · Solo los manuales** (6) — *"cuándo activar el protocolo de transfusión
+masiva"*. Una pregunta de procedimiento: no hay casos que se parezcan y
+responden solo el ATLS y el manual del HUV. Es lo que pidió la reunión del
+30/09: que el asistente no dependa solo de lo que se hizo en el hospital.
 
-**Cuidado con preguntas del público en este PC:** sin el reranker, el filtro es
-solo por similitud. Bloquea diabetes, apendicitis, asma o infarto, pero **no**
-"dolor torácico" ni "dolor de cabeza", que se parecen a casos de trauma (el
-reranker del PC de 8 GB sí los separa). Si alguien lo prueba, es un límite
-conocido: responde con los casos más cercanos y avisa si la similitud es baja.
+**8 · Abstención** (5) — *"manejo de cetoacidosis diabética en
+urgencias"*. Ni los casos ni los manuales responden: el sistema dice que no
+encontró nada suficientemente parecido. **Esta es la diapositiva que convence a
+un público clínico**: responde qué hace el sistema cuando no sabe.
+
+**Preguntas del público:** de las 10 consultas fuera de dominio medidas, el
+reranker frena 9 ("dolor torácico opresivo…" incluida); "apendicitis aguda con
+dolor en fosa ilíaca derecha y fiebre" pasa por los casos (límite conocido
+desde el 27/09), y los manuales no la dejan pasar. Una pregunta que no está en
+esas 10 no está medida.
 
 **Evitar en la demo:** escribir un número de caso para resumirlo. Ese resumen
 todavía lo escribe el modelo sin verificación y a veces cambia términos
@@ -293,7 +311,7 @@ todavía lo escribe el modelo sin verificación y a veces cambia términos
 | `RUTA_GUIAS` | `auto` | libros: `rerank` (densa + reranker sobre 30) si el reranker cabe en la GPU, si no `densa` |
 | `PRESUPUESTO_GUIAS` | `1400` | tokens de fragmentos de los libros que van al prompt (~6 con `fijo-256`) |
 | `UMBRAL_GUIAS` | `0.2` | ruta `rerank`: probabilidad mínima del mejor fragmento para que los libros hablen. Calibrar con `scripts\calibrar_guias.py` |
-| `UMBRAL_GUIAS_COSENO` | `0.60` | ruta `densa` (GTX 1650): coseno mínimo del mejor fragmento. Separa mal: con 0,60 frena las 10 fuera de dominio pero deja sin libros a 16 de 25 consultas de trauma |
+| `UMBRAL_GUIAS_COSENO` | `0.60` | ruta `densa` (sin el reranker en GPU): coseno mínimo del mejor fragmento. Separa mal: con 0,60 frena las 10 fuera de dominio pero deja sin libros a 16 de 25 consultas de trauma |
 
 `ENCODER=falso` sirve para verificar la tubería completa (índices, rutas,
 métricas, interfaz) sin descargar bge-m3. **No mide calidad**: es un hash de

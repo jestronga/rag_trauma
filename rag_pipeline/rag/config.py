@@ -214,8 +214,9 @@ TIMEOUT_LLM = _env_int("TIMEOUT_LLM", 400)
 # manuales de 3.624 tokens de mediana y 4.408 como máximo, más MAX_TOKENS_PROSA;
 # la estimación por caracteres (abajo, en generate.py) pide 6.144 para el más
 # largo. Una ventana fija importa: si cambia entre llamadas, Ollama recarga el
-# modelo (6-8 s). VRAM del 4B: 3,03 GB con 3.072 y 3,57 GB con 6.144. En la
-# GTX 1650 (4 GB) falta medirlo: si no cabe, NUM_CTX=5120 y PRESUPUESTO_GUIAS=1000.
+# modelo (6-8 s). VRAM del 4B: 3,03 GB con 3.072 y 3,57 GB con 6.144. Desde el
+# 17/10 solo se mide en la RTX 4060 (8 GB); con menos VRAM, probar NUM_CTX=5120
+# y PRESUPUESTO_GUIAS=1000.
 NUM_CTX = _env_int("NUM_CTX", 6144 if GUIAS else 3072)
 # Capas en GPU (-1 = que decida Ollama). Ollama calcula de más y en la GTX 1650
 # dejaba 10 de 37 capas en CPU: 33 % CPU, 15 tok/s. Con todas: 100 % GPU,
