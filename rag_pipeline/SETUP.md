@@ -84,10 +84,11 @@ Esta es la restricción que manda, y la configuración por defecto ya la respeta
 |---|---|---|
 | bge-m3 (indexación) | ~2,3 GB | **GPU**, una sola vez |
 | bge-m3 (consulta) | — | **CPU**: embeber una consulta corta cuesta ~150 ms |
-| `qwen3:4b-instruct` | ~3,0 GB con `NUM_CTX=3072` | **GPU**, vía Ollama |
+| `qwen3:4b-instruct` | ~3,0 GB con `NUM_CTX=3072` (sin libros); 3,57 GB con 6.144 (con libros) | **GPU**, vía Ollama |
 | bge-reranker-v2-m3 (fp16) | ~1,3 GB | **GPU** si torch ve CUDA (`RUTA=auto` → `rerank`) |
 
-Generador y reranker suman ~4,3 GB y caben en 8 GB con margen para Windows.
+Generador y reranker suman ~4,3 GB (~4,9 GB con los libros y `NUM_CTX=6144`) y caben
+en 8 GB con margen para Windows. Medido en la RTX 4060 el 17/10: 100 % en GPU.
 bge-m3 sale de la GPU en cuanto termina de indexar.
 
 **El reranker necesita GPU.** En CPU tarda ~31 s por consulta (medido en un
@@ -275,7 +276,9 @@ todavía lo escribe el modelo sin verificación y a veces cambia términos
 | `UMBRAL_RERANK` | `0.2` | con `rerank`: probabilidad mínima por caso; con menos de 2 casos sobre ella, se abstiene. Calibrar con `scripts\calibrar_umbral.py` |
 | `PROFUNDIDAD_RERANK` | `30` | candidatos de RRF que se reordenan |
 | `SALIDA` | `prosa` | `prosa`: el modelo redacta la sugerencia con citas y `rag/verificar.py` la revisa; si no pasa, se muestra la versión armada desde los casos. `sugerencias`: siempre la versión armada desde los casos |
-| `MAX_TOKENS_PROSA` | `400` | tope de la sugerencia en prosa (usa ~150–250) |
+| `MAX_TOKENS_PROSA` | `600` | tope de la sugerencia en prosa (solo casos usa ~150–250; con los manuales, ~260–470) |
+| `NUM_CTX` | `6144` con `GUIAS`, `3072` sin | ventana de Ollama. Con casos y manuales el prompt llega a ~4.400 tokens. Fija a propósito: si cambia entre llamadas, Ollama recarga el modelo (6-8 s). El 4B ocupa 3,57 GB con 6.144 |
+| `GUIAS` | encendido | los libros como segunda fuente de la respuesta. `0` = solo casos, como antes (ablación). Sin la colección `guias` indexada se comporta como `0` |
 | `SALIDA_ESTRUCTURADA` | encendido | el modelo responde JSON restringido a la lista de elementos (campo `format` de Ollama, requiere Ollama ≥ 0.5). `0` = viñetas de texto como antes |
 | `DISPOSITIVO_RERANKER` | `auto` | `cuda` si hay GPU NVIDIA; `cpu` si el generador es de 8B |
 | `MODELO_LLM` | `qwen3:4b-instruct` | generador en Ollama; según la VRAM, ver `MODELOS.md`. Sin GPU NVIDIA y poca RAM: `qwen2.5:3b` |

@@ -98,6 +98,11 @@ PRESUPUESTO_GUIAS = _env_int("PRESUPUESTO_GUIAS", 1400)
 #     trauma se quedan sin libros. Con 0,55 pasarían 3 de 10 fuera de dominio.
 UMBRAL_GUIAS = _env_float("UMBRAL_GUIAS", 0.2)
 UMBRAL_GUIAS_COSENO = _env_float("UMBRAL_GUIAS_COSENO", 0.60)
+# Los libros como segunda fuente de la respuesta (fase 5): generate.responder
+# los busca y, si pasan su guarda, la prosa da las dos miradas. Apagado (o sin
+# la colección indexada) la respuesta es la de antes, solo con casos: sirve
+# para la ablación y para un PC sin los PDF.
+GUIAS = _env_bool("GUIAS", True)
 
 # --- modelos ---------------------------------------------------------------
 MODELO_EMBEDDING = _env("MODELO_EMBEDDING", "BAAI/bge-m3")
@@ -190,8 +195,10 @@ SALIDA = _env("SALIDA", "prosa")                 # prosa | sugerencias
 # verificando y queda en Respuesta.motivos). Va contra "nada inventado":
 # volver a PROSA_SIEMPRE=0 después de la demo.
 PROSA_SIEMPRE = _env_bool("PROSA_SIEMPRE", True)
-# La prosa son 3-5 oraciones con citas: ~150-250 tokens.
-MAX_TOKENS_PROSA = _env_int("MAX_TOKENS_PROSA", 400)
+# La prosa son 3-5 oraciones con citas: ~150-250 tokens. Con los manuales,
+# 4-7 oraciones: medido (17/10, 41 consultas) mediana 374 y una cortada en 700
+# (con 400 se cortaban y no había prosa: el JSON quedaba incompleto).
+MAX_TOKENS_PROSA = _env_int("MAX_TOKENS_PROSA", 600)
 # Sin SINTESIS_LLM el modelo solo escribe 2-4 viñetas de sugerencias (~100
 # tokens medidos). Con SINTESIS_LLM escribe cuatro secciones: ~600-800.
 MAX_TOKENS = _env_int("MAX_TOKENS", 900 if SINTESIS_LLM else 250)
@@ -203,7 +210,13 @@ TIMEOUT_LLM = _env_int("TIMEOUT_LLM", 400)
 # en la GPU. Si un prompt no cabe (p. ej. 10 casos), generate.py agranda la
 # ventana solo para esa llamada: sin eso Ollama recorta el comienzo del
 # prompt, que es donde están las reglas.
-NUM_CTX = _env_int("NUM_CTX", 3072)
+# Con los manuales (GUIAS): 6.144. Medido (17/10, RTX 4060): prompt con casos y
+# manuales de 3.624 tokens de mediana y 4.408 como máximo, más MAX_TOKENS_PROSA;
+# la estimación por caracteres (abajo, en generate.py) pide 6.144 para el más
+# largo. Una ventana fija importa: si cambia entre llamadas, Ollama recarga el
+# modelo (6-8 s). VRAM del 4B: 3,03 GB con 3.072 y 3,57 GB con 6.144. En la
+# GTX 1650 (4 GB) falta medirlo: si no cabe, NUM_CTX=5120 y PRESUPUESTO_GUIAS=1000.
+NUM_CTX = _env_int("NUM_CTX", 6144 if GUIAS else 3072)
 # Capas en GPU (-1 = que decida Ollama). Ollama calcula de más y en la GTX 1650
 # dejaba 10 de 37 capas en CPU: 33 % CPU, 15 tok/s. Con todas: 100 % GPU,
 # 42 tok/s, ~3,0 GB de VRAM. Si da HTTP 500 por memoria (p. ej. el navegador
@@ -245,6 +258,11 @@ ETIQUETAS_REGION = {
     "columna": "Columna",
     "miembro_superior": "Miembro superior",
     "miembro_inferior": "Miembro inferior",
+}
+# Cómo se nombra cada libro en el prompt y en la respuesta (campo `fuente`).
+NOMBRES_LIBROS = {
+    "ATLS": "ATLS 11.ª ed.",
+    "HUV": "manual del HUV",
 }
 ETIQUETAS_DESENLACE = {
     "fallecimiento": "Fallecimiento",

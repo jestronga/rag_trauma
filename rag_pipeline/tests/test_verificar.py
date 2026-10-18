@@ -102,6 +102,9 @@ def entorno(casos, monkeypatch):
     monkeypatch.setattr(config, "SINTESIS_LLM", False)
     monkeypatch.setattr(generate, "confianza", lambda *a, **k: 0.9)
     monkeypatch.setattr(generate, "buscar", lambda *a, **k: casos)
+    # un PC sin los libros indexados: la respuesta es la de solo casos
+    # (con libros: tests/test_responder_guias.py)
+    monkeypatch.setattr(generate, "hay_guias", lambda: False)
 
     def modelo(prosa: str):
         monkeypatch.setattr(generate, "_ollama", lambda *a, **k: json.dumps({"sugerencia": prosa}))

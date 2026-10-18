@@ -18,7 +18,9 @@ Qué mide, por (modelo, modo):
                 sobran casos en el prompt (y tokens: pendiente 8).
   GPU           % del modelo en VRAM según /api/ps (lo que muestra `ollama ps`)
   prosa         (--modos prosa) si la prosa del modelo pasa rag/verificar.py y,
-                si no, por qué regla; la prosa queda en el CSV para leerla
+                si no, por qué regla; la prosa queda en el CSV para leerla.
+                Con los libros (GUIAS, por defecto), qué fuentes pasaron su
+                guarda y cuántos pasajes de los manuales cita la prosa
 
 Las consultas fuera de dominio solo miden si el sistema se abstiene: eso no
 depende del generador.
@@ -27,6 +29,8 @@ Uso (con el chatbot cerrado, o INDICE_DIR apuntando a una copia):
     python scripts/comparar_modelos.py                                   # modelo de config, JSON
     python scripts/comparar_modelos.py --modelos qwen3:4b-instruct,qwen3:8b
     python scripts/comparar_modelos.py --modos texto,json --n 5          # salida en texto vs JSON
+    python scripts/comparar_modelos.py --modos prosa --consultas guias   # + las 16 de procedimiento
+    python scripts/comparar_modelos.py --modos prosa --sin-guias         # solo casos (ablación)
 """
 from __future__ import annotations
 
@@ -48,26 +52,32 @@ sys.path.insert(0, str(RAIZ))
 from eval.evaluate import relevancia                                        # noqa: E402
 from rag import config                                                      # noqa: E402
 from rag.generate import (                                                  # noqa: E402
-    _ollama, eleccion_modelo, elegir_sugerencias, ensamblar, ensamblar_prosa, filtrar_relevantes,
-    generar_eleccion, generar_prosa, porcentaje_gpu,
+    _ollama, eleccion_modelo, elegir_sugerencias, ensamblar, ensamblar_verificado, filtrar_relevantes,
+    fuentes_en_prosa, generar_eleccion, generar_prosa, mensajes_prosa, porcentaje_gpu, usar_guias,
 )
 from rag.hallazgos import elegibles                                         # noqa: E402
-from rag.retrieve import buscar, confianza, ruta_por_defecto                # noqa: E402
-from rag.verificar import RX_CITA, verificar_prosa                          # noqa: E402
+from rag.retrieve import buscar, buscar_guias, confianza, ruta_por_defecto  # noqa: E402
+from rag.verificar import RX_CITA, RX_CITA_GUIA, verificar_por_fuente       # noqa: E402
 
 MODOS = {"texto": False, "json": True, "prosa": None}   # prosa: SALIDA=prosa
 
 
-def recuperar(c: dict, ruta: str) -> dict:
-    """Las dos guardas de responder(), con sus tiempos."""
+def recuperar(c: dict, ruta: str, con_guias: bool = False) -> dict:
+    """Las guardas de responder(), con sus tiempos: la de los casos y, con los
+    libros, la de los manuales (se responde si pasa cualquiera)."""
     t0 = time.perf_counter()
     conf = confianza(c["texto"])
     t1 = time.perf_counter()
     casos = [] if conf < config.UMBRAL_ABSTENCION else filtrar_relevantes(
         buscar(c["texto"], k=config.TOP_K, ruta=ruta))
+    if len(casos) < config.MIN_CASOS:
+        casos = []
     t2 = time.perf_counter()
-    return {"casos": casos, "confianza": conf, "abstiene": len(casos) < config.MIN_CASOS,
-            "s_coseno": t1 - t0, "s_recuperacion": t2 - t1}
+    guias = buscar_guias(c["texto"]) if con_guias else []
+    t3 = time.perf_counter()
+    return {"casos": casos, "guias": guias, "con_guias": con_guias, "confianza": conf,
+            "abstiene": not casos and not guias,
+            "s_coseno": t1 - t0, "s_recuperacion": t2 - t1 + t3 - t2, "s_guias": t3 - t2}
 
 
 def descargar(modelo: str) -> None:
@@ -128,7 +138,14 @@ _TIPOS_MOTIVO = [("cita inventada", "no están entre los recuperados"),
                  ("conteo", ("no coincide", "se recuperaron", "«todos»", "«la mayoría»")),
                  ("palabra ajena", "no aparecen en los casos"),
                  ("orden", "da una orden"),
-                 ("sin prosa", "no hay prosa")]
+                 ("sin prosa", "no hay prosa"),
+                 # oraciones que citan los manuales
+                 ("guía inventada", "fragmentos recuperados"),
+                 ("mezcla fuentes", "mezcla citas"),
+                 ("manual equivocado", "pasaje de otro manual"),
+                 ("cifra", ("no está en la guía", "cifras sin citar")),
+                 ("término fuera de la guía", "no consta en la guía"),
+                 ("palabra fuera de la guía", "no aparecen en la guía")]
 
 
 def tipo_motivo(motivo: str) -> str:
@@ -140,18 +157,30 @@ def tipo_motivo(motivo: str) -> str:
 
 def medir_prosa(c: dict, rec: dict) -> dict:
     """La prosa del modelo, si pasa la verificación y por qué no."""
-    casos = rec["casos"]
+    casos, guias = rec["casos"], rec["guias"]
     metricas: dict = {}
     t0 = time.perf_counter()
-    prosa = generar_prosa(c["texto"], casos, metricas=metricas)
+    prosa = generar_prosa(c["texto"], casos, metricas=metricas, guias=guias)
     t1 = time.perf_counter()
-    ok, motivos = verificar_prosa(prosa, casos, c["texto"])
-    (ensamblar_prosa(prosa, casos) if ok else ensamblar("", casos, c["texto"]))
+    v = verificar_por_fuente(prosa, casos, c["texto"], guias)
+    ok, motivos = v.pasa, v.motivos
+    ensamblar_verificado(prosa, v, casos, c["texto"], guias, rec["con_guias"])
     t2 = time.perf_counter()
 
     ids = {m.group(1) for m in RX_CITA.finditer(prosa)}
     citados = [x for x in casos if x.record_id in ids]
+    secciones = {f.seccion_id for f in guias}
+    citadas = {m.group(1).upper() for m in RX_CITA_GUIA.finditer(prosa)} & secciones
+    mensajes = mensajes_prosa(c["texto"], casos, guias) or []
     return {
+        "fuentes": "+".join(n for n, hay in (("casos", casos), ("guias", guias)) if hay),
+        # lo que ve el médico en prosa; el resto va en la versión determinista
+        "en_prosa": "+".join(fuentes_en_prosa(v, casos, guias)),
+        # para calibrar la estimación de tokens de generate._opciones_contexto
+        "caracteres_prompt": sum(len(m["content"]) for m in mensajes),
+        "pasajes": len(secciones),
+        "pasajes_citados": len(citadas),
+        "pasajes_citados_atls": sum(s.startswith("ATLS-") for s in citadas),
         "s_generacion": round(t1 - t0, 2),
         "s_carga": round(metricas.get("s_carga", 0.0), 2),
         "s_prompt": round(metricas.get("s_prompt", 0.0), 2),
@@ -177,6 +206,11 @@ def main() -> None:
     ap.add_argument("--modos", default="json", help="texto, json, prosa, separados por coma")
     ap.add_argument("--n", type=int, default=0, help="solo las primeras N consultas de dominio")
     ap.add_argument("--ruta", default=None, help="ruta de recuperación (por defecto la de config)")
+    ap.add_argument("--consultas", choices=["casos", "guias"], default="casos",
+                    help="casos: eval/consultas.yaml · guias: eval/consultas_guias.yaml "
+                         "(las mismas más 16 de procedimiento, que responden los manuales)")
+    ap.add_argument("--sin-guias", action="store_true", help="solo casos, como antes de los libros")
+    ap.add_argument("--salida", type=Path, default=RAIZ / "reports" / "comparar_modelos.csv")
     args = ap.parse_args()
 
     modelos = [m.strip() for m in args.modelos.split(",") if m.strip()]
@@ -184,16 +218,25 @@ def main() -> None:
     if set(modos) - set(MODOS):
         raise SystemExit(f"Modos desconocidos: {sorted(set(modos) - set(MODOS))}. Opciones: {', '.join(MODOS)}")
     ruta = args.ruta or ruta_por_defecto()
-    consultas = yaml.safe_load((RAIZ / "eval" / "consultas.yaml").read_text(encoding="utf-8"))["consultas"]
-    dentro = [c for c in consultas if not c.get("espera_abstencion")]
-    fuera = [c for c in consultas if c.get("espera_abstencion")]
+    con_guias = usar_guias(False if args.sin_guias else None)
+    base = yaml.safe_load((RAIZ / "eval" / "consultas.yaml").read_text(encoding="utf-8"))["consultas"]
+    consultas = base
+    if args.consultas == "guias":
+        # mismos id y texto; mecanismo y regiones (para la precisión) vienen de consultas.yaml
+        por_id = {c["id"]: c for c in base}
+        consultas = [{**por_id.get(c["id"], {}), **c} for c in
+                     yaml.safe_load((RAIZ / "eval" / "consultas_guias.yaml").read_text(encoding="utf-8"))["consultas"]]
+    es_fuera = lambda c: c.get("espera_abstencion") or c.get("categoria") == "fuera_de_dominio"   # noqa: E731
+    dentro = [c for c in consultas if not es_fuera(c)]
+    fuera = [c for c in consultas if es_fuera(c)]
     if args.n:
         dentro = dentro[:args.n]
 
-    print(f"Recuperando ({ruta}) · {len(dentro)} consultas de dominio, {len(fuera)} fuera …")
+    print(f"Recuperando ({ruta}{', con los manuales' if con_guias else ', solo casos'}) · "
+          f"{len(dentro)} consultas de dominio, {len(fuera)} fuera …")
     # la primera búsqueda carga bge-m3 (y el reranker): no es un tiempo típico
-    recuperar({"texto": "herida en mano"}, ruta)
-    recs = {c["id"]: recuperar(c, ruta) for c in dentro + fuera}
+    recuperar({"texto": "herida en mano"}, ruta, con_guias)
+    recs = {c["id"]: recuperar(c, ruta, con_guias) for c in dentro + fuera}
     falsas = [c["id"] for c in dentro if recs[c["id"]]["abstiene"]]
     respondidas = [c["id"] for c in fuera if not recs[c["id"]]["abstiene"]]
 
@@ -212,7 +255,8 @@ def main() -> None:
         for modo in modos:
             for c in dentro:
                 rec = recs[c["id"]]
-                if rec["abstiene"]:
+                # sin casos, los modos texto y json no tienen qué elegir
+                if rec["abstiene"] or (modo != "prosa" and not rec["casos"]):
                     continue
                 descargar(modelo)
                 fila = {"modelo": modelo, "modo": modo, "id": c["id"], "categoria": c["categoria"],
@@ -233,7 +277,8 @@ def main() -> None:
                       f"citados {fila['citados']}/{fila['recuperados']}  {detalle}")
 
     df = pd.DataFrame(filas)
-    salida = RAIZ / "reports" / "comparar_modelos.csv"
+    salida = args.salida
+    salida.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(salida, index=False, encoding="utf-8")
 
     print("\n=== Tiempos en segundos (mediana; 'peor' = el máximo) ===")
@@ -263,6 +308,15 @@ def main() -> None:
             tipos = pd.Series([t for ts in g["tipos_motivo"].fillna("") if ts for t in ts.split(" | ")])
             print(f"{modelo}: {int(g['verificada'].sum())} de {len(g)} verificadas"
                   + (f" · rechazos por: {tipos.value_counts().to_dict()}" if len(tipos) else ""))
+            if con_guias:
+                for fuentes, h in g.groupby("fuentes"):
+                    con_pasajes = h[h["pasajes"] > 0]
+                    citan = (f" · citan algún pasaje {int((con_pasajes['pasajes_citados'] > 0).sum())} de "
+                             f"{len(con_pasajes)} (del ATLS: {int((con_pasajes['pasajes_citados_atls'] > 0).sum())})"
+                             if len(con_pasajes) else "")
+                    en_prosa = h["en_prosa"].fillna("").replace("", "determinista").value_counts().to_dict()
+                    print(f"  {fuentes or 'sin fuentes'}: {int(h['verificada'].sum())} de {len(h)} "
+                          f"verificadas{citan} · en prosa: {en_prosa}")
 
     print(f"\nAbstención (no depende del modelo): {len(falsas)} de {len(dentro)} consultas de "
           f"dominio se abstienen{' (' + ', '.join(falsas) + ')' if falsas else ''}; "

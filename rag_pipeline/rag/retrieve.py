@@ -376,6 +376,7 @@ class FragmentoGuia:
     n_tokens_contexto: int
     coseno: float
     relevancia: float | None = None     # probabilidad del reranker (ruta rerank)
+    capitulo_num: int | None = None
 
     @property
     def puntaje(self) -> float:
@@ -409,7 +410,7 @@ def _fragmento(punto) -> FragmentoGuia:
         idioma=p.get("idioma", ""), texto=p.get("text", ""),
         texto_contexto=p.get("texto_contexto", p.get("text", "")),
         n_tokens_contexto=int(p.get("n_tokens_contexto", p.get("n_tokens", 0))),
-        coseno=float(punto.score),
+        coseno=float(punto.score), capitulo_num=p.get("capitulo_num"),
     )
 
 

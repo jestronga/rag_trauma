@@ -41,7 +41,7 @@ from . import config
 from .hallazgos import (
     PROCEDIMIENTOS_QUIRURGICOS, Elemento, extraer, formatear, normalizar, obvios, terminos,
 )
-from .retrieve import Resultado
+from .retrieve import FragmentoGuia, Resultado
 
 # Títulos del protocolo con el modelo: la plantilla se los pide y generate.py
 # los busca en su salida. No son los que ve el médico.
@@ -279,6 +279,181 @@ manejo se hizo en los casos similares.
 - No agregues razones, condiciones ni detalles que no estén escritos en los casos \
 ("si no hay…", "por presentar…").
 - Sin títulos, viñetas ni cantidades."""
+
+
+# --- Con los libros de trauma (PLAN_INDEXAR_LIBROS.md, fase 5) -----------------
+# Dos fuentes con el mismo peso y dos tipos de afirmación que nunca se mezclan:
+# lo que se hizo en casos similares ([caso: ID]) y lo que recomiendan los
+# manuales ([guía: ID], sin conteos). verificar.py revisa cada oración contra
+# su fuente. Si solo pasó la guarda de los casos, el prompt es el de arriba,
+# sin cambios; estos son para cuando hay fragmentos.
+_REGLAS_DOS_FUENTES = f"""\
+DOS FUENTES
+Trabajas SOLO con lo que se te entrega: casos del registro de trauma \
+({config.COBERTURA_TEMPORAL}) de un hospital de Colombia y fragmentos de dos manuales, el ATLS \
+(en inglés) y el manual de manejo inicial del HUV. No uses conocimiento médico general ni otras \
+guías. Si algo no aparece en los casos ni en los fragmentos, no existe para ti.
+
+PROHIBIDO INVENTAR
+- No menciones síntomas, medicamentos, dosis, estudios, procedimientos ni diagnósticos \
+que no estén escritos en los casos o en los fragmentos.
+- No completes datos que falten. Si algo no consta, dilo.
+- Los datos personales aparecen como marcadores ([FECHA], [EDAD:30-39], [INSTITUCION], \
+[MUNICIPIO], [MEDICO]). Son información no disponible: no intentes deducirlos.
+
+CITAS
+- Lo que viene de un caso lleva su identificador: [caso: 12345].
+- Lo que viene de un manual lleva el identificador de la cabecera de su fragmento, en la forma \
+[guía: LIBRO-00-000].
+- Una oración cita casos o cita manuales, nunca las dos cosas.
+- Nunca cites un identificador que no esté entre los entregados.
+
+ESTILO
+Español de Colombia, registro clínico, directo. Lo que dice el ATLS se escribe en español."""
+
+SISTEMA_PROSA_GUIAS = f"""Eres un asistente de apoyo al diagnóstico en trauma para personal de \
+salud. Ante una presentación clínica, redactas una sugerencia breve con dos miradas: lo que se \
+hizo en casos similares del registro y lo que recomiendan los manuales. No reemplazas el juicio \
+clínico de quien consulta.
+
+{_REGLAS_DOS_FUENTES}
+
+CÓMO REDACTAR
+- De los casos solo puedes nombrar hallazgos, estudios y manejos que estén en la lista \
+"ELEMENTOS DOCUMENTADOS EN LOS CASOS".
+- De los manuales solo puedes decir lo que está escrito en los fragmentos, sin agregar nada \
+aunque lo sepas.
+- No escribas cantidades de casos ("dos de ellos", "la mayoría", "todos"): quien lee tiene los \
+casos a la vista.
+- Redacta como orientación ("conviene valorar", "en casos similares se hizo", "el ATLS \
+recomienda"), nunca como orden ("se debe", "hay que")."""
+
+INSTRUCCION_PROSA_GUIAS = """\
+Redacta la sugerencia para quien consulta y responde SOLO con JSON:
+{"sugerencia": "texto"}
+- Primero, de 2 a 4 oraciones sobre los casos similares, en este orden: qué hallazgos valorar, \
+qué estudios considerar y qué manejo se hizo. Cada oración que nombra un elemento de la lista \
+termina con sus citas [caso: ID].
+- Después, de 1 a 3 oraciones sobre lo que recomiendan los manuales para esta consulta. Cada una \
+empieza por "El ATLS recomienda" o "El manual del HUV recomienda", según el manual del fragmento \
+que cita, y termina con su cita [guía: ID].
+- Cada oración habla de una sola fuente. No compares los casos con los manuales ni juzgues lo que \
+se hizo: quien lee tiene las dos miradas a la vista.
+- Cifras solo si están escritas en el fragmento que citas.
+- Usa "conviene", "se puede considerar" o "recomienda"; nunca "se debe", "debe" ni "hay que".
+- No agregues razones, condiciones ni detalles que no estén escritos ("si no hay…", "por \
+presentar…").
+- Sin títulos ni viñetas."""
+
+INSTRUCCION_PROSA_SOLO_GUIAS = """\
+En el registro no hay casos suficientemente similares: la sugerencia sale solo de los manuales.
+Redacta la sugerencia para quien consulta y responde SOLO con JSON:
+{"sugerencia": "texto"}
+- De 2 a 4 oraciones sobre lo que recomiendan los manuales para esta consulta. Cada una empieza \
+por "El ATLS recomienda" o "El manual del HUV recomienda", según el manual del fragmento que cita, \
+y termina con su cita [guía: ID].
+- No hables de casos.
+- Cifras solo si están escritas en el fragmento que citas.
+- Usa "conviene", "se puede considerar" o "recomienda"; nunca "se debe", "debe" ni "hay que".
+- No agregues razones, condiciones ni detalles que no estén escritos.
+- Sin títulos ni viñetas."""
+
+ROTULO_GUIAS = "**Según los manuales**"
+# Decisión 3: si no coinciden, no se elige un ganador. Lo dice el código, no el
+# modelo: medido el 17/10 (21 consultas), la oración de comparación que
+# escribía el 4B nombraba elementos sin cita y juzgaba la atención recibida
+# (ejemplos en PLAN_INDEXAR_LIBROS.md, fase 5; no van aquí porque todo lo
+# escrito en este archivo cuenta como vocabulario permitido en verificar.py).
+AVISO_DOS_FUENTES = ("*Lo que se hizo en casos del registro ({cobertura}) y lo que recomiendan "
+                     "los manuales pueden no coincidir: el asistente muestra las dos miradas y no "
+                     "elige entre ellas.*").format(cobertura=config.COBERTURA_TEMPORAL)
+AVISO_SOLO_CASOS =("*Los manuales (ATLS y manual del HUV) no tratan esta situación: la sugerencia "
+                    "sale solo de los casos del registro.*")
+AVISO_SOLO_GUIAS = ("*No hay casos suficientemente similares en el registro: la sugerencia sale "
+                    "solo de los manuales.*")
+
+
+def agrupar_guias(fragmentos: list[FragmentoGuia]) -> dict[str, list[FragmentoGuia]]:
+    """seccion_id -> sus fragmentos, en orden de lectura; las secciones, en el
+    orden de su mejor fragmento. La cita es por sección ([guía: HUV-11-003]):
+    dos ventanas de una misma sección son un solo pasaje para quien lee, y un
+    identificador corto se copia mejor."""
+    grupos: dict[str, list[FragmentoGuia]] = {}
+    for f in fragmentos:
+        grupos.setdefault(f.seccion_id, []).append(f)
+    return {s: sorted(fs, key=lambda f: f.id) for s, fs in grupos.items()}
+
+
+def _sin_ruta(f: FragmentoGuia) -> str:
+    """El texto del fragmento sin la ruta de títulos del inicio: va una vez, en la cabecera."""
+    primera, _, resto = f.texto_contexto.partition("\n")
+    return resto if primera.startswith(f"{f.fuente} › ") else f.texto_contexto
+
+
+def _unir(textos: list[str], maximo: int = 80) -> str:
+    """Une ventanas consecutivas quitando el solape (fijo-256 repite ~32 tokens)."""
+    salida: list[str] = []
+    for texto in textos:
+        nuevas = texto.split()
+        solape = next((m for m in range(min(maximo, len(salida), len(nuevas)), 0, -1)
+                       if salida[-m:] == nuevas[:m]), 0)
+        salida += nuevas[solape:]
+    return " ".join(salida)
+
+
+def texto_guia(fragmentos: list[FragmentoGuia]) -> str:
+    """El pasaje de una sección: sus fragmentos de texto unidos y sus tablas aparte."""
+    texto = _unir([_sin_ruta(f) for f in fragmentos if f.tipo != "tabla"])
+    tablas = [_sin_ruta(f) for f in fragmentos if f.tipo == "tabla"]
+    return "\n\n".join([t for t in [texto] if t] + tablas)
+
+
+def cabecera_guia(fragmentos: list[FragmentoGuia]) -> str:
+    """Libro, capítulo, títulos y páginas impresas: lo que permite ir al libro."""
+    f = fragmentos[0]
+    libro = config.NOMBRES_LIBROS.get(f.fuente, f.fuente)
+    capitulo = f"cap. {f.capitulo_num} {f.capitulo}" if f.capitulo_num else f.capitulo
+    ini = min(x.pagina_ini for x in fragmentos)
+    fin = max(x.pagina_fin for x in fragmentos)
+    paginas = f"p. {ini}" if ini == fin else f"pp. {ini}–{fin}"
+    return f"{libro} · {' › '.join([capitulo, *f.titulos])} · {paginas}"
+
+
+def bloque_guias(fragmentos: list[FragmentoGuia]) -> str:
+    bloques = []
+    for sid, fs in agrupar_guias(fragmentos).items():
+        idioma = " (en inglés)" if fs[0].idioma == "en" else ""
+        bloques.append(f"--- [guía: {sid}] {cabecera_guia(fs)}{idioma} ---\n{texto_guia(fs)}")
+    return "\n\n".join(bloques)
+
+
+def construir_prompt_guias(consulta: str, casos: list[Resultado], elementos: list[Elemento],
+                           guias: list[FragmentoGuia]) -> str:
+    """Prompt de la prosa con los manuales. Sin casos (no pasaron su guarda),
+    solo los fragmentos y la instrucción de una sola fuente."""
+    partes = [f"CONSULTA:\n{consulta}"]
+    if casos:
+        bloques = "\n\n".join(_bloque_caso(c, i) for i, c in enumerate(casos, start=1))
+        partes += [f"CASOS SIMILARES DEL REGISTRO ({len(casos)}):\n\n{bloques}",
+                   f"ELEMENTOS DOCUMENTADOS EN LOS CASOS (única fuente de lo que digas sobre los "
+                   f"casos):\n{formatear(elementos, len(casos))}"]
+    partes += [f"FRAGMENTOS DE LOS MANUALES ({len(agrupar_guias(guias))}):\n\n{bloque_guias(guias)}",
+               INSTRUCCION_PROSA_GUIAS if casos else INSTRUCCION_PROSA_SOLO_GUIAS]
+    return "\n\n".join(partes)
+
+
+def seccion_guias(fragmentos: list[FragmentoGuia]) -> str:
+    """Respaldo determinista de los manuales: dónde está cada pasaje, sin
+    parafrasearlo (el texto completo va en el apartado de la app)."""
+    lineas = [f"- {cabecera_guia(fs)} [guía: {sid}]" for sid, fs in agrupar_guias(fragmentos).items()]
+    return f"{ROTULO_GUIAS} (pasajes relacionados con la consulta):\n" + "\n".join(lineas)
+
+
+def linea_respaldo_guias(fragmentos: list[FragmentoGuia]) -> str:
+    grupos = agrupar_guias(fragmentos)
+    por_libro = Counter(fs[0].fuente for fs in grupos.values())
+    detalle = " · ".join(f"{config.NOMBRES_LIBROS.get(k, k)} {v}" for k, v in por_libro.most_common())
+    return f"*Manuales: {len(grupos)} {'pasaje' if len(grupos) == 1 else 'pasajes'} ({detalle}).*"
 
 
 def _instruccion_salida(estructurada: bool = False, prosa: bool = False) -> str:
