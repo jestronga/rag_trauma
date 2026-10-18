@@ -12,6 +12,12 @@ Para cada umbral candidato cuenta:
 
 y propone el punto medio del hueco entre ambos grupos, si lo hay.
 
+Si los libros están indexados, agrega la guarda de los libros (columna
+"libros": puntaje del mejor fragmento) y cuenta las dos guardas juntas, como
+responde el sistema (decisión 3 de PLAN_INDEXAR_LIBROS.md): se responde si
+pasa cualquiera; ninguna consulta fuera de dominio debe pasar ninguna. La
+guarda de los libros se calibra aparte con scripts/calibrar_guias.py.
+
 Uso (con el chatbot cerrado, o INDICE_DIR apuntando a una copia):
     python scripts/calibrar_umbral.py
     python scripts/calibrar_umbral.py --profundidad 20
@@ -31,7 +37,9 @@ RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ))
 
 from rag import config                                   # noqa: E402
-from rag.retrieve import buscar_rerank, confianza, dispositivo_reranker  # noqa: E402
+from rag.retrieve import (buscar_rerank, candidatos_guias, confianza,  # noqa: E402
+                          dispositivo_reranker, hay_guias, ruta_guias_por_defecto,
+                          umbral_guias)
 
 
 def main() -> None:
@@ -44,6 +52,8 @@ def main() -> None:
 
     filas, tiempos = [], []
     buscar_rerank("calentamiento", config.TOP_K, profundidad=args.profundidad)   # carga el modelo
+    libros = hay_guias()
+    ruta_libros = ruta_guias_por_defecto()
     for c in consultas:
         conf = confianza(c["texto"])
         t0 = time.perf_counter()
@@ -51,16 +61,19 @@ def main() -> None:
         tiempos.append(time.perf_counter() - t0)
         probas = [r.relevancia for r in res]
         decisiva = probas[n_min - 1] if len(probas) >= n_min else 0.0
+        mejor_libro = (max((f.puntaje for f in candidatos_guias(c["texto"], ruta_libros)), default=0.0)
+                       if libros else None)
         filas.append({"id": c["id"], "fuera": bool(c.get("espera_abstencion")),
                       "coseno": conf, "p1": probas[0] if probas else 0.0, "decisiva": decisiva,
-                      "texto": c["texto"]})
+                      "libros": mejor_libro, "texto": c["texto"]})
 
     print(f"Profundidad {args.profundidad} · {dispositivo_reranker()} · "
           f"rerank {sorted(tiempos)[len(tiempos) // 2]:.2f} s mediana, {max(tiempos):.2f} s peor\n")
-    print(f"{'id':8} {'coseno':>6} {'p1':>6} {'p' + str(n_min):>6}  consulta")
+    print(f"{'id':8} {'coseno':>6} {'p1':>6} {'p' + str(n_min):>6} {'libros':>6}  consulta")
     for f in sorted(filas, key=lambda f: (f["fuera"], f["decisiva"])):
         marca = "  ← fuera de dominio" if f["fuera"] else ""
-        print(f"{f['id']:8} {f['coseno']:6.3f} {f['p1']:6.3f} {f['decisiva']:6.3f}  "
+        lib = f"{f['libros']:6.3f}" if libros else f"{'—':>6}"
+        print(f"{f['id']:8} {f['coseno']:6.3f} {f['p1']:6.3f} {f['decisiva']:6.3f} {lib}  "
               f"{f['texto'][:60]}{marca}")
 
     def abstiene(f, t):
@@ -85,6 +98,25 @@ def main() -> None:
               f"de una fuera de dominio ({peor_fuera:.3f}). Revisar las filas de arriba.")
     print(f"(UMBRAL_RERANK actual: {config.UMBRAL_RERANK} · MIN_CASOS: {n_min} · "
           f"UMBRAL_ABSTENCION: {config.UMBRAL_ABSTENCION})")
+
+    if libros:
+        u_lib = umbral_guias(ruta_libros)
+
+        def responde(f) -> tuple[bool, bool]:
+            return not abstiene(f, config.UMBRAL_RERANK), f["libros"] >= u_lib
+
+        print(f"\nLas dos guardas juntas (decisión 3), con los umbrales actuales "
+              f"(libros: ruta {ruta_libros}, umbral {u_lib}):")
+        for nombre, grupo in (("trauma", dentro), ("fuera de dominio", fuera)):
+            r = [responde(f) for f in grupo]
+            print(f"  {nombre:16} solo casos {sum(c and not l for c, l in r):>2} · solo libros "
+                  f"{sum(l and not c for c, l in r):>2} · las dos {sum(c and l for c, l in r):>2} · "
+                  f"ninguna {sum(not (c or l) for c, l in r):>2}  (de {len(grupo)})")
+        pasan = [f["id"] for f in fuera if any(responde(f))]
+        print("  → ninguna consulta fuera de dominio pasa." if not pasan else
+              f"  → fuera de dominio que responderían: {pasan}")
+    else:
+        print("\n(Sin la colección de los libros: python -m rag.index --fuente guias)")
 
 
 if __name__ == "__main__":

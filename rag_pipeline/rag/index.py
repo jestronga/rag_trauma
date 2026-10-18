@@ -138,6 +138,10 @@ def fragmentos_guias(secciones: list[dict], nombre: str, contar: fr.Contador,
     for f in frags:
         s = por_id[f["seccion_id"]]
         f.update(libro=s["libro"], capitulo=s["capitulo"], titulos=s["titulos"])
+        # lo que cuenta para el presupuesto del prompt (retrieve.seleccionar_guias);
+        # difiere de n_tokens solo en small-to-big
+        f["n_tokens_contexto"] = (f["n_tokens"] if f["texto_contexto"] == f["texto"]
+                                  else contar(f["texto_contexto"]))
     return frags
 
 

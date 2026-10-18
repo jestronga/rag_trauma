@@ -99,6 +99,15 @@ def test_fragmentos_guias_falla_si_alguno_pasa_el_limite():
         index.fragmentos_guias([seccion("ATLS-07-001", ["LARGA"])], "fijo-256", largo)
 
 
+def test_n_tokens_contexto_cuenta_lo_que_va_al_prompt():
+    secciones = [seccion("ATLS-07-001", ["Word " * 300])]
+    fijo = index.fragmentos_guias(secciones, "fijo-256", contar)
+    assert all(f["n_tokens_contexto"] == f["n_tokens"] for f in fijo)
+    # small-to-big: se embebe un hijo de ~128 y al prompt va el padre, más largo
+    hijos = index.fragmentos_guias(secciones, "oraciones-128", contar)
+    assert all(f["n_tokens_contexto"] == contar(f["texto_contexto"]) > f["n_tokens"] for f in hijos)
+
+
 def test_cargar_secciones_sin_extraer_dice_que_correr(tmp_path):
     with pytest.raises(SystemExit, match="extraer_guias"):
         index.cargar_secciones(tmp_path / "no_existe.jsonl")

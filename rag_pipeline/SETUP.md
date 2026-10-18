@@ -285,6 +285,12 @@ todavía lo escribe el modelo sin verificación y a veces cambia términos
 | `PRECISION_CONSULTA` | `bf16` | precisión de bge-m3 en CPU: `bf16` ~1,1 GB de RAM, `fp32` ~2,3 GB |
 | `DISPOSITIVO_CONSULTA` | `cpu` | dónde embeber la consulta |
 | `ENCODER` | `hf` | `hf` = transformers directo · `st` = sentence-transformers · `falso` = sustituto hash |
+| `COLECCION_GUIAS` | `guias` | colección de Qdrant con los libros de trauma |
+| `FRAGMENTACION_GUIAS` | `fijo-256` | configuración de `rag/fragmentar.py` al indexar los libros (reindexar si cambia) |
+| `RUTA_GUIAS` | `auto` | libros: `rerank` (densa + reranker sobre 30) si el reranker cabe en la GPU, si no `densa` |
+| `PRESUPUESTO_GUIAS` | `1400` | tokens de fragmentos de los libros que van al prompt (~6 con `fijo-256`) |
+| `UMBRAL_GUIAS` | `0.2` | ruta `rerank`: probabilidad mínima del mejor fragmento para que los libros hablen. Calibrar con `scripts\calibrar_guias.py` |
+| `UMBRAL_GUIAS_COSENO` | `0.60` | ruta `densa` (GTX 1650): coseno mínimo del mejor fragmento. Separa mal: con 0,60 frena las 10 fuera de dominio pero deja sin libros a 16 de 25 consultas de trauma |
 
 `ENCODER=falso` sirve para verificar la tubería completa (índices, rutas,
 métricas, interfaz) sin descargar bge-m3. **No mide calidad**: es un hash de

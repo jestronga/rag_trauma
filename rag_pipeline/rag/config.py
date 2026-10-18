@@ -72,6 +72,32 @@ COLECCION_GUIAS = _env("COLECCION_GUIAS", "guias")
 # PLAN_INDEXAR_LIBROS.md, fase 2. Sin BM25: en una lista fusionada saca al ATLS
 # (en inglés) del presupuesto del prompt.
 FRAGMENTACION_GUIAS = _env("FRAGMENTACION_GUIAS", "fijo-256")
+# Recuperación en los libros (fase 4, retrieve.buscar_guias): densa sobre los
+# dos libros y, si el reranker cabe en la GPU, el cross-encoder reordena los
+# PROFUNDIDAD_RERANK primeros (rerank-densa de la fase 2).
+# Latencia en la RTX 4060: 0,88 s por consulta con rerank, 0,68 s solo densa.
+RUTA_GUIAS = _env("RUTA_GUIAS", "auto")            # auto | densa | rerank
+# Tokens de fragmentos que van al prompt, en orden, sin pasar de aquí: el
+# mismo espacio para cada fuente (decisión 3) y lo que mide R@ppto. Con
+# fijo-256 son ~6 fragmentos. Medido (17/10/2026, ruta rerank con
+# UMBRAL_GUIAS, 41 consultas anotadas): 1.000 → 0,286 · 1.400 → 0,331 ·
+# 1.800 → 0,354. Ojo: el prompt de la fase 5 suma esto a los casos y las reglas.
+PRESUPUESTO_GUIAS = _env_int("PRESUPUESTO_GUIAS", 1400)
+# Guarda de los libros: si el MEJOR fragmento no llega, los libros no hablan
+# (y responden los casos, si pasan su guarda). Si llega, el presupuesto se
+# llena en orden: filtrar fragmento por fragmento recuperaba menos (0,297
+# contra 0,331), porque la continuación de una sección relevante puntúa bajo
+# leída sola. Calibrado con scripts/calibrar_guias.py (17/10/2026, 41
+# consultas de trauma y procedimiento, 10 fuera de dominio):
+#   ruta rerank, probabilidad: fuera de dominio máx. 0,173 ("cuál es la capital
+#     de Colombia"); con 0,2 ninguna pasa, las 16 de procedimiento responden y
+#     11 de 25 de trauma se quedan sin libros (abreviaturas, ortografía y
+#     coloquiales, que además se recuperaban mal).
+#   ruta densa, coseno (GTX 1650): separa mal. Fuera de dominio máx. 0,589
+#     ("dolor torácico opresivo…"); con 0,60 ninguna pasa, pero 16 de 25 de
+#     trauma se quedan sin libros. Con 0,55 pasarían 3 de 10 fuera de dominio.
+UMBRAL_GUIAS = _env_float("UMBRAL_GUIAS", 0.2)
+UMBRAL_GUIAS_COSENO = _env_float("UMBRAL_GUIAS_COSENO", 0.60)
 
 # --- modelos ---------------------------------------------------------------
 MODELO_EMBEDDING = _env("MODELO_EMBEDDING", "BAAI/bge-m3")

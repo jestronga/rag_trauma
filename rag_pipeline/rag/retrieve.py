@@ -15,6 +15,9 @@ desajusta con cada consulta nueva. RRF no necesita calibración.
 
 Todas las rutas devuelven `Resultado`, con `score_norm` en [0, 1] para que la
 abstención tenga un criterio comparable: el coseno del mejor caso.
+
+Los libros de trauma (colección COLECCION_GUIAS) se buscan aparte, con
+`buscar_guias`, y devuelven `FragmentoGuia`: nunca se mezclan con los casos.
 """
 from __future__ import annotations
 
@@ -218,11 +221,15 @@ def buscar_bm25(consulta: str, k: int, filtros: Filtros | None = None) -> list[R
     return salida
 
 
+def _vector_consulta(consulta: str) -> np.ndarray:
+    return _encoder().encode([config.PREFIJO_CONSULTA + consulta],
+                             normalize_embeddings=True, convert_to_numpy=True)[0]
+
+
 def buscar_densa(consulta: str, k: int, filtros: Filtros | None = None) -> list[Resultado]:
     from qdrant_client import models
 
-    vector = _encoder().encode([config.PREFIJO_CONSULTA + consulta],
-                               normalize_embeddings=True, convert_to_numpy=True)[0]
+    vector = _vector_consulta(consulta)
 
     condiciones = []
     if filtros and not filtros.vacio():
@@ -341,3 +348,122 @@ _CAMPOS_META = ("mecanismo_lesion", "region_anatomica", "desenlace", "es_pediatr
 
 def _meta(payload: dict) -> dict:
     return {c: payload.get(c) for c in _CAMPOS_META if c in payload}
+
+
+# ---------------------------------------------------------------------------
+# Libros de trauma (PLAN_INDEXAR_LIBROS.md, fase 4)
+# ---------------------------------------------------------------------------
+RUTAS_GUIAS = ("densa", "rerank")
+
+
+@dataclass
+class FragmentoGuia:
+    """Un fragmento de los libros. Es un tipo aparte de `Resultado` a
+    propósito: un fragmento en la lista de casos rompería los conteos ("2 de
+    5") de hallazgos.py, la tabla y verificar.py."""
+    id: str                     # ATLS-07-019-02: sección + número de fragmento
+    seccion_id: str
+    fuente: str                 # ATLS | HUV
+    libro: str
+    capitulo: str
+    titulos: list[str]
+    pagina_ini: int             # páginas impresas: las que se citan
+    pagina_fin: int
+    tipo: str                   # texto | tabla
+    idioma: str                 # en (ATLS) | es (HUV)
+    texto: str                  # lo que se embebe: ruta de títulos + texto
+    texto_contexto: str         # lo que va al prompt
+    n_tokens_contexto: int
+    coseno: float
+    relevancia: float | None = None     # probabilidad del reranker (ruta rerank)
+
+    @property
+    def puntaje(self) -> float:
+        """Lo que decide la guarda: la probabilidad si hubo reranker, si no el coseno."""
+        return self.coseno if self.relevancia is None else self.relevancia
+
+
+def ruta_guias_por_defecto() -> str:
+    """RUTA_GUIAS=auto: rerank si el reranker cabe en la GPU; si no, densa."""
+    if config.RUTA_GUIAS != "auto":
+        return config.RUTA_GUIAS
+    return "rerank" if _reranker_cabe() else "densa"
+
+
+def umbral_guias(ruta: str) -> float:
+    return config.UMBRAL_GUIAS if ruta == "rerank" else config.UMBRAL_GUIAS_COSENO
+
+
+@lru_cache(maxsize=1)
+def hay_guias() -> bool:
+    """¿Se indexaron los libros? (python -m rag.index --fuente guias)"""
+    return config.QDRANT_PATH.exists() and _qdrant().collection_exists(config.COLECCION_GUIAS)
+
+
+def _fragmento(punto) -> FragmentoGuia:
+    p = punto.payload
+    return FragmentoGuia(
+        id=str(p["record_id"]), seccion_id=p["seccion_id"], fuente=p["fuente"],
+        libro=p.get("libro", ""), capitulo=p.get("capitulo", ""), titulos=list(p.get("titulos", [])),
+        pagina_ini=p.get("pagina_ini"), pagina_fin=p.get("pagina_fin"), tipo=p.get("tipo", "texto"),
+        idioma=p.get("idioma", ""), texto=p.get("text", ""),
+        texto_contexto=p.get("texto_contexto", p.get("text", "")),
+        n_tokens_contexto=int(p.get("n_tokens_contexto", p.get("n_tokens", 0))),
+        coseno=float(punto.score),
+    )
+
+
+def candidatos_guias(consulta: str, ruta: str | None = None,
+                     profundidad: int | None = None) -> list[FragmentoGuia]:
+    """Los `profundidad` fragmentos más cercanos por la densa, de mejor a peor;
+    con la ruta rerank, reordenados por el cross-encoder. Sin guarda ni
+    presupuesto: eso lo hace `seleccionar_guias` (y así calibrar_guias.py
+    prueba varios umbrales sin repetir la búsqueda)."""
+    ruta = (ruta or ruta_guias_por_defecto()).lower()
+    if ruta not in RUTAS_GUIAS:
+        raise ValueError(f"Ruta de libros desconocida: {ruta!r}. Opciones: {', '.join(RUTAS_GUIAS)}")
+    if not hay_guias():
+        raise SystemExit(f"Falta la colección de los libros ({config.COLECCION_GUIAS!r}). "
+                         "Corre: python -m rag.index --fuente guias")
+    puntos = _qdrant().query_points(
+        config.COLECCION_GUIAS,
+        query=_vector_consulta(consulta).tolist(),
+        limit=profundidad or config.PROFUNDIDAD_RERANK,
+        with_payload=True,
+    ).points
+    frags = [_fragmento(p) for p in puntos]
+    if ruta == "rerank" and frags:
+        for f, p in zip(frags, _probabilidades([(consulta, f.texto) for f in frags])):
+            f.relevancia = float(p)
+        frags.sort(key=lambda f: f.relevancia, reverse=True)
+    return frags
+
+
+def seleccionar_guias(candidatos: list[FragmentoGuia], umbral: float,
+                      presupuesto: int) -> list[FragmentoGuia]:
+    """Guarda y presupuesto. Si el mejor fragmento no llega a `umbral`, los
+    libros se abstienen (lista vacía). Si llega, entran en orden mientras
+    quepan en `presupuesto` tokens, sin repetir contexto (small-to-big trae el
+    mismo padre para varios hijos). Se corta en el primero que no cabe, como
+    R@ppto en scripts/comparar_fragmentacion.py: así lo medido es lo que llega
+    al prompt."""
+    if not candidatos or max(f.puntaje for f in candidatos) < umbral:
+        return []
+    salida, tokens, vistos = [], 0, set()
+    for f in candidatos:
+        if f.texto_contexto in vistos:
+            continue
+        if tokens + f.n_tokens_contexto > presupuesto:
+            break
+        vistos.add(f.texto_contexto)
+        tokens += f.n_tokens_contexto
+        salida.append(f)
+    return salida
+
+
+def buscar_guias(consulta: str, ruta: str | None = None) -> list[FragmentoGuia]:
+    """Fragmentos de los libros para el prompt; vacío si los libros no tratan
+    la consulta (la guarda de esta fuente no pasa)."""
+    ruta = (ruta or ruta_guias_por_defecto()).lower()
+    return seleccionar_guias(candidatos_guias(consulta, ruta), umbral_guias(ruta),
+                             config.PRESUPUESTO_GUIAS)
