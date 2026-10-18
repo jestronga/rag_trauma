@@ -62,6 +62,16 @@ LIBROS_DIR = Path(_env("LIBROS_DIR", str(RAIZ_ANONIMIZACION / "data")))
 GUIAS_DIR = RAIZ / "guias"
 GUIAS_PERFILES = GUIAS_DIR / "perfiles.yaml"
 GUIAS_SECCIONES = Path(_env("GUIAS_SECCIONES", str(GUIAS_DIR / "secciones.jsonl")))
+# Los libros van en su propia colección del mismo Qdrant local: sus puntajes no
+# se comparan con los de los casos, y un fragmento entre los casos rompería
+# los conteos ("2 de 5") de hallazgos.py, la tabla y verificar.py.
+COLECCION_GUIAS = _env("COLECCION_GUIAS", "guias")
+# Configuración de rag/fragmentar.py. fijo-256 (ventanas de 256 tokens con la
+# ruta de títulos al inicio) fue la más estable en la fase 2 (08/10/2026):
+# R@ppto 0,401 con la densa en las 51 consultas anotadas. Ver
+# PLAN_INDEXAR_LIBROS.md, fase 2. Sin BM25: en una lista fusionada saca al ATLS
+# (en inglés) del presupuesto del prompt.
+FRAGMENTACION_GUIAS = _env("FRAGMENTACION_GUIAS", "fijo-256")
 
 # --- modelos ---------------------------------------------------------------
 MODELO_EMBEDDING = _env("MODELO_EMBEDDING", "BAAI/bge-m3")

@@ -141,6 +141,20 @@ Para probar rápido sin esperar a que indexe todo:
 python -m rag.index --limite 2000
 ```
 
+### Libros de trauma (colección `guias`)
+
+Los PDF van en `..\anonimizacion\data\` (fuera de git). Se extraen y se
+indexan aparte; los casos no se reindexan:
+
+```powershell
+python scripts\extraer_guias.py         # → guias\secciones.jsonl (926 secciones)
+python -m rag.index --fuente guias      # fijo-256: 2.272 fragmentos, ~20 s en GPU
+```
+
+Cada fuente vive en su colección del mismo Qdrant (`trauma` y `guias`) y
+reindexar una no borra la otra. `--fuente todas` hace las dos.
+`indices\meta.json` registra cuándo y con qué se indexó cada fuente.
+
 ---
 
 ## 4. Comparar las rutas de recuperación
