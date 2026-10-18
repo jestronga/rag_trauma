@@ -2,7 +2,7 @@
 
 Resumen para retomar el trabajo. Última sesión: **17 de octubre de 2026**, en
 el **PC de 8 GB** (RTX 4060), preparado desde un clon limpio. **Empezar por la
-sección 00** (libros de trauma: la próxima sesión arranca la fase 5), después
+sección 00** (libros de trauma: la próxima sesión arranca la fase 6), después
 0, 1, 5 y 6.
 
 ---
@@ -31,14 +31,32 @@ prefiere el HUV). La mitad del presupuesto para cada libro sube el ATLS
 (0,203 → 0,318) y baja el HUV (0,572 → 0,494); el total no cambia más allá
 del ruido. Tabla en el plan, fase 4.
 
-**Próxima sesión: fase 5** (generación y verificación, y después la 6):
-- El prompt con dos bloques ("Casos similares" y "Fragmentos de los
-  manuales"); si solo pasó una fuente, solo esa, y la respuesta lo dice.
-- `GUIAS=1` para encender o apagar los libros, leído por `generate.responder`.
-- `NUM_CTX` a 4.096 (1.400 tokens de libros + casos + reglas): medir VRAM y
-  tiempo. ¿`TOP_K` de casos de 5 a 4?
-- `verificar.py`: citas `[guía: ID]`, números de la oración presentes en el
-  fragmento, no atribuir a un caso lo que dice la guía ni al revés.
+**Fase 5 hecha el 17/10** (`PLAN_INDEXAR_LIBROS.md`, fase 5, con la tabla
+y las iteraciones): `generate.responder` usa las dos guardas (se abstiene solo
+si no pasa ninguna), prompt con los dos bloques (solo casos: el de siempre,
+sin cambios), cita por sección `[guía: HUV-11-003]`, verificador con las
+reglas 7 a 11 (las de los casos no cambian) y **respaldo por fuente**: cada
+parte en prosa si sus oraciones pasan, si no en determinista. Medido en 41
+consultas: con las dos fuentes, 7 de 21 en prosa completa y 18 de 21 con
+alguna parte en prosa. Con libros, 7,6 s de mediana (sin libros 5,3 s).
+`GUIAS=1` por defecto, `NUM_CTX` 6.144 con libros, `MAX_TOKENS_PROSA` 600.
+**Desvío del plan:** se quitó la oración en que el modelo comparaba casos y
+manuales (juzgaba la atención y nunca pasaba); lo dice el código, en general:
+`AVISO_DOS_FUENTES`.
+
+**Antes de usar la app con libros: decidir `PROSA_SIEMPRE`** (sigue en
+`True` desde la demo). Con los libros, la prosa sin verificar puede citar la
+sección equivocada o agregar detalles clínicos.
+
+**Próxima sesión: fase 6** (la app):
+- Expander "Fragmentos de los manuales consultados", con libro, capítulo,
+  sección, página y el texto (el ATLS en inglés, tal cual). Hoy la respuesta
+  ya trae `[guía: ID]` pero la app no muestra los fragmentos.
+- El aviso fijo y la barra lateral nombran las dos fuentes; un control para
+  `GUIAS` (ablación en vivo).
+- `preparar_modelos` (app) y `preparar_demo.py`: calentar también la
+  búsqueda en los libros; `SISTEMA_PROSA_GUIAS` en el calentamiento de Ollama.
+- Medir en la GTX 1650: VRAM con `NUM_CTX=6144`.
 - Validar las 51 consultas anotadas puede ir en paralelo. Si cambian,
   repetir `calibrar_guias.py` (segundos) y, si cambia la fragmentación,
   `FRAGMENTACION_GUIAS` y reindexar (~20 s).
@@ -98,7 +116,7 @@ el 08/10; sirven para el PC de 8 GB):
    cd rag_pipeline
    ..\.venv\Scripts\python.exe -m pip install "pymupdf==1.28.2"
    ..\.venv\Scripts\python.exe scripts\extraer_guias.py
-   ..\.venv\Scripts\python.exe -m pytest tests/ -q        # 189 desde el 17/10 (ver nota)
+   ..\.venv\Scripts\python.exe -m pytest tests/ -q        # 220 desde el 17/10 (ver nota)
    ```
    **Nota:** con `PROSA_SIEMPRE=True` (cambio de la demo, sección 2.12)
    falla `test_responder_vuelve_a_la_version_determinista`; con
@@ -568,7 +586,7 @@ la demo, **solo prosa y debajo los casos consultados**.
 ## 5. Pendientes, por prioridad
 
 **Nuevo desde el 07/10, antes que todo lo demás:** libros de trauma, sección 00
-y `PLAN_INDEXAR_LIBROS.md` (fases 1 a 4 hechas; sigue la fase 5, después 6 y 7).
+y `PLAN_INDEXAR_LIBROS.md` (fases 1 a 5 hechas; sigue la fase 6, después la 7).
 
 **`CONSULTAS_DEMO.md` y `PREGUNTAS_DEMO.md` nunca entraron a git** (el commit
 `45662e9` llevó `app.py`, `config.py` y `generate.py`, no esos dos): solo
@@ -686,7 +704,7 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
 |---|---|---|
 | `MODELO_LLM` | `qwen3:4b-instruct` | NO `qwen3:4b` (Thinking). Sin GPU: `qwen2.5:3b` |
 | `NUM_GPU` | `99` | todas las capas en GPU; `-1` = que decida Ollama |
-| `NUM_CTX` | `3072` | se agranda sola para la llamada si el prompt no cabe |
+| `NUM_CTX` | `6144` con `GUIAS`, `3072` sin | se agranda sola para la llamada si el prompt no cabe (y Ollama recarga el modelo) |
 | `MAX_TOKENS` | `250` | `900` con `SINTESIS_LLM=1` |
 | `MAX_TOKENS_RESUMEN` | `700` | resumen de un caso por identificador |
 | `TIMEOUT_LLM` | `400` | |
@@ -704,6 +722,8 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
 | `PRECISION_CONSULTA` | `bf16` | con 16 GB de RAM se puede usar `fp32` |
 | `DISPOSITIVO_CONSULTA` | `cpu` | dejar en CPU: la VRAM es para el generador |
 | `INDICE_DIR` | `rag_pipeline/indices` | apuntar a una copia para correr scripts con el chatbot abierto |
+| `GUIAS` | `1` | los libros como segunda fuente; `0` o sin la colección = solo casos, como antes |
+| `MAX_TOKENS_PROSA` | `600` | 400 hasta el 17/10: con los libros se cortaba el JSON |
 | `COLECCION_GUIAS` | `guias` | colección de Qdrant con los libros (17/10) |
 | `FRAGMENTACION_GUIAS` | `fijo-256` | configuración de `rag/fragmentar.py` al indexar los libros |
 | `RUTA_GUIAS` | `auto` | libros: `rerank` con ≥ 7 GB de VRAM, si no `densa` |

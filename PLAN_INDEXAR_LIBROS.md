@@ -369,7 +369,100 @@ Plan original:
   `calibrar_umbral.py` calibra las dos guardas: las 10 consultas fuera de
   dominio no deben pasar ninguna.
 
-### Fase 5 — Generación y verificación
+### Fase 5 — Generación y verificación (hecha el 17/10/2026, en el PC de 8 GB)
+
+**Resultado** (`scripts/comparar_modelos.py --modos prosa --consultas guias`,
+41 consultas: 25 de trauma y 16 de procedimiento; `PROSA_SIEMPRE=0`):
+
+| Fuentes que pasan su guarda | Consultas | Prosa completa | Parcial: casos en prosa | Parcial: manuales en prosa | Todo determinista |
+|---|---|---|---|---|---|
+| casos y manuales | 21 | 7 | 10 | 1 | 3 |
+| solo casos | 11 | 7 | — | — | 4 |
+| solo manuales | 9 | 5 | — | — | 4 |
+
+En las mismas 25 consultas de trauma, **sin libros** (`--sin-guias`): 14 de
+25 prosas verificadas, 5,3 s de mediana (peor 6,4), prompt de 1.857 tokens.
+**Con libros:** 12 de 25 completas y 19 de 25 con alguna parte en prosa,
+7,6 s de mediana (peor 11,5), prompt de 3.131 tokens (máx. 4.410), salida de
+256 tokens (máx. 471). Generador 100 % en GPU. Ninguna consulta de dominio se
+abstiene; fuera de dominio responde `neg-05` (apendicitis), solo por los casos,
+como antes.
+
+Cómo quedó:
+- **`generate.responder`**: guarda de los casos (como antes) y de los
+  libros (`buscar_guias`); se abstiene solo si no pasa ninguna
+  (`MENSAJE_ABSTENCION_GUIAS`). `GUIAS=1` por defecto; sin la colección
+  indexada se comporta como `GUIAS=0`, que da la respuesta de antes byte a
+  byte. `Respuesta.guias` trae los fragmentos y `Respuesta.fuentes_en_prosa`,
+  qué partes se muestran en prosa.
+- **Prompt** (`build_prompt.py`): con solo casos, **el de siempre, sin
+  cambios** (test). Con fragmentos, `SISTEMA_PROSA_GUIAS` +
+  `construir_prompt_guias`: casos, elementos y "FRAGMENTOS DE LOS MANUALES"
+  agrupados por sección, con cabecera de libro, capítulo, títulos y páginas
+  impresas, sin la ruta repetida ni el solape entre ventanas. **La cita es
+  por sección** (`[guía: HUV-11-003]`): más corta de copiar, y dos ventanas
+  de una sección son un solo pasaje. Solo manuales:
+  `INSTRUCCION_PROSA_SOLO_GUIAS`.
+- **Verificador** (`verificar.py`, reglas 7 a 11): las oraciones que citan
+  `[guía: ID]` se revisan contra el fragmento citado: la cita existe, no
+  mezcla `[caso]` y `[guía]`, el manual nombrado es el citado, las cifras
+  están en el fragmento y el tono orienta. Del HUV, además, los términos del
+  léxico y el vocabulario; del ATLS, solo cita, cifras y tono (decisión 2).
+  Con fragmentos, una oración sin cita no puede dar cifras. **Las reglas de
+  los casos no cambian.**
+- **Respaldo por fuente** (`ensamblar_verificado`): cada parte en prosa si
+  sus oraciones pasan, si no en su versión determinista (casos: la respuesta
+  de siempre; manuales: `seccion_guias`, con libro, capítulo, sección y
+  página, sin parafrasear). Nunca se muestra una oración que no pasó, y las
+  dos fuentes siempre aparecen. Sin esto, en 8 de 14 rechazos se perdía la
+  parte de los casos por una oración del manual.
+- **Avisos del código, no del modelo**: con las dos fuentes, que pueden no
+  coincidir y el asistente no elige (`AVISO_DOS_FUENTES`); con una sola,
+  cuál falta (`AVISO_SOLO_CASOS`, `AVISO_SOLO_GUIAS`).
+- `NUM_CTX` 6.144 con `GUIAS` (3,57 GB de VRAM; 3,03 con 3.072): cubre el
+  prompt más largo sin que Ollama recargue el modelo, que pasa cada vez que
+  cambia la ventana (6-8 s). `MAX_TOKENS_PROSA` 400 → 600: con 400 se
+  cortaba el JSON y no había prosa. `TOP_K` de casos se queda en 5: con
+  6.144 no hace falta bajarlo.
+- `PALABRAS_COMUNES`: aplicar, momento, debido, podría(n), rápidamente,
+  mantuvo (falsos rechazos medidos, no clínicos).
+- Tests: `tests/test_responder_guias.py` (31).
+
+**Iteraciones (medidas sobre las mismas 41 consultas):**
+1. Con una oración final que comparara casos y manuales "sin nombrar
+   elementos": **0 de 21** prosas con las dos fuentes pasaban. Esa oración
+   nombraba elementos sin cita, daba cifras de la guía sin citarla y
+   juzgaba la atención ("un enfoque más riguroso", "podría afectar la
+   detección temprana de lesiones graves", "una brecha respecto a lo
+   recomendado"). **Se quitó**: que pueden no coincidir lo dice el código
+   (`AVISO_DOS_FUENTES`). Es un cambio respecto al plan ("si no coinciden,
+   la respuesta lo dice"): ahora lo dice siempre, en general, sin decir en qué.
+2. Sin la comparación, con la regla del manual nombrado y las palabras
+   comunes: 7 de 21 completas.
+3. Con el respaldo por fuente: 18 de 21 con alguna parte en prosa.
+
+**Lo que rechaza ahora** (justo, revisado a mano): citas a la sección
+equivocada del mismo manual (la prosa dice lo de HUV-12-007 y cita
+HUV-12-004: el médico no lo encontraría en el pasaje citado), detalles
+clínicos agregados ("esternotomía", "necrótico", "mortalidad"), contenido
+de la guía puesto en una oración de casos, y órdenes copiadas del manual
+("debe retirarse en quirófano").
+
+**Revisado a mano, 5 oraciones del ATLS verificadas** (solo se comprueban
+cita y cifras): fieles al fragmento, con deslices menores: agrega "cuello" a
+una tabla que no lo tiene, pega "independientemente del patrón de fractura"
+a otra oración, y dice "el ATLS recomienda" para datos descriptivos
+(epidemiología de caídas). **Para la revisión médica (fase 7).**
+
+**Pendiente de la fase 5:**
+- Medir en la GTX 1650: VRAM con `NUM_CTX=6144` (allá el 4B ocupaba 3,0 GB
+  de 4) y la guarda de coseno de los libros. Si no cabe, `NUM_CTX=5120` y
+  `PRESUPUESTO_GUIAS=1000`.
+- **`PROSA_SIEMPRE` sigue en `True`** (demo del 28/09): muestra la prosa
+  aunque no pase. Con los libros el riesgo crece (citas a la sección
+  equivocada, detalles agregados). Decidirlo antes de usar la app con libros.
+
+Plan original:
 - El prompt tiene dos bloques del mismo tamaño, "Casos similares" y
   "Fragmentos de los manuales". La prosa separa "En casos similares…" de "El
   ATLS / el manual del HUV recomienda…" y dice si coinciden o no.
