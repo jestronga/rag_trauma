@@ -37,7 +37,7 @@ from rag.index import cargar_secciones                            # noqa: E402
 from rag.retrieve import (_reranker_cabe, candidatos_guias,       # noqa: E402
                           seleccionar_guias, umbral_guias)
 
-UMBRALES = {"rerank": [0.05, 0.1, 0.15, 0.18, 0.2, 0.25, 0.3, 0.4],
+UMBRALES = {"rerank": [0.05, 0.1, 0.15, 0.18, 0.2, 0.25, 0.3, 0.34, 0.4],
             "densa": [0.5, 0.52, 0.55, 0.57, 0.59, 0.6, 0.62]}
 
 

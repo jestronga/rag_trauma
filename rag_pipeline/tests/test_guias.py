@@ -94,6 +94,18 @@ def test_continua_solo_si_la_oracion_quedo_abierta():
     (bloque("Lecturas Recomendadas", fuente="Montserrat-Bold", tam=16, color=0x00BAE3), HUV, "referencias"),
     (bloque("2. www.seguridadjusticiaypaz.org 2019", fuente="FuturaBT-BookItalic", tam=12, color=NEGRO),
      HUV, "descartar"),
+    # Pies de foto y dibujo del HUV (pp. 55, 140, 97): se descartan
+    (bloque("Foto. E-FAST inicial de paciente HUV", fuente="FuturaBT-LightItalic", tam=11, color=NEGRO),
+     HUV, "figura"),
+    (bloque("Dibujos. Técnica de toracostomía", fuente="FuturaBT-LightItalic", tam=11, color=NEGRO),
+     HUV, "figura"),
+    (bloque("Foto Control del sangrado externo.", fuente="FuturaBT-LightItalic", tam=11, color=NEGRO),
+     HUV, "figura"),
+    # ...pero no el título "IMAGENES DIAGNÓSTICAS" (p. 198) ni el rótulo de un flujograma (p. 269)
+    (bloque("IMAGENES DIAGNÓSTICAS", fuente="Montserrat-Bold", tam=16, color=0x00BAE3), HUV, "titulo1"),
+    (bloque("Imagenes: AngioTAC", fuente="Montserrat-SemiBold", tam=9, color=BLANCO), HUV, "material"),
+    # El ATLS no tiene la regla: sus figuras van con su pie ("Figure 7-1:")
+    (bloque("Foto of a patient", fuente="OpenSans-Medium", tam=8), ATLS, "material"),
 ])
 def test_clasificar(b, perfil, rol):
     assert guias.clasificar(b, perfil) == rol
@@ -164,6 +176,30 @@ def test_recuadros_conserva_listas_y_descarta_flujogramas():
     cajas, perdido = guias.recuadros(lista + flujo)
     assert len(cajas) == 1 and "Neumotórax a tensión" in cajas[0].anexo
     assert perdido > 0
+
+
+def test_pie_de_foto_partido_en_dos_bloques():
+    # HUV p. 97: la segunda línea del pie es otro bloque, pegado debajo
+    fuente = dict(fuente="FuturaBT-LightItalic", tam=11.0, color=NEGRO)
+    pie = bloque("Foto. TAC trauma renal manejo conservador y", x0=72, y0=400, x1=540, y1=415,
+                 rol="figura", **fuente)
+    sigue = bloque("hemostáticos y trauma hepático. Cortesía grupo de CTE-FVL", x0=72, y0=413, x1=500,
+                   y1=426, rol="material", **fuente)
+    lejos = bloque("Otro rótulo en la misma fuente", x0=72, y0=480, x1=500, rol="material", **fuente)
+    otra_fuente = bloque("Una celda", x0=72, y0=428, x1=300, fuente="Tahoma", tam=12, rol="material")
+    guias.continuar_figuras([pie, sigue, lejos, otra_fuente])
+    assert (sigue.rol, lejos.rol, otra_fuente.rol) == ("figura", "material", "material")
+
+
+def test_pie_de_foto_no_se_lleva_la_lista_de_encima():
+    # HUV p. 59: "Indicaciones para realizar TAC corporal Total" (sin pie)
+    # encima del pie de una foto, en la misma columna
+    lista = [bloque("Indicaciones para realizar TAC corporal Total", y0=100, rol="material"),
+             bloque("Herida múltiple por AF | Herida múltiple por ACP", y0=118, rol="material")]
+    foto = bloque("Foto. E-FAST inicial de paciente HUV", y0=300, rol="figura")
+    salida, _ = guias.agrupar_pies(lista + [foto], "abajo")
+    assert foto.anexo == ""
+    assert [b.rol for b in salida if "TAC corporal" in b.anexo] == ["recuadro"]
 
 
 def test_es_flujograma():
@@ -254,3 +290,107 @@ def test_perfiles_capitulos_consecutivos():
         assert [c.numero for c in caps] == list(range(1, len(caps) + 1))
         assert all(c.pdf_ini <= c.pdf_fin for c in caps)
         assert caps[-1].pdf_fin == perfil["fin"]
+
+
+# ---------------------------------------------------------------------------
+# Transcripciones a mano (flujogramas y tablas en imagen del HUV)
+# ---------------------------------------------------------------------------
+TITULO_HUV = ("Montserrat-Bold", 16, 0x00BAE3)
+CUERPO_HUV = ("Tahoma", 12, NEGRO)
+CAJA = ("Montserrat-SemiBold", 9, BLANCO)
+
+
+def _perfil_huv(**cambios) -> dict:
+    p = dict(HUV, capitulos=[[15, "Trauma abdominal penetrante", 1]], fin=2)
+    p.update(cambios)
+    return p
+
+
+def _transcripcion(tipo, texto, ancla=None):
+    return {"tipo": tipo, "texto": texto, "ancla": ancla or guias.ANCLAS[tipo]}
+
+
+FLUJO = "Flujograma 2: trauma abdominal penetrante (transcripción del diagrama del libro).\nAgónico: toracotomía."
+
+
+def test_flujograma_transcrito_reemplaza_las_cajas_sueltas():
+    # HUV p. 98: tras el título, recuadros y pasos leídos como cuerpo
+    doc = [
+        _pagina([("TRATAMIENTO", (36, 60, 300, 75), *TITULO_HUV),
+                 ("El texto del capítulo sigue aquí.", (36, 100, 578, 140), *CUERPO_HUV),
+                 ("Flujograma 2", (36, 200, 200, 215), *TITULO_HUV),
+                 ("Control de hemorragia externa (Compresible).", (150, 300, 500, 330), *CUERPO_HUV),
+                 ("Agónico", (60, 400, 120, 410), *CAJA),
+                 ("Toractomía de Resucitación", (60, 500, 200, 520), *CAJA)]),
+        _pagina([("Más texto del capítulo después del diagrama.", IZQ, *CUERPO_HUV)]),
+    ]
+    ex = guias.Extractor(_perfil_huv(), {1: _transcripcion("flujograma", FLUJO)})
+    tratamiento, flujo = list(ex.secciones(doc))
+    assert tratamiento["texto"] == "El texto del capítulo sigue aquí."
+    assert flujo["titulos"] == ["Flujograma 2"]
+    # la transcripción entera y nada de las cajas; la página siguiente sigue igual
+    assert flujo["anexos"] == [FLUJO]
+    assert flujo["parrafos"] == ["Más texto del capítulo después del diagrama."]
+    assert "Toractomía" not in flujo["texto"] and "Compresible" not in flujo["texto"]
+    assert ex.stats["reemplazado"] > 0 and ex.stats["transcritas"] == 1
+
+
+def test_tabla_transcrita_reemplaza_pie_y_material():
+    # HUV p. 120: la tabla no tiene texto; solo el pie "Tabla. Manejo medico inicial"
+    tabla = "Tabla: manejo médico inicial (transcripción de la tabla del libro).\n4. Toxoide tetánico x 0.5 cc."
+    doc = [_pagina([("CASOS ESPECIALES", (36, 60, 300, 75), *TITULO_HUV),
+                    ("Texto antes de la tabla.", (36, 100, 578, 140), *CUERPO_HUV),
+                    ("Celda suelta", (100, 600, 300, 612), *CAJA),
+                    ("Tabla. Manejo medico inicial", (150, 700, 450, 712), *CUERPO_HUV)])]
+    ex = guias.Extractor(_perfil_huv(fin=1), {1: _transcripcion("tabla", tabla, r"^Tabla\. Manejo")})
+    (s,) = list(ex.secciones(doc))
+    assert s["anexos"] == [tabla]
+    assert s["parrafos"] == ["Texto antes de la tabla."]
+
+
+def test_transcripcion_sin_ancla_falla():
+    # si cambian las reglas y el título deja de serlo, no se pierde el diagrama sin aviso
+    doc = [_pagina([("Solo texto.", IZQ, *CUERPO_HUV)])]
+    ex = guias.Extractor(_perfil_huv(fin=1), {1: _transcripcion("flujograma", FLUJO)})
+    with pytest.raises(ValueError, match="ancla"):
+        list(ex.secciones(doc))
+
+
+def test_transcripcion_en_pagina_que_no_se_extrae_falla():
+    doc = [_pagina([("Solo texto.", IZQ, *CUERPO_HUV)])]
+    ex = guias.Extractor(_perfil_huv(fin=1), {7: _transcripcion("flujograma", FLUJO)})
+    with pytest.raises(ValueError, match=r"\[7\]"):
+        list(ex.secciones(doc))
+
+
+def test_cargar_transcripciones(tmp_path):
+    assert guias.cargar_transcripciones(tmp_path / "no_existe.yaml") == {}
+    ruta = tmp_path / "t.yaml"
+    ruta.write_text("huv:\n"
+                    "  - {pagina: 120, tipo: tabla, ancla: '^Tabla\\. Manejo', texto: \"Tabla: x\\n1. y\\n\"}\n"
+                    "  - {pagina: 201, tipo: flujograma, texto: 'Flujograma 1: z', notas: duda}\n",
+                    encoding="utf-8")
+    t = guias.cargar_transcripciones(ruta)["huv"]
+    assert t[120]["texto"] == "Tabla: x\n1. y" and t[120]["ancla"] == r"^Tabla\. Manejo"
+    assert t[201]["ancla"] == guias.ANCLAS["flujograma"]
+    ruta.write_text("huv:\n  - {pagina: 1, tipo: figura, texto: x}\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="tipo"):
+        guias.cargar_transcripciones(ruta)
+    ruta.write_text("huv:\n  - {pagina: 1, tipo: tabla, texto: x}\n  - {pagina: 1, tipo: tabla, texto: y}\n",
+                    encoding="utf-8")
+    with pytest.raises(ValueError, match="misma página"):
+        guias.cargar_transcripciones(ruta)
+
+
+@pytest.mark.skipif(not guias.config.GUIAS_TRANSCRIPCIONES.exists(),
+                    reason="el archivo de transcripciones está fuera de git (junto a los PDF)")
+def test_transcripciones_reales_bien_formadas():
+    """Lo que rag/fragmentar.py necesita: primera línea = título de una sola
+    oración que dice que es transcripción; una fila por línea, ninguna vacía."""
+    for libro, por_pagina in guias.cargar_transcripciones().items():
+        paginas = {p for c in guias.capitulos(PERFILES[libro]) for p in range(c.pdf_ini, c.pdf_fin + 1)}
+        for pagina, t in por_pagina.items():
+            titulo, *filas = t["texto"].split("\n")
+            assert pagina in paginas, pagina
+            assert "(transcripción de" in titulo and titulo.endswith(")."), pagina
+            assert filas and all(f.strip() for f in filas), pagina

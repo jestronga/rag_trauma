@@ -144,12 +144,15 @@ python -m rag.index --limite 2000
 
 ### Libros de trauma (colección `guias`)
 
-Los PDF van en `..\anonimizacion\data\` (fuera de git). Se extraen y se
-indexan aparte; los casos no se reindexan:
+Los PDF van en `..\anonimizacion\data\` (fuera de git), junto con
+`transcripciones_guias.yaml`: la transcripción a mano de los flujogramas y las
+tablas en imagen del manual del HUV. Ese archivo no se regenera: se copia con
+los PDF. Sin él, `extraer_guias.py` avisa y los flujogramas entran como cajas
+sueltas. Se extraen y se indexan aparte; los casos no se reindexan:
 
 ```powershell
-python scripts\extraer_guias.py         # → guias\secciones.jsonl (926 secciones)
-python -m rag.index --fuente guias      # fijo-256: 2.272 fragmentos, ~20 s en GPU
+python scripts\extraer_guias.py         # → guias\secciones.jsonl (935 secciones)
+python -m rag.index --fuente guias      # fijo-256: 2.201 fragmentos, ~20 s en GPU
 ```
 
 Cada fuente vive en su colección del mismo Qdrant (`trauma` y `guias`) y
@@ -319,7 +322,7 @@ todavía lo escribe el modelo sin verificación y a veces cambia términos
 | `FRAGMENTACION_GUIAS` | `fijo-256` | configuración de `rag/fragmentar.py` al indexar los libros (reindexar si cambia) |
 | `RUTA_GUIAS` | `auto` | libros: `rerank` (densa + reranker sobre 30) si el reranker cabe en la GPU, si no `densa` |
 | `PRESUPUESTO_GUIAS` | `1400` | tokens de fragmentos de los libros que van al prompt (~6 con `fijo-256`) |
-| `UMBRAL_GUIAS` | `0.2` | ruta `rerank`: probabilidad mínima del mejor fragmento para que los libros hablen. Calibrar con `scripts\calibrar_guias.py` |
+| `UMBRAL_GUIAS` | `0.34` | ruta `rerank`: probabilidad mínima del mejor fragmento para que los libros hablen (0,2 hasta el 19/10). Calibrar con `scripts\calibrar_guias.py` |
 | `UMBRAL_GUIAS_COSENO` | `0.60` | ruta `densa` (sin el reranker en GPU): coseno mínimo del mejor fragmento. Separa mal: con 0,60 frena las 10 fuera de dominio pero deja sin libros a 16 de 25 consultas de trauma |
 
 `ENCODER=falso` sirve para verificar la tubería completa (índices, rutas,

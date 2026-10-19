@@ -13,7 +13,12 @@ Por eso cada bloque recibe un ROL según su fuente dominante (reglas por libro
 en guias/perfiles.yaml): títulos, cuerpo, pie de figura o tabla, o
 "material" (el texto suelto de figuras y tablas). El material solo se
 conserva pegado a su pie ("Table 7-4: Glasgow Coma Scale…"); sin pie (los
-flujogramas, los objetivos del capítulo) se descarta.
+flujogramas, los objetivos del capítulo) se descarta. Los pies de foto y de
+dibujo del HUV se descartan con su material.
+
+Lo que el PDF no trae como texto legible (flujogramas, que sin las flechas no
+se pueden leer, y tablas en imagen) sale de una transcripción a mano
+(cargar_transcripciones).
 
 Salida: una SECCIÓN por título, con la ruta de títulos, el capítulo y las
 páginas impresas, para que el médico encuentre el pasaje en el libro.
@@ -45,6 +50,37 @@ _FUENTES_SIMBOLO = ("wingdings", "symbol", "zapf")
 def cargar_perfiles(ruta: Path | None = None) -> dict:
     with Path(ruta or config.GUIAS_PERFILES).open(encoding="utf-8") as f:
         return yaml.safe_load(f)
+
+
+# Ancla por defecto de cada tipo de transcripción: el título "Flujograma" que
+# abre la sección del diagrama, o el pie "Tabla." de la tabla en imagen.
+ANCLAS = {"flujograma": r"^Flujograma\b", "tabla": r"^Tabla\b"}
+
+
+def cargar_transcripciones(ruta: Path | None = None) -> dict[str, dict[int, dict]]:
+    """{clave del libro: {página del PDF: transcripción}}; vacío si no está el
+    archivo (fuera de git, junto a los PDF).
+
+    Cada transcripción: `tipo` (flujograma | tabla), `texto` (la primera línea
+    es el título; una fila o un paso por línea, como las tablas, para que
+    rag/fragmentar.py la parta por filas), `ancla` opcional y `notas` para la
+    revisión médica (no se indexan)."""
+    ruta = Path(ruta or config.GUIAS_TRANSCRIPCIONES)
+    if not ruta.exists():
+        return {}
+    with ruta.open(encoding="utf-8") as f:
+        datos = yaml.safe_load(f) or {}
+    salida: dict[str, dict[int, dict]] = {}
+    for libro, entradas in datos.items():
+        por_pagina = salida.setdefault(libro, {})
+        for e in entradas:
+            if e["tipo"] not in ANCLAS:
+                raise ValueError(f"{libro} p. {e['pagina']}: tipo desconocido {e['tipo']!r}")
+            if e["pagina"] in por_pagina:
+                raise ValueError(f"{libro} p. {e['pagina']}: dos transcripciones en la misma página")
+            por_pagina[e["pagina"]] = {**e, "ancla": e.get("ancla") or ANCLAS[e["tipo"]],
+                                       "texto": e["texto"].strip()}
+    return salida
 
 
 # ---------------------------------------------------------------------------
@@ -179,6 +215,8 @@ def clasificar(b: Bloque, perfil: dict) -> str:
         return "referencias"
     if re.match(perfil["pie"], texto):
         return "pie"
+    if perfil.get("figura") and re.match(perfil["figura"], texto):
+        return "figura"
     for regla in perfil["roles"]:
         if _calza(regla, b, texto):
             return regla["rol"]
@@ -236,14 +274,33 @@ def _material(bloques: list[Bloque], pies: list[Bloque], posicion: str) -> list[
     return material
 
 
+def continuar_figuras(bloques: list[Bloque], salto: float = 14) -> None:
+    """Marca como "figura" la continuación de un pie de foto partido en varios
+    bloques: pegada debajo (a menos de `salto` puntos), en la misma columna y
+    la misma fuente. Medido el 19/10 en el HUV: 20 pies siguen en un segundo
+    bloque ("…con compresión y" / "hemostáticos y trauma hepático…", p. 97)."""
+    pendientes = [b for b in bloques if b.rol == "figura"]
+    while pendientes:
+        f = pendientes.pop()
+        for m in bloques:
+            if (m.rol == "material" and m.fuente == f.fuente and abs(m.tam - f.tam) < 0.5
+                    and m.solapa_x(f) and -6 <= m.y0 - f.y1 <= salto):
+                m.rol = "figura"
+                pendientes.append(m)
+
+
 def agrupar_pies(bloques: list[Bloque], posicion: str = "arriba") -> tuple[list[Bloque], int]:
     """Pega a cada pie el material de su tabla o figura.
 
     Un bloque de material va con el pie más cercano que comparta columna y
     quede encima de él (`posicion="arriba"`, ATLS) o debajo (`"abajo"`, HUV).
     Devuelve los bloques sin el material y cuántos caracteres de material
-    quedaron sin pie (se descartan).
+    quedaron sin pie (se descartan). Los pies de foto o dibujo (rol "figura")
+    no recogen material: medido el 19/10, el pie de una foto se llevaba listas
+    sin pie que estaban encima ("Indicaciones para realizar TAC corporal
+    Total", HUV p. 59).
     """
+    continuar_figuras(bloques)
     pies = [b for b in bloques if b.rol == "pie"]
     asignado: dict[int, list[Bloque]] = {id(p): [] for p in pies}
     sueltos: list[Bloque] = []
@@ -378,16 +435,24 @@ class Seccion:
 class Extractor:
     """Recorre un libro capítulo a capítulo y emite una sección por título."""
 
-    def __init__(self, perfil: dict):
+    def __init__(self, perfil: dict, transcripciones: dict[int, dict] | None = None):
         self.perfil = perfil
         self.guion = perfil.get("guion_corta_palabra", True)
-        self.stats = {"material_sin_pie": 0, "descartado": 0, "referencias": 0}
+        # {página del PDF: transcripción} de este libro (cargar_transcripciones)
+        self.transcripciones = transcripciones or {}
+        self.stats = {"material_sin_pie": 0, "descartado": 0, "referencias": 0,
+                      "figuras": 0, "reemplazado": 0, "transcritas": 0}
 
     def secciones(self, doc) -> Iterator[dict]:
         saltar = set(self.perfil.get("saltar", []))
+        self.colocadas: set[int] = set()
         for cap in capitulos(self.perfil):
             portada = {cap.pdf_ini} if self.perfil.get("saltar_portada") else set()
             yield from self._capitulo(doc, cap, saltar | portada)
+        fuera = sorted(set(self.transcripciones) - self.colocadas)
+        if fuera:
+            raise ValueError(f"{self.perfil['fuente']}: transcripciones en páginas que no se "
+                             f"extraen (saltadas o fuera de los capítulos): {fuera}")
 
     def _capitulo(self, doc, cap: Capitulo, saltar: set[int]) -> Iterator[dict]:
         p = self.perfil
@@ -404,9 +469,19 @@ class Extractor:
                 b.rol = clasificar(b, p)
             bloques, sin_pie = agrupar_pies(bloques, p.get("pie_posicion", "arriba"))
             self.stats["material_sin_pie"] += sin_pie
+            trans = self.transcripciones.get(pdf)
+            colocada = reemplazando = False
             for b in orden_lectura(bloques, pagina.rect.width):
                 texto = b.texto(self.guion)
-                if b.rol == "referencias" or b.rol.startswith("titulo"):
+                es_titulo = b.rol == "referencias" or b.rol.startswith("titulo")
+                if reemplazando and not es_titulo:
+                    # las cajas del diagrama (recuadros, rótulos leídos como
+                    # cuerpo): su contenido ya va en la transcripción
+                    self.stats["reemplazado"] += len(texto) + len(b.anexo)
+                    continue
+                reemplazando = False
+                ancla = bool(trans) and not colocada and bool(re.match(trans["ancla"], texto))
+                if es_titulo:
                     if not actual.vacia:
                         n += 1
                         yield self._registro(actual, n)
@@ -416,17 +491,37 @@ class Extractor:
                         nivel = int(b.rol[-1])
                         titulos = [t for t in titulos if t[0] < nivel] + [(nivel, texto)]
                     actual = Seccion(p["fuente"], cap, [t for _, t in titulos])
+                    if ancla and trans["tipo"] == "flujograma" and b.rol != "referencias":
+                        # el diagrama entero, en la sección que abre su título
+                        actual.agregar(trans["texto"], pdf, es_cuerpo=False)
+                        colocada = reemplazando = True
                 elif en_referencias:
                     self.stats["referencias"] += len(texto)
                 elif b.rol == "cuerpo":
                     actual.agregar(texto, pdf)
                 elif b.rol == "pie":
-                    tabla = texto + ("\n" + b.anexo if b.anexo else "")
+                    if ancla and trans["tipo"] == "tabla":
+                        # la transcripción trae su título: reemplaza pie y material
+                        self.stats["reemplazado"] += len(b.anexo)
+                        tabla = trans["texto"]
+                        colocada = True
+                    else:
+                        tabla = texto + ("\n" + b.anexo if b.anexo else "")
                     actual.agregar(tabla, pdf, es_cuerpo=False)
                 elif b.rol == "recuadro":
                     actual.agregar("Recuadro:\n" + b.anexo, pdf, es_cuerpo=False)
+                elif b.rol == "figura":
+                    self.stats["figuras"] += len(texto) + len(b.anexo)
                 elif b.rol == "descartar":
                     self.stats["descartado"] += len(texto)
+            if trans and not colocada:
+                # mejor fallar que perder el diagrama sin aviso (p. ej., si
+                # cambian las reglas y el título deja de ser título)
+                raise ValueError(f"{p['fuente']} p. PDF {pdf}: no se encontró el ancla "
+                                 f"{trans['ancla']!r} de la transcripción ({trans['tipo']})")
+            if trans:
+                self.colocadas.add(pdf)
+                self.stats["transcritas"] += 1
         if not actual.vacia:
             n += 1
             yield self._registro(actual, n)

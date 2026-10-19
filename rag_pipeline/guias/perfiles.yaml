@@ -11,6 +11,10 @@
 # flujogramas, hechos de rótulos cortos ("¿Penetra?", "SI", "NO"), se
 # descartan (rag/guias.py, recuadros).
 #
+# Los flujogramas y las tablas que el PDF trae como imagen o sin las flechas
+# se reemplazan por una transcripción a mano (GUIAS_TRANSCRIPCIONES, fuera
+# de git; ver rag/guias.py, cargar_transcripciones).
+#
 # Roles: titulo1..titulo4 (jerarquía de secciones), cuerpo, descartar.
 # Medido sobre los PDF el 07/10/2026 con scratchpad/bloques.py.
 
@@ -44,9 +48,11 @@ atls:
   # La primera página de cada capítulo es la portada con los objetivos.
   saltar_portada: true
   # [número, título, primera página del PDF]. El capítulo termina donde
-  # empieza el siguiente; el último, en `fin`. ATLS-OE (p. 351+) y el índice
-  # alfabético (p. 356+) quedan fuera.
-  fin: 350
+  # empieza el siguiente; el último, en `fin`. El índice alfabético (p. 356+)
+  # queda fuera. Hasta el 19/10 `fin` era 350 y dejaba fuera el final del
+  # capítulo 24 (ATLS-OE, el consenso de Hartford y el resumen), tomado por
+  # error por un apéndice.
+  fin: 355
   # Capítulos sin contenido diagnóstico: se extraen igual y la fase 4 decide
   # con mediciones si se filtran.
   no_clinicos: [2, 16, 18, 19, 20]
@@ -89,6 +95,11 @@ huv:
   pie: '^(Tabla|Figura|Gr[aá]fic[oa]|Cuadro|Algoritmo)\s*\d*[.:]'
   # "Tabla 1." va debajo de la tabla (p. 12).
   pie_posicion: abajo
+  # Pies de foto y de dibujo ("Foto.", "Dibujos.", "imagen."): se descartan
+  # con el material que tengan encima (rótulos de la imagen). Sin la imagen
+  # no dicen nada revisable y entraban como "Recuadro: Foto. Herida por arma
+  # de fuego…" (19/10: 99 recuadros).
+  figura: '(?i)^(fotos?|dibujos?)\b|^imagen\.'
   referencias: '^(BIBLIOGRAF[IÍ]A|REFERENCIAS|LECTURAS RECOMENDADAS)\.?$'
   roles:
     - {rol: titulo1, fuente: 'Montserrat-Bold', tam: [15.5, 16.5], color: '00bae3'}

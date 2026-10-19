@@ -62,6 +62,11 @@ LIBROS_DIR = Path(_env("LIBROS_DIR", str(RAIZ_ANONIMIZACION / "data")))
 GUIAS_DIR = RAIZ / "guias"
 GUIAS_PERFILES = GUIAS_DIR / "perfiles.yaml"
 GUIAS_SECCIONES = Path(_env("GUIAS_SECCIONES", str(GUIAS_DIR / "secciones.jsonl")))
+# Transcripción a mano de los flujogramas y las tablas sin capa de texto (19/10).
+# Va junto a los PDF y viaja con ellos: es texto de los libros (fuera de git) y,
+# a diferencia de guias/, no se regenera.
+GUIAS_TRANSCRIPCIONES = Path(_env("GUIAS_TRANSCRIPCIONES",
+                                  str(LIBROS_DIR / "transcripciones_guias.yaml")))
 # Los libros van en su propia colección del mismo Qdrant local: sus puntajes no
 # se comparan con los de los casos, y un fragmento entre los casos rompería
 # los conteos ("2 de 5") de hallazgos.py, la tabla y verificar.py.
@@ -93,10 +98,16 @@ PRESUPUESTO_GUIAS = _env_int("PRESUPUESTO_GUIAS", 1400)
 #     de Colombia"); con 0,2 ninguna pasa, las 16 de procedimiento responden y
 #     11 de 25 de trauma se quedan sin libros (abreviaturas, ortografía y
 #     coloquiales, que además se recuperaban mal).
+#   19/10, con los flujogramas y tablas del HUV transcritos: "hemorragia
+#     digestiva alta por úlcera péptica" llega a 0,326 (la tabla del quemado
+#     habla de úlcera duodenal y hemorragia digestiva). 0,34 es el punto medio
+#     hasta la consulta de trauma siguiente (0,351): ninguna fuera de dominio
+#     pasa y 12 de 25 de trauma quedan sin libros. Margen corto por los dos
+#     lados: agregar consultas fuera de dominio antes de moverlo.
 #   ruta densa, coseno (GTX 1650): separa mal. Fuera de dominio máx. 0,589
 #     ("dolor torácico opresivo…"); con 0,60 ninguna pasa, pero 16 de 25 de
 #     trauma se quedan sin libros. Con 0,55 pasarían 3 de 10 fuera de dominio.
-UMBRAL_GUIAS = _env_float("UMBRAL_GUIAS", 0.2)
+UMBRAL_GUIAS = _env_float("UMBRAL_GUIAS", 0.34)
 UMBRAL_GUIAS_COSENO = _env_float("UMBRAL_GUIAS_COSENO", 0.60)
 # Los libros como segunda fuente de la respuesta (fase 5): generate.responder
 # los busca y, si pasan su guarda, la prosa da las dos miradas. Apagado (o sin

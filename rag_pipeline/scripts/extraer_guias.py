@@ -21,7 +21,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from rag import config  # noqa: E402
-from rag.guias import Extractor, cargar_perfiles  # noqa: E402
+from rag.guias import Extractor, cargar_perfiles, cargar_transcripciones  # noqa: E402
 
 
 def main() -> None:
@@ -35,6 +35,10 @@ def main() -> None:
     import pymupdf
 
     perfiles = cargar_perfiles()
+    transcripciones = cargar_transcripciones()
+    if not transcripciones:
+        print(f"[aviso] falta {config.GUIAS_TRANSCRIPCIONES}: los flujogramas del HUV entran como "
+              f"recuadros sueltos y faltan las tablas en imagen. Copiarlo junto a los PDF.")
     claves = list(perfiles) if args.libro == "todos" else [args.libro]
     registros = []
     for clave in claves:
@@ -42,7 +46,7 @@ def main() -> None:
         ruta = config.LIBROS_DIR / perfil["archivo"]
         if not ruta.exists():
             raise SystemExit(f"Falta {ruta}")
-        extractor = Extractor(perfil)
+        extractor = Extractor(perfil, transcripciones.get(clave))
         with pymupdf.open(ruta) as doc:
             secciones = list(extractor.secciones(doc))
         registros += secciones
@@ -53,7 +57,11 @@ def main() -> None:
               f"máx. {max(largos):,})")
         st = extractor.stats
         print(f"    descartado: referencias {st['referencias']:,} · material sin pie "
-              f"{st['material_sin_pie']:,} · otros {st['descartado']:,} caracteres")
+              f"{st['material_sin_pie']:,} · pies de foto y dibujo {st['figuras']:,} · "
+              f"otros {st['descartado']:,} caracteres")
+        if st["transcritas"]:
+            print(f"    transcritas a mano: {st['transcritas']} páginas (reemplazan "
+                  f"{st['reemplazado']:,} caracteres de cajas sueltas)")
         sin_texto = sorted({c for c in (n for n, *_ in perfil["capitulos"])} - caps)
         if sin_texto:
             print(f"    ¡capítulos sin secciones!: {sin_texto}")
