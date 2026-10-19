@@ -45,9 +45,14 @@ alguna parte en prosa. Con libros, 7,6 s de mediana (sin libros 5,3 s).
 manuales (juzgaba la atención y nunca pasaba); lo dice el código, en general:
 `AVISO_DOS_FUENTES`.
 
-**Antes de usar la app con libros: decidir `PROSA_SIEMPRE`** (sigue en
-`True` desde la demo). Con los libros, la prosa sin verificar puede citar la
-sección equivocada o agregar detalles clínicos.
+**`PROSA_SIEMPRE`: decidido para la demo (18/10, usuario): `True`, todas las
+respuestas en prosa.** La verificación corre igual (`Respuesta.motivos`,
+`prosa_verificada`) pero no reemplaza nada ni se muestra la nota. Riesgo
+conocido y aceptado para la demo: con los libros, la prosa sin verificar puede
+citar la sección equivocada o agregar detalles clínicos. `preparar_demo.py`
+marca "prosa SIN verificar" para saberlo antes. Después de la demo, volver a
+pensarlo (con `False`, respaldo por fuente y nota arriba). Los tests fijan
+`PROSA_SIEMPRE` en cada caso y pasan con cualquier valor.
 
 **Fase 6 hecha el 17/10** (`PLAN_INDEXAR_LIBROS.md`, fase 6): la app tiene
 el apartado "Fragmentos de los manuales" (cada pasaje con libro, capítulo,
@@ -59,8 +64,21 @@ pasa 6 consultas (la nueva, `6 · Solo manuales`, es `proc-09` de
 `consultas_guias.yaml`); el 17/10 terminó en "Todo listo". Guion de la demo
 en `SETUP.md` §6, al día (sin botones, PC de 8 GB, dos fuentes).
 
+**Respuesta por apartados (18/10, pedido del usuario para la demo):**
+`generate.armar_secciones` arma la respuesta en `Respuesta.secciones`:
+"Casos similares del registro" (prosa sobre los casos + línea de respaldo;
+sin tabla, pedido del usuario) y "Manuales de trauma (ATLS y HUV)" (prosa sobre los
+manuales; sin lista de pasajes, pedido del usuario: están en el desplegable;
+sin prosa, `aviso_pasajes` remite a él), más el aviso de que pueden no
+coincidir. La app pinta cada apartado con su desplegable debajo
+(`app.cuerpo_respuesta`). La prosa se parte por fuente con
+`verificar_por_fuente` (oraciones con `[guía]` → manuales; el resto → casos):
+con `PROSA_SIEMPRE` se muestran las dos partes; sin él, solo las que pasaron
+(`prosa_por_fuente`). Si una fuente no responde, su apartado lo dice.
+`Respuesta.texto` es la unión de los apartados (historial, scripts).
+
 **Lo que sigue con los libros:**
-1. **Decidir `PROSA_SIEMPRE`** (arriba).
+1. ~~Decidir `PROSA_SIEMPRE`~~ decidido para la demo: `True` (arriba).
 2. **Fase 7, revisión médica:** planilla con la prosa nueva y la pregunta "¿la
    guía citada corresponde a la situación?"; mirar las oraciones del ATLS
    (solo se verifican cita y cifras) y la decisión abierta de la cuota por
@@ -131,12 +149,8 @@ el 08/10; sirven para el PC de 8 GB):
    cd rag_pipeline
    ..\.venv\Scripts\python.exe -m pip install "pymupdf==1.28.2"
    ..\.venv\Scripts\python.exe scripts\extraer_guias.py
-   ..\.venv\Scripts\python.exe -m pytest tests/ -q        # 220 desde el 17/10 (ver nota)
+   ..\.venv\Scripts\python.exe -m pytest tests/ -q        # 221 desde el 18/10
    ```
-   **Nota:** con `PROSA_SIEMPRE=True` (cambio de la demo, sección 2.12)
-   falla `test_responder_vuelve_a_la_version_determinista`; con
-   `$env:PROSA_SIEMPRE = "0"` pasan todos. Se arregla al decidir
-   `PROSA_SIEMPRE` (pendiente 12).
    Después de extraer: `..\.venv\Scripts\python.exe -m rag.index --fuente guias`.
    **Versión exacta de PyMuPDF a propósito:** otra versión podría extraer
    distinto, los IDs de sección (`ATLS-07-019`) se correrían y
@@ -586,6 +600,7 @@ la demo, **solo prosa y debajo los casos consultados**.
    ```powershell
    ollama pull qwen3:4b-instruct      # valor por defecto de config.py; NO qwen3:4b
    setx OLLAMA_KEEP_ALIVE -1          # opcional: no descargar el modelo a los 5 min
+   setx LLAMA_ARG_CACHE_RAM 0         # Ollama >= 0.40: sin caché de prompts en RAM (sección 6)
    ```
 4. Comprobar el entorno: `cd rag_pipeline; python scripts\revisar_entorno.py`
 5. Índices (no están en git): `python -m rag.index` desde `rag_pipeline\`.
@@ -701,6 +716,16 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
   Log en `%LOCALAPPDATA%\Ollama\server.log`.
 - **Ollama descarga el modelo a los 5 minutos sin uso.** Se evita con
   `OLLAMA_KEEP_ALIVE=-1`.
+- **Ollama ≥ 0.40 guarda en RAM una caché de prompts que crece hasta 8 GB**
+  (motor llama.cpp, `--cache-ram`, 8.192 MiB por defecto). El 17/10, tras las
+  mediciones con prompts de ~4.000 tokens, llegó a 8,8 GB; con la app (7,2 GB)
+  la memoria comprometida tocó el límite (29,3 de 30,6 GB) y Ollama se colgó
+  guardando un prompt: la app decía "Cargando modelos…" minutos y terminaba en
+  `TimeoutError: timed out`. Síntoma en `%LOCALAPPDATA%\Ollama\server.log`:
+  `prompt_save` seguido de `500 | 3m0s`. **Arreglo: `setx LLAMA_ARG_CACHE_RAM 0`**
+  y reiniciar Ollama (el log dice "prompt cache is disabled"). Aquí no ayuda:
+  cada consulta trae casos y pasajes distintos, y leer un prompt de 3.000
+  tokens tarda < 1 s en la 4060. Para revertir: `setx LLAMA_ARG_CACHE_RAM ""`.
 - **Al editar archivos desde Bash con heredoc**, las tildes, el "·" y los `\n`
   dentro de strings se dañaron varias veces. Usar la herramienta de edición
   directa, o un script en un archivo aparte.

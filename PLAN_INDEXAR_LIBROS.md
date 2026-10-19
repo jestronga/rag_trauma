@@ -456,9 +456,10 @@ a otra oración, y dice "el ATLS recomienda" para datos descriptivos
 
 **Pendiente de la fase 5** (desde el 17/10 solo se mide en la RTX 4060; la
 GTX 1650 ya no es objetivo):
-- **`PROSA_SIEMPRE` sigue en `True`** (demo del 28/09): muestra la prosa
-  aunque no pase. Con los libros el riesgo crece (citas a la sección
-  equivocada, detalles agregados). Decidirlo antes de usar la app con libros.
+- **`PROSA_SIEMPRE`: decidido el 18/10 (usuario), `True` para la demo**:
+  todas las respuestas en prosa, aunque no pasen la verificación (que corre
+  igual y queda en `Respuesta.motivos`). Riesgo aceptado: citas a la sección
+  equivocada, detalles agregados. Volver a pensarlo después de la demo.
 
 Plan original:
 - El prompt tiene dos bloques del mismo tamaño, "Casos similares" y
