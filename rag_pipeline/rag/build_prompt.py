@@ -358,7 +358,10 @@ y termina con su cita [guía: ID].
 - No agregues razones, condiciones ni detalles que no estén escritos.
 - Sin títulos ni viñetas."""
 
-ROTULO_GUIAS = "**Según los manuales**"
+# Los apartados de la respuesta (generate.armar_secciones): uno por fuente,
+# cada uno con su información y, en la app, su desplegable de texto completo.
+ROTULO_CASOS = "### Casos similares del registro"
+ROTULO_MANUALES = "### Manuales de trauma (ATLS y HUV)"
 # Decisión 3: si no coinciden, no se elige un ganador. Lo dice el código, no el
 # modelo: medido el 17/10 (21 consultas), la oración de comparación que
 # escribía el 4B nombraba elementos sin cita y juzgaba la atención recibida
@@ -442,18 +445,17 @@ def construir_prompt_guias(consulta: str, casos: list[Resultado], elementos: lis
     return "\n\n".join(partes)
 
 
-def seccion_guias(fragmentos: list[FragmentoGuia]) -> str:
-    """Respaldo determinista de los manuales: dónde está cada pasaje, sin
-    parafrasearlo (el texto completo va en el apartado de la app)."""
-    lineas = [f"- {cabecera_guia(fs)} [guía: {sid}]" for sid, fs in agrupar_guias(fragmentos).items()]
-    return f"{ROTULO_GUIAS} (pasajes relacionados con la consulta):\n" + "\n".join(lineas)
-
-
-def linea_respaldo_guias(fragmentos: list[FragmentoGuia]) -> str:
-    grupos = agrupar_guias(fragmentos)
-    por_libro = Counter(fs[0].fuente for fs in grupos.values())
-    detalle = " · ".join(f"{config.NOMBRES_LIBROS.get(k, k)} {v}" for k, v in por_libro.most_common())
-    return f"*Manuales: {len(grupos)} {'pasaje' if len(grupos) == 1 else 'pasajes'} ({detalle}).*"
+def aviso_pasajes(fragmentos: list[FragmentoGuia]) -> str:
+    """Lo que dice el apartado de los manuales cuando no hay prosa sobre ellos:
+    dónde ver los pasajes. Libro, capítulo, página y texto de cada uno están en
+    el desplegable de la app (la lista en la respuesta se quitó: pedido del
+    usuario, 18/10)."""
+    n = len(agrupar_guias(fragmentos))
+    if n == 1:
+        return ("*Hay un pasaje de los manuales relacionado con la consulta: su texto está en "
+                "«Fragmentos de los manuales».*")
+    return (f"*Hay {n} pasajes de los manuales relacionados con la consulta: el texto de cada "
+            f"uno está en «Fragmentos de los manuales».*")
 
 
 def _instruccion_salida(estructurada: bool = False, prosa: bool = False) -> str:

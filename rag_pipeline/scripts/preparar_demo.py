@@ -50,7 +50,7 @@ def main() -> int:
     print(f"{OK if vram else AVISO} VRAM {vram:.1f} GB" + ("" if vram else " (torch no ve una GPU NVIDIA)"))
     print(f"{OK} ruta {ruta} · reranker en {dispositivo_reranker()} · "
           f"umbral de abstención {config.UMBRAL_ABSTENCION} · salida {config.SALIDA} · "
-          f"keep_alive {config.KEEP_ALIVE}")
+          f"prosa siempre {'sí' if config.PROSA_SIEMPRE else 'no'} · keep_alive {config.KEEP_ALIVE}")
     if 0 < vram < config.VRAM_MIN_RERANK and ruta == "rerank":
         print(f"{MAL} RUTA=rerank con {vram:.1f} GB: el reranker no cabe junto al generador. "
               f"Quitar la variable RUTA.")
@@ -111,6 +111,9 @@ def main() -> int:
             en_prosa = " + ".join({"casos": "casos", "guias": "manuales"}[n] for n in r.fuentes_en_prosa)
             if r.prosa_verificada:
                 detalle = f"{fuentes} · prosa verificada"
+            elif config.PROSA_SIEMPRE and en_prosa:
+                # se muestra igual: así lo decidió el usuario para la demo
+                detalle = f"{fuentes} · prosa SIN verificar ({r.motivos[0] if r.motivos else ''})"
             elif en_prosa:
                 detalle = f"{fuentes} · en prosa: {en_prosa} ({r.motivos[0] if r.motivos else ''})"
             else:

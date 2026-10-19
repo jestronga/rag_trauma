@@ -275,9 +275,65 @@ def pie_tiempo(segundos: float | None) -> None:
                 unsafe_allow_html=True)
 
 
-def detalle_respuesta(respuesta, segundos: float | None, consulta: str) -> None:
-    """Lo que va bajo el texto: tiempo, aviso fijo, alertas y el texto completo
-    de los casos y de los pasajes de los manuales."""
+def desplegable_casos(respuesta, consulta: str) -> None:
+    """El texto completo de cada caso: la base de cada afirmación sobre los
+    casos, que el médico tiene que poder revisar por su cuenta."""
+    if not respuesta.casos:
+        return
+    buscada = respuesta.consulta_reescrita or consulta
+    etiqueta = f"Casos consultados ({len(respuesta.casos)}) · texto completo"
+    if respuesta.consulta_reescrita:
+        etiqueta += "  ·  consulta reescrita"
+    with st.expander(etiqueta):
+        if respuesta.consulta_reescrita:
+            st.caption(f"Búsqueda realizada: «{respuesta.consulta_reescrita}»")
+        relevancia = (f" · relevancia del reranker: {respuesta.relevancia:.2f}"
+                      if respuesta.relevancia is not None else "")
+        st.caption(f"Confianza (coseno del mejor caso): {respuesta.confianza:.3f}{relevancia} · "
+                   f"resaltado: lo que coincide con la consulta")
+        for c in respuesta.casos:
+            st.markdown(tarjeta_caso(c, buscada), unsafe_allow_html=True)
+
+
+def desplegable_guias(respuesta, consulta: str) -> None:
+    """El texto completo de cada pasaje de los manuales."""
+    if not respuesta.guias:
+        return
+    buscada = respuesta.consulta_reescrita or consulta
+    grupos = agrupar_guias(respuesta.guias)
+    with st.expander(f"Fragmentos de los manuales ({len(grupos)}) · texto completo"):
+        st.caption("Pasajes que pasaron la guarda de los manuales, del más al menos relevante. "
+                   "Páginas impresas del libro; el ATLS, en su idioma original.")
+        for seccion, fragmentos in grupos.items():
+            st.markdown(tarjeta_guia(seccion, fragmentos, buscada), unsafe_allow_html=True)
+
+
+def cuerpo_respuesta(respuesta, consulta: str, de_a_poco: bool = False) -> None:
+    """La respuesta por apartados: casos (prosa, tabla de todos los casos y su
+    desplegable) y manuales (prosa, lista de todos los pasajes y su
+    desplegable). Sin apartados (abstención, resumen de un caso), el texto y
+    los desplegables al final."""
+    def escribir(texto: str) -> None:
+        if de_a_poco:
+            st.write_stream(escribir_de_a_poco(texto, segundos_max=1.0))
+        else:
+            st.markdown(texto)
+
+    if not respuesta.secciones:
+        escribir(respuesta.texto)
+        desplegable_casos(respuesta, consulta)
+        desplegable_guias(respuesta, consulta)
+        return
+    for seccion in respuesta.secciones:
+        escribir(seccion.texto)
+        if seccion.fuente == "casos":
+            desplegable_casos(respuesta, consulta)
+        elif seccion.fuente == "guias":
+            desplegable_guias(respuesta, consulta)
+
+
+def detalle_respuesta(respuesta, segundos: float | None) -> None:
+    """Lo que va al final: tiempo, aviso fijo y alertas."""
     pie_tiempo(segundos)
     if respuesta.error:
         return
@@ -287,29 +343,6 @@ def detalle_respuesta(respuesta, segundos: float | None, consulta: str) -> None:
         st.warning("El modelo citó identificadores que no están entre los casos ni los pasajes "
                    f"recuperados: {', '.join(respuesta.citas_invalidas)}. "
                    "Esa parte de la respuesta no está respaldada.")
-    buscada = respuesta.consulta_reescrita or consulta
-    # El texto completo de cada caso y de cada pasaje es la base de cada
-    # afirmación: el médico tiene que poder revisarla por su cuenta.
-    if respuesta.casos:
-        etiqueta = f"Casos consultados ({len(respuesta.casos)}) · texto completo"
-        if respuesta.consulta_reescrita:
-            etiqueta += "  ·  consulta reescrita"
-        with st.expander(etiqueta):
-            if respuesta.consulta_reescrita:
-                st.caption(f"Búsqueda realizada: «{respuesta.consulta_reescrita}»")
-            relevancia = (f" · relevancia del reranker: {respuesta.relevancia:.2f}"
-                          if respuesta.relevancia is not None else "")
-            st.caption(f"Confianza (coseno del mejor caso): {respuesta.confianza:.3f}{relevancia} · "
-                       f"resaltado: lo que coincide con la consulta")
-            for c in respuesta.casos:
-                st.markdown(tarjeta_caso(c, buscada), unsafe_allow_html=True)
-    if respuesta.guias:
-        grupos = agrupar_guias(respuesta.guias)
-        with st.expander(f"Fragmentos de los manuales ({len(grupos)}) · texto completo"):
-            st.caption("Pasajes que pasaron la guarda de los manuales, del más al menos relevante. "
-                       "Páginas impresas del libro; el ATLS, en su idioma original.")
-            for seccion, fragmentos in grupos.items():
-                st.markdown(tarjeta_guia(seccion, fragmentos, buscada), unsafe_allow_html=True)
 
 
 def escribir_de_a_poco(texto: str, segundos_max: float = 2.0):
@@ -324,10 +357,13 @@ def escribir_de_a_poco(texto: str, segundos_max: float = 2.0):
 def pintar(rol: str, contenido: str, respuesta=None, segundos: float | None = None,
            consulta: str = "") -> None:
     with st.chat_message(rol):
-        nota_verificacion(respuesta)
-        st.markdown(contenido)
+        if respuesta is None or respuesta.error:
+            st.markdown(contenido)
+        else:
+            nota_verificacion(respuesta)
+            cuerpo_respuesta(respuesta, consulta)
         if respuesta is not None:
-            detalle_respuesta(respuesta, segundos, consulta)
+            detalle_respuesta(respuesta, segundos)
 
 
 for m in st.session_state.mensajes:
@@ -365,8 +401,8 @@ if pregunta:
         else:
             texto = r.texto
             nota_verificacion(r)
-            st.write_stream(escribir_de_a_poco(texto))
-        detalle_respuesta(r, segundos, pregunta)
+            cuerpo_respuesta(r, pregunta, de_a_poco=True)
+        detalle_respuesta(r, segundos)
 
     st.session_state.mensajes.append(
         {"role": "assistant", "content": texto, "respuesta": r, "segundos": segundos,

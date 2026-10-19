@@ -10,7 +10,7 @@ import json
 import pytest
 
 from rag import config, generate
-from rag.build_prompt import ROTULO_SUGERENCIA, ROTULO_SUGERENCIAS
+from rag.build_prompt import ROTULO_CASOS, ROTULO_SUGERENCIAS
 from rag.retrieve import Resultado
 from rag.verificar import palabras_sin_raiz, suavizar, verificar_prosa
 
@@ -100,6 +100,9 @@ def test_palabras_sin_raiz(casos):
 def entorno(casos, monkeypatch):
     monkeypatch.setattr(config, "SALIDA", "prosa")
     monkeypatch.setattr(config, "SINTESIS_LLM", False)
+    # el respaldo determinista se prueba con PROSA_SIEMPRE apagado, sea cual
+    # sea el valor por defecto (la demo lo usa encendido)
+    monkeypatch.setattr(config, "PROSA_SIEMPRE", False)
     monkeypatch.setattr(generate, "confianza", lambda *a, **k: 0.9)
     monkeypatch.setattr(generate, "buscar", lambda *a, **k: casos)
     # un PC sin los libros indexados: la respuesta es la de solo casos
@@ -115,8 +118,9 @@ def test_responder_muestra_la_prosa_verificada(entorno):
     entorno(BUENA)
     r = generate.responder(CONSULTA)
     assert r.prosa_verificada is True and r.motivos == []
-    assert r.texto.startswith(ROTULO_SUGERENCIA)
-    assert "Respaldo: 4 casos" in r.texto
+    # apartado de casos: título, la prosa y el respaldo, sin tabla
+    assert r.texto.startswith(f"{ROTULO_CASOS}\n\n{BUENA}\n\n*Respaldo: 4 casos")
+    assert "| Caso |" not in r.texto
     assert r.citas_invalidas == []
 
 
@@ -126,6 +130,16 @@ def test_responder_vuelve_a_la_version_determinista(entorno):
     assert r.prosa_verificada is False and r.motivos
     assert "neumotórax" not in r.texto
     assert ROTULO_SUGERENCIAS in r.texto            # la respuesta armada desde los casos
+
+
+def test_prosa_siempre_muestra_la_prosa_aunque_no_pase(entorno, monkeypatch):
+    # demo (decisión del 18/10): todo en prosa; la verificación queda en motivos
+    monkeypatch.setattr(config, "PROSA_SIEMPRE", True)
+    entorno("Conviene valorar neumotórax y pedir gammagrafía [caso: 101].")
+    r = generate.responder(CONSULTA)
+    assert r.prosa_verificada is False and r.motivos
+    assert r.texto.startswith(ROTULO_CASOS) and "neumotórax" in r.texto
+    assert ROTULO_SUGERENCIAS not in r.texto
 
 
 def test_salida_sugerencias_no_usa_prosa(entorno, monkeypatch):

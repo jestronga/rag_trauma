@@ -216,7 +216,7 @@ class Verificacion:
 
     Casos: las oraciones sin [guía: ID] (también las que no citan nada).
     Manuales: las que citan [guía: ID]. Cada parte se puede mostrar si sus
-    oraciones pasan, aunque la otra no (generate.ensamblar_verificado)."""
+    oraciones pasan, aunque la otra no (generate.prosa_por_fuente)."""
     oraciones_casos: list[str] = field(default_factory=list)
     oraciones_guias: list[str] = field(default_factory=list)
     motivos_casos: list[str] = field(default_factory=list)

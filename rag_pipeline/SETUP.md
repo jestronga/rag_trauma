@@ -197,11 +197,18 @@ el umbral de abstención, encender o apagar los manuales (interruptor "Manuales
 de trauma") y filtrar los casos por mecanismo, región y desenlace en vivo —
 útil para responder preguntas durante la demostración sin salir de la interfaz.
 
-Bajo cada respuesta: "Casos consultados" (texto completo de cada caso) y
-"Fragmentos de los manuales" (cada pasaje con libro, capítulo, sección y página
-impresa; el ATLS en inglés, tal cual). Si una parte de la redacción del modelo
-no pasó la verificación, una nota arriba de la respuesta dice cuál y por qué, y
-esa parte se muestra armada desde las fuentes.
+Cada respuesta va en dos apartados, uno debajo del otro:
+
+- **Casos similares del registro**: la prosa sobre los casos, la línea de
+  respaldo (cuántos casos y su similitud) y debajo el desplegable "Casos
+  consultados" con el texto completo de cada caso.
+- **Manuales de trauma (ATLS y HUV)**: la prosa sobre los manuales y debajo el
+  desplegable "Fragmentos de los manuales", con libro, capítulo, sección,
+  página y texto de cada pasaje (el ATLS en inglés, tal cual).
+
+Si una fuente no responde, su apartado lo dice. Con `PROSA_SIEMPRE=0`, la parte
+de la redacción del modelo que no pasó la verificación se muestra armada desde
+su fuente y una nota arriba de la respuesta dice cuál y por qué.
 
 Escribir solo un número (`40887`) recupera y resume ese caso concreto.
 
@@ -246,8 +253,10 @@ coincidir con los manuales: el sistema lo dice y no elige.
 oración antes de mostrarla contra su fuente: que lo que nombra esté en los
 casos o en el pasaje citado, que el caso o el pasaje citado lo tenga, que las
 cifras estén en el manual, que no cuente mal y que oriente en vez de ordenar.
-La parte que no pasa se muestra armada desde las fuentes y una nota arriba dice
-por qué (pasa seguido con las consultas 1, 2 y 4: buena ocasión para mostrarlo).
+**Para la demo todo va en prosa** (`PROSA_SIEMPRE=1`, decisión del 18/10): el
+verificador corre igual y deja sus motivos, pero no reemplaza nada. Fuera de la
+demo, con `PROSA_SIEMPRE=0`, la parte que no pasa se muestra armada desde las
+fuentes y una nota arriba dice por qué.
 
 **4 · Brecha de vocabulario** (2) — *"paciente apuñalado en el pecho,
 herida penetrante"*. El corpus dice `HPACP en tórax` o `ME APUÑALARON`. Por eso
@@ -325,6 +334,17 @@ se rompe cuando esa librería cambia de versión mayor.
 ---
 
 ## Si algo falla
+
+**La app se queda en "Cargando modelos…" y termina en `TimeoutError: timed out`**
+→ Ollama ≥ 0.40 guarda en RAM una caché de prompts que crece hasta 8 GB y puede
+agotar la memoria (pasó el 17/10 en el PC de 16 GB de RAM). Desactivarla y
+reiniciar Ollama (salir desde el ícono de la bandeja y volver a abrirlo):
+
+```powershell
+setx LLAMA_ARG_CACHE_RAM 0
+```
+
+En `%LOCALAPPDATA%\Ollama\server.log` debe aparecer "prompt cache is disabled".
 
 **`Falta el índice denso`** → `python -m rag.index`
 

@@ -32,15 +32,24 @@ from dataclasses import dataclass, field
 
 from . import config
 from .build_prompt import (
-    AVISO_DOS_FUENTES, AVISO_SOLO_CASOS, AVISO_SOLO_GUIAS, ROTULO_GUIAS, ROTULO_SINTESIS, ROTULO_SUGERENCIA, ROTULO_SUGERENCIAS,
-    SIN_SUGERENCIAS, SISTEMA, SISTEMA_PROSA, SISTEMA_PROSA_GUIAS, SISTEMA_RESUMEN, TITULO_CASOS,
-    TITULO_LIMITES, TITULO_SUGERENCIAS, conclusion_calculada, construir_prompt,
-    construir_prompt_guias, contexto_elemento, limites_calculados, linea_base, linea_respaldo,
-    linea_respaldo_guias, para_afinar, resumen_de_caso, seccion_guias, tabla_casos,
+    AVISO_DOS_FUENTES, AVISO_SOLO_CASOS, AVISO_SOLO_GUIAS, ROTULO_CASOS, ROTULO_MANUALES,
+    ROTULO_SINTESIS, ROTULO_SUGERENCIAS, SIN_SUGERENCIAS, SISTEMA, SISTEMA_PROSA,
+    SISTEMA_PROSA_GUIAS, SISTEMA_RESUMEN, TITULO_CASOS, TITULO_LIMITES, TITULO_SUGERENCIAS,
+    conclusion_calculada, construir_prompt, construir_prompt_guias, contexto_elemento,
+    aviso_pasajes, limites_calculados, linea_base, linea_respaldo, para_afinar, resumen_de_caso,
+    tabla_casos,
 )
 from .hallazgos import PROCEDIMIENTOS_QUIRURGICOS, Elemento, elegibles, elemento_mencionado, extraer
 from .retrieve import FragmentoGuia, Filtros, Resultado, buscar, buscar_guias, confianza, hay_guias
 from .verificar import RX_CITA, RX_CITA_GUIA, Verificacion, suavizar, verificar_por_fuente
+
+
+@dataclass
+class Seccion:
+    """Un apartado de la respuesta: "casos", "guias" o "pie" (los avisos). La
+    app pinta cada uno con su desplegable de texto completo debajo."""
+    fuente: str
+    texto: str
 
 
 @dataclass
@@ -63,6 +72,9 @@ class Respuesta:
     # Qué fuentes se muestran en prosa ("casos", "guias"): con las dos, la parte
     # que no pasó la verificación va en su versión determinista.
     fuentes_en_prosa: list[str] = field(default_factory=list)
+    # La respuesta por apartados (texto = su unión). Vacío en la abstención, el
+    # resumen de un caso y los errores: ahí basta `texto`.
+    secciones: list[Seccion] = field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
@@ -267,35 +279,34 @@ def responder(
             relevancia=relevancia,
         )
 
-    prosa_verificada, motivos, en_prosa = None, [], []
+    prosa_verificada, motivos = None, []
+    prosa_casos = prosa_guias = eleccion = ""
     try:
         if config.SALIDA == "prosa" and not config.SINTESIS_LLM:
             prosa = generar_prosa(consulta, casos, guias=fragmentos)
             v = verificar_por_fuente(prosa, casos, consulta, fragmentos)
             prosa_verificada, motivos = v.pasa, v.motivos
-            # Si no pasa, la versión determinista con la elección de las reglas
-            # del código: una segunda llamada al modelo duplicaría la espera.
-            # Con PROSA_SIEMPRE se muestra aunque no pase; sin prosa no hay qué mostrar.
-            if prosa and config.PROSA_SIEMPRE:
-                texto = ensamblar_prosa(prosa, casos, fragmentos, con_guias)
-                en_prosa = [n for n, hay in (("casos", casos), ("guias", fragmentos)) if hay]
-            else:
-                texto = ensamblar_verificado(prosa, v, casos, consulta, fragmentos, con_guias)
-                en_prosa = fuentes_en_prosa(v, casos, fragmentos)
-        else:
-            eleccion = generar_eleccion(consulta, casos) if casos else ""
-            texto = ensamblar_fuentes(eleccion, casos, consulta, fragmentos, con_guias)
+            # Lo que no va en prosa se arma desde su fuente con la elección de
+            # las reglas del código: una segunda llamada al modelo duplicaría
+            # la espera. Con PROSA_SIEMPRE se muestra la prosa aunque no pase.
+            prosa_casos, prosa_guias = prosa_por_fuente(v, casos, fragmentos, config.PROSA_SIEMPRE)
+        elif casos:
+            eleccion = generar_eleccion(consulta, casos)
+        secciones = armar_secciones(casos, consulta, fragmentos, con_guias,
+                                    prosa_casos, prosa_guias, eleccion)
     except Exception as e:
         return Respuesta(texto="", casos=casos, guias=fragmentos, confianza=conf,
                          consulta_reescrita=reescrita,
                          error=f"No se pudo generar la respuesta: {e}")
 
+    texto = "\n\n".join(s.texto for s in secciones)
     validas, invalidas = verificar_citas(texto, casos, fragmentos)
     return Respuesta(texto=texto, casos=casos, guias=fragmentos, confianza=conf,
                      citas_validas=validas, citas_invalidas=invalidas,
                      consulta_reescrita=reescrita, relevancia=relevancia,
                      prosa_verificada=prosa_verificada, motivos=motivos,
-                     fuentes_en_prosa=en_prosa)
+                     fuentes_en_prosa=[n for n, p in (("casos", prosa_casos), ("guias", prosa_guias)) if p],
+                     secciones=secciones)
 
 
 def mensajes_prosa(consulta: str, casos: list[Resultado],
@@ -346,32 +357,6 @@ def generar_prosa(consulta: str, casos: list[Resultado], metricas: dict | None =
         return ""
 
 
-def _aviso_fuente(casos: list[Resultado], guias: list[FragmentoGuia], con_guias: bool) -> str:
-    """Qué fuente falta, si falta una; con las dos, que pueden no coincidir
-    (decisión 3). Sin GUIAS no se dice nada: la respuesta es la de antes."""
-    if not con_guias:
-        return ""
-    if not casos:
-        return AVISO_SOLO_GUIAS
-    return AVISO_DOS_FUENTES if guias else AVISO_SOLO_CASOS
-
-
-def ensamblar_prosa(prosa: str, casos: list[Resultado], guias: list[FragmentoGuia] | None = None,
-                    con_guias: bool = False) -> str:
-    """Prosa verificada + sobre cuánto se apoya. El detalle de cada caso y de
-    cada fragmento está en los apartados de la app."""
-    guias = guias or []
-    partes = [ROTULO_SUGERENCIA, prosa]
-    if casos:
-        partes.append(linea_respaldo(casos, "los casos consultados"))
-    if guias:
-        partes.append(linea_respaldo_guias(guias))
-    aviso = _aviso_fuente(casos, guias, con_guias)
-    if aviso:
-        partes.append(aviso)
-    return "\n\n".join(partes)
-
-
 def fuentes_en_prosa(v: Verificacion, casos: list[Resultado],
                      guias: list[FragmentoGuia] | None = None) -> list[str]:
     """Las fuentes cuya parte de la prosa pasó la verificación (y existe)."""
@@ -385,50 +370,53 @@ def fuentes_en_prosa(v: Verificacion, casos: list[Resultado],
     return salida
 
 
-def ensamblar_verificado(prosa: str, v: Verificacion, casos: list[Resultado], consulta: str,
-                         guias: list[FragmentoGuia] | None = None, con_guias: bool = False) -> str:
-    """Cada fuente en prosa si sus oraciones pasaron la verificación; si no, en
-    su versión determinista. Nunca se muestra una oración que no pasó.
+def prosa_por_fuente(v: Verificacion, casos: list[Resultado], guias: list[FragmentoGuia] | None,
+                     siempre: bool) -> tuple[str, str]:
+    """(prosa de los casos, prosa de los manuales) que se muestran; vacía = esa
+    parte va armada desde su fuente.
 
-    Medido (17/10, 21 consultas con las dos fuentes): en 8 de los 14 rechazos
-    solo fallaban oraciones de los manuales, y se perdía también la parte de
-    los casos, que estaba bien. Con todo verificado, la prosa tal cual."""
+    Con PROSA_SIEMPRE (la demo, decisión del 18/10), la que el modelo escribió,
+    pase o no la verificación. Sin él, solo la parte cuyas oraciones pasaron:
+    medido (17/10, 21 consultas con las dos fuentes), en 8 de los 14 rechazos
+    solo fallaban oraciones de los manuales, y no hay por qué perder la de los
+    casos. Nunca se muestra una oración que no pasó."""
+    if v.vacia:
+        return "", ""
+    mostrar = {"casos", "guias"} if siempre else set(fuentes_en_prosa(v, casos, guias))
+    prosa_casos = " ".join(v.oraciones_casos) if casos and "casos" in mostrar else ""
+    prosa_guias = " ".join(v.oraciones_guias) if guias and "guias" in mostrar else ""
+    return prosa_casos, prosa_guias
+
+
+def armar_secciones(casos: list[Resultado], consulta: str, guias: list[FragmentoGuia] | None = None,
+                    con_guias: bool = False, prosa_casos: str = "", prosa_guias: str = "",
+                    eleccion: str = "") -> list[Seccion]:
+    """La respuesta en apartados, uno por fuente, cada uno con su título (la app
+    pone debajo de cada uno el desplegable con el texto completo):
+
+      · Casos: la prosa sobre los casos y sobre cuántos se apoya (con el aviso
+        de similitud baja); el detalle de cada caso, en el desplegable (sin
+        tabla: pedido del usuario, 18/10). Sin prosa, la respuesta armada desde
+        los casos (ensamblar, con la elección del modelo si la hubo).
+      · Manuales (con GUIAS): la prosa sobre los manuales; libro, capítulo,
+        página y texto de cada pasaje, en el desplegable (sin lista: pedido
+        del usuario, 18/10). Sin prosa, una línea que remite al desplegable.
+      · Pie: con las dos fuentes, que pueden no coincidir (decisión 3).
+    Si una fuente no pasó su guarda, su apartado lo dice."""
     guias = guias or []
-    en_prosa = fuentes_en_prosa(v, casos, guias)
-    if v.pasa and set(en_prosa) == {n for n, hay in (("casos", casos), ("guias", guias)) if hay}:
-        return ensamblar_prosa(prosa, casos, guias, con_guias)
-    if not en_prosa:
-        return ensamblar_fuentes("", casos, consulta, guias, con_guias)
-    partes = []
-    if "casos" in en_prosa:
-        partes += [ROTULO_SUGERENCIA, " ".join(v.oraciones_casos),
-                   linea_respaldo(casos, "los casos consultados")]
-    elif casos:
-        partes.append(ensamblar("", casos, consulta))
-    if "guias" in en_prosa:
-        partes += [ROTULO_GUIAS, " ".join(v.oraciones_guias), linea_respaldo_guias(guias)]
-    elif guias:
-        partes.append(seccion_guias(guias))
-    aviso = _aviso_fuente(casos, guias, con_guias)
-    if aviso:
-        partes.append(aviso)
-    return "\n\n".join(partes)
-
-
-def ensamblar_fuentes(texto_modelo: str, casos: list[Resultado], consulta: str,
-                      guias: list[FragmentoGuia] | None = None, con_guias: bool = False) -> str:
-    """Respuesta determinista con las dos fuentes: la de los casos (ensamblar) y
-    dónde están los pasajes de los manuales, sin parafrasearlos."""
-    guias = guias or []
-    aviso = _aviso_fuente(casos, guias, con_guias)
-    partes = [aviso] if aviso and not casos else []
-    if casos:
-        partes.append(ensamblar(texto_modelo, casos, consulta))
-    if guias:
-        partes.append(seccion_guias(guias))
-    if aviso and casos:
-        partes.append(aviso)
-    return "\n\n".join(partes)
+    if not casos:
+        texto_casos = AVISO_SOLO_GUIAS
+    elif prosa_casos:
+        texto_casos = f"{prosa_casos}\n\n{linea_respaldo(casos, 'los casos consultados')}"
+    else:
+        texto_casos = ensamblar(eleccion, casos, consulta)
+    secciones = [Seccion("casos", f"{ROTULO_CASOS}\n\n{texto_casos}")]
+    if con_guias:
+        texto_guias = ((prosa_guias or aviso_pasajes(guias)) if guias else AVISO_SOLO_CASOS)
+        secciones.append(Seccion("guias", f"{ROTULO_MANUALES}\n\n{texto_guias}"))
+        if casos and guias:
+            secciones.append(Seccion("pie", AVISO_DOS_FUENTES))
+    return secciones
 
 
 def generar_eleccion(consulta: str, casos: list[Resultado], estructurada: bool | None = None,

@@ -52,8 +52,9 @@ sys.path.insert(0, str(RAIZ))
 from eval.evaluate import relevancia                                        # noqa: E402
 from rag import config                                                      # noqa: E402
 from rag.generate import (                                                  # noqa: E402
-    _ollama, eleccion_modelo, elegir_sugerencias, ensamblar, ensamblar_verificado, filtrar_relevantes,
-    fuentes_en_prosa, generar_eleccion, generar_prosa, mensajes_prosa, porcentaje_gpu, usar_guias,
+    _ollama, armar_secciones, eleccion_modelo, elegir_sugerencias, ensamblar, filtrar_relevantes,
+    fuentes_en_prosa, generar_eleccion, generar_prosa, mensajes_prosa, porcentaje_gpu,
+    prosa_por_fuente, usar_guias,
 )
 from rag.hallazgos import elegibles                                         # noqa: E402
 from rag.retrieve import buscar, buscar_guias, confianza, ruta_por_defecto  # noqa: E402
@@ -164,7 +165,9 @@ def medir_prosa(c: dict, rec: dict) -> dict:
     t1 = time.perf_counter()
     v = verificar_por_fuente(prosa, casos, c["texto"], guias)
     ok, motivos = v.pasa, v.motivos
-    ensamblar_verificado(prosa, v, casos, c["texto"], guias, rec["con_guias"])
+    # lo que vería el médico con la verificación encendida (PROSA_SIEMPRE=0)
+    armar_secciones(casos, c["texto"], guias, rec["con_guias"],
+                    *prosa_por_fuente(v, casos, guias, siempre=False))
     t2 = time.perf_counter()
 
     ids = {m.group(1) for m in RX_CITA.finditer(prosa)}

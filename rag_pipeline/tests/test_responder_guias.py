@@ -10,8 +10,8 @@ import pytest
 from rag import config, generate
 from rag.build_prompt import (
     AVISO_DOS_FUENTES, AVISO_SOLO_CASOS, AVISO_SOLO_GUIAS, INSTRUCCION_PROSA_GUIAS, INSTRUCCION_PROSA_SOLO_GUIAS,
-    ROTULO_GUIAS, ROTULO_SUGERENCIA, ROTULO_SUGERENCIAS, SISTEMA_PROSA, SISTEMA_PROSA_GUIAS, agrupar_guias,
-    cabecera_guia, construir_prompt, construir_prompt_guias, texto_guia,
+    ROTULO_CASOS, ROTULO_MANUALES, ROTULO_SUGERENCIAS, SISTEMA_PROSA, SISTEMA_PROSA_GUIAS, agrupar_guias,
+    aviso_pasajes, cabecera_guia, construir_prompt, construir_prompt_guias, texto_guia,
 )
 from rag.hallazgos import elegibles
 from rag.retrieve import FragmentoGuia, Resultado
@@ -225,15 +225,26 @@ def entorno(casos, guias, monkeypatch):
     return modelo
 
 
+def seccion(r, fuente: str) -> str:
+    """El texto del apartado `fuente` de la respuesta ("" si no está)."""
+    return next((s.texto for s in r.secciones if s.fuente == fuente), "")
+
+
 def test_las_dos_fuentes(entorno, guias):
     entorno(f"{CASOS_OK} {HUV_OK}")
     r = generate.responder(CONSULTA)
     assert r.prosa_verificada is True, r.motivos
     assert entorno.llamadas[0][0]["content"] == SISTEMA_PROSA_GUIAS
-    assert "Respaldo: 4 casos" in r.texto and "*Manuales: 2 pasajes" in r.texto
+    assert [s.fuente for s in r.secciones] == ["casos", "guias", "pie"]
+    # casos: título, prosa y respaldo; sin tabla (el detalle, en el desplegable)
+    casos = seccion(r, "casos")
+    assert casos.startswith(f"{ROTULO_CASOS}\n\n{CASOS_OK}")
+    assert "| Caso |" not in casos and "Respaldo: 4 casos" in casos
+    # manuales: título y prosa; los pasajes, en el desplegable de la app
+    assert seccion(r, "guias") == f"{ROTULO_MANUALES}\n\n{HUV_OK}"
     # que pueden no coincidir lo dice el código, no el modelo (decisión 3)
-    assert r.texto.endswith(AVISO_DOS_FUENTES)
-    assert AVISO_SOLO_CASOS not in r.texto and AVISO_SOLO_GUIAS not in r.texto
+    assert seccion(r, "pie") == AVISO_DOS_FUENTES and r.texto.endswith(AVISO_DOS_FUENTES)
+    assert r.texto == "\n\n".join(s.texto for s in r.secciones)
     assert r.guias == guias and r.citas_invalidas == []
     assert "HUV-11-007" in r.citas_validas
 
@@ -243,7 +254,9 @@ def test_solo_manuales_si_los_casos_no_pasan(entorno, monkeypatch):
     entorno(HUV_OK)
     r = generate.responder(CONSULTA)
     assert not r.abstuvo and r.casos == [] and r.prosa_verificada is True, r.motivos
-    assert AVISO_SOLO_GUIAS in r.texto and "Respaldo:" not in r.texto
+    assert seccion(r, "casos") == f"{ROTULO_CASOS}\n\n{AVISO_SOLO_GUIAS}"
+    assert seccion(r, "guias").startswith(f"{ROTULO_MANUALES}\n\n{HUV_OK}")
+    assert "pie" not in [s.fuente for s in r.secciones]
 
 
 def test_solo_casos_si_los_manuales_no_pasan(entorno, monkeypatch):
@@ -251,24 +264,27 @@ def test_solo_casos_si_los_manuales_no_pasan(entorno, monkeypatch):
     entorno(CASOS_OK)
     r = generate.responder(CONSULTA)
     assert entorno.llamadas[0][0]["content"] == SISTEMA_PROSA       # el prompt de siempre
-    assert r.prosa_verificada is True and r.texto.endswith(AVISO_SOLO_CASOS)
+    assert r.prosa_verificada is True
+    assert seccion(r, "guias") == f"{ROTULO_MANUALES}\n\n{AVISO_SOLO_CASOS}"
 
 
 def test_se_abstiene_si_no_pasa_ninguna(entorno, monkeypatch):
     monkeypatch.setattr(generate, "confianza", lambda *a, **k: 0.3)
     monkeypatch.setattr(generate, "buscar_guias", lambda *a, **k: [])
     r = generate.responder(CONSULTA)
-    assert r.abstuvo and r.texto.startswith("No encontré casos en el registro ni pasajes de los manuales")
+    assert r.abstuvo and r.secciones == []
+    assert r.texto.startswith("No encontré casos en el registro ni pasajes de los manuales")
 
 
-def test_si_falla_la_parte_de_los_manuales_los_casos_quedan_en_prosa(entorno):
+def test_si_falla_la_parte_de_los_manuales_los_casos_quedan_en_prosa(entorno, guias):
     entorno(f"{CASOS_OK} El manual del HUV recomienda toracotomía [guía: HUV-11-007].")
     r = generate.responder(CONSULTA)
     assert r.prosa_verificada is False and r.fuentes_en_prosa == ["casos"]
-    assert r.texto.startswith(f"{ROTULO_SUGERENCIA}\n\n{CASOS_OK}")
+    assert seccion(r, "casos").startswith(f"{ROTULO_CASOS}\n\n{CASOS_OK}")
     assert ROTULO_SUGERENCIAS not in r.texto                  # los casos no van en determinista
-    # los manuales, en su versión determinista: dónde está cada pasaje
-    assert ROTULO_GUIAS in r.texto and "[guía: ATLS-05-013]" in r.texto
+    # los manuales, sin prosa: una línea que remite al desplegable
+    assert seccion(r, "guias") == f"{ROTULO_MANUALES}\n\n{aviso_pasajes(guias)}"
+    assert "Hay 2 pasajes" in aviso_pasajes(guias)
     assert "recomienda toracotomía" not in r.texto
 
 
@@ -276,36 +292,47 @@ def test_si_falla_la_parte_de_los_casos_los_manuales_quedan_en_prosa(entorno):
     entorno(f"Conviene valorar neumotórax [caso: 101]. {HUV_OK}")
     r = generate.responder(CONSULTA)
     assert r.prosa_verificada is False and r.fuentes_en_prosa == ["guias"]
-    assert ROTULO_SUGERENCIAS in r.texto                      # los casos, en determinista
-    assert f"{ROTULO_GUIAS}\n\n{HUV_OK}" in r.texto
+    assert ROTULO_SUGERENCIAS in seccion(r, "casos")          # los casos, en determinista
+    assert seccion(r, "guias").startswith(f"{ROTULO_MANUALES}\n\n{HUV_OK}")
     assert "valorar neumotórax" not in r.texto
 
 
-def test_si_falla_todo_las_dos_en_determinista(entorno):
+def test_si_falla_todo_las_dos_en_determinista(entorno, guias):
     entorno("Conviene valorar neumotórax [caso: 101]. El manual del HUV recomienda toracotomía "
             "[guía: HUV-11-007].")
     r = generate.responder(CONSULTA)
     assert r.fuentes_en_prosa == []
-    assert ROTULO_SUGERENCIAS in r.texto and ROTULO_GUIAS in r.texto
-    assert ROTULO_SUGERENCIA + "\n" not in r.texto
+    assert ROTULO_SUGERENCIAS in seccion(r, "casos")
+    assert seccion(r, "guias") == f"{ROTULO_MANUALES}\n\n{aviso_pasajes(guias)}"
 
 
-def test_sin_oraciones_de_los_manuales_van_en_determinista(entorno):
-    # la prosa pasa, pero no dijo nada de los manuales: no quedan fuera
+def test_sin_oraciones_de_los_manuales_remite_al_desplegable(entorno, guias):
+    # la prosa pasa, pero no dijo nada de los manuales: el apartado no queda vacío
     entorno(CASOS_OK)
     r = generate.responder(CONSULTA)
     assert r.prosa_verificada is True and r.fuentes_en_prosa == ["casos"]
-    assert ROTULO_GUIAS in r.texto and "[guía: HUV-11-007]" in r.texto
+    assert seccion(r, "guias") == f"{ROTULO_MANUALES}\n\n{aviso_pasajes(guias)}"
 
 
-def test_sin_guias_es_la_respuesta_de_antes(entorno, monkeypatch):
+def test_prosa_siempre_las_dos_partes_en_prosa(entorno, monkeypatch):
+    # la demo (18/10): todo en prosa, aunque la parte de los manuales no pase
+    monkeypatch.setattr(config, "PROSA_SIEMPRE", True)
+    entorno(f"{CASOS_OK} El manual del HUV recomienda toracotomía [guía: HUV-11-007].")
+    r = generate.responder(CONSULTA)
+    assert r.prosa_verificada is False and r.fuentes_en_prosa == ["casos", "guias"]
+    assert "recomienda toracotomía" in seccion(r, "guias")
+    assert "| Caso |" not in seccion(r, "casos") and "Pasajes consultados" not in seccion(r, "guias")
+
+
+def test_sin_guias_solo_el_apartado_de_casos(entorno, monkeypatch):
     def no_llamar(*a, **k):
         raise AssertionError("con GUIAS=0 no se buscan los libros")
     monkeypatch.setattr(config, "GUIAS", False)
     monkeypatch.setattr(generate, "buscar_guias", no_llamar)
     entorno(CASOS_OK)
     r = generate.responder(CONSULTA)
-    assert r.guias == [] and AVISO_SOLO_CASOS not in r.texto and r.prosa_verificada is True
+    assert r.guias == [] and r.prosa_verificada is True
+    assert [s.fuente for s in r.secciones] == ["casos"] and AVISO_SOLO_CASOS not in r.texto
 
 
 def test_verificar_citas_de_guias(casos, guias):
