@@ -249,8 +249,6 @@ Elige qué elementos de la lista sugerir a quien consulta y responde SOLO con JS
 # revisa oración por oración y, si no pasa, se muestra la versión determinista.
 # Por eso las reglas piden exactamente lo que el verificador comprueba: solo
 # elementos de la lista, cita en cada oración que los nombra, sin conteos.
-ROTULO_SUGERENCIA = "**Sugerencia**"
-
 SISTEMA_PROSA = f"""Eres un asistente de apoyo al diagnóstico en trauma para personal de salud. \
 Ante una presentación clínica, comparas con casos similares del registro y redactas una \
 sugerencia breve basada en lo que se hizo en ellos. No reemplazas el juicio clínico de quien \

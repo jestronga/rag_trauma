@@ -1,10 +1,11 @@
 # Contexto de trabajo — rag_trauma
 
-Resumen para retomar el trabajo. Última sesión: **17 de octubre de 2026**, en
+Resumen para retomar el trabajo. Última sesión: **18 de octubre de 2026**, en
 el **PC de 8 GB** (RTX 4060), preparado desde un clon limpio. **Desde el 17/10
 solo se mide en la RTX 4060** (decisión del usuario): la GTX 1650 ya no es
-objetivo. **Empezar por la sección 00** (libros de trauma: fases 3 a 6 hechas;
-sigue decidir `PROSA_SIEMPRE` y la revisión médica, fase 7), después 0, 1, 5 y 6.
+objetivo. **Empezar por la sección 00** (libros de trauma: fases 1 a 6 hechas y
+`PROSA_SIEMPRE` decidido para la demo; sigue la revisión médica, fase 7),
+después 0, 1, 5 y 6.
 
 ---
 
@@ -149,7 +150,7 @@ el 08/10; sirven para el PC de 8 GB):
    cd rag_pipeline
    ..\.venv\Scripts\python.exe -m pip install "pymupdf==1.28.2"
    ..\.venv\Scripts\python.exe scripts\extraer_guias.py
-   ..\.venv\Scripts\python.exe -m pytest tests/ -q        # 221 desde el 18/10
+   ..\.venv\Scripts\python.exe -m pytest tests/ -q        # 222 desde el 18/10
    ```
    Después de extraer: `..\.venv\Scripts\python.exe -m rag.index --fuente guias`.
    **Versión exacta de PyMuPDF a propósito:** otra versión podría extraer
@@ -199,10 +200,10 @@ captura de pantalla ni `desktop.ini`.
 **Lo primero después de la demo:**
 1. **Pasar a limpio las notas de `PREGUNTAS_DEMO.md`** (respuestas, consultas que
    escribieron los asistentes, acuerdos) y convertirlas en pendientes aquí.
-2. **Decidir `PROSA_SIEMPRE`** (sección 2.12): hoy muestra la prosa aunque no
-   pase la verificación, lo que va contra "nada inventado". Volver a `False`
-   salvo que el usuario decida otra cosa con lo que digan los médicos.
-3. Commit de los cambios de la demo (cuando el usuario lo pida).
+2. ~~**Decidir `PROSA_SIEMPRE`**~~ decidido para la demo (18/10, usuario):
+   `True`; repensarlo después de la demo (sección 00).
+3. ~~Commit de los cambios de la demo~~ hecho en `45662e9` (salvo los dos `.md`
+   de arriba).
 
 **Urgente, después de la demo — PHI en GitHub:** `anonimizacion/trauma.csv`
 (datos crudos), `outputs/log_reemplazos.csv` (texto original de cada
@@ -212,14 +213,13 @@ están versionados desde `5c3a035` y ya están en `origin/main`
 haría que el `git pull` en el PC de la demo los borre del disco. Ver
 pendiente 0.
 
-**Primeros pasos, en el PC de 8 GB:**
-1. Tests: `cd rag_pipeline; ..\.venv\Scripts\python.exe -m pytest tests/ -q`
-   (93) y en `anonimizacion\` los 83.
-2. Modelos: `ollama pull qwen3:4b-instruct` y bajar el reranker (`SETUP.md`,
-   sección 2).
-3. `python scripts\calibrar_umbral.py` → debe decir `cuda` y < 1 s por consulta.
-4. `python scripts\comparar_modelos.py --modos prosa` → tiempos reales,
-   `gpu_pct` = 100 y cuántas prosas pasan la verificación.
+**Primeros pasos, en el PC de 8 GB** (1 a 4 hechos el 17/10, sección 3):
+1. ~~Tests~~ pasan los 222 de `rag_pipeline\` y los 83 de `anonimizacion\`
+   (18/10).
+2. ~~Modelos~~ `qwen3:4b-instruct` y el reranker descargados.
+3. ~~`calibrar_umbral.py`~~ `cuda`, 0,56 s de mediana por consulta.
+4. ~~`comparar_modelos.py --modos prosa`~~ fase 5 de los libros: 5,3 s de
+   mediana sin libros y 7,6 s con libros, generador 100 % en GPU.
 5. Revisión médica (pendiente 1), ahora con la prosa: regenerar la planilla.
 
 ---
@@ -236,7 +236,7 @@ sugerencias mostrar; sigue así con `SALIDA=sugerencias`).
 
 ```
 rag_trauma/
-  .venv/                 entorno compartido (Python 3.13) — NO se copia entre PCs
+  .venv/                 entorno compartido (Python 3.12 en el PC de 8 GB) — NO se copia entre PCs
   requirements.txt       instala las dos partes (-r a cada carpeta)
   README.md              visión general
   CONTEXTO_SESION.md     este archivo
@@ -250,11 +250,15 @@ rag_trauma/
   rag_pipeline/          índices, evaluación y chatbot
     app.py               chatbot Streamlit
     .streamlit/          config.toml: no recargar rag/ en caliente (ver sección 6)
-    rag/                 config, encoder, retrieve, index, build_prompt, hallazgos, generate
-    indices/             BM25 + Qdrant local (8.198 puntos) — no está en git
-    tests/               93 tests del extractor, la respuesta y el verificador (sin Ollama ni índices)
-    scripts/             revisar_entorno, probar_respuestas, exportar_revision
-    eval/                consultas.yaml (28 consultas), evaluate.py, revision/ (planilla médica, no en git)
+    rag/                 config, encoder, retrieve, index, build_prompt, hallazgos, generate,
+                         verificar, guias (extracción de los libros), fragmentar
+    guias/               perfiles.yaml (en git) y el texto extraído de los libros (no está en git)
+    indices/             BM25 + Qdrant local (casos: 8.198 puntos; guias: 2.272) — no está en git
+    tests/               222 tests del extractor, los libros, la respuesta y el verificador (sin Ollama ni índices)
+    scripts/             revisar_entorno, probar_respuestas, exportar_revision, preparar_demo,
+                         calibrar_umbral/_guias, comparar_modelos/_fragmentacion, extraer_guias
+    eval/                consultas.yaml (35 consultas), consultas_guias.yaml (51, libros), evaluate.py,
+                         revision/ (planilla médica, no en git)
     MODELOS.md           modelos recomendados para 4 GB y 8 GB de VRAM (con mediciones)
     SETUP.md             instalación y variables de entorno
 ```
@@ -603,9 +607,10 @@ la demo, **solo prosa y debajo los casos consultados**.
    setx LLAMA_ARG_CACHE_RAM 0         # Ollama >= 0.40: sin caché de prompts en RAM (sección 6)
    ```
 4. Comprobar el entorno: `cd rag_pipeline; python scripts\revisar_entorno.py`
-5. Índices (no están en git): `python -m rag.index` desde `rag_pipeline\`.
+5. Índices (no están en git): `python -m rag.index` desde `rag_pipeline\`, y
+   para los libros `python -m rag.index --fuente guias` (antes, la sección 00).
    Si falta `anonimizacion/outputs/`, antes: `cd ..\anonimizacion; python run_pipeline.py`.
-6. Tests: `python -m pytest tests/ -q` (93).
+6. Tests: `python -m pytest tests/ -q` (222).
 7. Probar: `python scripts\probar_respuestas.py "herida por arma de fuego en tórax con hipoventilación"`
 8. Antes de una demo: `python scripts\preparar_demo.py` (debe decir "Todo
    listo" y 100 % en GPU).
@@ -674,7 +679,9 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
    leer el prompt (~1.700 tokens). En la GTX 1650 serían ~16 s + ~3–4 s. El
    "prompt corto" ya no sirve: la prosa necesita el texto de los casos.
    **En el PC de 8 GB, ~5 s por respuesta** con todo cargado (17/10, 3
-   consultas). Falta la corrida completa: `comparar_modelos.py --modos prosa`.
+   consultas). ~~Falta la corrida completa~~ hecha el 17/10 (fase 5 de los
+   libros, 25 consultas de trauma): 5,3 s de mediana sin libros (peor 6,4) y
+   7,6 s con libros (peor 11,5).
 9. **Medir otros modelos en el PC de 8 GB:** el script ya existe
    (`scripts/comparar_modelos.py`, secciones 2.9 y 2.10): `python scripts\comparar_modelos.py --modelos
    qwen3:4b-instruct,qwen3:8b --ruta rrf`. Con `--ruta rrf` los dos modelos
@@ -686,7 +693,8 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
 11. ~~Restos de truncados en `consultas.yaml` y en el guion de `SETUP.md`~~
     Hecho el 28/09 (sección 2.11).
 12. **Después de la demo (sección 2.12):** notas de `PREGUNTAS_DEMO.md` →
-    pendientes; decidir `PROSA_SIEMPRE`. ~~Actualizar el guion de `SETUP.md`
+    pendientes; ~~decidir `PROSA_SIEMPRE`~~ decidido para la demo (18/10):
+    `True` (sección 00). ~~Actualizar el guion de `SETUP.md`
     §6; correr los tests y abrir la app~~ hecho el 17/10 (fase 6 de los libros:
     220 tests, app probada con `AppTest`, `preparar_demo.py` en "Todo listo").
 13. ~~**Motivo visible si vuelve la versión determinista**~~ hecho el 17/10:
@@ -750,7 +758,7 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
 | `TIMEOUT_LLM` | `400` | |
 | `SINTESIS_LLM` | apagado | no encender sin revisar respuestas |
 | `SALIDA` | `prosa` | `sugerencias` = siempre la respuesta determinista |
-| `PROSA_SIEMPRE` | `1` | demo 28/09: prosa aunque no pase la verificación; volver a `0` (sección 2.12) |
+| `PROSA_SIEMPRE` | `1` | prosa aunque no pase la verificación; decidido para la demo (18/10), repensar después (sección 00) |
 | `UMBRAL_ABSTENCION` | `0.52` | primera guarda: coseno del mejor caso (0,45 hasta el 28/09; sin reranker no bloqueaba cetoacidosis) |
 | `KEEP_ALIVE` | `2h` | se envía en cada llamada a Ollama: el modelo no se descarga entre preguntas |
 | `UMBRAL_RERANK` | `0.2` | segunda guarda (ruta rerank): prob. mínima por caso; < 2 casos → abstención |

@@ -309,10 +309,10 @@ def desplegable_guias(respuesta, consulta: str) -> None:
 
 
 def cuerpo_respuesta(respuesta, consulta: str, de_a_poco: bool = False) -> None:
-    """La respuesta por apartados: casos (prosa, tabla de todos los casos y su
-    desplegable) y manuales (prosa, lista de todos los pasajes y su
-    desplegable). Sin apartados (abstención, resumen de un caso), el texto y
-    los desplegables al final."""
+    """La respuesta por apartados: casos (prosa, línea de respaldo y su
+    desplegable) y manuales (prosa o aviso de los pasajes, y su desplegable).
+    Sin apartados (abstención, resumen de un caso), el texto y los
+    desplegables al final."""
     def escribir(texto: str) -> None:
         if de_a_poco:
             st.write_stream(escribir_de_a_poco(texto, segundos_max=1.0))
