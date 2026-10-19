@@ -1,9 +1,10 @@
 # Contexto de trabajo — rag_trauma
 
-Resumen para retomar el trabajo. Última sesión: **18 de octubre de 2026**, en
+Resumen para retomar el trabajo. Última sesión: **19 de octubre de 2026**, en
 el **PC de 8 GB** (RTX 4060), preparado desde un clon limpio. **Desde el 17/10
 solo se mide en la RTX 4060** (decisión del usuario): la GTX 1650 ya no es
-objetivo. **Empezar por la sección 00** (libros de trauma: fases 1 a 6 hechas y
+objetivo. **Empezar por la sección 00** (libros de trauma: fases 1 a 6 hechas,
+cobertura de los libros corregida el 19/10 con `UMBRAL_GUIAS` recalibrado, y
 `PROSA_SIEMPRE` decidido para la demo; sigue la revisión médica, fase 7),
 después 0, 1, 5 y 6.
 
@@ -11,8 +12,34 @@ después 0, 1, 5 y 6.
 
 ## 00. Libros de trauma (desde el 07/10)
 
+**Cobertura de los libros corregida el 19/10** (`PLAN_INDEXAR_LIBROS.md`,
+fase 1, "Cambios del 19/10"): entraba el 74 % del texto del ATLS y el 77 % del
+HUV; lo que faltaba era casi todo a propósito, salvo tres huecos:
+- el final del capítulo 24 del ATLS (`fin` 350 → 355: ATLS-OE, Hartford,
+  resumen);
+- **los 23 flujogramas y 3 tablas del HUV, transcritos a mano** en
+  `anonimizacion/data/transcripciones_guias.yaml` (fuera de git, viaja con
+  los PDF). Antes sus cajas entraban sueltas, sin las flechas;
+- los pies de foto y dibujo del HUV, que entraban como 99 recuadros, ahora se
+  descartan.
+
+Ningún ID se corrió. 935 secciones, 2.201 fragmentos, 236 tests. **Las
+transcripciones las tiene que revisar el médico** (fase 7): las dudas de
+lectura están en sus `notas`.
+
+**`UMBRAL_GUIAS` 0,2 → 0,34 (19/10, decisión del usuario).** Con la tabla del
+quemado transcrita, `neg-09` ("hemorragia digestiva alta por úlcera péptica")
+pasaba la guarda de los libros con 0,326 (antes el máximo fuera de dominio era
+0,173). Con 0,34 vuelve a pasar 0 de 10 por los libros, y `voc-04` queda sin
+libros (12 de 25 de trauma sin libros, antes 11; igual la responden los
+casos). Las dos guardas juntas (`calibrar_umbral.py`): las 25 de trauma
+responden (13 con las dos fuentes, 12 solo casos); fuera de dominio solo
+`neg-05` (apendicitis, por los casos, como desde el 27/09). Margen corto por
+los dos lados (`fin-04` 0,351): agregar consultas fuera de dominio antes de
+moverlo.
+
 **Fase 3 hecha el 17/10** (`PLAN_INDEXAR_LIBROS.md`, fase 3): colección
-`guias` en el mismo Qdrant, 2.272 fragmentos `fijo-256`, con
+`guias` en el mismo Qdrant, 2.272 fragmentos `fijo-256` (2.201 desde el 19/10), con
 `python -m rag.index --fuente guias`. Reindexar una fuente ya no borra la
 otra. Leyendo de Qdrant reproduce la fase 2 (R@ppto densa 0,406 en las
 anotadas, 0,787 en las sintéticas).
@@ -22,7 +49,8 @@ anotadas, 0,787 en las sintéticas).
 los casos) hasta `PRESUPUESTO_GUIAS` (1.400 tokens), o nada si el mejor
 fragmento no pasa la guarda. En el PC de 8 GB, `rerank` con `UMBRAL_GUIAS`
 0,2: ninguna fuera de dominio pasa, las 16 de procedimiento responden y 11 de
-25 de trauma se quedan sin libros (les responden los casos). Sin el reranker
+25 de trauma se quedan sin libros (les responden los casos); desde el 19/10,
+0,34 y 12 de 25 (arriba). Sin el reranker
 en GPU, `densa` con `UMBRAL_GUIAS_COSENO` 0,60 (respaldo; deja sin libros a
 16 de 25). Calibración: `scripts/calibrar_guias.py`; las dos guardas juntas:
 `calibrar_umbral.py`.
@@ -82,14 +110,15 @@ con `PROSA_SIEMPRE` se muestran las dos partes; sin él, solo las que pasaron
 1. ~~Decidir `PROSA_SIEMPRE`~~ decidido para la demo: `True` (arriba).
 2. **Fase 7, revisión médica:** planilla con la prosa nueva y la pregunta "¿la
    guía citada corresponde a la situación?"; mirar las oraciones del ATLS
-   (solo se verifican cita y cifras) y la decisión abierta de la cuota por
-   libro.
+   (solo se verifican cita y cifras), la decisión abierta de la cuota por
+   libro y **las 25 transcripciones del HUV** (19/10).
 3. Validar las 51 consultas anotadas (usuario o médico). Si cambian, repetir
    `calibrar_guias.py` (segundos) y, si cambia la fragmentación,
    `FRAGMENTACION_GUIAS` y reindexar (~20 s).
-4. Revisar a mano `guias/muestra_revision.md` (fase 1). Visto el 17/10: un
+4. Revisar a mano `guias/muestra_revision.md` (fase 1). ~~Visto el 17/10: un
    "Recuadro: Foto. Herida por arma de fuego…" del HUV (cap. 23) entra como
-   pasaje; es un pie de foto que la extracción no quitó.
+   pasaje~~ corregido el 19/10: los pies de foto y dibujo se descartan. La
+   muestra es del 07/10; regenerarla con `extraer_guias.py --muestra 30`.
 5. Ideas medibles: expandir abreviaturas de la consulta solo para los libros
    (11 de 25 de trauma quedan sin libros, casi todas por abreviaturas u
    ortografía); "ocluar"/"ocluye" y "quinto"/"5to" rechazan oraciones del
@@ -100,8 +129,9 @@ se agregan dos libros como segunda fuente, **con el mismo peso que los casos**
 (decisión del usuario). Todo el plan y su estado están en
 **`PLAN_INDEXAR_LIBROS.md`** (raíz). Resumen:
 - **Fase 1, extracción (hecha):** `rag/guias.py` + `guias/perfiles.yaml` →
-  `guias/secciones.jsonl`, con 926 secciones (ATLS 676, HUV 250). Falta
-  revisar a mano `guias/muestra_revision.md` contra el PDF.
+  `guias/secciones.jsonl`, con 926 secciones (ATLS 676, HUV 250); 935 desde
+  el 19/10 (ATLS 682, HUV 253). Falta revisar a mano
+  `guias/muestra_revision.md` contra el PDF.
 - **Fase 2, fragmentación (hecha el 08/10, provisional):** 7
   configuraciones en `rag/fragmentar.py`, comparadas con
   `scripts/comparar_fragmentacion.py` sobre 51 consultas anotadas
@@ -126,8 +156,10 @@ ni nada de `anonimizacion/`**, porque ahí hay casos. El zip se arma con
 5.1) escribe las rutas con `\` y Kaggle lo rechaza.
 
 **Qué NO viaja por git** (está en `.gitignore`):
-- `anonimizacion/data/`: `trauma.csv` (PHI) y los dos PDF (80 y 185 MB, con
-  derechos de autor). Desde el 07/10 `trauma.csv` vive ahí, no en
+- `anonimizacion/data/`: `trauma.csv` (PHI), los dos PDF (80 y 185 MB, con
+  derechos de autor) y, desde el 19/10, `transcripciones_guias.yaml` (los
+  flujogramas y tablas del HUV transcritos a mano: **no se regenera**, se
+  copia con los PDF). Desde el 07/10 `trauma.csv` vive ahí, no en
   `anonimizacion/`.
 - `rag_pipeline/guias/*` salvo `perfiles.yaml`: el texto extraído se
   regenera en cada PC.
@@ -143,21 +175,24 @@ el 08/10; sirven para el PC de 8 GB):
    ```
 2. Copiar los dos PDF (USB o red) a `anonimizacion\data\`:
    `ATLS_11thEdition_CourseManual_ENG_17.pdf` y
-   `LIBRO PACIENTE TRAUMATIZADO MANUAL DE MANEJO INICIAL.pdf`.
+   `LIBRO PACIENTE TRAUMATIZADO MANUAL DE MANEJO INICIAL.pdf`, y con ellos
+   `transcripciones_guias.yaml` (19/10; sin él, `extraer_guias.py` avisa y
+   la huella del paso 5 no coincide).
 3. `git pull`.
 4. Instalar y extraer:
    ```powershell
    cd rag_pipeline
    ..\.venv\Scripts\python.exe -m pip install "pymupdf==1.28.2"
    ..\.venv\Scripts\python.exe scripts\extraer_guias.py
-   ..\.venv\Scripts\python.exe -m pytest tests/ -q        # 222 desde el 18/10
+   ..\.venv\Scripts\python.exe -m pytest tests/ -q        # 236 desde el 19/10
    ```
    Después de extraer: `..\.venv\Scripts\python.exe -m rag.index --fuente guias`.
    **Versión exacta de PyMuPDF a propósito:** otra versión podría extraer
    distinto, los IDs de sección (`ATLS-07-019`) se correrían y
    `eval/consultas_guias.yaml` quedaría apuntando a otras secciones.
-5. Comprobar que la extracción es idéntica a la del PC sin GPU; debe
-   imprimir **`926 1937563090e0`**:
+5. Comprobar que la extracción es idéntica a la del PC de 8 GB; debe
+   imprimir **`935 9885b7f88286`** (desde el 19/10; hasta entonces
+   `926 1937563090e0`):
    ```powershell
    ..\.venv\Scripts\python.exe -c "import json,hashlib; ids=[json.loads(l)['id']+'|'+' > '.join(json.loads(l)['titulos']) for l in open('guias/secciones.jsonl',encoding='utf-8')]; print(len(ids), hashlib.sha1('\n'.join(ids).encode()).hexdigest()[:12])"
    ```
@@ -214,8 +249,8 @@ haría que el `git pull` en el PC de la demo los borre del disco. Ver
 pendiente 0.
 
 **Primeros pasos, en el PC de 8 GB** (1 a 4 hechos el 17/10, sección 3):
-1. ~~Tests~~ pasan los 222 de `rag_pipeline\` y los 83 de `anonimizacion\`
-   (18/10).
+1. ~~Tests~~ pasan los 236 de `rag_pipeline\` y los 83 de `anonimizacion\`
+   (19/10).
 2. ~~Modelos~~ `qwen3:4b-instruct` y el reranker descargados.
 3. ~~`calibrar_umbral.py`~~ `cuda`, 0,56 s de mediana por consulta.
 4. ~~`comparar_modelos.py --modos prosa`~~ fase 5 de los libros: 5,3 s de
@@ -253,8 +288,8 @@ rag_trauma/
     rag/                 config, encoder, retrieve, index, build_prompt, hallazgos, generate,
                          verificar, guias (extracción de los libros), fragmentar
     guias/               perfiles.yaml (en git) y el texto extraído de los libros (no está en git)
-    indices/             BM25 + Qdrant local (casos: 8.198 puntos; guias: 2.272) — no está en git
-    tests/               222 tests del extractor, los libros, la respuesta y el verificador (sin Ollama ni índices)
+    indices/             BM25 + Qdrant local (casos: 8.198 puntos; guias: 2.201) — no está en git
+    tests/               236 tests del extractor, los libros, la respuesta y el verificador (sin Ollama ni índices)
     scripts/             revisar_entorno, probar_respuestas, exportar_revision, preparar_demo,
                          calibrar_umbral/_guias, comparar_modelos/_fragmentacion, extraer_guias
     eval/                consultas.yaml (35 consultas), consultas_guias.yaml (51, libros), evaluate.py,
@@ -610,7 +645,7 @@ la demo, **solo prosa y debajo los casos consultados**.
 5. Índices (no están en git): `python -m rag.index` desde `rag_pipeline\`, y
    para los libros `python -m rag.index --fuente guias` (antes, la sección 00).
    Si falta `anonimizacion/outputs/`, antes: `cd ..\anonimizacion; python run_pipeline.py`.
-6. Tests: `python -m pytest tests/ -q` (222).
+6. Tests: `python -m pytest tests/ -q` (236).
 7. Probar: `python scripts\probar_respuestas.py "herida por arma de fuego en tórax con hipoventilación"`
 8. Antes de una demo: `python scripts\preparar_demo.py` (debe decir "Todo
    listo" y 100 % en GPU).
@@ -776,5 +811,6 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
 | `FRAGMENTACION_GUIAS` | `fijo-256` | configuración de `rag/fragmentar.py` al indexar los libros |
 | `RUTA_GUIAS` | `auto` | libros: `rerank` con ≥ 7 GB de VRAM, si no `densa` |
 | `PRESUPUESTO_GUIAS` | `1400` | tokens de fragmentos de los libros para el prompt |
-| `UMBRAL_GUIAS` | `0.2` | ruta `rerank`: prob. mínima del mejor fragmento (fuera de dominio máx. 0,173) |
+| `UMBRAL_GUIAS` | `0.34` | ruta `rerank`: prob. mínima del mejor fragmento. 0,2 hasta el 19/10; con las transcripciones, fuera de dominio máx. 0,326 (`neg-09`), sección 00 |
+| `GUIAS_TRANSCRIPCIONES` | `anonimizacion/data/transcripciones_guias.yaml` | flujogramas y tablas del HUV transcritos a mano (19/10); fuera de git, viaja con los PDF |
 | `UMBRAL_GUIAS_COSENO` | `0.60` | ruta `densa` (sin reranker en GPU): coseno mínimo del mejor fragmento; separa mal |

@@ -95,6 +95,42 @@ secciones) contra el PDF. Revisado por Claude: sin encabezados, sin guiones
 blandos ni caracteres de Wingdings; las 11 "et al." que quedan son citas en
 el texto, no bibliografía; los "hypo- and" son guiones suspendidos reales.
 
+**Cambios del 19/10 (cobertura de los libros).** Medido recorriendo los dos
+PDF: entraba el 74 % del texto del ATLS y el 77 % del HUV. Lo que faltaba era
+casi todo a propósito (bibliografía, preliminares, índice alfabético,
+portadas con objetivos, encabezados), salvo tres huecos que se corrigieron:
+1. **Final del capítulo 24 del ATLS (pp. 332–335):** `fin` pasó de 350 a 355.
+   "ATLS-OE" se había tomado por un apéndice y es una sección del capítulo:
+   *zero survey*, *quaternary survey*, el consenso de Hartford (tirador
+   activo, víctimas en masa) y el resumen con sus *key learning points*. Son 6
+   secciones nuevas al final del capítulo (`ATLS-24-014` a `-019`).
+2. **Flujogramas y tablas en imagen del HUV, transcritos a mano:** 23
+   flujogramas (pp. 33, 42, 65, 86, 98, 124, 135, 145, 160, 173, 183, 191,
+   201, 202, 214, 229, 241, 253, 254, 269, 281 y 298) y 3 tablas (p. 68,
+   variables de la vía aérea, entraba a medias; p. 117, Lund y Browder, en
+   imagen; p. 120, manejo médico inicial del quemado, sin texto). Los
+   flujogramas no solo se descartaban: en casi todos, sus cajas entraban como
+   recuadros sueltos sin las flechas, que es lo que la regla quería evitar. La
+   transcripción reemplaza todo lo que sigue al título "Flujograma" en su
+   página y, en las tablas, el contenido del pie. Va en
+   `anonimizacion/data/transcripciones_guias.yaml` (fuera de git, junto a los
+   PDF; `GUIAS_TRANSCRIPCIONES`), con `notas` de las dudas de lectura para el
+   médico. Si el ancla no aparece, la extracción falla en vez de perder el
+   diagrama. 3 secciones nuevas, al final de su capítulo (`HUV-11-017`,
+   `HUV-15-012`, `HUV-18-011`): eran flujogramas sin nada que indexar.
+3. **Pies de foto y dibujo del HUV** ("Foto.", "Dibujos.", "imagen.", y su
+   segunda línea si el pie viene partido): se descartan (`figura` en
+   `perfiles.yaml`). Entraban como 99 recuadros ("Recuadro: Foto. Herida por
+   arma de fuego…"). No recogen material: así se llevaban listas sin pie que
+   estaban encima ("Indicaciones para realizar TAC corporal Total", p. 59).
+   Efecto menor: la lista de la p. 101 pierde su encabezado ("Foto. Factores
+   que favorecen las caídas en los ancianos", que era a la vez pie y título).
+
+**Ningún ID existente se corrió** (comparado sección por sección): las 9
+secciones nuevas van al final de su capítulo. Resultado: 935 secciones (ATLS
+682, HUV 253), huella `935 9885b7f88286`. Tests: 14 nuevos en
+`tests/test_guias.py`.
+
 Plan original:
 - Script `rag_pipeline/scripts/extraer_guias.py` con PyMuPDF (open source,
   local). Va a `requirements.txt`.
@@ -276,7 +312,12 @@ Cómo quedó (`rag/index.py`):
 - Tests: `tests/test_index.py` (6): reindexar una fuente no borra la otra,
   payload con la cita, el límite de tokens y `meta.json`.
 
-**Verificado:**
+**Reindexado el 19/10** con los cambios de la fase 1 (arriba): **2.201
+fragmentos** (ATLS 1.652, HUV 549; 476 de tablas). El HUV baja de 640 a 549:
+salen los recuadros de pies de foto y de cajas sueltas y entran las 25
+transcripciones.
+
+**Verificado (17/10, antes de los cambios del 19/10):**
 - Extracción idéntica a la de los otros PC (`926 1937563090e0`).
 - `comparar_fragmentacion.py --configs fijo-256 --rutas densa,rerank-densa`
   reproduce **exactamente** la fase 2: 0,401 y 0,374 (anotadas), 0,787 y
@@ -345,6 +386,35 @@ mitad del presupuesto para cada libro (lo que uno no usa pasa al otro):
 El total no cambia más allá del ruido: es un balance entre el protocolo
 local (HUV) y el estándar internacional (ATLS), no una mejora. Se queda el
 presupuesto común hasta que se decida.
+
+**Medido otra vez el 19/10, después de los cambios de la fase 1** (ruta
+`rerank`, `UMBRAL_GUIAS` 0,2):
+
+| | R@ppto anot. | R@ppto sint. | Trauma sin libros | Proc. sin libros | Fuera de dominio que pasan |
+|---|---|---|---|---|---|
+| 17/10 | 0,331 | 0,854 | 11/25 | 0/16 | 0/10 (máx. 0,173) |
+| 19/10 | 0,327 | 0,854 | 11/25 | 0/16 | **1/10** (`neg-09`, 0,326) |
+
+- Las anotadas bajan 0,004, dentro del ruido. Las secciones de flujograma
+  nuevas o con contenido nuevo no están anotadas: cuando entran al
+  presupuesto, cuentan como no relevantes. Validar las anotaciones con el
+  médico debería incluirlas.
+- **`neg-09` ("hemorragia digestiva alta por úlcera péptica") pasa la guarda
+  de los libros:** la atrae una fila real de la tabla transcrita de la p. 120
+  ("…riesgo de úlcera duodenal y hemorragia digestiva: omeprazol 40 mg…").
+  Con las dos guardas juntas, responderían 2 de 10 fuera de dominio
+  (`neg-05` por los casos, `neg-09` por los libros). **Decidido (usuario,
+  19/10): `UMBRAL_GUIAS` 0,34**, el punto medio entre `neg-09` (0,326) y la
+  consulta de trauma siguiente (`fin-04`, 0,351). Vuelve a 0 de 10 por los
+  libros, a cambio de dejar sin libros a `voc-04` (0,236): 12 de 25, con
+  R@ppto igual (0,327 y 0,854). Las dos guardas juntas: las 25 de trauma
+  responden (13 con las dos fuentes, 12 solo casos) y de las fuera de
+  dominio solo `neg-05`, por los casos. El margen es corto en los dos lados:
+  agregar consultas fuera de dominio antes de moverlo.
+- Los flujogramas transcritos sí llegan al prompt cuando corresponden: el de
+  trauma cerrado de abdomen, la tabla del quemado, el de cuello, el
+  precordial (primero) y Lund y Browder (primero), en consultas escritas para
+  probarlo.
 
 **Ideas para medir después:**
 - 11 de 25 consultas de trauma quedan sin libros: abreviaturas ("HPAF",
@@ -517,6 +587,12 @@ Plan original:
 ### Fase 7 — Revisión médica
 - Planilla con la prosa nueva (pendiente 1 de `CONTEXTO_SESION.md`) y una
   pregunta más en la rúbrica: ¿la guía citada corresponde a la situación?
+- **Revisar las 25 transcripciones** (`transcripciones_guias.yaml`) contra
+  el libro: pasan a ser "lo que dice el manual". Las dudas de lectura están
+  en `notas`; las más importantes: la flecha "aumenta" ↔ ventana
+  pericárdica (p. 183), "persiste sangrado" en pelvis (p. 229), el paso 3
+  del flujograma 1 de abdomen penetrante (p. 201) y la rama de signos duros
+  (p. 269).
 - Cada error marcado se vuelve un test.
 
 ---
