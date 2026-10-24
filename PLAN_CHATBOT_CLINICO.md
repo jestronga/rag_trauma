@@ -393,7 +393,7 @@ generar) y `reports/probar_preguntas.csv`, con la columna vacía
 
 ---
 
-## Fase 4 — Mejora 2: que ordene la respuesta como el ATLS (en curso el 24/10/2026; decisión 2: dentro de cada apartado)
+## Fase 4 — Mejora 2: que ordene la respuesta como el ATLS (hecha el 24/10/2026; decisión 2: dentro de cada apartado; faltan la tabla del médico y la decisión 3)
 
 **Idea.** El ATLS 11 organiza la revisión primaria como xABCDE: hemorragia
 exanguinante, vía aérea, respiración, circulación, déficit neurológico y
@@ -459,10 +459,10 @@ inválido, letras coherentes, tokens de salida y mediana de tiempo. Al médico:
 línea base, mediana de 10 s o menos y la tabla de letras revisada por el
 médico.
 
-**Avance (24/10, RTX 4060).** Decisión 2 del usuario: dentro de cada apartado.
-Para la decisión 3 se sigue lo recomendado: medir y, si el % verificado baja,
-armar desde su fuente la letra que no pasa (`PROSA_SIEMPRE_ATLS=0`).
-`ORDEN_ATLS` sigue apagado hasta terminar de medir.
+**Resultado (24/10, RTX 4060).** Decisión 2 del usuario: dentro de cada
+apartado. **`ORDEN_ATLS=1` por defecto** desde la 3.ª medición (abajo). La
+decisión 3 queda para el usuario: `PROSA_SIEMPRE_ATLS` toma el valor de
+`PROSA_SIEMPRE` (encendido para la demo, 18/10).
 
 - **`rag/prioridades.py`:**
   - una letra para cada término del léxico, con las del plan; un test cuida
@@ -506,18 +506,45 @@ armar desde su fuente la letra que no pasa (`PROSA_SIEMPRE_ATLS=0`).
 - **La app:** los rótulos en negrita dentro de cada apartado y, arriba, qué
   letras van armadas desde su fuente.
 
-| 25 presentaciones (`comparar_modelos.py --modos prosa,atls --consultas guias`) | por letras, 1.ª | por letras, 2.ª (letra por lo citado) | prosa de siempre |
-|---|---|---|---|
-| JSON inválido | 0 | 1 (abr-04, cortado) | — |
-| verificadas enteras | 5 | 7 | 7 |
-| fuentes en prosa (de 45) | 18 | 19 | 20 |
-| letras verificadas | 55 de 97 | 53 de 89 | — |
-| mediana | 9,4 s | 9,7 s | 8,7 s |
-| tokens de salida | 359 | 363 | 305 |
+| 25 presentaciones (`comparar_modelos.py --modos prosa,atls --consultas guias`) | por letras, 1.ª | 2.ª (letra por lo citado) | 3.ª (tope de 400 caracteres) | prosa de siempre |
+|---|---|---|---|---|
+| JSON inválido | 0 | 1 (abr-04, cortado) | **0** | — |
+| verificadas enteras | 5 | 7 | 5 | 7 |
+| fuentes en prosa (de 45) | 18 | 19 | 18 | 20 |
+| · casos (de 25) | | | 14 | 16 |
+| · manuales (de 20) | | | 4 | 4 |
+| letras verificadas | 55 de 97 | 53 de 89 | 51 de 92 | — |
+| de la letra equivocada | 10 | 6 | 2 | — |
+| mediana | 9,4 s | 9,7 s | **9,1 s** (peor 12,8 s) | 8,7 s |
+| tokens de salida | 359 | 363 | 327 (máx. 580) | 305 |
 
-- **La 3.ª medición**, con el tope de 400 caracteres para abr-04, se detuvo por
-  falta de memoria antes de empezar a generar. Hay que repetirla:
-  `comparar_modelos.py --modos atls --consultas guias`.
+`reports/comparar_modelos_atls_orden.csv`, `…orden2.csv`, `…orden3.csv`.
+
+**Por qué se encendió:**
+- **Se cumplen** el JSON válido (0 de 25) y la mediana de 10 s o menos.
+- **Lo verificado queda un poco por debajo:** 18 fuentes de 45 contra 20; las
+  tres corridas dieron 18, 19 y 18, y la prosa de siempre se midió una vez.
+  Estrictamente, "no baja" no se cumple; la diferencia es del orden de lo que
+  varía entre corridas.
+- **Falta la tabla del médico** (letras de los términos y los capítulos, con
+  los 7 dudosos), como en la fase 3.
+
+**La decisión 3, con datos (para el usuario):**
+- **Con `PROSA_SIEMPRE_ATLS=0`,** la letra que no pasa va armada desde su
+  fuente:
+  - en los casos, "En casos similares consta hemotórax [caso: …] y tubo de
+    tórax [caso: …]", que se lee mecánico pero tiene sus citas;
+  - en los manuales, "Pasajes de esta letra: [guía: …]".
+- **Los manuales pasan enteros solo en 4 de 20**, igual que la prosa de
+  siempre. Con 0, en 16 de 20 alguna letra de los manuales queda como lista y
+  la recomendación no se ve. Con `PROSA_SIEMPRE`, se ve aunque no pase, como
+  hoy.
+- **Por eso no se siguió lo recomendado** (0) sin preguntar: cambiaría lo que el
+  usuario eligió para la demo. `PROSA_SIEMPRE_ATLS` toma el valor de
+  `PROSA_SIEMPRE`.
+- **Lo que hace fallar a los manuales** es lo de siempre: el manual
+  equivocado, palabras fuera de la guía citada y el tono. El orden por letras
+  no lo empeora ni lo arregla.
 - **Lo que queda en los rechazos** es lo de siempre: palabras fuera de la guía
   citada, el manual equivocado (la "11.ª edición" con una cita del HUV) y el
   tono, más algunos de letra que son errores de verdad (hemotórax y tubo de

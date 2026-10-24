@@ -71,13 +71,17 @@ contra 13,8 s (`scripts/probar_conversaciones.py`). **Fase 3 hecha el 24/10**
 (`rag/preguntas.py`, `PREGUNTAS=1`): hasta 2 preguntas con botones en el orden
 xABCDE. En las 25 de trauma salen 46 y ninguna repite lo ya dicho
 (`scripts/probar_preguntas.py`); falta que el médico diga si son las que haría.
-**Fase 4 en curso el 24/10** (`rag/prioridades.py`, `ORDEN_ATLS=0` hasta
-terminar de medir): la prosa por letras, dentro de cada apartado (decisión 2),
-con la letra que no pasa armada desde su fuente (`PROSA_SIEMPRE_ATLS=0`,
-decisión 3 como se recomendó). En las 25 presentaciones de paciente queda
-empatada con la prosa de siempre (7 de 25 enteras; 9,7 s contra 8,7 s). La
-última medición, con el tope de 400 caracteres por letra, se detuvo por falta
-de memoria: hay que repetirla.
+**Fase 4 hecha el 24/10** (`rag/prioridades.py`, `generate.prosa_atls`,
+`ORDEN_ATLS=1`): la prosa por letras de la revisión primaria, dentro de cada
+apartado (decisión 2), solo con un paciente. En las 25 presentaciones: 0 JSON
+inválidos, 9,1 s de mediana, y lo verificado un poco debajo de la prosa de
+siempre (18 fuentes de 45 contra 20). Faltan dos cosas:
+- que el médico revise la tabla de letras (`prioridades.DUDOSOS`);
+- la decisión 3, del usuario. `PROSA_SIEMPRE_ATLS` toma el valor de
+  `PROSA_SIEMPRE`. Con 0, la letra que no pasa va armada desde su fuente, y en
+  16 de 20 respuestas los manuales quedarían como una lista de pasajes.
+
+Sigue la fase 5 (la demo).
 
 ---
 
@@ -902,8 +906,8 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
 | `ABREVIATURAS_YAML` | `anonimizacion/config/abreviaturas.yaml` | el diccionario de la anonimización, leído como dato |
 | `CONVERSACION` | `ficha` | cómo se sigue la conversación: `ficha` = la ficha del paciente armada por el código (`rag/ficha.py`, fase 2 de `PLAN_CHATBOT_CLINICO.md`, 24/10), sin llamar al modelo; `llm` = el modelo reescribe cada seguimiento con el historial (`generate.reescribir`), como hasta el 24/10. Con la ficha: 9,9 s contra 13,8 s por seguimiento y más casos del mecanismo y la región |
 | `PREGUNTAS` | `1` | hasta 2 preguntas con botones bajo la respuesta, en el orden xABCDE (`rag/preguntas.py`, fase 3, 24/10). Necesita `CONVERSACION=ficha` |
-| `ORDEN_ATLS` | `0` | la prosa por letras de la revisión primaria (xABCDE) dentro de cada apartado, solo con un paciente (`rag/prioridades.py`, `generate.prosa_atls`, fase 4). Apagado hasta terminar de medir |
-| `PROSA_SIEMPRE_ATLS` | `0` | con `ORDEN_ATLS`: la letra que no pasa la verificación va armada desde su fuente (decisión 3, lo recomendado); `1` = se muestra igual, como `PROSA_SIEMPRE` |
+| `ORDEN_ATLS` | `1` | la prosa por letras de la revisión primaria (xABCDE) dentro de cada apartado, solo con un paciente (`rag/prioridades.py`, `generate.prosa_atls`, fase 4, 24/10). `0` = la prosa de siempre |
+| `PROSA_SIEMPRE_ATLS` | el de `PROSA_SIEMPRE` | con `ORDEN_ATLS`: `1` = la letra que no pasa la verificación se muestra igual; `0` = va armada desde su fuente (lo recomendado en la decisión 3, pendiente del usuario: con 0, los manuales quedan como lista en 16 de 20) |
 | `MAX_TOKENS_ATLS` | `1000` | salida de la prosa por letras: 7 letras de 400 caracteres como máximo |
 | `MAX_TOKENS_PROSA` | `600` | 400 hasta el 17/10: con los libros se cortaba el JSON |
 | `COLECCION_GUIAS` | `guias` | colección de Qdrant con los libros (17/10) |

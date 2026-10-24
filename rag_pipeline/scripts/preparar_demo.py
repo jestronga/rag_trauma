@@ -153,6 +153,11 @@ def main() -> int:
             en_prosa = " + ".join({"casos": "casos", "guias": "manuales"}[n] for n in r.fuentes_en_prosa)
             if r.prosa_verificada:
                 detalle = f"{fuentes} · prosa verificada"
+            elif r.orden_atls and r.letras_armadas:
+                # por letras (fase 4) con PROSA_SIEMPRE_ATLS=0: la que no pasa va armada desde su fuente
+                detalle = f"{fuentes} · por letras; armadas desde la fuente: {', '.join(r.letras_armadas)}"
+            elif r.orden_atls:
+                detalle = f"{fuentes} · por letras SIN verificar ({r.motivos[0] if r.motivos else ''})"
             elif config.PROSA_SIEMPRE and en_prosa:
                 # se muestra igual: así lo decidió el usuario para la demo
                 detalle = f"{fuentes} · prosa SIN verificar ({r.motivos[0] if r.motivos else ''})"

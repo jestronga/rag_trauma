@@ -290,13 +290,19 @@ PREGUNTAS = _env_bool("PREGUNTAS", True)
 # La respuesta ordenada como la revisión primaria del ATLS, xABCDE, dentro de
 # cada apartado (rag/prioridades.py; PLAN_CHATBOT_CLINICO.md, fase 4, decisión 2).
 # Solo para la presentación de un paciente: las preguntas de procedimiento
-# siguen con la prosa de siempre.
-ORDEN_ATLS = _env_bool("ORDEN_ATLS", False)
+# siguen con la prosa de siempre. Encendido el 24/10 (scripts/comparar_modelos.py
+# --modos prosa,atls, 25 presentaciones): 0 JSON inválidos, 9,1 s de mediana, y
+# lo verificado un poco debajo de la prosa de siempre (18 fuentes de 45 contra
+# 20), dentro de lo que varía entre corridas.
+ORDEN_ATLS = _env_bool("ORDEN_ATLS", True)
 MAX_TOKENS_ATLS = _env_int("MAX_TOKENS_ATLS", 1000)   # 7 letras de 400 caracteres (generate)
-# Decisión 3 del plan: con el orden por letras, ¿se muestra la letra que no pasó
-# la verificación (como PROSA_SIEMPRE) o se arma desde su fuente? Recomendado:
-# medir y, si el % verificado baja, armarla desde su fuente (0).
-PROSA_SIEMPRE_ATLS = _env_bool("PROSA_SIEMPRE_ATLS", False)
+# Decisión 3 del plan (del usuario): con el orden por letras, ¿se muestra la
+# letra que no pasó la verificación o se arma desde su fuente (0)? Por defecto,
+# lo mismo que PROSA_SIEMPRE, que el usuario eligió para la demo (18/10). Medido
+# el 24/10: con 0, en 16 de las 20 respuestas con manuales alguna letra de los
+# manuales queda como una lista de pasajes (pasan enteros 4 de 20, como con la
+# prosa de siempre).
+PROSA_SIEMPRE_ATLS = _env_bool("PROSA_SIEMPRE_ATLS", PROSA_SIEMPRE)
 # Cuánto deja Ollama el modelo cargado tras cada llamada. Su valor por defecto
 # son 5 min: en una demo, la pregunta después de una pausa recargaba el modelo
 # (25-35 s en la GTX 1650). Se envía en cada llamada: no hace falta
