@@ -14,6 +14,13 @@
 # Las de trauma repiten el `id` y el texto de eval/consultas.yaml. Las de
 # procedimiento (proc-*) son nuevas: preguntas que responde un libro y no un
 # caso. Las fuera de dominio (neg-*) no tienen relevantes.
+#
+# ATLS 10.ª ed. en español (23/10/2026, PLAN_INDEXAR_ATLS10.md, fase 2): cada
+# consulta lleva al final su bloque `ATLS10-*`, propuesto por Claude desde el
+# índice de secciones y los candidatos de la búsqueda (densa + reranker).
+# También falta validarlo. scripts/calibrar_guias.py solo cuenta los libros
+# que están en el índice: hasta que el ATLS 10 se indexe, su bloque no cambia
+# las cifras. neg-11 a neg-20 son nuevas (las mismas en eval/consultas.yaml).
 # ---------------------------------------------------------------------------
 
 consultas:
@@ -38,6 +45,21 @@ consultas:
       HUV-11-004: 1   # Trauma torácico penetrante › AYUDAS DIAGNÓSTICAS › ● Radiografía de Tórax (Rx Tórax)
       HUV-11-009: 1   # Trauma torácico penetrante › TRATAMIENTO › ● Hemotórax masivo y requerimiento de toracotomía
       HUV-11-016: 1   # Trauma torácico penetrante › CONCLUSIONES
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-04-006: 2   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › problemas respiratorios
+      ATLS10-04-007: 2   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › problemas respiratorios › Tensión neumotoraxica
+      ATLS10-04-008: 2   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › problemas respiratorios › El neumotórax abierto
+      ATLS10-04-009: 2   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › problemas respiratorios › hemotórax masivo
+      ATLS10-04-011: 2   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › Los problemas de circulación › hemotórax masivo
+      ATLS10-04-016: 2   # Trauma torácico › evaluación secundaria › lesiones potencialmente mortal › El neumotórax simple
+      ATLS10-04-017: 2   # Trauma torácico › evaluación secundaria › lesiones potencialmente mortal › hemotórax
+      ATLS10-01-010: 1   # Evaluación y tratamiento inicial › Valoración primaria con la reanimación simultánea › La respiración y ventilación
+      ATLS10-01-027: 1   # Evaluación y tratamiento inicial › evaluación secundaria › Historia
+      ATLS10-01-029: 1   # Evaluación y tratamiento inicial › evaluación secundaria › Historia › El trauma penetrante
+      ATLS10-02-010: 1   # Vía aérea y manejo ventilatorio › ventilación › signos objetivos de ventilación inadecuada
+      ATLS10-04-001: 1   # Trauma torácico › 
+      ATLS10-20-022: 1   # Apéndice G: Habilidades › dedo y tubo de toracostomía
+      ATLS10-23-017: 1   # Biomecánica de la lesión › traumatismo penetrante › balas
 
   - id: lex-02
     texto: fractura de cadera por caída de propia altura en paciente anciano
@@ -55,6 +77,18 @@ consultas:
       HUV-07-006: 1   # Trauma en el adulto mayor. Un manejo dif › EXÁMENES E IMÁGENES DIAGNÓSTICAS.
       HUV-07-007: 1   # Trauma en el adulto mayor. Un manejo dif › EVALUACIÓN DE LA FRAGILIDAD DEL PACIENTE GERIATRICO
       HUV-07-009: 1   # Trauma en el adulto mayor. Un manejo dif › RESUMEN
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-08-046: 2   # Trauma musculoesquelético › Principios de inmovilización › fracturas femorales
+      ATLS10-11-004: 2   # Trauma geriátrico › mecanismo de la lesión › Caídas
+      ATLS10-11-013: 2   # Trauma geriátrico › lesiones específicas
+      ATLS10-11-015: 2   # Trauma geriátrico › lesiones específicas › Las fracturas pélvicas
+      ATLS10-03-048: 1   # Choque › Consideraciones Especiales › edad avanzada
+      ATLS10-11-002: 1   # Trauma geriátrico › efectos del envejecimiento y el impacto de las condiciones preexistentes
+      ATLS10-11-011: 1   # Trauma geriátrico › Valoración primaria con la reanimación › Circulación
+      ATLS10-11-012: 1   # Trauma geriátrico › Valoración primaria con la reanimación › La exposición y el Medio Ambiente
+      ATLS10-11-017: 1   # Trauma geriátrico › circunstancias especiales › Los medicamentos
+      ATLS10-11-019: 1   # Trauma geriátrico › circunstancias especiales › El establecimiento de objetivos de los cuidados
+      ATLS10-11-020: 1   # Trauma geriátrico › Resumen del capítulo
 
   - id: lex-03
     texto: trauma craneoencefálico severo con Glasgow menor de 9
@@ -76,6 +110,24 @@ consultas:
       ATLS-07-050: 1   # Disability: Neurological Assessment and  › INTERVENTIONS AND TREATMENTS › TREATMENTS TO AVOID
       ATLS-07-059: 1   # Disability: Neurological Assessment and  › CHAPTER SUMMARY
       HUV-04-014: 1   # Paciente politraumatizado. Atención inic › MANEJO DEFINITIVO
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-06-011: 2   # Trauma de la cabeza › Clasificación de las lesiones en la cabeza › Gravedad de la lesión
+      ATLS10-06-018: 2   # Trauma de la cabeza › Las directrices de tratamiento basadas en la evidencia › Manejo de la lesión cerebral grave (GCS p
+      ATLS10-06-019: 2   # Trauma de la cabeza › Encuesta primaria y resucitación
+      ATLS10-06-021: 2   # Trauma de la cabeza › Encuesta primaria y resucitación › examinación neurológica
+      ATLS10-06-028: 2   # Trauma de la cabeza › Las terapias médicas para la lesión cerebral › La hiperventilación
+      ATLS10-06-029: 2   # Trauma de la cabeza › Las terapias médicas para la lesión cerebral › manitol
+      ATLS10-01-014: 1   # Evaluación y tratamiento inicial › Valoración primaria con la reanimación simultánea › discapacidad (neurológicos evalua
+      ATLS10-02-024: 1   # Vía aérea y manejo ventilatorio › manejo de vía aérea › vías respiratorias definitiva › La intubación endotraqueal
+      ATLS10-06-013: 1   # Trauma de la cabeza › Clasificación de las lesiones en la cabeza › Morfología › Las fracturas de cráneo
+      ATLS10-06-014: 1   # Trauma de la cabeza › Clasificación de las lesiones en la cabeza › Morfología › Las lesiones intracraneales
+      ATLS10-06-020: 1   # Trauma de la cabeza › Encuesta primaria y resucitación › Circulación
+      ATLS10-06-022: 1   # Trauma de la cabeza › Encuesta primaria y resucitación › anestésicos, analgésicos y sedantes
+      ATLS10-06-024: 1   # Trauma de la cabeza › Procedimientos de diagnóstico
+      ATLS10-06-025: 1   # Trauma de la cabeza › Las terapias médicas para la lesión cerebral
+      ATLS10-06-030: 1   # Trauma de la cabeza › Las terapias médicas para la lesión cerebral › salina hipertónica
+      ATLS10-06-033: 1   # Trauma de la cabeza › El manejo quirúrgico
+      ATLS10-06-036: 1   # Trauma de la cabeza › Resumen del capítulo
 
   - id: lex-04
     texto: quemadura de segundo grado en miembro superior
@@ -94,6 +146,18 @@ consultas:
       HUV-08-007: 1   # Manejo inicial del paciente quemado. Rea › CRITERIOS DE HOSPITALIZACIÓN
       HUV-08-008: 1   # Manejo inicial del paciente quemado. Rea › MANEJO INICIAL
       HUV-08-012: 1   # Manejo inicial del paciente quemado. Rea › Flujograma
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-09-009: 2   # Lesiones térmicas › la evaluación del paciente › área superficial del cuerpo
+      ATLS10-09-010: 2   # Lesiones térmicas › la evaluación del paciente › profundidad de la quemadura
+      ATLS10-09-014: 2   # Lesiones térmicas › evaluación secundaria y adjuntos relacionados › La circulación periférica de las extremidades quemad
+      ATLS10-09-017: 2   # Lesiones térmicas › evaluación secundaria y adjuntos relacionados › Cuidado de heridas
+      ATLS10-01-030: 1   # Evaluación y tratamiento inicial › evaluación secundaria › Historia › Lesión térmica
+      ATLS10-09-003: 1   # Lesiones térmicas › Encuesta primaria y la reanimación de pacientes con quemaduras › detener el proceso de grabación
+      ATLS10-09-006: 1   # Lesiones térmicas › Encuesta primaria y la reanimación de pacientes con quemaduras › Manejo de la circulación con la rea
+      ATLS10-09-007: 1   # Lesiones térmicas › la evaluación del paciente
+      ATLS10-09-016: 1   # Lesiones térmicas › evaluación secundaria y adjuntos relacionados › narcóticos, analgésicos y sedantes
+      ATLS10-09-026: 1   # Lesiones térmicas › el traslado del paciente › Criterios para la transferencia
+      ATLS10-09-035: 1   # Lesiones térmicas › Resumen del capítulo
 
   - id: lex-05
     texto: accidente de tránsito en motociclista con politraumatismo
@@ -112,6 +176,18 @@ consultas:
       HUV-04-003: 1   # Paciente politraumatizado. Atención inic › EPIDEMIOLOGÍA
       HUV-04-012: 1   # Paciente politraumatizado. Atención inic › MANEJO PREHOSPITALARIO
       HUV-04-014: 1   # Paciente politraumatizado. Atención inic › MANEJO DEFINITIVO
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-01-027: 2   # Evaluación y tratamiento inicial › evaluación secundaria › Historia
+      ATLS10-01-028: 2   # Evaluación y tratamiento inicial › evaluación secundaria › Historia › Traumatismo cerrado
+      ATLS10-23-012: 2   # Biomecánica de la lesión › traumatismo cerrado › La lesión de los ciclistas
+      ATLS10-01-005: 1   # Evaluación y tratamiento inicial › triage
+      ATLS10-01-008: 1   # Evaluación y tratamiento inicial › Valoración primaria con la reanimación simultánea
+      ATLS10-01-026: 1   # Evaluación y tratamiento inicial › evaluación secundaria
+      ATLS10-05-003: 1   # Trauma abdominal y pélvico › mecanismo de la lesión
+      ATLS10-08-015: 1   # Trauma musculoesquelético › evaluación secundaria › Historia › Mecanismo de lesión
+      ATLS10-13-003: 1   # Transferencia al cuidado definitivo › determinar la necesidad de la transferencia de pacientes › Los factores de transfe
+      ATLS10-18-022: 1   # Apéndice E: ATLS y manejo de recursos de › Entregando Atls® dentro de un equipo › Controlar la vía respiratoria y la res
+      ATLS10-23-002: 1   # Biomecánica de la lesión › traumatismo cerrado
 
   - id: lex-06
     texto: herida por arma cortopunzante en abdomen con laparotomía
@@ -130,6 +206,18 @@ consultas:
       HUV-15-005: 1   # Trauma abdominal penetrante › DIAGNÓSTICO Y TRATAMIENTO › Paso 5. Solicitud de estudios adicionales.
       HUV-15-008: 1   # Trauma abdominal penetrante › IMAGENES DIAGNÓSTICAS › ● AngioTAC
       HUV-23-001: 1   # Exploración de la herida traumática. ¿Cu › Introducción:
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-05-004: 2   # Trauma abdominal y pélvico › mecanismo de la lesión › penetrante
+      ATLS10-05-018: 2   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Evaluación de lesiones penetrantes específicos
+      ATLS10-05-020: 2   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Evaluación de lesiones penetrantes específicos › Las herida
+      ATLS10-05-006: 1   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Historia
+      ATLS10-05-008: 1   # Trauma abdominal y pélvico › Evaluación y gestión de caída › examen físico › Inspección, auscultación, percusión y palpa
+      ATLS10-05-014: 1   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Los adjuntos al examen físico › Los rayos X para Abdominal 
+      ATLS10-05-017: 1   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Los adjuntos al examen físico › La laparoscopia diagnóstica
+      ATLS10-05-021: 1   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Evaluación de lesiones penetrantes específicos › Flanco y l
+      ATLS10-05-026: 1   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Evaluación de lesiones penetrantes específicos › Las lesion
+      ATLS10-05-027: 1   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Evaluación de lesiones penetrantes específicos › Las lesion
+      ATLS10-05-031: 1   # Trauma abdominal y pélvico › Resumen del capítulo
 
   - id: voc-01
     texto: paciente apuñalado en el pecho, herida penetrante
@@ -148,6 +236,20 @@ consultas:
       HUV-11-015: 1   # Trauma torácico penetrante › TRATAMIENTO › Empalamiento torácico
       HUV-13-001: 1   # Trauma precordial penetrante. Evaluación › DEFINICION EPIDEMIOLOGIA
       HUV-13-002: 1   # Trauma precordial penetrante. Evaluación › ENFOQUE DIAGNOSTICO
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-01-029: 2   # Evaluación y tratamiento inicial › evaluación secundaria › Historia › El trauma penetrante
+      ATLS10-04-007: 2   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › problemas respiratorios › Tensión neumotoraxica
+      ATLS10-04-008: 2   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › problemas respiratorios › El neumotórax abierto
+      ATLS10-04-011: 2   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › Los problemas de circulación › hemotórax masivo
+      ATLS10-04-012: 2   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › Los problemas de circulación › Taponamiento card
+      ATLS10-01-027: 1   # Evaluación y tratamiento inicial › evaluación secundaria › Historia
+      ATLS10-01-036: 1   # Evaluación y tratamiento inicial › evaluación secundaria › examen físico › Pecho
+      ATLS10-04-001: 1   # Trauma torácico › 
+      ATLS10-04-016: 1   # Trauma torácico › evaluación secundaria › lesiones potencialmente mortal › El neumotórax simple
+      ATLS10-04-017: 1   # Trauma torácico › evaluación secundaria › lesiones potencialmente mortal › hemotórax
+      ATLS10-04-021: 1   # Trauma torácico › evaluación secundaria › lesiones potencialmente mortal › Lesión traumática diafragmática
+      ATLS10-05-019: 1   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Evaluación de lesiones penetrantes específicos › Las herida
+      ATLS10-20-022: 1   # Apéndice G: Habilidades › dedo y tubo de toracostomía
 
   - id: voc-02
     texto: sujeto baleado en extremidad inferior
@@ -169,6 +271,19 @@ consultas:
       HUV-20-004: 1   # Trauma vascular periférico. Primero cont › DIAGNÓSTICO › Paso 3. Identificar pacientes que requieren cirugía i
       HUV-20-006: 1   # Trauma vascular periférico. Primero cont › DIAGNÓSTICO › Paso 5. Seleccione los pacientes para observación.
       HUV-20-010: 1   # Trauma vascular periférico. Primero cont › Conclusiones
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-08-003: 2   # Trauma musculoesquelético › Primaria encuesta y reanimación de pacientes con lesiones de las extremidades potencialmente
+      ATLS10-08-005: 2   # Trauma musculoesquelético › Primaria encuesta y reanimación de pacientes con lesiones de las extremidades potencialmente
+      ATLS10-08-029: 2   # Trauma musculoesquelético › lesiones de los miembros que amenazan › Las lesiones vasculares › Evaluación
+      ATLS10-08-030: 2   # Trauma musculoesquelético › lesiones de los miembros que amenazan › Las lesiones vasculares › administración
+      ATLS10-08-002: 1   # Trauma musculoesquelético › Primaria encuesta y reanimación de pacientes con lesiones de las extremidades potencialmente
+      ATLS10-08-004: 1   # Trauma musculoesquelético › Primaria encuesta y reanimación de pacientes con lesiones de las extremidades potencialmente
+      ATLS10-08-022: 1   # Trauma musculoesquelético › evaluación secundaria › examen físico › Evaluación circulatorio
+      ATLS10-08-026: 1   # Trauma musculoesquelético › lesiones de los miembros que amenazan › Fracturas abiertas y lesiones en las articulaciones 
+      ATLS10-08-027: 1   # Trauma musculoesquelético › lesiones de los miembros que amenazan › Fracturas abiertas y lesiones en las articulaciones 
+      ATLS10-08-031: 1   # Trauma musculoesquelético › lesiones de los miembros que amenazan › Síndrome compartimental
+      ATLS10-20-027: 1   # Apéndice G: Habilidades › Aplicación del torniquete combatir la Aplicación
+      ATLS10-23-017: 1   # Biomecánica de la lesión › traumatismo penetrante › balas
 
   - id: voc-03
     texto: peatón arrollado por vehículo automotor
@@ -183,6 +298,15 @@ consultas:
       ATLS-21-030: 1   # Thoracic, Abdominopelvic, and Genitourin › EVALUATION OF OTHER SPECIFIC INJURIES › BLUNT AORTIC INJURY
       ATLS-21-040: 1   # Thoracic, Abdominopelvic, and Genitourin › PELVIC FRACTURES AND ASSOCIATED INJURIES › MECHANISM OF INJURY AND 
       HUV-04-013: 1   # Paciente politraumatizado. Atención inic › MANEJO EN URGENCIAS
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-01-027: 2   # Evaluación y tratamiento inicial › evaluación secundaria › Historia
+      ATLS10-10-002: 2   # Trauma pediátrico › tipos y patrones de lesión
+      ATLS10-23-011: 2   # Biomecánica de la lesión › traumatismo cerrado › lesiones de los peatones
+      ATLS10-01-028: 1   # Evaluación y tratamiento inicial › evaluación secundaria › Historia › Traumatismo cerrado
+      ATLS10-05-003: 1   # Trauma abdominal y pélvico › mecanismo de la lesión
+      ATLS10-08-015: 1   # Trauma musculoesquelético › evaluación secundaria › Historia › Mecanismo de lesión
+      ATLS10-18-022: 1   # Apéndice E: ATLS y manejo de recursos de › Entregando Atls® dentro de un equipo › Controlar la vía respiratoria y la res
+      ATLS10-23-002: 1   # Biomecánica de la lesión › traumatismo cerrado
 
   - id: voc-04
     texto: precipitación desde altura con trauma de columna
@@ -204,6 +328,20 @@ consultas:
       ATLS-07-047: 1   # Disability: Neurological Assessment and  › HOSPITAL › SURGICAL MANAGEMENT FOR SPINAL INJURIES
       ATLS-07-052: 1   # Disability: Neurological Assessment and  › REASSESSMENT › SPINAL INJURY
       ATLS-14-003: 1   # Initial Assessment: Secondary Survey › MECHANISM OF INJURY
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-07-017: 2   # Trauma de columna vertebral y médula esp › tipos específicos de lesiones de la médula › toracolumbar Junction fracturas 
+      ATLS10-07-018: 2   # Trauma de columna vertebral y médula esp › tipos específicos de lesiones de la médula › fracturas lumbares
+      ATLS10-07-023: 2   # Trauma de columna vertebral y médula esp › La evaluación radiográfica › columna torácica y lumbar
+      ATLS10-07-024: 2   # Trauma de columna vertebral y médula esp › generales de gestión de trampa
+      ATLS10-23-013: 2   # Biomecánica de la lesión › traumatismo cerrado › Caídas
+      ATLS10-01-035: 1   # Evaluación y tratamiento inicial › evaluación secundaria › examen físico › Columna cervical y cuello
+      ATLS10-01-039: 1   # Evaluación y tratamiento inicial › evaluación secundaria › examen físico › Sistema musculoesquelético
+      ATLS10-07-001: 1   # Trauma de columna vertebral y médula esp › 
+      ATLS10-07-008: 1   # Trauma de columna vertebral y médula esp › Documentación de lesiones de médula espinal › la severidad del déficit neurol
+      ATLS10-07-016: 1   # Trauma de columna vertebral y médula esp › tipos específicos de lesiones de la médula › Fracturas y dislocaciones (C3 a 
+      ATLS10-07-022: 1   # Trauma de columna vertebral y médula esp › La evaluación radiográfica › Columna cervical
+      ATLS10-18-022: 1   # Apéndice E: ATLS y manejo de recursos de › Entregando Atls® dentro de un equipo › Controlar la vía respiratoria y la res
+      ATLS10-20-045: 1   # Apéndice G: Habilidades › La eliminación de la columna vertebral Junta
 
   - id: voc-05
     texto: lesión ocular penetrante por cuerpo extraño metálico
@@ -219,6 +357,17 @@ consultas:
       ATLS-23-017: 1   # Ocular Trauma › TRANSFER
       ATLS-23-019: 1   # Ocular Trauma › CHAPTER SUMMARY
       ATLS-23-020: 1   # Ocular Trauma › CHAPTER SUMMARY › KEY LEARNING POINTS
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-14-004: 2   # Apéndice A: Trauma ocular › Evaluación › Historia
+      ATLS10-14-005: 2   # Apéndice A: Trauma ocular › Evaluación › examen físico
+      ATLS10-14-009: 2   # Apéndice A: Trauma ocular › Evaluación › examen físico › Examen anterior
+      ATLS10-14-014: 2   # Apéndice A: Trauma ocular › Las lesiones oculares específicas › Globos de abiertas
+      ATLS10-01-033: 1   # Evaluación y tratamiento inicial › evaluación secundaria › examen físico › Cabeza
+      ATLS10-14-002: 1   # Apéndice A: Trauma ocular › anatomía de la opinión
+      ATLS10-14-006: 1   # Apéndice A: Trauma ocular › Evaluación › examen físico › Visión
+      ATLS10-14-007: 1   # Apéndice A: Trauma ocular › Evaluación › examen físico › Alumnos
+      ATLS10-14-008: 1   # Apéndice A: Trauma ocular › Evaluación › examen físico › Presión intraocular
+      ATLS10-14-015: 1   # Apéndice A: Trauma ocular › resumen
 
   - id: voc-06
     texto: agresión física con objeto romo en región craneal
@@ -236,6 +385,20 @@ consultas:
       ATLS-07-051: 1   # Disability: Neurological Assessment and  › REASSESSMENT › TRAUMATIC BRAIN INJURY
       ATLS-14-012: 1   # Initial Assessment: Secondary Survey › COMPREHENSIVE PHYSICAL EXAMINATION › NEUROLOGICAL EXAM
       HUV-04-014: 1   # Paciente politraumatizado. Atención inic › MANEJO DEFINITIVO
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-06-011: 2   # Trauma de la cabeza › Clasificación de las lesiones en la cabeza › Gravedad de la lesión
+      ATLS10-06-013: 2   # Trauma de la cabeza › Clasificación de las lesiones en la cabeza › Morfología › Las fracturas de cráneo
+      ATLS10-06-014: 2   # Trauma de la cabeza › Clasificación de las lesiones en la cabeza › Morfología › Las lesiones intracraneales
+      ATLS10-06-016: 2   # Trauma de la cabeza › Las directrices de tratamiento basadas en la evidencia › Manejo de la lesión cerebral leve (GCS pu
+      ATLS10-06-024: 2   # Trauma de la cabeza › Procedimientos de diagnóstico
+      ATLS10-01-033: 1   # Evaluación y tratamiento inicial › evaluación secundaria › examen físico › Cabeza
+      ATLS10-01-040: 1   # Evaluación y tratamiento inicial › evaluación secundaria › examen físico › Sistema neurológico
+      ATLS10-06-001: 1   # Trauma de la cabeza › 
+      ATLS10-06-012: 1   # Trauma de la cabeza › Clasificación de las lesiones en la cabeza › Morfología
+      ATLS10-06-017: 1   # Trauma de la cabeza › Las directrices de tratamiento basadas en la evidencia › Manejo de la lesión cerebral moderada (GC
+      ATLS10-06-018: 1   # Trauma de la cabeza › Las directrices de tratamiento basadas en la evidencia › Manejo de la lesión cerebral grave (GCS p
+      ATLS10-06-021: 1   # Trauma de la cabeza › Encuesta primaria y resucitación › examinación neurológica
+      ATLS10-20-046: 1   # Apéndice G: Habilidades › Evaluación de las TC de cabeza
 
   - id: abr-01
     texto: HPAF en cráneo con orificio de entrada parietal
@@ -249,6 +412,15 @@ consultas:
       ATLS-07-045: 1   # Disability: Neurological Assessment and  › SURGICAL MANAGEMENT FOR TBI › Open Skull Fractures
       ATLS-07-049: 1   # Disability: Neurological Assessment and  › OTHER MANAGEMENT CONSIDERATIONS › SEIZURE PROPHYLAXIS AND TREATMENT
       HUV-04-006: 1   # Paciente politraumatizado. Atención inic › CINEMATICA DEL TRAUMA EN EL POLITRAUMATIZADO › ● Arma de Fuego (AF)
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-06-034: 2   # Trauma de la cabeza › El manejo quirúrgico › lesiones penetrantes del cerebro
+      ATLS10-01-029: 1   # Evaluación y tratamiento inicial › evaluación secundaria › Historia › El trauma penetrante
+      ATLS10-06-013: 1   # Trauma de la cabeza › Clasificación de las lesiones en la cabeza › Morfología › Las fracturas de cráneo
+      ATLS10-06-014: 1   # Trauma de la cabeza › Clasificación de las lesiones en la cabeza › Morfología › Las lesiones intracraneales
+      ATLS10-06-018: 1   # Trauma de la cabeza › Las directrices de tratamiento basadas en la evidencia › Manejo de la lesión cerebral grave (GCS p
+      ATLS10-06-033: 1   # Trauma de la cabeza › El manejo quirúrgico
+      ATLS10-23-017: 1   # Biomecánica de la lesión › traumatismo penetrante › balas
+      ATLS10-23-019: 1   # Biomecánica de la lesión › traumatismo penetrante › Las heridas de entrada y salida
 
   - id: abr-02
     texto: HPACP en zona II de cuello
@@ -267,6 +439,13 @@ consultas:
       HUV-09-009: 1   # Trauma penetrante de cuello. El valor de › MANEJO INICIAL › ● Paso 1. Proteja la vía aérea.
       HUV-09-010: 1   # Trauma penetrante de cuello. El valor de › MANEJO INICIAL › ● Paso 2. Controle el sangrado.
       HUV-09-012: 1   # Trauma penetrante de cuello. El valor de › RESUMEN
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-01-035: 2   # Evaluación y tratamiento inicial › evaluación secundaria › examen físico › Columna cervical y cuello
+      ATLS10-02-005: 2   # Vía aérea y manejo ventilatorio › Aerovía › reconocimiento del problema › El trauma de cuello
+      ATLS10-02-003: 1   # Vía aérea y manejo ventilatorio › Aerovía › reconocimiento del problema
+      ATLS10-02-006: 1   # Vía aérea y manejo ventilatorio › Aerovía › reconocimiento del problema › El trauma de laringe
+      ATLS10-04-005: 1   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › problemas de las vías respiratorias › Lesiones á
+      ATLS10-07-020: 1   # Trauma de columna vertebral y médula esp › tipos específicos de lesiones de la médula › lesiones de la arteria carótida 
 
   - id: abr-03
     texto: TCE leve con pérdida de conciencia transitoria
@@ -282,6 +461,17 @@ consultas:
       ATLS-11-035: 1   # Trauma in the Pediatric Patient › HEAD TRAUMA › ASSESSMENT
       ATLS-12-023: 1   # Trauma in the Older Adult › SPECIFIC INJURIES › TRAUMATIC BRAIN INJURY
       HUV-04-014: 1   # Paciente politraumatizado. Atención inic › MANEJO DEFINITIVO
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-06-011: 2   # Trauma de la cabeza › Clasificación de las lesiones en la cabeza › Gravedad de la lesión
+      ATLS10-06-016: 2   # Trauma de la cabeza › Las directrices de tratamiento basadas en la evidencia › Manejo de la lesión cerebral leve (GCS pu
+      ATLS10-01-040: 1   # Evaluación y tratamiento inicial › evaluación secundaria › examen físico › Sistema neurológico
+      ATLS10-06-013: 1   # Trauma de la cabeza › Clasificación de las lesiones en la cabeza › Morfología › Las fracturas de cráneo
+      ATLS10-06-014: 1   # Trauma de la cabeza › Clasificación de las lesiones en la cabeza › Morfología › Las lesiones intracraneales
+      ATLS10-06-015: 1   # Trauma de la cabeza › Las directrices de tratamiento basadas en la evidencia
+      ATLS10-06-017: 1   # Trauma de la cabeza › Las directrices de tratamiento basadas en la evidencia › Manejo de la lesión cerebral moderada (GC
+      ATLS10-06-024: 1   # Trauma de la cabeza › Procedimientos de diagnóstico
+      ATLS10-06-036: 1   # Trauma de la cabeza › Resumen del capítulo
+      ATLS10-20-046: 1   # Apéndice G: Habilidades › Evaluación de las TC de cabeza
 
   - id: abr-04
     texto: FX de radio distal con inmovilización
@@ -298,6 +488,18 @@ consultas:
       ATLS-10-031: 1   # Musculoskeletal Trauma › ISOLATED FRACTURES › ASSESSMENT
       ATLS-10-037: 1   # Musculoskeletal Trauma › ADJUNCTS › X-RAY EXAMINATION
       ATLS-10-039: 1   # Musculoskeletal Trauma › SECONDARY SURVEY › PAIN CONTROL
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-08-011: 2   # Trauma musculoesquelético › Los adjuntos al primario encuesta › inmovilización la fractura
+      ATLS10-08-044: 2   # Trauma musculoesquelético › lesiones de las extremidades otRos › fracturas › administración
+      ATLS10-08-045: 2   # Trauma musculoesquelético › Principios de inmovilización
+      ATLS10-08-050: 2   # Trauma musculoesquelético › Principios de inmovilización › extremidad superior y de lesiones en las manos
+      ATLS10-08-012: 1   # Trauma musculoesquelético › Los adjuntos al primario encuesta › radiografía
+      ATLS10-08-021: 1   # Trauma musculoesquelético › evaluación secundaria › examen físico › Sensación
+      ATLS10-08-022: 1   # Trauma musculoesquelético › evaluación secundaria › examen físico › Evaluación circulatorio
+      ATLS10-08-023: 1   # Trauma musculoesquelético › evaluación secundaria › examen físico › Radiografía
+      ATLS10-08-043: 1   # Trauma musculoesquelético › lesiones de las extremidades otRos › fracturas › Evaluación
+      ATLS10-08-051: 1   # Trauma musculoesquelético › control de dolor
+      ATLS10-20-066: 1   # Apéndice G: Habilidades › Reducir y férula de una fractura en un paciente simulado Trauma
 
   - id: abr-05
     texto: paciente con IOT y manejo en UCI por trauma de tórax
@@ -317,6 +519,16 @@ consultas:
       HUV-12-004: 1   # Trauma cerrado de tórax › DIAGNÓSTICO › Evaluación primaria
       HUV-12-007: 1   # Trauma cerrado de tórax › ENFOQUE TERAPÉUTICO › ● Lesiones torácicas críticas. Ponen en riesgo inmediato la vi
       HUV-22-007: 1   # Toracostomía cerrada. Técnica quirúrgica › CUIDADOS DEL PACIENTE CON TUBO DE TÓRAX
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-02-024: 2   # Vía aérea y manejo ventilatorio › manejo de vía aérea › vías respiratorias definitiva › La intubación endotraqueal
+      ATLS10-04-018: 2   # Trauma torácico › evaluación secundaria › lesiones potencialmente mortal › Flagelo pecho y pulmonar Contusion
+      ATLS10-04-026: 2   # Trauma torácico › evaluación secundaria › Manifestaciones de otro tipo de lesiones en el pecho › Costillas, el esternón,
+      ATLS10-01-019: 1   # Evaluación y tratamiento inicial › Los adjuntos a la valoración primaria con la reanimación › frecuencia ventilatoria, c
+      ATLS10-02-025: 1   # Vía aérea y manejo ventilatorio › manejo de vía aérea › vías respiratorias definitiva › La intubación asistida por fárma
+      ATLS10-02-029: 1   # Vía aérea y manejo ventilatorio › gestión de oxigenación
+      ATLS10-04-007: 1   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › problemas respiratorios › Tensión neumotoraxica
+      ATLS10-04-016: 1   # Trauma torácico › evaluación secundaria › lesiones potencialmente mortal › El neumotórax simple
+      ATLS10-04-027: 1   # Trauma torácico › Resumen del capítulo
 
   - id: ort-01
     texto: pcte con heridad por arma de fuego en torax
@@ -333,6 +545,20 @@ consultas:
       HUV-11-010: 1   # Trauma torácico penetrante › TRATAMIENTO › • Neumotórax
       HUV-11-011: 1   # Trauma torácico penetrante › TRATAMIENTO › ● Hemotórax
       HUV-11-014: 1   # Trauma torácico penetrante › TRATAMIENTO › ● Lesiones transmediastinales
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-04-007: 2   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › problemas respiratorios › Tensión neumotoraxica
+      ATLS10-04-008: 2   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › problemas respiratorios › El neumotórax abierto
+      ATLS10-04-011: 2   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › Los problemas de circulación › hemotórax masivo
+      ATLS10-04-012: 2   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › Los problemas de circulación › Taponamiento card
+      ATLS10-01-027: 1   # Evaluación y tratamiento inicial › evaluación secundaria › Historia
+      ATLS10-01-029: 1   # Evaluación y tratamiento inicial › evaluación secundaria › Historia › El trauma penetrante
+      ATLS10-04-001: 1   # Trauma torácico › 
+      ATLS10-04-009: 1   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › problemas respiratorios › hemotórax masivo
+      ATLS10-04-013: 1   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › Los problemas de circulación › La parada circula
+      ATLS10-04-016: 1   # Trauma torácico › evaluación secundaria › lesiones potencialmente mortal › El neumotórax simple
+      ATLS10-04-017: 1   # Trauma torácico › evaluación secundaria › lesiones potencialmente mortal › hemotórax
+      ATLS10-04-021: 1   # Trauma torácico › evaluación secundaria › lesiones potencialmente mortal › Lesión traumática diafragmática
+      ATLS10-23-017: 1   # Biomecánica de la lesión › traumatismo penetrante › balas
 
   - id: ort-02
     texto: traumatismo craneoencefalico sin tildes en region parietal
@@ -347,6 +573,19 @@ consultas:
       ATLS-07-023: 1   # Disability: Neurological Assessment and  › IMAGING ADJUNCTS TO ASSESSMENT › INTERPRETATION OF HEAD CT SCANS
       ATLS-07-059: 1   # Disability: Neurological Assessment and  › CHAPTER SUMMARY
       HUV-04-014: 1   # Paciente politraumatizado. Atención inic › MANEJO DEFINITIVO
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-06-011: 2   # Trauma de la cabeza › Clasificación de las lesiones en la cabeza › Gravedad de la lesión
+      ATLS10-06-013: 2   # Trauma de la cabeza › Clasificación de las lesiones en la cabeza › Morfología › Las fracturas de cráneo
+      ATLS10-06-014: 2   # Trauma de la cabeza › Clasificación de las lesiones en la cabeza › Morfología › Las lesiones intracraneales
+      ATLS10-06-016: 2   # Trauma de la cabeza › Las directrices de tratamiento basadas en la evidencia › Manejo de la lesión cerebral leve (GCS pu
+      ATLS10-01-033: 1   # Evaluación y tratamiento inicial › evaluación secundaria › examen físico › Cabeza
+      ATLS10-01-040: 1   # Evaluación y tratamiento inicial › evaluación secundaria › examen físico › Sistema neurológico
+      ATLS10-06-001: 1   # Trauma de la cabeza › 
+      ATLS10-06-017: 1   # Trauma de la cabeza › Las directrices de tratamiento basadas en la evidencia › Manejo de la lesión cerebral moderada (GC
+      ATLS10-06-018: 1   # Trauma de la cabeza › Las directrices de tratamiento basadas en la evidencia › Manejo de la lesión cerebral grave (GCS p
+      ATLS10-06-021: 1   # Trauma de la cabeza › Encuesta primaria y resucitación › examinación neurológica
+      ATLS10-06-024: 1   # Trauma de la cabeza › Procedimientos de diagnóstico
+      ATLS10-20-046: 1   # Apéndice G: Habilidades › Evaluación de las TC de cabeza
 
   - id: ort-03
     texto: luxacion de hombro por caida
@@ -361,6 +600,18 @@ consultas:
       ATLS-10-026: 1   # Musculoskeletal Trauma › NEUROLOGICAL INJURY SECONDARY TO FRACTURE OR DISLOCATION › MANAGEMENT
       ATLS-10-034: 1   # Musculoskeletal Trauma › FRACTURE IMMOBILIZATION › PRINCIPLES OF SPLINTING AND IMMOBILIZATION
       ATLS-10-037: 1   # Musculoskeletal Trauma › ADJUNCTS › X-RAY EXAMINATION
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-08-035: 2   # Trauma musculoesquelético › lesiones de los miembros que amenazan › neurológica lesión secundaria a fractura o dislocaci
+      ATLS10-08-036: 2   # Trauma musculoesquelético › lesiones de los miembros que amenazan › neurológica lesión secundaria a fractura o dislocaci
+      ATLS10-08-040: 2   # Trauma musculoesquelético › lesiones de las extremidades otRos › lesiones en las articulaciones y el ligamento › Evaluac
+      ATLS10-08-041: 2   # Trauma musculoesquelético › lesiones de las extremidades otRos › lesiones en las articulaciones y el ligamento › adminis
+      ATLS10-08-052: 2   # Trauma musculoesquelético › lesiones asociadas
+      ATLS10-08-019: 1   # Trauma musculoesquelético › evaluación secundaria › examen físico
+      ATLS10-08-021: 1   # Trauma musculoesquelético › evaluación secundaria › examen físico › Sensación
+      ATLS10-08-022: 1   # Trauma musculoesquelético › evaluación secundaria › examen físico › Evaluación circulatorio
+      ATLS10-08-023: 1   # Trauma musculoesquelético › evaluación secundaria › examen físico › Radiografía
+      ATLS10-08-039: 1   # Trauma musculoesquelético › lesiones de las extremidades otRos › lesiones en las articulaciones y el ligamento
+      ATLS10-08-050: 1   # Trauma musculoesquelético › Principios de inmovilización › extremidad superior y de lesiones en las manos
 
   - id: ort-04
     texto: qemadura por gasolina en cara y cuello
@@ -377,6 +628,18 @@ consultas:
       HUV-08-004: 1   # Manejo inicial del paciente quemado. Rea › CLASIFICACIÓN
       HUV-08-007: 1   # Manejo inicial del paciente quemado. Rea › CRITERIOS DE HOSPITALIZACIÓN
       HUV-08-010: 1   # Manejo inicial del paciente quemado. Rea › CASOS ESPECIALES
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-09-003: 2   # Lesiones térmicas › Encuesta primaria y la reanimación de pacientes con quemaduras › detener el proceso de grabación
+      ATLS10-09-004: 2   # Lesiones térmicas › Encuesta primaria y la reanimación de pacientes con quemaduras › establecer el control de la vía aér
+      ATLS10-09-005: 2   # Lesiones térmicas › Encuesta primaria y la reanimación de pacientes con quemaduras › Asegurar una ventilación adecuada
+      ATLS10-01-030: 1   # Evaluación y tratamiento inicial › evaluación secundaria › Historia › Lesión térmica
+      ATLS10-02-003: 1   # Vía aérea y manejo ventilatorio › Aerovía › reconocimiento del problema
+      ATLS10-09-006: 1   # Lesiones térmicas › Encuesta primaria y la reanimación de pacientes con quemaduras › Manejo de la circulación con la rea
+      ATLS10-09-009: 1   # Lesiones térmicas › la evaluación del paciente › área superficial del cuerpo
+      ATLS10-09-010: 1   # Lesiones térmicas › la evaluación del paciente › profundidad de la quemadura
+      ATLS10-09-017: 1   # Lesiones térmicas › evaluación secundaria y adjuntos relacionados › Cuidado de heridas
+      ATLS10-09-021: 1   # Lesiones térmicas › lesiones por quemaduras únicas › quemaduras químicas
+      ATLS10-09-026: 1   # Lesiones térmicas › el traslado del paciente › Criterios para la transferencia
 
   - id: fin-01
     texto: mordedura de perro en mano con pérdida de tejido
@@ -386,6 +649,12 @@ consultas:
       ATLS-14-028: 2   # Initial Assessment: Secondary Survey › OTHER ASSESSMENT AND TREATMENT ADJUNCTS › OTHER TREATMENTS
       ATLS-10-014: 1   # Musculoskeletal Trauma › OPEN FRACTURES AND PENETRATING JOINT INJURIES › MANAGEMENT
       HUV-23-001: 1   # Exploración de la herida traumática. ¿Cu › Introducción:
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-08-038: 2   # Trauma musculoesquelético › lesiones de las extremidades otRos › Contusiones y laceraciones
+      ATLS10-08-020: 1   # Trauma musculoesquelético › evaluación secundaria › examen físico › Busque y Ask
+      ATLS10-08-027: 1   # Trauma musculoesquelético › lesiones de los miembros que amenazan › Fracturas abiertas y lesiones en las articulaciones 
+      ATLS10-08-050: 1   # Trauma musculoesquelético › Principios de inmovilización › extremidad superior y de lesiones en las manos
+      ATLS10-09-019: 1   # Lesiones térmicas › evaluación secundaria y adjuntos relacionados › tétanos
 
   - id: fin-02
     texto: trauma abdominal cerrado con lesión esplénica
@@ -401,6 +670,18 @@ consultas:
       ATLS-21-021: 1   # Thoracic, Abdominopelvic, and Genitourin › ADJUNCTS TO PHYSICAL EXAMINATION › COMPUTED TOMOGRAPHY
       HUV-16-001: 1   # Trauma cerrado de abdomen › DEFINICIÓN CUADRO CLÍNICO
       HUV-16-002: 1   # Trauma cerrado de abdomen › EPIDEMIOLOGÍA
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-05-014: 2   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Los adjuntos al examen físico › Los rayos X para Abdominal 
+      ATLS10-05-016: 2   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Los adjuntos al examen físico › Tomografía computarizada
+      ATLS10-05-027: 2   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Evaluación de lesiones penetrantes específicos › Las lesion
+      ATLS10-01-037: 1   # Evaluación y tratamiento inicial › evaluación secundaria › examen físico › Abdomen y pelvis
+      ATLS10-05-001: 1   # Trauma abdominal y pélvico › 
+      ATLS10-05-003: 1   # Trauma abdominal y pélvico › mecanismo de la lesión
+      ATLS10-05-008: 1   # Trauma abdominal y pélvico › Evaluación y gestión de caída › examen físico › Inspección, auscultación, percusión y palpa
+      ATLS10-05-015: 1   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Los adjuntos al examen físico › El lavado peritoneal diagnó
+      ATLS10-05-031: 1   # Trauma abdominal y pélvico › Resumen del capítulo
+      ATLS10-10-033: 1   # Trauma pediátrico › traumatismo abdominal › El tratamiento no quirúrgico
+      ATLS10-10-034: 1   # Trauma pediátrico › traumatismo abdominal › Lesiones viscerales específicos
 
   - id: fin-03
     texto: lactante con trauma craneal por caída de la cama
@@ -414,6 +695,16 @@ consultas:
       ATLS-11-005: 1   # Trauma in the Pediatric Patient › GENERAL CONSIDERATIONS › SIZE, SHAPE, AND SURFACE AREA
       ATLS-11-047: 1   # Trauma in the Pediatric Patient › CHAPTER SUMMARY
       ATLS-18-014: 1   # Injury Prevention › INJURY PREVENTION SCREENING TOOLS › CHILD ABUSE AND NEGLECT
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-10-035: 2   # Trauma pediátrico › Trauma de la cabeza
+      ATLS10-10-036: 2   # Trauma pediátrico › Trauma de la cabeza › evaluación
+      ATLS10-10-037: 2   # Trauma pediátrico › Trauma de la cabeza › Administración
+      ATLS10-06-011: 1   # Trauma de la cabeza › Clasificación de las lesiones en la cabeza › Gravedad de la lesión
+      ATLS10-06-016: 1   # Trauma de la cabeza › Las directrices de tratamiento basadas en la evidencia › Manejo de la lesión cerebral leve (GCS pu
+      ATLS10-10-001: 1   # Trauma pediátrico › 
+      ATLS10-10-002: 1   # Trauma pediátrico › tipos y patrones de lesión
+      ATLS10-10-003: 1   # Trauma pediátrico › características únicas de pacientes pediátricos
+      ATLS10-10-005: 1   # Trauma pediátrico › características únicas de pacientes pediátricos › esqueleto
 
   - id: fin-04
     texto: herida por arma de fuego con desenlace fatal en sala de urgencias
@@ -425,6 +716,14 @@ consultas:
       ATLS-20-004: 1   # Communicating Serious News in the Acute  › COMMUNICATING SERIOUS NEWS
       HUV-11-009: 1   # Trauma torácico penetrante › TRATAMIENTO › ● Hemotórax masivo y requerimiento de toracotomía
       HUV-13-002: 1   # Trauma precordial penetrante. Evaluación › ENFOQUE DIAGNOSTICO
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-04-013: 2   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › Los problemas de circulación › La parada circula
+      ATLS10-01-012: 1   # Evaluación y tratamiento inicial › Valoración primaria con la reanimación simultánea › De circulación con control de la 
+      ATLS10-01-013: 1   # Evaluación y tratamiento inicial › Valoración primaria con la reanimación simultánea › De circulación con control de la 
+      ATLS10-03-038: 1   # Choque › El tratamiento inicial del shock hemorrágico › El acceso vascular › Mínima o sin respuesta
+      ATLS10-04-011: 1   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › Los problemas de circulación › hemotórax masivo
+      ATLS10-04-012: 1   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › Los problemas de circulación › Taponamiento card
+      ATLS10-23-017: 1   # Biomecánica de la lesión › traumatismo penetrante › balas
 
   - id: proc-01
     texto: ¿cuándo está indicado colocar un tubo de tórax en trauma?
@@ -439,6 +738,16 @@ consultas:
       HUV-11-013: 1   # Trauma torácico penetrante › TRATAMIENTO › ● Neumo o hemotórax manejado conservadoramente. ¿Cuánto tiempo Obse
       HUV-22-001: 1   # Toracostomía cerrada. Técnica quirúrgica › DEFINICIÓN
       HUV-22-006: 1   # Toracostomía cerrada. Técnica quirúrgica › TÉCNICA QUIRÚRGICA Paso a Paso
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-04-007: 2   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › problemas respiratorios › Tensión neumotoraxica
+      ATLS10-04-008: 2   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › problemas respiratorios › El neumotórax abierto
+      ATLS10-04-011: 2   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › Los problemas de circulación › hemotórax masivo
+      ATLS10-04-016: 2   # Trauma torácico › evaluación secundaria › lesiones potencialmente mortal › El neumotórax simple
+      ATLS10-04-017: 2   # Trauma torácico › evaluación secundaria › lesiones potencialmente mortal › hemotórax
+      ATLS10-04-009: 1   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › problemas respiratorios › hemotórax masivo
+      ATLS10-04-013: 1   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › Los problemas de circulación › La parada circula
+      ATLS10-10-017: 1   # Trauma pediátrico › respiración › aguja y tubo de toracotomía
+      ATLS10-20-022: 1   # Apéndice G: Habilidades › dedo y tubo de toracostomía
 
   - id: proc-02
     texto: técnica de la toracostomía cerrada paso a paso
@@ -451,6 +760,13 @@ consultas:
       HUV-22-005: 1   # Toracostomía cerrada. Técnica quirúrgica › EQUIPO REQUERIDO › Sistema de drenaje.
       HUV-22-007: 1   # Toracostomía cerrada. Técnica quirúrgica › CUIDADOS DEL PACIENTE CON TUBO DE TÓRAX
       HUV-22-009: 1   # Toracostomía cerrada. Técnica quirúrgica › COMPLICACIONES
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-20-022: 2   # Apéndice G: Habilidades › dedo y tubo de toracostomía
+      ATLS10-04-016: 1   # Trauma torácico › evaluación secundaria › lesiones potencialmente mortal › El neumotórax simple
+      ATLS10-04-017: 1   # Trauma torácico › evaluación secundaria › lesiones potencialmente mortal › hemotórax
+      ATLS10-10-017: 1   # Trauma pediátrico › respiración › aguja y tubo de toracotomía
+      ATLS10-20-019: 1   # Apéndice G: Habilidades › La respiración habilidades de
+      ATLS10-20-021: 1   # Apéndice G: Habilidades › la descompresión de la aguja
 
   - id: proc-03
     texto: dosis y momento de administración del ácido tranexámico en trauma
@@ -461,6 +777,10 @@ consultas:
       ATLS-06-028: 1   # Circulation Assessment and Volume Resusc › MANAGEMENT › TRAUMATIC CARDIAC ARREST
       ATLS-13-023: 1   # Trauma in the Pregnant Patient › APPROACH TO THE PREGNANT TRAUMA PATIENT: INITIAL ASSESSMENT PRIMARY SURVEY › 
       HUV-06-004: 1   # Shock hemorrágico traumático. Primero pa › INTRODUCCIÓN › Paso 3. Fluidoterapia inicial.
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-01-013: 2   # Evaluación y tratamiento inicial › Valoración primaria con la reanimación simultánea › De circulación con control de la 
+      ATLS10-03-044: 2   # Choque › reemplazo de sangre › coagulopatía
+      ATLS10-03-043: 1   # Choque › reemplazo de sangre › La transfusión masiva
 
   - id: proc-04
     texto: criterios para solicitar radiografía de tórax en trauma cerrado de tórax
@@ -469,6 +789,15 @@ consultas:
       HUV-12-005: 2   # Trauma cerrado de tórax › Imágenes Diagnosticas
       ATLS-05-018: 1   # Breathing and Ventilation Assessment and › IMAGING › CHEST RADIOGRAPHY
       HUV-12-004: 1   # Trauma cerrado de tórax › DIAGNÓSTICO › Evaluación primaria
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-01-023: 2   # Evaluación y tratamiento inicial › Los adjuntos a la valoración primaria con la reanimación › exámenes de rayos X y estu
+      ATLS10-04-014: 2   # Trauma torácico › evaluación secundaria
+      ATLS10-20-020: 2   # Apéndice G: Habilidades › Interpretación de la radiografía del pecho
+      ATLS10-01-036: 1   # Evaluación y tratamiento inicial › evaluación secundaria › examen físico › Pecho
+      ATLS10-01-041: 1   # Evaluación y tratamiento inicial › Los adjuntos a la evaluación secundaria
+      ATLS10-04-016: 1   # Trauma torácico › evaluación secundaria › lesiones potencialmente mortal › El neumotórax simple
+      ATLS10-04-020: 1   # Trauma torácico › evaluación secundaria › lesiones potencialmente mortal › La interrupción aórtica traumática
+      ATLS10-04-026: 1   # Trauma torácico › evaluación secundaria › Manifestaciones de otro tipo de lesiones en el pecho › Costillas, el esternón,
 
   - id: proc-05
     texto: cómo calcular la reposición de líquidos en un paciente quemado
@@ -479,6 +808,14 @@ consultas:
       HUV-08-008: 2   # Manejo inicial del paciente quemado. Rea › MANEJO INICIAL
       ATLS-09-006: 1   # Thermal Injuries › BURN CARE PRIORITIES WITHIN THE PRIMARY SURVEY › CIRCULATION
       ATLS-09-011: 1   # Thermal Injuries › BURN PRIORITIES IN THE SECONDARY SURVEY › BODY SURFACE AREA AND DEPTH
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-09-006: 2   # Lesiones térmicas › Encuesta primaria y la reanimación de pacientes con quemaduras › Manejo de la circulación con la rea
+      ATLS10-09-009: 2   # Lesiones térmicas › la evaluación del paciente › área superficial del cuerpo
+      ATLS10-09-007: 1   # Lesiones térmicas › la evaluación del paciente
+      ATLS10-09-013: 1   # Lesiones térmicas › evaluación secundaria y adjuntos relacionados › línea de base determinaciones para los pacientes con
+      ATLS10-09-022: 1   # Lesiones térmicas › lesiones por quemaduras únicas › Las quemaduras eléctricas
+      ATLS10-09-035: 1   # Lesiones térmicas › Resumen del capítulo
+      ATLS10-10-022: 1   # Trauma pediátrico › circulación y de choque › la reposición de líquidos y reposición de sangre
 
   - id: proc-06
     texto: indicaciones de intubación orotraqueal en el paciente traumatizado
@@ -491,6 +828,18 @@ consultas:
       HUV-05-017: 2   # Vía aérea en trauma. Manejo inicial de l › TRATAMIENTO › Paso 5. Intubación
       ATLS-07-034: 1   # Disability: Neurological Assessment and  › HOSPITAL › AIRWAY AND BREATHING
       ATLS-11-012: 1   # Trauma in the Pediatric Patient › PEDIATRIC ANATOMIC CONSIDERATIONS › OROTRACHEAL INTUBATION
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-02-023: 2   # Vía aérea y manejo ventilatorio › manejo de vía aérea › vías respiratorias definitiva
+      ATLS10-02-024: 2   # Vía aérea y manejo ventilatorio › manejo de vía aérea › vías respiratorias definitiva › La intubación endotraqueal
+      ATLS10-02-025: 2   # Vía aérea y manejo ventilatorio › manejo de vía aérea › vías respiratorias definitiva › La intubación asistida por fárma
+      ATLS10-01-009: 1   # Evaluación y tratamiento inicial › Valoración primaria con la reanimación simultánea › de las vías respiratorias de mant
+      ATLS10-02-003: 1   # Vía aérea y manejo ventilatorio › Aerovía › reconocimiento del problema
+      ATLS10-02-007: 1   # Vía aérea y manejo ventilatorio › Aerovía › signos objetivos de obstrucción de las vías
+      ATLS10-02-010: 1   # Vía aérea y manejo ventilatorio › ventilación › signos objetivos de ventilación inadecuada
+      ATLS10-02-012: 1   # Vía aérea y manejo ventilatorio › manejo de vía aérea › La predicción de manejo de vía aérea difícil
+      ATLS10-02-013: 1   # Vía aérea y manejo ventilatorio › manejo de vía aérea › DECISIÓN DE vías respiratorias Esquema
+      ATLS10-09-004: 1   # Lesiones térmicas › Encuesta primaria y la reanimación de pacientes con quemaduras › establecer el control de la vía aér
+      ATLS10-10-013: 1   # Trauma pediátrico › Aerovía › Administración › La intubación orotraqueal
 
   - id: proc-07
     texto: cricotiroidotomía cuando no se logra intubar ni oxigenar
@@ -501,6 +850,16 @@ consultas:
       ATLS-11-013: 1   # Trauma in the Pediatric Patient › PEDIATRIC ANATOMIC CONSIDERATIONS › LARYNGEAL MASK AIRWAY AND CRICOTHYROIDOT
       HUV-05-019: 1   # Vía aérea en trauma. Manejo inicial de l › Traqueostomía. Vía aérea Quirúrgica en paciente con Trauma Maxilofa
       HUV-05-020: 1   # Vía aérea en trauma. Manejo inicial de l › Vía aérea Quirúrgica con lesión laringotraqueal.
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-02-013: 2   # Vía aérea y manejo ventilatorio › manejo de vía aérea › DECISIÓN DE vías respiratorias Esquema
+      ATLS10-02-026: 2   # Vía aérea y manejo ventilatorio › manejo de vía aérea › vías respiratorias definitiva › la vía aérea quirúrgica
+      ATLS10-02-027: 2   # Vía aérea y manejo ventilatorio › manejo de vía aérea › vías respiratorias definitiva › aguja cricotiroidotomía
+      ATLS10-02-028: 2   # Vía aérea y manejo ventilatorio › manejo de vía aérea › vías respiratorias definitiva › cricotiroidotomía quirúrgica
+      ATLS10-02-024: 1   # Vía aérea y manejo ventilatorio › manejo de vía aérea › vías respiratorias definitiva › La intubación endotraqueal
+      ATLS10-02-030: 1   # Vía aérea y manejo ventilatorio › Resumen del capítulo
+      ATLS10-10-014: 1   # Trauma pediátrico › Aerovía › Administración › cricothyroidotomy
+      ATLS10-20-014: 1   # Apéndice G: Habilidades › cricotirotomia aguja
+      ATLS10-20-015: 1   # Apéndice G: Habilidades › cricotirotomía quirúrgica
 
   - id: proc-08
     texto: manejo del neumotórax a tensión
@@ -512,6 +871,16 @@ consultas:
       ATLS-05-006: 1   # Breathing and Ventilation Assessment and › PATHOPHYSIOLOGY OF COMMON INJURIES › PNEUMOTHORAX PATHOPHYSIOLOGY
       ATLS-06-026: 1   # Circulation Assessment and Volume Resusc › MANAGEMENT › OBSTRUCTIVE ETIOLOGIES
       HUV-12-007: 1   # Trauma cerrado de tórax › ENFOQUE TERAPÉUTICO › ● Lesiones torácicas críticas. Ponen en riesgo inmediato la vi
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-03-012: 2   # Choque › La evaluación del paciente iniciales › La diferenciación clínica de la causa del shock › Tensión neumotoraxica
+      ATLS10-04-007: 2   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › problemas respiratorios › Tensión neumotoraxica
+      ATLS10-20-021: 2   # Apéndice G: Habilidades › la descompresión de la aguja
+      ATLS10-01-010: 1   # Evaluación y tratamiento inicial › Valoración primaria con la reanimación simultánea › La respiración y ventilación
+      ATLS10-04-006: 1   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › problemas respiratorios
+      ATLS10-04-013: 1   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › Los problemas de circulación › La parada circula
+      ATLS10-04-016: 1   # Trauma torácico › evaluación secundaria › lesiones potencialmente mortal › El neumotórax simple
+      ATLS10-10-017: 1   # Trauma pediátrico › respiración › aguja y tubo de toracotomía
+      ATLS10-20-022: 1   # Apéndice G: Habilidades › dedo y tubo de toracostomía
 
   - id: proc-09
     texto: cuándo activar el protocolo de transfusión masiva
@@ -525,6 +894,16 @@ consultas:
       ATLS-06-019: 1   # Circulation Assessment and Volume Resusc › MANAGEMENT › RESUSCITATION TARGETS IN HEMORRHAGIC SHOCK
       ATLS-06-020: 1   # Circulation Assessment and Volume Resusc › MANAGEMENT › ASSESSING RESPONSES TO RESUSCITATION
       HUV-17-010: 1   # Trauma pélvico severo › TRATAMIENTO
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-03-037: 2   # Choque › El tratamiento inicial del shock hemorrágico › El acceso vascular › Respuesta transitoria
+      ATLS10-03-038: 2   # Choque › El tratamiento inicial del shock hemorrágico › El acceso vascular › Mínima o sin respuesta
+      ATLS10-03-043: 2   # Choque › reemplazo de sangre › La transfusión masiva
+      ATLS10-03-017: 1   # Choque › El shock hemorrágico › fisiológica de clasificación
+      ATLS10-03-034: 1   # Choque › El tratamiento inicial del shock hemorrágico › El acceso vascular › La medición de respuesta del paciente a la 
+      ATLS10-03-035: 1   # Choque › El tratamiento inicial del shock hemorrágico › El acceso vascular › Los patrones de respuesta del paciente
+      ATLS10-03-040: 1   # Choque › reemplazo de sangre › Pruebas cruzadas, tipo-específica, y el tipo de sangre O
+      ATLS10-03-044: 1   # Choque › reemplazo de sangre › coagulopatía
+      ATLS10-10-022: 1   # Trauma pediátrico › circulación y de choque › la reposición de líquidos y reposición de sangre
 
   - id: proc-10
     texto: uso del torniquete en hemorragia de una extremidad
@@ -536,6 +915,16 @@ consultas:
       ATLS-01-009: 1   # Initial Assessment: Primary Survey › PRIMARY SURVEY WITH SIMULTANEOUS RESUSCITATION › CONTROL OF EXSANGUINATIN
       ATLS-03-004: 1   # x: Control of eXsanguinating External He › MANAGEMENT
       ATLS-10-009: 1   # Musculoskeletal Trauma › MAJOR ARTERIAL INJURY AND TRAUMATIC AMPUTATION › MANAGEMENT
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-01-013: 2   # Evaluación y tratamiento inicial › Valoración primaria con la reanimación simultánea › De circulación con control de la 
+      ATLS10-08-005: 2   # Trauma musculoesquelético › Primaria encuesta y reanimación de pacientes con lesiones de las extremidades potencialmente
+      ATLS10-20-027: 2   # Apéndice G: Habilidades › Aplicación del torniquete combatir la Aplicación
+      ATLS10-03-027: 1   # Choque › El tratamiento inicial del shock hemorrágico › examen físico › Circulación: control de la hemorragia
+      ATLS10-08-003: 1   # Trauma musculoesquelético › Primaria encuesta y reanimación de pacientes con lesiones de las extremidades potencialmente
+      ATLS10-16-004: 1   # Apéndice C: Trauma en víctimas en masa,  › Care gran número de víctimas › prioridades de gestión
+      ATLS10-16-010: 1   # Apéndice C: Trauma en víctimas en masa,  › militares Trauma › Tactical Combat Casualty Care › Cuidado bajo fuego
+      ATLS10-16-019: 1   # Apéndice C: Trauma en víctimas en masa,  › La mejora de supervivencia a partir de shooter activo y eventos intencionales
+      ATLS10-20-026: 1   # Apéndice G: Habilidades › empaquetado de la herida
 
   - id: proc-11
     texto: estabilización pélvica con faja en fractura de pelvis con inestabilidad hemodinámica
@@ -550,6 +939,15 @@ consultas:
       ATLS-21-040: 1   # Thoracic, Abdominopelvic, and Genitourin › PELVIC FRACTURES AND ASSOCIATED INJURIES › MECHANISM OF INJURY AND 
       HUV-17-003: 1   # Trauma pélvico severo › ENFOQUE DIAGNÓSTICO
       HUV-17-011: 1   # Trauma pélvico severo › TRATAMIENTO › Paso 7. Angioembolización.
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-05-009: 2   # Trauma abdominal y pélvico › Evaluación y gestión de caída › examen físico › Evaluación de la pelvis
+      ATLS10-05-029: 2   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Evaluación de lesiones penetrantes específicos › Mecanismo 
+      ATLS10-05-030: 2   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Evaluación de lesiones penetrantes específicos › administra
+      ATLS10-20-031: 2   # Apéndice G: Habilidades › Aplicación de aglutinante pélvica o dispositivo de estabilización pélvica Otros
+      ATLS10-01-013: 1   # Evaluación y tratamiento inicial › Valoración primaria con la reanimación simultánea › De circulación con control de la 
+      ATLS10-05-028: 1   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Evaluación de lesiones penetrantes específicos › Las fractu
+      ATLS10-10-043: 1   # Trauma pediátrico › musculoesquelético Trauma › pérdida de sangre
+      ATLS10-11-015: 1   # Trauma geriátrico › lesiones específicas › Las fracturas pélvicas
 
   - id: proc-12
     texto: ventana pericárdica o ultrasonido en herida precordial
@@ -562,6 +960,12 @@ consultas:
       HUV-13-006: 1   # Trauma precordial penetrante. Evaluación › ENFOQUE TERAPEUTICO › ● AngioTAC de tórax
       HUV-13-009: 1   # Trauma precordial penetrante. Evaluación › Flujograma
       HUV-21-003: 1   # Ultrasonido en trauma. Una extensión del › PASO A PASO DEL ULTRASONIDO US EN TRAUMA
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-04-012: 2   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › Los problemas de circulación › Taponamiento card
+      ATLS10-20-036: 2   # Apéndice G: Habilidades › Pericardiocentesis usando habilidad ultrasonido opcional Enlaces a futuros aprendizajes
+      ATLS10-03-011: 1   # Choque › La evaluación del paciente iniciales › La diferenciación clínica de la causa del shock › Taponamiento cardíaco
+      ATLS10-05-019: 1   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Evaluación de lesiones penetrantes específicos › Las herida
+      ATLS10-20-050: 1   # Apéndice G: Habilidades › Realizar un examen rápido y correctamente sondas de posición
 
   - id: proc-13
     texto: cuándo y cómo explorar una herida traumática
@@ -571,6 +975,12 @@ consultas:
       ATLS-21-026: 1   # Thoracic, Abdominopelvic, and Genitourin › EVALUATION OF SPECIFIC PENETRATING INJURIES › ANTERIOR ABDOMINAL WO
       ATLS-22-005: 1   # Penetrating Trauma › ASSESSMENT
       HUV-15-004: 1   # Trauma abdominal penetrante › DIAGNÓSTICO Y TRATAMIENTO
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-05-020: 2   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Evaluación de lesiones penetrantes específicos › Las herida
+      ATLS10-08-038: 2   # Trauma musculoesquelético › lesiones de las extremidades otRos › Contusiones y laceraciones
+      ATLS10-05-018: 1   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Evaluación de lesiones penetrantes específicos
+      ATLS10-05-021: 1   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Evaluación de lesiones penetrantes específicos › Flanco y l
+      ATLS10-08-026: 1   # Trauma musculoesquelético › lesiones de los miembros que amenazan › Fracturas abiertas y lesiones en las articulaciones 
 
   - id: proc-14
     texto: protocolo E-FAST paso a paso en trauma
@@ -583,6 +993,16 @@ consultas:
       HUV-12-005: 1   # Trauma cerrado de tórax › Imágenes Diagnosticas
       HUV-21-004: 1   # Ultrasonido en trauma. Una extensión del › PRECAUCIONES Y RECOMENDACIONES
       HUV-21-005: 1   # Ultrasonido en trauma. Una extensión del › Flujograma
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-20-050: 2   # Apéndice G: Habilidades › Realizar un examen rápido y correctamente sondas de posición
+      ATLS10-20-051: 2   # Apéndice G: Habilidades › Realizar un examen EFAST y demostrar de colocación de sondas adecuado
+      ATLS10-20-052: 2   # Apéndice G: Habilidades › Identificar anormales EFAST en las imágenes fijas o vídeo
+      ATLS10-20-053: 2   # Apéndice G: Habilidades › Identificar fluido sobre rápida de video o imágenes fijas de ayuno
+      ATLS10-01-023: 1   # Evaluación y tratamiento inicial › Los adjuntos a la valoración primaria con la reanimación › exámenes de rayos X y estu
+      ATLS10-03-008: 1   # Choque › La evaluación del paciente iniciales › La diferenciación clínica de la causa del shock
+      ATLS10-04-012: 1   # Trauma torácico › Encuesta primaria: lesiones potencialmente mortales › Los problemas de circulación › Taponamiento card
+      ATLS10-05-014: 1   # Trauma abdominal y pélvico › Evaluación y gestión de caída › Los adjuntos al examen físico › Los rayos X para Abdominal 
+      ATLS10-10-031: 1   # Trauma pediátrico › traumatismo abdominal › auxiliares diagnósticos › La ecografía enfocada Evaluación de Trauma
 
   - id: proc-15
     texto: prevención de la hipotermia en el paciente traumatizado
@@ -595,6 +1015,19 @@ consultas:
       ATLS-11-023: 1   # Trauma in the Pediatric Patient › CIRCULATION AND SHOCK › THERMOREGULATION
       HUV-03-001: 1   # Cómo prevenir la hipotermia durante el p › DEFINICIÓN
       HUV-03-005: 1   # Cómo prevenir la hipotermia durante el p › FACTORES DE RIESGO ASOCIADOS A HIPOTERMIA
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-01-015: 2   # Evaluación y tratamiento inicial › Valoración primaria con la reanimación simultánea › La exposición y control ambiental
+      ATLS10-03-041: 2   # Choque › reemplazo de sangre › prevenir la hipotermia
+      ATLS10-15-002: 2   # Apéndice B: Hipotermia y lesiones por ca › lesión por frío: La hipotermia sistémica
+      ATLS10-15-005: 2   # Apéndice B: Hipotermia y lesiones por ca › lesión por frío: La hipotermia sistémica › Administración
+      ATLS10-03-029: 1   # Choque › El tratamiento inicial del shock hemorrágico › examen físico › Exposición: examen completo
+      ATLS10-03-052: 1   # Choque › Consideraciones Especiales › Hipotermia
+      ATLS10-09-034: 1   # Lesiones térmicas › lesión por frío: hipotermia sistémica
+      ATLS10-10-024: 1   # Trauma pediátrico › circulación y de choque › termorregulación
+      ATLS10-11-012: 1   # Trauma geriátrico › Valoración primaria con la reanimación › La exposición y el Medio Ambiente
+      ATLS10-15-003: 1   # Apéndice B: Hipotermia y lesiones por ca › lesión por frío: La hipotermia sistémica › señales
+      ATLS10-15-004: 1   # Apéndice B: Hipotermia y lesiones por ca › lesión por frío: La hipotermia sistémica › efectos fisiológicos
+      ATLS10-18-026: 1   # Apéndice E: ATLS y manejo de recursos de › Entregando Atls® dentro de un equipo › La exposición y el Medio Ambiente
 
   - id: proc-16
     texto: cómo se puntúa la escala de coma de Glasgow
@@ -603,6 +1036,15 @@ consultas:
       ATLS-07-018: 2   # Disability: Neurological Assessment and  › ANATOMY, PHYSIOLOGY, AND PATHOLOGY OF TBI AND SCI › DISABILITY ASSE
       ATLS-01-015: 1   # Initial Assessment: Primary Survey › PRIMARY SURVEY WITH SIMULTANEOUS RESUSCITATION › DISABILITY
       ATLS-14-012: 1   # Initial Assessment: Secondary Survey › COMPREHENSIVE PHYSICAL EXAMINATION › NEUROLOGICAL EXAM
+      # ATLS 10 (propuesta de Claude, 23/10/2026; falta validar)
+      ATLS10-06-011: 2   # Trauma de la cabeza › Clasificación de las lesiones en la cabeza › Gravedad de la lesión
+      ATLS10-06-013: 2   # Trauma de la cabeza › Clasificación de las lesiones en la cabeza › Morfología › Las fracturas de cráneo
+      ATLS10-20-039: 2   # Apéndice G: Habilidades › breves o centrado Examinación neurológica › Determinar nueva escala de Glasgow
+      ATLS10-01-014: 1   # Evaluación y tratamiento inicial › Valoración primaria con la reanimación simultánea › discapacidad (neurológicos evalua
+      ATLS10-06-021: 1   # Trauma de la cabeza › Encuesta primaria y resucitación › examinación neurológica
+      ATLS10-10-036: 1   # Trauma pediátrico › Trauma de la cabeza › evaluación
+      ATLS10-18-025: 1   # Apéndice E: ATLS y manejo de recursos de › Entregando Atls® dentro de un equipo › discapacidad
+      ATLS10-20-044: 1   # Apéndice G: Habilidades › Examen neurológico detallada
 
   - id: neg-01
     texto: manejo de cetoacidosis diabética en urgencias
@@ -651,5 +1093,62 @@ consultas:
 
   - id: neg-10
     texto: dosis de amoxicilina para otitis media aguda
+    categoria: fuera_de_dominio
+    relevantes: {}
+
+  # Añadidas el 23/10/2026 (PLAN_INDEXAR_ATLS10.md, fase 2): urgencias no
+  # traumáticas cercanas a lo que trae el ATLS 10 (embarazo, adulto mayor,
+  # anticoagulación, neurología). El margen de UMBRAL_GUIAS es corto (neg-09
+  # en 0,326, el umbral en 0,34). No se agregaron intoxicaciones por agentes
+  # nerviosos (el apéndice D del ATLS 10 las trata) ni intoxicaciones: el
+  # registro de trauma tiene casos de intoxicación (mecanismo `intoxicacion`).
+
+  - id: neg-11
+    texto: control prenatal de rutina en embarazo de bajo riesgo
+    categoria: fuera_de_dominio
+    relevantes: {}
+
+  - id: neg-12
+    texto: sangrado vaginal en el primer trimestre de embarazo
+    categoria: fuera_de_dominio
+    relevantes: {}
+
+  - id: neg-13
+    texto: ajuste de la dosis de warfarina en fibrilación auricular
+    categoria: fuera_de_dominio
+    relevantes: {}
+
+  - id: neg-14
+    texto: delirium en adulto mayor con infección urinaria
+    categoria: fuera_de_dominio
+    relevantes: {}
+
+  - id: neg-15
+    texto: accidente cerebrovascular isquémico con hemiparesia de inicio súbito
+    categoria: fuera_de_dominio
+    relevantes: {}
+
+  - id: neg-16
+    texto: convulsión febril en lactante
+    categoria: fuera_de_dominio
+    relevantes: {}
+
+  - id: neg-17
+    texto: migraña con aura en mujer joven
+    categoria: fuera_de_dominio
+    relevantes: {}
+
+  - id: neg-18
+    texto: anafilaxia por picadura de abeja
+    categoria: fuera_de_dominio
+    relevantes: {}
+
+  - id: neg-19
+    texto: insuficiencia cardiaca descompensada con edema pulmonar
+    categoria: fuera_de_dominio
+    relevantes: {}
+
+  - id: neg-20
+    texto: hipoglucemia en paciente diabético que usa insulina
     categoria: fuera_de_dominio
     relevantes: {}

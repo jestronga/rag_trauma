@@ -432,6 +432,16 @@ CUERPO10, ROJO_TIT, ROJO, OCRE, VERDE, GRIS, ROTULO = (
     (bloque("Libélula Media Group", fuente=ARIAL, tam=6.4, color=ROTULO), "descartar"),
     (bloque("UN segundo do", fuente=ARIAL, tam=7.0, color=CUERPO10), "descartar"),
     (bloque("bibliografía", fuente=ARIAL, tam=12.8, color=ROJO_TIT), "referencias"),
+    # la traducción achica franjas a 8,4 (PDF 258) y cambia la palabra de los
+    # pies: "mesa" (Table), "caja de correos" (Box), "Panorámica" (PDF 230, 364, 167)
+    (bloque("Trauma de la cabeza", fuente=ARIAL, tam=8.4, color=BLANCO), "titulo1"),
+    (bloque("mesa tasas de fluidos de resucitación 9-1 de quemaduras", fuente=ARIAL, tam=7.5,
+            color=BLANCO), "pie"),
+    (bloque("caja de correos 4 consejos para comunicarse con", fuente=ARIAL, tam=8.7, color=BLANCO), "pie"),
+    (bloque("Panorámica general de 6-3 manejo de la lesión cerebral", fuente=ARIAL, tam=8.8,
+            color=BLANCO), "pie"),
+    (bloque("Parte 1: habilidades básicas de las vías respiratorias", fuente=ARIAL, tam=8.4,
+            color=BLANCO), "titulo1"),
 ])
 def test_clasificar_atls10(b, rol):
     assert guias.clasificar(b, ATLS10) == rol
@@ -498,6 +508,15 @@ def test_capitulos_con_ultima_pagina_explicita():
     assert caps[13].pdf_fin == 312 and not caps[18].clinico and caps[16].clinico
 
 
+def test_equivalencias_con_el_atls11():
+    # cada capítulo del ATLS 10 apunta a capítulos que existen en el ATLS 11
+    caps10 = {c.numero for c in guias.capitulos(ATLS10)}
+    caps11 = {c.numero for c in guias.capitulos(ATLS)}
+    eq = ATLS10["equivalente_11"]
+    assert set(eq) == caps10
+    assert all(set(v) <= caps11 for v in eq.values())
+
+
 def test_tabla_trampa_prevencion_por_columnas():
     # PDF 61: cada renglón es un bloque; con _filas se intercalaban las celdas
     b = lambda texto, *caja: Bloque(*caja, lineas=[texto], cajas=[caja])
@@ -528,6 +547,19 @@ def test_tabla_con_filas_enteras_por_columnas():
     texto = guias._filas_por_columnas([fila(481, "Ritmo cardiaco ", "↔", "↔ / ↑ "),
                                        fila(505, "Presión sanguínea ", "↔", "↔")])
     assert texto == "Ritmo cardiaco | ↔ | ↔ / ↑\nPresión sanguínea | ↔ | ↔"
+
+
+def test_pie_partido_en_dos_bloques():
+    # PDF 210: "Tabla 8-1 deformidades luxación de la articulación" / "comunes";
+    # sin unirlos, "comunes" (blanco, 8,6) se leería como título
+    pie = bloque("Tabla 8-1 deformidades luxación de la articulación", y0=86, y1=96,
+                 fuente=ARIAL, tam=8.6, color=BLANCO, rol="pie")
+    sigue = bloque("comunes", y0=98, y1=108, fuente=ARIAL, tam=8.6, color=BLANCO, rol="titulo1")
+    lejos = bloque("Otro título", y0=200, y1=210, fuente=ARIAL, tam=11.2, color=BLANCO, rol="titulo1")
+    cuerpo = bloque("Texto del cuerpo debajo", y0=100, y1=110, color=CUERPO10, rol="cuerpo")
+    salida = guias.unir_pies_partidos([pie, sigue, lejos, cuerpo])
+    assert salida == [pie, lejos, cuerpo]
+    assert pie.texto() == "Tabla 8-1 deformidades luxación de la articulación comunes"
 
 
 def test_sin_repeticiones():

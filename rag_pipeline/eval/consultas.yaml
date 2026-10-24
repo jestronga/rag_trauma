@@ -278,3 +278,80 @@ consultas:
     mecanismo: null
     regiones: []
     espera_abstencion: true
+
+  # Añadidas el 23/10/2026 (PLAN_INDEXAR_ATLS10.md, fase 2): urgencias no
+  # traumáticas cercanas a lo que trae el ATLS 10 (embarazo, adulto mayor,
+  # anticoagulación, neurología). El margen de UMBRAL_GUIAS es corto (neg-09
+  # en 0,326, el umbral en 0,34). No se agregaron intoxicaciones por agentes
+  # nerviosos (el apéndice D del ATLS 10 las trata) ni intoxicaciones: el
+  # registro de trauma tiene casos de intoxicación (mecanismo `intoxicacion`).
+
+  - id: neg-11
+    texto: control prenatal de rutina en embarazo de bajo riesgo
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true
+
+  - id: neg-12
+    texto: sangrado vaginal en el primer trimestre de embarazo
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true
+
+  - id: neg-13
+    texto: ajuste de la dosis de warfarina en fibrilación auricular
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true
+
+  - id: neg-14
+    texto: delirium en adulto mayor con infección urinaria
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true
+
+  - id: neg-15
+    texto: accidente cerebrovascular isquémico con hemiparesia de inicio súbito
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true
+
+  - id: neg-16
+    texto: convulsión febril en lactante
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true
+
+  - id: neg-17
+    texto: migraña con aura en mujer joven
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true
+
+  - id: neg-18
+    texto: anafilaxia por picadura de abeja
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true
+
+  - id: neg-19
+    texto: insuficiencia cardiaca descompensada con edema pulmonar
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true
+
+  - id: neg-20
+    texto: hipoglucemia en paciente diabético que usa insulina
+    categoria: fuera_de_dominio
+    mecanismo: null
+    regiones: []
+    espera_abstencion: true

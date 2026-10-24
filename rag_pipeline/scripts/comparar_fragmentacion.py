@@ -60,11 +60,17 @@ PROFUNDIDAD = 100           # fragmentos que trae cada ruta antes de deduplicar
 # ---------------------------------------------------------------------------
 # Datos
 # ---------------------------------------------------------------------------
-def cargar_consultas(secciones: dict[str, dict], conjunto: str) -> list[dict]:
+def cargar_consultas(secciones: dict[str, dict], conjunto: str,
+                     libros: set[str] | None = None) -> list[dict]:
+    """Las consultas anotadas y las sintéticas. Con `libros`, solo cuentan las
+    secciones de esos libros (calibrar_guias.py: los que están en el índice)."""
+    if libros is not None:
+        secciones = {k: s for k, s in secciones.items() if s["fuente"] in libros}
+    de_otro = lambda s: libros is not None and s.split("-")[0] not in libros   # noqa: E731
     consultas = []
     if conjunto in ("anotado", "ambos"):
         for c in yaml.safe_load(CONSULTAS.read_text(encoding="utf-8"))["consultas"]:
-            rel = c.get("relevantes") or {}
+            rel = {s: g for s, g in (c.get("relevantes") or {}).items() if not de_otro(s)}
             faltan = [s for s in rel if s not in secciones]
             if faltan:
                 # los IDs cambian si se re-extraen los libros con otras reglas

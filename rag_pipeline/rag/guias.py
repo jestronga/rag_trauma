@@ -338,6 +338,22 @@ def continuar_figuras(bloques: list[Bloque], salto: float = 14) -> None:
                 pendientes.append(m)
 
 
+def unir_pies_partidos(bloques: list[Bloque], salto: float = 6) -> list[Bloque]:
+    """Un pie de dos renglones que viene en dos bloques (ATLS 10: "Tabla 8-1
+    deformidades luxación de la articulación" / "comunes", p. 210 del PDF): el
+    de abajo, del mismo color, pegado y en la misma columna, se suma al pie.
+    Sin esto, el segundo renglón se leería como un título."""
+    for p in [b for b in bloques if b.rol == "pie"]:
+        for b in sorted(bloques, key=lambda b: b.y0):
+            if (b is not p and b.rol not in ("pie", "unido") and b.color == p.color
+                    and b.solapa_x(p) and 0 <= b.y0 - p.y1 <= salto):
+                p.lineas += b.lineas
+                p.cajas += b.cajas
+                p.y1 = max(p.y1, b.y1)
+                b.rol = "unido"
+    return [b for b in bloques if b.rol != "unido"]
+
+
 def agrupar_pies(bloques: list[Bloque], posicion: str = "arriba",
                  por_columnas: bool = False) -> tuple[list[Bloque], int]:
     """Pega a cada pie el material de su tabla o figura.
@@ -606,6 +622,8 @@ class Extractor:
                 bloques = [b for b in bloques if b.y1 > arriba]
             for b in bloques:
                 b.rol = clasificar(b, p)
+            if p.get("unir_pies"):
+                bloques = unir_pies_partidos(bloques)
             bloques, sin_pie = agrupar_pies(bloques, p.get("pie_posicion", "arriba"),
                                             p.get("tablas_por_columnas", False))
             self.stats["material_sin_pie"] += sin_pie

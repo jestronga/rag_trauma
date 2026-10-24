@@ -2,10 +2,12 @@
 Preguntas sintéticas para evaluar la recuperación de los libros (fase 2 de
 PLAN_INDEXAR_LIBROS.md).
 
-    python scripts/generar_preguntas_guias.py               # 100 preguntas, 50 por libro
+    python scripts/generar_preguntas_guias.py               # 100 preguntas, repartidas por libro
     python scripts/generar_preguntas_guias.py --n 10        # prueba
+    python scripts/generar_preguntas_guias.py --libro ATLS10 --n 40 --agregar
+                                    # suma 40 de un libro sin tocar las que ya hay
 
-Toma secciones clínicas al azar, repartidas por igual entre los dos libros y,
+Toma secciones clínicas al azar, repartidas por igual entre los libros y,
 dentro de cada libro, entre capítulos. Para cada una, el modelo local escribe
 UNA pregunta clínica en español que esa sección responde. La relevante es la
 sección de origen.
@@ -103,11 +105,24 @@ def main() -> None:
     ap.add_argument("--n", type=int, default=100)
     ap.add_argument("--salida", type=Path, default=SALIDA)
     ap.add_argument("--modelo", default=config.MODELO_LLM)
+    ap.add_argument("--libro", default=None, help="solo secciones de este libro (campo fuente: ATLS10)")
+    ap.add_argument("--agregar", action="store_true",
+                    help="suma las preguntas al archivo en vez de reemplazarlo: las de antes "
+                         "no cambian y todas las configuraciones se siguen midiendo igual")
     args = ap.parse_args()
 
     secciones = [json.loads(l) for l in config.GUIAS_SECCIONES.read_text(encoding="utf-8").splitlines()]
+    previas = []
+    if args.agregar and args.salida.exists():
+        previas = [json.loads(l) for l in args.salida.read_text(encoding="utf-8").splitlines()]
+        usadas = {p["seccion_id"] for p in previas}
+        secciones = [s for s in secciones if s["id"] not in usadas]
+    if args.libro:
+        secciones = [s for s in secciones if s["fuente"] == args.libro]
+        if not secciones:
+            raise SystemExit(f"No hay secciones del libro {args.libro} en {config.GUIAS_SECCIONES}")
     elegidas = muestrear(secciones, args.n)
-    preguntas, descartadas = [], 0
+    preguntas, descartadas = list(previas), 0
     for k, s in enumerate(elegidas, 1):
         texto = s["texto"][:MAX_CARACTERES]
         pregunta = None

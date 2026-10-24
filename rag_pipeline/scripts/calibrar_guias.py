@@ -49,6 +49,22 @@ def grupo(c: dict) -> str:
     return "proc" if c["categoria"] == "procedimiento" else "trauma"
 
 
+def libros_indexados() -> set[str]:
+    """Los libros (`fuente`) que hay en la colección. secciones.jsonl puede
+    traer uno extraído y anotado que todavía no se indexó (el ATLS 10 desde el
+    23/10, PLAN_INDEXAR_ATLS10.md): sus secciones no se pueden recuperar y, si
+    contaran, R@ppto bajaría sin que la búsqueda haya cambiado."""
+    from rag.retrieve import _qdrant
+    libros: set[str] = set()
+    siguiente = None
+    while True:
+        puntos, siguiente = _qdrant().scroll(config.COLECCION_GUIAS, limit=1000, offset=siguiente,
+                                             with_payload=["fuente"], with_vectors=False)
+        libros |= {p.payload["fuente"] for p in puntos}
+        if siguiente is None:
+            return libros
+
+
 def recall(seleccion, relevantes: dict[str, int]) -> float | None:
     dos = {s for s, g in relevantes.items() if g >= 2}
     if not dos:
@@ -78,11 +94,12 @@ def main() -> None:
     args = ap.parse_args()
     rutas = args.rutas.split(",") if args.rutas else (["rerank", "densa"] if _reranker_cabe() else ["densa"])
 
-    consultas = cargar_consultas({s["id"]: s for s in cargar_secciones()}, args.conjunto)
+    libros = libros_indexados()
+    consultas = cargar_consultas({s["id"]: s for s in cargar_secciones()}, args.conjunto, libros)
     n = {g: sum(grupo(c) == g for c in consultas) for g in ("trauma", "proc", "fuera")}
     print(f"{len(consultas)} consultas ({n['trauma']} de trauma, {n['proc']} de procedimiento, "
           f"{n['fuera']} fuera de dominio, el resto sintéticas) · rutas {rutas} · "
-          f"presupuesto {config.PRESUPUESTO_GUIAS} tokens")
+          f"presupuesto {config.PRESUPUESTO_GUIAS} tokens · libros {', '.join(sorted(libros))}")
 
     for ruta in rutas:
         candidatos_guias("calentamiento", ruta)              # carga los modelos

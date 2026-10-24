@@ -31,6 +31,28 @@ def frag(sid: str, texto: str, contexto: str | None = None) -> dict:
 # ---------------------------------------------------------------------------
 # comparar_fragmentacion
 # ---------------------------------------------------------------------------
+def test_cargar_consultas_solo_con_los_libros_indexados(tmp_path, monkeypatch, capsys):
+    # ATLS 10 (23/10): anotado y extraído antes de indexarse; calibrar_guias.py
+    # no debe contar sus secciones (no se pueden recuperar) ni avisar por ellas
+    anot = tmp_path / "c.yaml"
+    anot.write_text("consultas:\n  - id: q1\n    texto: x\n    categoria: lexica\n    relevantes:\n"
+                    "      ATLS-05-012: 2\n      ATLS10-04-007: 2\n", encoding="utf-8")
+    sint = tmp_path / "s.jsonl"
+    sint.write_text('{"id": "sin-1", "texto": "y", "seccion_id": "ATLS10-04-007", "fuente": "ATLS10"}\n'
+                    '{"id": "sin-2", "texto": "z", "seccion_id": "ATLS-05-012", "fuente": "ATLS"}\n',
+                    encoding="utf-8")
+    monkeypatch.setattr(cf, "CONSULTAS", anot)
+    monkeypatch.setattr(cf, "SINTETICAS", sint)
+    secciones = {"ATLS-05-012": {"fuente": "ATLS"}, "ATLS10-04-007": {"fuente": "ATLS10"}}
+    todas = cf.cargar_consultas(secciones, "ambos")
+    assert todas[0]["relevantes"] == {"ATLS-05-012": 2, "ATLS10-04-007": 2} and len(todas) == 3
+    solo = cf.cargar_consultas(secciones, "ambos", {"ATLS", "HUV"})
+    assert solo[0]["relevantes"] == {"ATLS-05-012": 2}
+    assert [c["id"] for c in solo] == ["q1", "sin-2"]
+    assert "aviso" not in capsys.readouterr().out
+
+
+
 def test_metricas_deduplican_por_seccion():
     frags = [frag("ATLS-05-012", "a " * 10), frag("ATLS-05-012", "b " * 10),
              frag("HUV-11-007", "c " * 10), frag("X-01-001", "d " * 10)]

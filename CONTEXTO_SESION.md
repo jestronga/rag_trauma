@@ -12,12 +12,17 @@ después 0, 1, 5 y 6.
 Plan en **`PLAN_INDEXAR_ATLS10.md`** (raíz). El PDF
 (`anonimizacion/data/ATLS_10_ed_espanol.pdf`, fuera de git) parece traducción
 automática de la edición anterior. **Fase 1 (extracción) hecha el 23/10**:
-682 secciones (`ATLS10-03-005`), 1,12 M caracteres; el ATLS 11 y el HUV
+689 secciones (`ATLS10-03-005`), 1,12 M caracteres; el ATLS 11 y el HUV
 salen idénticos byte a byte. `guias/secciones.jsonl` ya trae los tres libros,
 pero **no reindexar todavía** (`rag.index --fuente guias`): el prompt y el
-verificador no conocen el ATLS 10 hasta la fase 5. Sigue la fase 2. Cuatro
-decisiones para el usuario; la primera es si quien lo pidió sabe lo de la
-traducción.
+verificador no conocen el ATLS 10 hasta la fase 5. **Fase 2 hecha el 23/10**:
+anotaciones del ATLS 10 en las 41 consultas (falta validarlas), 38 preguntas
+sintéticas, tabla de capítulos 10.ª → 11.ª y 10 consultas fuera de dominio
+nuevas (neg-11 a neg-20, en los dos archivos). Esas consultas destaparon que,
+con los umbrales de hoy, responderían 3 de 20 fuera de dominio (neg-05,
+neg-15 ACV, neg-19 insuficiencia cardiaca); no se movió ningún umbral
+(decisión 5 del plan). Sigue la fase 3. Cinco decisiones para el usuario; la
+primera es si quien lo pidió sabe lo de la traducción.
 
 **Próxima reunión (pedido del 19/10): "un chatbot mucho más sofisticado".**
 Plan en **`PLAN_CHATBOT_CLINICO.md`** (raíz), sin empezar: que pregunte lo que
@@ -213,7 +218,7 @@ el 08/10; sirven para el PC de 8 GB):
    cd rag_pipeline
    ..\.venv\Scripts\python.exe -m pip install "pymupdf==1.28.2"
    ..\.venv\Scripts\python.exe scripts\extraer_guias.py
-   ..\.venv\Scripts\python.exe -m pytest tests/ -q        # 262 desde el 23/10
+   ..\.venv\Scripts\python.exe -m pytest tests/ -q        # 270 desde el 23/10
    ```
    Después de extraer: `..\.venv\Scripts\python.exe -m rag.index --fuente guias`.
    **Versión exacta de PyMuPDF a propósito:** otra versión podría extraer
@@ -221,8 +226,8 @@ el 08/10; sirven para el PC de 8 GB):
    `eval/consultas_guias.yaml` quedaría apuntando a otras secciones.
 5. Comprobar que la extracción es idéntica a la del PC de 8 GB.
    `extraer_guias.py` imprime una huella por libro (23/10): ATLS
-   `682 0fb5ef517866`, HUV `253 6c83224cbb24`, ATLS10 `682 32bd704cd2af`.
-   Las tres juntas, con este comando, **`1617 1a058871c67d`** (ATLS y HUV
+   `682 0fb5ef517866`, HUV `253 6c83224cbb24`, ATLS10 `689 3bbb01c493d0`.
+   Las tres juntas, con este comando, **`1624 a15bc4fb7152`** (ATLS y HUV
    solos, `935 9885b7f88286`, como desde el 19/10; hasta entonces
    `926 1937563090e0`):
    ```powershell
@@ -281,7 +286,7 @@ haría que el `git pull` en el PC de la demo los borre del disco. Ver
 pendiente 0.
 
 **Primeros pasos, en el PC de 8 GB** (1 a 4 hechos el 17/10, sección 3):
-1. ~~Tests~~ pasan los 262 de `rag_pipeline\` (23/10) y los 83 de `anonimizacion\`
+1. ~~Tests~~ pasan los 270 de `rag_pipeline\` (23/10) y los 83 de `anonimizacion\`
    (19/10).
 2. ~~Modelos~~ `qwen3:4b-instruct` y el reranker descargados.
 3. ~~`calibrar_umbral.py`~~ `cuda`, 0,56 s de mediana por consulta.
@@ -321,7 +326,7 @@ rag_trauma/
                          verificar, guias (extracción de los libros), fragmentar
     guias/               perfiles.yaml (en git) y el texto extraído de los libros (no está en git)
     indices/             BM25 + Qdrant local (casos: 8.198 puntos; guias: 2.201) — no está en git
-    tests/               262 tests del extractor, los libros, la respuesta y el verificador (sin Ollama ni índices)
+    tests/               270 tests del extractor, los libros, la respuesta y el verificador (sin Ollama ni índices)
     scripts/             revisar_entorno, probar_respuestas, exportar_revision, preparar_demo,
                          calibrar_umbral/_guias, comparar_modelos/_fragmentacion, extraer_guias
     eval/                consultas.yaml (35 consultas), consultas_guias.yaml (51, libros), evaluate.py,
@@ -677,7 +682,7 @@ la demo, **solo prosa y debajo los casos consultados**.
 5. Índices (no están en git): `python -m rag.index` desde `rag_pipeline\`, y
    para los libros `python -m rag.index --fuente guias` (antes, la sección 00).
    Si falta `anonimizacion/outputs/`, antes: `cd ..\anonimizacion; python run_pipeline.py`.
-6. Tests: `python -m pytest tests/ -q` (262).
+6. Tests: `python -m pytest tests/ -q` (270).
 7. Probar: `python scripts\probar_respuestas.py "herida por arma de fuego en tórax con hipoventilación"`
 8. Antes de una demo: `python scripts\preparar_demo.py` (debe decir "Todo
    listo" y 100 % en GPU).

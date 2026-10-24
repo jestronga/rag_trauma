@@ -113,6 +113,17 @@ indexado) deja el asistente como hoy, byte a byte.
    la 11.ª". El asistente no elige entre ediciones, igual que no elige entre
    casos y manuales. Si se quiere que diga "donde difieran, rige la 11.ª", lo
    decide el médico.
+5. **Las guardas con 20 consultas fuera de dominio** (nueva, 23/10, fase 2).
+   Con los umbrales de hoy responderían 3 de 20 (neg-05, neg-15, neg-19). Ni
+   subir `UMBRAL_GUIAS` ni `UMBRAL_RERANK` sale gratis:
+   - `UMBRAL_GUIAS` de 0,34 a 0,40 frena a neg-15 en los libros, pero deja
+     sin libros a fin-04 (0,351): 13 de 25 de trauma sin manuales;
+   - en los casos no hay hueco: neg-19 está en 0,208 y voc-06, de trauma, en
+     0,215.
+
+   Recomendado: decidirlo en la fase 4, con el ATLS 10 indexado (cambia los
+   puntajes de los libros) y con la expansión de abreviaturas del plan del
+   chatbot en mente, que sube las de trauma sin tocar las fuera de dominio.
 
 ---
 
@@ -128,7 +139,7 @@ los tres libros, 1.617 secciones.
 | Descartado | bibliografía 116 k; rótulos de figura y objetivos 25 k; material sin pie 4 k |
 | Cobertura | el 90 % del texto de las páginas extraídas (lo demás es casi todo bibliografía) y el 75 % del libro (el ATLS 11, 74 %) |
 | Páginas impresas | cuadran en las 362 páginas con número en el encabezado |
-| Huella | ATLS10 `682 32bd704cd2af`; las tres juntas `1617 1a058871c67d` |
+| Huella | ATLS10 `689 3bbb01c493d0`; las tres juntas `1624 a15bc4fb7152` (fase 2) |
 
 **El ATLS 11 y el HUV salen idénticos byte a byte** a la extracción del 19/10
 (`935 9885b7f88286`): todo lo nuevo va detrás de opciones del perfil. Tests:
@@ -243,7 +254,74 @@ opciones del perfil**. Así el ATLS 11 y el HUV extraen igual que hoy.
 
 Estimado: ~1,1 M caracteres útiles, unas 600 secciones.
 
-## Fase 2 — Conjunto de evaluación (1 día)
+## Fase 2 — Conjunto de evaluación (hecha el 23/10/2026; falta validarla)
+
+**Resultado:**
+- **Anotaciones** (`eval/consultas_guias.yaml`): las 41 consultas de trauma y
+  de procedimiento llevan al final su bloque `ATLS10-*`, con **137 secciones de
+  grado 2 y 257 de grado 1** (el ATLS 11 y el HUV juntos: 156 y 223). Propuesta
+  de Claude a partir del índice de secciones y de los candidatos de la
+  búsqueda (densa sobre fragmentos `fijo-256` + reranker). La búsqueda sola no
+  alcanzaba: en lex-03, "Manejo de la lesión cerebral grave (GCS 3-8)" salía
+  con probabilidad 0,01.
+- **`scripts/calibrar_guias.py` solo cuenta los libros del índice**
+  (`libros_indexados`, `cargar_consultas(..., libros)`). Hasta la fase 3 las
+  secciones del ATLS 10 no se pueden recuperar: si contaran, R@ppto bajaría
+  sin que la búsqueda haya cambiado. Así la línea base del plan del chatbot
+  sigue siendo comparable. Test en `test_comparar_fragmentacion.py`.
+- **Tabla de equivalencias 10.ª → 11.ª** (`equivalente_11` en el perfil, con
+  test). Comprobada contra las anotaciones: en 35 de las 37 consultas con
+  grado 2 en los dos ATLS, los capítulos coinciden por la tabla. Las dos que
+  no se explican: el cuello penetrante está en los capítulos 1 y 2 de la 10.ª
+  y en el 22 de la 11.ª, y el E-FAST está en el apéndice de habilidades, que no
+  tiene equivalente. Se agregaron a la tabla los capítulos que la 11.ª separa:
+  el 3 (hemorragia exanguinante, con el torniquete), el 22 (penetrante) y el 6
+  (parada traumática).
+- **38 preguntas sintéticas del ATLS 10** (`sin-090` a `sin-127`), con
+  `generar_preguntas_guias.py --libro ATLS10 --agregar`: las 89 de antes
+  siguen idénticas. Se descartaron 14 de 52 por copiar 5 o más palabras
+  seguidas del texto, lo esperable con un libro en el idioma de la pregunta.
+- **10 consultas fuera de dominio nuevas** (`neg-11` a `neg-20`, en
+  `consultas.yaml` y `consultas_guias.yaml`): embarazo, adulto mayor,
+  anticoagulación, neurología, intoxicación, anafilaxia, insuficiencia
+  cardiaca e hipoglucemia. Se dejaron fuera los agentes nerviosos, porque el
+  apéndice D los trata.
+- **Extracción corregida al anotar:** la traducción achicó algunas franjas de
+  título a 8,4 pt ("Trauma de la cabeza", p. 258 del PDF) y el trauma craneal
+  pediátrico quedaba bajo "traumatismo abdominal". Además, la traducción
+  cambia la palabra de los pies de tabla ("mesa 9-1" por *Table*, "caja de
+  correos 4" por *Box*). Ahora es pie el texto blanco con la palabra y un
+  número, y su segundo renglón se suma al pie (`unir_pies`). El ATLS 10 pasa a
+  689 secciones; el ATLS 11 y el HUV siguen idénticos. Tests: 270.
+
+**Medido el 23/10 con el índice de hoy** (ATLS 11 y HUV, ruta `rerank`,
+`calibrar_guias.py` y `calibrar_umbral.py`):
+- **La línea base no se movió:** R@ppto 0,327 en las anotadas y 0,854 en las
+  sintéticas, y 12 de 25 consultas de trauma sin libros, como el 19/10.
+- **Las consultas fuera de dominio nuevas destapan debilidades que ya
+  existían, no del ATLS 10:**
+  | Consulta | Casos (p2) | Libros | Responde por |
+  |---|---|---|---|
+  | neg-05 apendicitis (conocida desde el 27/09) | 0,423 | 0,019 | casos |
+  | neg-15 ACV isquémico con hemiparesia | 0,580 | **0,361** | casos y libros |
+  | neg-19 insuficiencia cardiaca descompensada | 0,208 | 0,029 | casos (umbral 0,2) |
+
+  Con las dos guardas juntas responderían 3 de 20 (antes, 1 de 10). Por los
+  libros pasa solo neg-15 (0,361), atraída por un pasaje del ATLS 11 sobre
+  el equipo de trauma y el shock en la lesión medular (`ATLS-02-018`). Por los
+  casos la atraen caídas con "no le responden las piernas". neg-19 pasa la
+  guarda de los casos por 0,008, y la consulta de trauma más baja (voc-06)
+  está en 0,215.
+- **neg-17 se cambió** (acetaminofén → migraña con aura). El registro de
+  trauma tiene casos de intoxicación (mecanismo `intoxicacion`): el
+  acetaminofén encontraba casos reales y no era fuera de dominio para los
+  casos.
+- **No se movió ningún umbral.** Es la regla del 19/10 (primero más consultas
+  fuera de dominio), y ahora hay 20. Se decide en la fase 4 con el ATLS 10
+  indexado, porque la guarda de los libros se recalibra igual (decisión 5,
+  abajo).
+
+Plan original:
 
 1. **Anotar el ATLS 10 en las 51 consultas** de `eval/consultas_guias.yaml`
    (grado 2 y 1, como las demás; propuestas por Claude). Sin esto, R@ppto
@@ -317,7 +395,8 @@ Más:
 - el ATLS 11 no pierde: R@ppto anotado del ATLS ≥ 0,203 y su % de fragmentos
   no baja del 34 %;
 - el HUV no baja de 0,494 (su valor con cuota);
-- 0 de 10 fuera de dominio por los manuales;
+- fuera de dominio por los manuales: no más de las que pasan hoy, 1 de 20
+  (neg-15, medido el 23/10), o las que deje la decisión 5;
 - latencia de la búsqueda ≤ 1,5 s.
 
 **Lo que se espera ganar:** de las 12 de 25 consultas de trauma sin manuales,
