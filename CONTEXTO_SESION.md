@@ -38,9 +38,13 @@ responden igual. **Fase 5 hecha el 23/10** (decisiones 1, 3 y 4: tercer manual
 citable con su etiqueta, la prosa dice la edición, aviso de ediciones del
 código): el modelo cita el ATLS 10 en 22 de 24 consultas con pasajes suyos,
 siempre con la edición, pero la prosa verificada baja de 18 a 14 de 41 (copia
-las órdenes de la traducción) y la mediana sube a 8,6 s. Una segunda iteración
-(`_TONO_TRES`) quedó sin medir: la corrida se cortó por falta de memoria.
-Sigue la fase 6 (app). `ATLS10` sigue en 0. Cinco decisiones para el usuario; la
+las órdenes de la traducción) y la mediana sube a 8,6 s. La segunda iteración
+(`_TONO_TRES`, 24/10) da 15 de 41: con tres manuales el modelo se equivoca
+más de manual, y con `PROSA_SIEMPRE` eso se vería. **Fase 6 hecha el 24/10**:
+la app nombra los tres manuales, la tarjeta del ATLS 10 dice dónde está lo
+mismo en la 11.ª, y `preparar_demo.py` tiene el botón "7 · ATLS en español"
+(con `ATLS10=1` termina en "Todo listo"). **`ATLS10` sigue en 0: encenderlo
+para la demo es decisión del usuario.** Falta la fase 7, la revisión médica. Cinco decisiones para el usuario; la
 primera es si quien lo pidió sabe lo de la traducción.
 
 **Próxima reunión (pedido del 19/10): "un chatbot mucho más sofisticado".**
@@ -237,7 +241,7 @@ el 08/10; sirven para el PC de 8 GB):
    cd rag_pipeline
    ..\.venv\Scripts\python.exe -m pip install "pymupdf==1.28.2"
    ..\.venv\Scripts\python.exe scripts\extraer_guias.py
-   ..\.venv\Scripts\python.exe -m pytest tests/ -q        # 299 desde el 23/10
+   ..\.venv\Scripts\python.exe -m pytest tests/ -q        # 300 desde el 24/10
    ```
    Después de extraer: `..\.venv\Scripts\python.exe -m rag.index --fuente guias`.
    **Versión exacta de PyMuPDF a propósito:** otra versión podría extraer
@@ -305,7 +309,7 @@ haría que el `git pull` en el PC de la demo los borre del disco. Ver
 pendiente 0.
 
 **Primeros pasos, en el PC de 8 GB** (1 a 4 hechos el 17/10, sección 3):
-1. ~~Tests~~ pasan los 299 de `rag_pipeline\` (23/10) y los 83 de `anonimizacion\`
+1. ~~Tests~~ pasan los 300 de `rag_pipeline\` (23/10) y los 83 de `anonimizacion\`
    (19/10).
 2. ~~Modelos~~ `qwen3:4b-instruct` y el reranker descargados.
 3. ~~`calibrar_umbral.py`~~ `cuda`, 0,56 s de mediana por consulta.
@@ -345,7 +349,7 @@ rag_trauma/
                          verificar, guias (extracción de los libros), fragmentar
     guias/               perfiles.yaml (en git) y el texto extraído de los libros (no está en git)
     indices/             BM25 + Qdrant local (casos: 8.198 puntos; guias: 2.201) — no está en git
-    tests/               299 tests del extractor, los libros, la respuesta y el verificador (sin Ollama ni índices)
+    tests/               300 tests del extractor, los libros, la respuesta y el verificador (sin Ollama ni índices)
     scripts/             revisar_entorno, probar_respuestas, exportar_revision, preparar_demo,
                          calibrar_umbral/_guias, comparar_modelos/_fragmentacion, extraer_guias
     eval/                consultas.yaml (35 consultas), consultas_guias.yaml (51, libros), evaluate.py,
@@ -701,7 +705,7 @@ la demo, **solo prosa y debajo los casos consultados**.
 5. Índices (no están en git): `python -m rag.index` desde `rag_pipeline\`, y
    para los libros `python -m rag.index --fuente guias` (antes, la sección 00).
    Si falta `anonimizacion/outputs/`, antes: `cd ..\anonimizacion; python run_pipeline.py`.
-6. Tests: `python -m pytest tests/ -q` (299).
+6. Tests: `python -m pytest tests/ -q` (300).
 7. Probar: `python scripts\probar_respuestas.py "herida por arma de fuego en tórax con hipoventilación"`
 8. Antes de una demo: `python scripts\preparar_demo.py` (debe decir "Todo
    listo" y 100 % en GPU).

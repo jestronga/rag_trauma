@@ -517,6 +517,14 @@ def test_equivalencias_con_el_atls11():
     assert all(set(v) <= caps11 for v in eq.values())
 
 
+def test_equivalentes_atls11_para_la_tarjeta():
+    # la app muestra "en la 11.ª ed.: cap. 7" en los pasajes del ATLS 10 (fase 6)
+    assert guias.equivalentes_atls11(6, PERFILES) == [(7, "Disability: Neurological Assessment and Management")]
+    assert [n for n, _ in guias.equivalentes_atls11(4, PERFILES)] == [5, 21, 6, 22]
+    assert guias.equivalentes_atls11(20, PERFILES) == []          # apéndice G: habilidades
+    assert guias.equivalentes_atls11(99, PERFILES) == []
+
+
 def test_tabla_trampa_prevencion_por_columnas():
     # PDF 61: cada renglón es un bloque; con _filas se intercalaban las celdas
     b = lambda texto, *caja: Bloque(*caja, lineas=[texto], cajas=[caja])

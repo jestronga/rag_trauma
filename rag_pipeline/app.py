@@ -22,6 +22,7 @@ from rag.build_prompt import (                                 # noqa: E402
     RX_LINEA_RESPALDO, agrupar_guias, cabecera_guia, desenlace_visible, texto_guia,
 )
 from rag.generate import ollama_disponible, responder, resumir_caso, usar_guias   # noqa: E402
+from rag.guias import cargar_perfiles, equivalentes_atls11      # noqa: E402
 from rag.hallazgos import resaltar_html                        # noqa: E402
 from rag.retrieve import RUTAS, Filtros, hay_guias, ruta_por_defecto  # noqa: E402
 
@@ -72,18 +73,30 @@ def preparar_modelos() -> bool:
     demás. Corre una vez por proceso de Streamlit. Si falla, lanza: Streamlit
     no cachea excepciones y vuelve a intentarlo (p. ej. tras abrir Ollama).
     """
-    from rag.build_prompt import SISTEMA_PROSA, SISTEMA_PROSA_GUIAS
+    from rag.build_prompt import SISTEMA_PROSA, SISTEMA_PROSA_GUIAS, SISTEMA_PROSA_GUIAS_ATLS10
     from rag.generate import _ollama
     from rag.retrieve import buscar, buscar_guias
     buscar("herida en mano", k=1, ruta=ruta_por_defecto())
     sistema = SISTEMA_PROSA
     if usar_guias():
         buscar_guias("herida en mano")
-        sistema = SISTEMA_PROSA_GUIAS
+        sistema = SISTEMA_PROSA_GUIAS_ATLS10 if config.ATLS10 else SISTEMA_PROSA_GUIAS
     # carga el modelo con la ventana NUM_CTX: si después cambiara, Ollama lo recargaría
     _ollama([{"role": "system", "content": sistema},
              {"role": "user", "content": "ok"}], max_tokens=1, timeout=180)
     return True
+
+
+@st.cache_resource(show_spinner=False)
+def perfiles_libros() -> dict:
+    return cargar_perfiles()
+
+
+# Los manuales que se buscan, para los textos de la app. El ATLS 10 solo con
+# ATLS10=1 (PLAN_INDEXAR_ATLS10.md, fase 6), con su edición y su origen.
+MANUALES = ("el ATLS 11.ª ed. (en inglés), el ATLS 10.ª ed. (2018, edición anterior, en una "
+            "traducción no oficial al español) y el manual de manejo inicial del HUV"
+            if config.ATLS10 else "el ATLS 11.ª ed. (en inglés) y el manual de manejo inicial del HUV")
 
 
 def manuales_indexados() -> bool:
@@ -133,9 +146,8 @@ with st.sidebar:
     con_guias = st.toggle(
         "Manuales de trauma (ATLS y HUV)", value=config.GUIAS and hay_manuales,
         disabled=not hay_manuales,
-        help="Segunda fuente, con el mismo peso que los casos: lo que recomiendan el ATLS "
-             "11.ª ed. y el manual de manejo inicial del HUV. Apagado, la respuesta sale solo "
-             "de los casos del registro.")
+        help=f"Segunda fuente, con el mismo peso que los casos: lo que recomiendan {MANUALES}. "
+             "Apagado, la respuesta sale solo de los casos del registro.")
     if not hay_manuales:
         st.caption("Los manuales no están indexados: `python -m rag.index --fuente guias`.")
 
@@ -154,9 +166,10 @@ with st.sidebar:
     )
 
     st.divider()
-    manuales = (" · <b>Manuales</b>: ATLS 11.ª ed. (en inglés) y el manual de manejo inicial "
-                "del HUV, lo que recomiendan. Lo hecho en los casos y lo que recomiendan los "
-                "manuales puede no coincidir: el sistema muestra las dos miradas y no elige."
+    manuales = (f" · <b>Manuales</b>: {MANUALES}, lo que recomiendan. Lo hecho en los casos y lo "
+                "que recomiendan los manuales puede no coincidir: el sistema muestra las dos "
+                "miradas y no elige"
+                + (", tampoco entre las dos ediciones del ATLS." if config.ATLS10 else ".")
                 if con_guias else "")
     st.markdown(
         f"<div class='aviso'><b>Alcance</b><br>"
@@ -216,8 +229,14 @@ def aviso_respuesta(respuesta) -> str:
                       f"describen estos casos, no frecuencias generales, y los protocolos pueden "
                       f"haber cambiado.")
     if respuesta.guias:
-        partes.append("Pasajes del ATLS 11.ª ed. y del manual del HUV: lo del ATLS (en inglés) va "
-                      "resumido en español; el texto original está en «Fragmentos de los manuales».")
+        fuentes = {f.fuente for f in respuesta.guias}
+        nombres = [n for libro, n in (("ATLS", "del ATLS 11.ª ed."),
+                                      ("ATLS10", "del ATLS 10.ª ed. (2018, traducción no oficial)"),
+                                      ("HUV", "del manual del HUV")) if libro in fuentes]
+        lista = nombres[0] if len(nombres) == 1 else ", ".join(nombres[:-1]) + " y " + nombres[-1]
+        ingles = ("; lo del ATLS 11 (en inglés) va resumido en español" if "ATLS" in fuentes else "")
+        partes.append(f"Pasajes {lista}{ingles}. El texto de cada uno está en «Fragmentos de los "
+                      f"manuales».")
     partes.append("Apoyo a la decisión; no reemplaza el juicio clínico.")
     return " ".join(partes)
 
@@ -235,17 +254,34 @@ def tarjeta_caso(caso, consulta: str = "") -> str:
             f"· similitud {caso.score_norm:.2f}<br>{''.join(etiquetas)}<br><br>{texto}</div>")
 
 
+def etiquetas_guia(f) -> str:
+    """Las etiquetas de un pasaje además de su cabecera (que ya dice libro,
+    edición y origen, decisión 1 de PLAN_INDEXAR_ATLS10.md): el idioma del ATLS
+    11 y, del ATLS 10, el capítulo que trata lo mismo en la 11.ª (tabla
+    `equivalente_11`; el título completo, al pasar el cursor)."""
+    if f.idioma == "en":
+        return "<span class='etq'>en inglés</span>"
+    if f.fuente != "ATLS10" or not f.capitulo_num:
+        return ""
+    equivalentes = equivalentes_atls11(f.capitulo_num, perfiles_libros())
+    if not equivalentes:
+        return ""
+    caps = " y ".join(str(n) for n, _ in equivalentes)
+    titulo = html.escape(" / ".join(t for _, t in equivalentes), quote=True)
+    return (f"<span class='etq' title='{titulo}'>en la 11.ª ed.: "
+            f"cap{'s' if len(equivalentes) > 1 else ''}. {caps}</span>")
+
+
 def tarjeta_guia(seccion: str, fragmentos, consulta: str = "") -> str:
     """Un pasaje de un manual: libro, capítulo, sección y páginas impresas, y su
-    texto tal cual (el ATLS en inglés)."""
+    texto tal cual (el ATLS 11 en inglés, el ATLS 10 en la traducción del PDF)."""
     f = fragmentos[0]
     escala = "relevancia" if f.relevancia is not None else "similitud"
     puntaje = max(x.puntaje for x in fragmentos)
-    idioma = "<span class='etq'>en inglés</span>" if f.idioma == "en" else ""
     texto = resaltar_html(texto_guia(fragmentos), consulta).replace("\n", "<br>")
     return (f"<div class='caso-box guia-box'><span class='caso-id'>guía {seccion}</span> "
             f"· {escala} {puntaje:.2f}<br><span class='etq'>{html.escape(cabecera_guia(fragmentos))}"
-            f"</span>{idioma}<br><br>{texto}</div>")
+            f"</span>{etiquetas_guia(f)}<br><br>{texto}</div>")
 
 
 def nota_verificacion(respuesta) -> None:
@@ -305,7 +341,9 @@ def desplegable_guias(respuesta, consulta: str) -> None:
     grupos = agrupar_guias(respuesta.guias)
     with st.expander(f"Fragmentos de los manuales ({len(grupos)}) · texto completo"):
         st.caption("Pasajes que pasaron la guarda de los manuales, del más al menos relevante. "
-                   "Páginas impresas del libro; el ATLS, en su idioma original.")
+                   "Páginas impresas del libro; el ATLS 11, en su idioma original"
+                   + ("; el ATLS 10, tal como viene en la traducción no oficial, sin corregir."
+                      if config.ATLS10 else "."))
         for seccion, fragmentos in grupos.items():
             st.markdown(tarjeta_guia(seccion, fragmentos, buscada), unsafe_allow_html=True)
 

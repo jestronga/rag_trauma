@@ -33,10 +33,10 @@ RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ))
 
 from rag import config                                                      # noqa: E402
-from rag.build_prompt import SISTEMA_PROSA, SISTEMA_PROSA_GUIAS             # noqa: E402
+from rag.build_prompt import SISTEMA_PROSA, SISTEMA_PROSA_GUIAS, SISTEMA_PROSA_GUIAS_ATLS10  # noqa: E402
 from rag.generate import (_ollama, ollama_disponible, porcentaje_gpu, responder,  # noqa: E402
                           usar_guias)
-from rag.retrieve import (dispositivo_reranker, ruta_guias_por_defecto,     # noqa: E402
+from rag.retrieve import (dispositivo_reranker, libros_indexados, ruta_guias_por_defecto,  # noqa: E402
                           ruta_por_defecto, umbral_guias, vram_gb)
 
 OK, MAL, AVISO = "  [ok]", "  [!!]", "  [ ?]"
@@ -59,7 +59,22 @@ def main() -> int:
     if con_guias:
         ruta_libros = ruta_guias_por_defecto()
         print(f"{OK} manuales: ruta {ruta_libros} · umbral {umbral_guias(ruta_libros)} · "
-              f"presupuesto {config.PRESUPUESTO_GUIAS} tokens · NUM_CTX {config.NUM_CTX}")
+              f"presupuesto {config.PRESUPUESTO_GUIAS} tokens{' con cuota por libro' if config.CUOTA_GUIAS else ''}"
+              f" · NUM_CTX {config.NUM_CTX}")
+        if config.SENAL_TRAUMA:
+            print(f"{OK} guarda por señal de trauma: sin señal, libros {config.UMBRAL_GUIAS_SIN_SENAL} "
+                  f"y casos {config.UMBRAL_RERANK_SIN_SENAL}")
+        # el ATLS 10 (PLAN_INDEXAR_ATLS10.md): indexado desde la fase 3, se busca con ATLS10=1
+        indexado = "ATLS10" in libros_indexados()
+        if config.ATLS10 and not indexado:
+            print(f"{MAL} ATLS10=1 pero el ATLS 10 no está indexado: extraer y correr "
+                  f"python -m rag.index --fuente guias")
+            problemas += 1
+        elif config.ATLS10:
+            print(f"{OK} ATLS 10.ª ed. encendido (edición anterior, traducción no oficial)")
+        else:
+            print(f"{AVISO} ATLS10=0: el ATLS 10.ª ed. {'está indexado pero ' if indexado else ''}"
+                  f"no se busca")
     elif config.GUIAS:
         print(f"{MAL} GUIAS=1 pero los manuales no están indexados: la respuesta saldrá solo de "
               f"los casos. Correr: python -m rag.index --fuente guias")
@@ -73,7 +88,8 @@ def main() -> int:
     if not ok:
         return 1
     t0 = time.perf_counter()
-    sistema = SISTEMA_PROSA_GUIAS if con_guias else SISTEMA_PROSA
+    sistema = ((SISTEMA_PROSA_GUIAS_ATLS10 if config.ATLS10 else SISTEMA_PROSA_GUIAS)
+               if con_guias else SISTEMA_PROSA)
     _ollama([{"role": "system", "content": sistema}, {"role": "user", "content": "ok"}],
             max_tokens=1, timeout=300)
     gpu = porcentaje_gpu()
@@ -93,6 +109,9 @@ def main() -> int:
         consultas += [c for c in yaml.safe_load((RAIZ / "eval" / "consultas_guias.yaml").read_text(
             encoding="utf-8"))["consultas"] if c["id"] not in ids]
     for c in sorted((c for c in consultas if c.get("boton")), key=lambda c: c["boton"]):
+        if c.get("atls10") and not (config.ATLS10 and con_guias):
+            print(f"{AVISO} {c['boton']:28} se salta: solo con el ATLS 10 encendido (ATLS10=1)")
+            continue
         espera = bool(c.get("espera_abstencion")) or c.get("categoria") == "fuera_de_dominio"
         t0 = time.perf_counter()
         r = responder(c["texto"], reescribir_consulta=False)
@@ -104,6 +123,8 @@ def main() -> int:
             fallos.append(f"{'no ' if espera else ''}se abstuvo (coseno {r.confianza:.3f})")
         if r.citas_invalidas:
             fallos.append(f"citas inválidas {r.citas_invalidas}")
+        if c.get("atls10") and not any(f.fuente == "ATLS10" for f in r.guias):
+            fallos.append("no trajo pasajes del ATLS 10")
         if r.abstuvo:
             detalle = f"se abstiene (coseno {r.confianza:.3f})"
         else:

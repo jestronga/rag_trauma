@@ -151,9 +151,16 @@ los PDF. Sin él, `extraer_guias.py` avisa y los flujogramas entran como cajas
 sueltas. Se extraen y se indexan aparte; los casos no se reindexan:
 
 ```powershell
-python scripts\extraer_guias.py         # → guias\secciones.jsonl (935 secciones)
-python -m rag.index --fuente guias      # fijo-256: 2.201 fragmentos, ~20 s en GPU
+python scripts\extraer_guias.py         # → guias\secciones.jsonl (1.624 secciones)
+python -m rag.index --fuente guias      # fijo-256: 4.013 fragmentos, ~30 s en GPU
 ```
+
+Desde el 23/10 son tres libros: el ATLS 11.ª ed. (inglés), el manual del HUV y
+el **ATLS 10.ª ed. en español** (`ATLS_10_ed_espanol.pdf`: la edición anterior,
+en una traducción automática no oficial; `PLAN_INDEXAR_ATLS10.md`). El ATLS 10
+se indexa siempre, pero **solo se busca con `ATLS10=1`**: así, sin la variable,
+el asistente responde como antes. Encendido, el presupuesto de los manuales
+pasa a 1.800 tokens repartidos por libro (`CUOTA_GUIAS`).
 
 Cada fuente vive en su colección del mismo Qdrant (`trauma` y `guias`) y
 reindexar una no borra la otra. `--fuente todas` hace las dos.
@@ -207,7 +214,12 @@ Cada respuesta va en dos apartados, uno debajo del otro:
   con el texto completo de cada caso y la confianza de la búsqueda.
 - **Manuales de trauma (ATLS y HUV)**: la prosa sobre los manuales y debajo el
   desplegable "Fragmentos de los manuales", con libro, capítulo, sección,
-  página y texto de cada pasaje (el ATLS en inglés, tal cual).
+  página y texto de cada pasaje (el ATLS en inglés, tal cual). Con `ATLS10=1`,
+  la prosa nombra la edición ("La 10.ª edición del ATLS recomienda…"), el
+  apartado termina con un aviso del código (es la edición anterior, en
+  traducción no oficial; si también hay pasajes de la 11.ª, que pueden no
+  coincidir) y la tarjeta de cada pasaje dice dónde está lo mismo en la 11.ª
+  ("en la 11.ª ed.: cap. 7").
 
 Las citas `[caso: ID]` y `[guía: ID]` van en rojo. Para la demo (19/10) no se
 muestran la línea de respaldo ("Respaldo: 5 casos del registro · similitud…")
@@ -232,9 +244,12 @@ cd rag_pipeline
 python scripts\preparar_demo.py
 ```
 
-Revisa la GPU, la configuración de los manuales, que Ollama tenga el modelo
-entero en la VRAM (100 %) y pasa las 6 consultas de la demo por el sistema
-completo (campo `boton` de `eval/consultas.yaml` y `eval/consultas_guias.yaml`).
+Revisa la GPU, la configuración de los manuales (con el ATLS 10 y la guarda por
+señal de trauma), que Ollama tenga el modelo entero en la VRAM (100 %) y pasa
+las consultas de la demo por el sistema completo (campo `boton` de
+`eval/consultas.yaml` y `eval/consultas_guias.yaml`; la 7 solo con `ATLS10=1`).
+Para mostrar el ATLS 10, lanzar las dos cosas con la variable:
+`$env:ATLS10 = "1"`.
 Debe terminar en "Todo listo". Después: `streamlit run app.py`. Al abrir, la
 app precarga los modelos (~30 s, una sola vez) y el modelo queda cargado 2 horas
 (`KEEP_ALIVE`).
@@ -285,16 +300,24 @@ masiva"*. Una pregunta de procedimiento: no hay casos que se parezcan y
 responden solo el ATLS y el manual del HUV. Es lo que pidió la reunión del
 30/09: que el asistente no dependa solo de lo que se hizo en el hospital.
 
+**7b · El ATLS en español** (7, solo con `ATLS10=1`) — *"TCE leve con pérdida
+de conciencia transitoria"*. Sin el ATLS 10, los manuales no responden esta
+consulta; con él, responde la 10.ª edición, y la prosa lo dice. Abre
+"Fragmentos de los manuales": es la **edición anterior (2018), en una
+traducción no oficial al español** (el aviso del apartado y la cabecera de cada
+pasaje lo dicen), y la tarjeta indica dónde está lo mismo en la 11.ª. El
+sistema no elige entre ediciones.
+
 **8 · Abstención** (5) — *"manejo de cetoacidosis diabética en
 urgencias"*. Ni los casos ni los manuales responden: el sistema dice que no
 encontró nada suficientemente parecido. **Esta es la diapositiva que convence a
 un público clínico**: responde qué hace el sistema cuando no sabe.
 
-**Preguntas del público:** de las 10 consultas fuera de dominio medidas, el
-reranker frena 9 ("dolor torácico opresivo…" incluida); "apendicitis aguda con
-dolor en fosa ilíaca derecha y fiebre" pasa por los casos (límite conocido
-desde el 27/09), y los manuales no la dejan pasar. Una pregunta que no está en
-esas 10 no está medida.
+**Preguntas del público:** de las 20 consultas fuera de dominio medidas
+(apendicitis, ACV, infarto, embarazo, hipoglucemia…), desde el 23/10 no responde
+ninguna: si la consulta no nombra un mecanismo, una lesión ni un procedimiento
+de trauma, las dos guardas piden más (guarda por señal de trauma,
+`rag/senal.py`). Una pregunta que no está en esas 20 no está medida.
 
 **Evitar en la demo:** escribir un número de caso para resumirlo. Ese resumen
 todavía lo escribe el modelo sin verificación y a veces cambia términos

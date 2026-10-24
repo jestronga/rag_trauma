@@ -633,13 +633,19 @@ Generador 100 % en GPU, sin JSON cortados.
   18) y la mediana pasa de 8,5 s (8,6 s; son 1.400 tokens más de prompt).
   Con `PROSA_SIEMPRE=True` (la demo) la prosa se muestra igual: hay más
   oraciones sin verificar en pantalla, el riesgo aceptado el 18/10.
-- **Segunda iteración, sin medir:** la instrucción con el ATLS 10 pide escribir
-  como recomendación lo que el pasaje dice como orden (`_TONO_TRES`). La
-  corrida se cortó el 23/10: Claude Code la detuvo porque el equipo se quedó
-  sin memoria. Para repetirla, con el chatbot cerrado: `ATLS10=1 python
-  scripts\comparar_modelos.py --modos prosa --consultas guias --salida
-  reports\comparar_modelos_atls10.csv` (unos 7 min). La primera iteración quedó
-  en el scratchpad de la sesión.
+- **Segunda iteración (24/10):** la instrucción con el ATLS 10 pide escribir
+  como recomendación lo que el pasaje dice como orden (`_TONO_TRES`). Resultado:
+  15 de 41 verificadas (antes 14), mediana 8,9 s; no se nota más allá del
+  ruido. Quedó porque no estorba. `reports/comparar_modelos_atls10.csv` es esta
+  corrida. Leídos los rechazos:
+  - las 6 órdenes que quedan son sobre todo del HUV ("se debe…"), como sin el
+    ATLS 10;
+  - **con tres manuales el modelo se equivoca más de manual** (6 rechazos
+    "manual equivocado"): "El manual del HUV recomienda… [guía: ATLS10-14-011]",
+    "La 11.ª edición del ATLS recomienda…" con un pasaje de la 10.ª. El
+    verificador los atrapa (regla 8), pero **con `PROSA_SIEMPRE=True` se
+    mostrarían igual**. Hay que tenerlo en cuenta al decidir si se enciende el
+    ATLS 10 para la demo.
 
 Plan original:
 
@@ -671,7 +677,42 @@ Plan original:
   ATLS 10 y pasan la regla de la edición. Nueva columna
   `pasajes_citados_atls10`.
 
-## Fase 6 — App y demo (medio día)
+## Fase 6 — App y demo (hecha el 24/10/2026)
+
+**Qué se hizo** (con `ATLS10=0` la app queda como estaba):
+- **Tarjeta del pasaje:** la cabecera ya dice "ATLS 10.ª ed. (2018, edición
+  anterior, traducción no oficial)". Se agrega la etiqueta "en la 11.ª ed.:
+  cap. 7", con el título al pasar el cursor
+  (`guias.equivalentes_atls11`, desde la tabla `equivalente_11`). Una etiqueta
+  aparte con la edición, como pedía el plan, repetía la cabecera y se quitó.
+- **Textos de la app** según `ATLS10`: ayuda del interruptor, "Alcance" (los
+  tres manuales y que no elige entre ediciones), aviso bajo la respuesta (los
+  libros que trajo esa respuesta) y leyenda del desplegable (el ATLS 10 tal
+  como viene en la traducción, sin corregir). La precarga usa el sistema con
+  tres manuales.
+- **`preparar_demo.py`:** muestra la cuota, la guarda por señal de trauma y si
+  el ATLS 10 está encendido e indexado. Botón nuevo, **"7 · ATLS en español"**
+  (abr-03, "TCE leve con pérdida de conciencia transitoria", `atls10: true` en
+  `consultas.yaml`): sin el ATLS 10 los manuales no la responden; con él, sí.
+  Solo corre con `ATLS10=1`, y falla si no trae pasajes del ATLS 10.
+- **Guion** (`SETUP.md` §6): el paso 7b, la variable para lanzar la demo con
+  el ATLS 10 y las 20 consultas fuera de dominio de la guarda por señal.
+
+**Verificado:**
+- `preparar_demo.py` con `ATLS10=1`: **"Todo listo"**; los 7 botones bien, el 7
+  con casos y manuales y prosa verificada, 100 % en GPU.
+- La app con `AppTest`:
+  - con `ATLS10=1`, la consulta del botón 7 sale sin errores, con "La 10.ª
+    edición del ATLS recomienda…" y las citas en rojo, el aviso de la edición
+    anterior y la tarjeta con "en la 11.ª ed.: cap. 7";
+  - con `ATLS10=0`, nada del ATLS 10 en pantalla.
+- Tests: 300.
+
+**Pendiente para encender el ATLS 10 en la demo (decisión del usuario):** con
+`PROSA_SIEMPRE=True`, las oraciones que atribuyen un pasaje al manual
+equivocado se muestran igual (fase 5). Hoy `ATLS10=0`.
+
+Plan original:
 
 - Tarjeta del pasaje con la etiqueta "10.ª ed. · 2018 · traducción no
   oficial" y, si hay equivalencia, "en la 11.ª ed.: cap. N".

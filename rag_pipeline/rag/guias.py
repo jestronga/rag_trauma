@@ -52,6 +52,16 @@ def cargar_perfiles(ruta: Path | None = None) -> dict:
         return yaml.safe_load(f)
 
 
+def equivalentes_atls11(capitulo_num: int, perfiles: dict | None = None) -> list[tuple[int, str]]:
+    """Los capítulos del ATLS 11 (número, título) que tratan lo mismo que un
+    capítulo del ATLS 10 (`equivalente_11` en su perfil; propuesta de Claude
+    que valida el médico, PLAN_INDEXAR_ATLS10.md, fase 2). Vacío si no hay."""
+    perfiles = perfiles or cargar_perfiles()
+    titulos = {fila[0]: fila[1] for fila in perfiles["atls"]["capitulos"]}
+    tabla = perfiles.get("atls10", {}).get("equivalente_11", {})
+    return [(n, titulos[n]) for n in tabla.get(capitulo_num, [])]
+
+
 # Ancla por defecto de cada tipo de transcripción: el título "Flujograma" que
 # abre la sección del diagrama, o el pie "Tabla." de la tabla en imagen.
 ANCLAS = {"flujograma": r"^Flujograma\b", "tabla": r"^Tabla\b"}

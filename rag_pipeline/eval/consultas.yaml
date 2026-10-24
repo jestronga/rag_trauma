@@ -131,6 +131,10 @@ consultas:
     categoria: abreviatura
     mecanismo: no_determinado
     regiones: [craneo_encefalo]
+    # demo con ATLS10=1 (scripts/preparar_demo.py): sin el ATLS 10 los manuales no
+    # la responden; con él, sí (PLAN_INDEXAR_ATLS10.md, fase 6)
+    boton: '7 · ATLS en español'
+    atls10: true
 
   - id: abr-04
     texto: FX de radio distal con inmovilización
