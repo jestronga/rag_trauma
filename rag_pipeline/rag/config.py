@@ -87,11 +87,12 @@ RUTA_GUIAS = _env("RUTA_GUIAS", "auto")            # auto | densa | rerank
 # fijo-256 son ~6 fragmentos. Medido (17/10/2026, ruta rerank con
 # UMBRAL_GUIAS, 41 consultas anotadas): 1.000 → 0,286 · 1.400 → 0,331 ·
 # 1.800 → 0,354. Ojo: el prompt de la fase 5 suma esto a los casos y las reglas.
-# El ATLS 10.ª ed. en español (PLAN_INDEXAR_ATLS10.md). Desde la fase 3 está en
-# la colección de los libros, pero apagado no se busca: la respuesta es la de
-# siempre hasta que el prompt y el verificador lo conozcan (fase 5). Encendido,
-# el presupuesto pasa a 1.800 y se reparte con cuota (decisión 2, abajo).
-ATLS10 = _env_bool("ATLS10", False)
+# El ATLS 10.ª ed. en español (PLAN_INDEXAR_ATLS10.md): la edición anterior, en
+# una traducción automática no oficial, como tercer manual citable. Encendido
+# por defecto desde el 24/10/2026 (usuario), tras las fases 1 a 6. Encendido, el
+# presupuesto pasa a 1.800 y se reparte con cuota (decisión 2, abajo).
+# ATLS10=0 deja el asistente como antes: dos manuales, 1.400 tokens sin cuota.
+ATLS10 = _env_bool("ATLS10", True)
 PRESUPUESTO_GUIAS = _env_int("PRESUPUESTO_GUIAS", 1800 if ATLS10 else 1400)
 # Guarda de los libros: si el MEJOR fragmento no llega, los libros no hablan
 # (y responden los casos, si pasan su guarda). Si llega, el presupuesto se

@@ -43,8 +43,12 @@ las órdenes de la traducción) y la mediana sube a 8,6 s. La segunda iteración
 más de manual, y con `PROSA_SIEMPRE` eso se vería. **Fase 6 hecha el 24/10**:
 la app nombra los tres manuales, la tarjeta del ATLS 10 dice dónde está lo
 mismo en la 11.ª, y `preparar_demo.py` tiene el botón "7 · ATLS en español"
-(con `ATLS10=1` termina en "Todo listo"). **`ATLS10` sigue en 0: encenderlo
-para la demo es decisión del usuario.** Falta la fase 7, la revisión médica. Cinco decisiones para el usuario; la
+(con `ATLS10=1` termina en "Todo listo"). **El 24/10 el usuario lo encendió:
+`ATLS10=1` es el valor por defecto**, con cuota por libro y 1.800 tokens
+(`ATLS10=0` vuelve a dos manuales). `preparar_demo.py` sin variables: "Todo
+listo". Riesgo aceptado: con `PROSA_SIEMPRE`, una oración puede atribuir un
+pasaje al manual equivocado (le pasó al botón 6 en una corrida y no en la
+otra). Falta la fase 7, la revisión médica. Cinco decisiones para el usuario; la
 primera es si quien lo pidió sabe lo de la traducción.
 
 **Próxima reunión (pedido del 19/10): "un chatbot mucho más sofisticado".**
@@ -866,7 +870,7 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
 | `DISPOSITIVO_CONSULTA` | `cpu` | dejar en CPU: la VRAM es para el generador |
 | `INDICE_DIR` | `rag_pipeline/indices` | apuntar a una copia para correr scripts con el chatbot abierto |
 | `GUIAS` | `1` | los libros como segunda fuente; `0` o sin la colección = solo casos, como antes |
-| `ATLS10` | `0` | el ATLS 10.ª ed. en español: indexado desde el 23/10 (fase 3 de `PLAN_INDEXAR_ATLS10.md`), pero apagado no se busca (`retrieve.libros_apagados`); encenderlo después de la fase 5 |
+| `ATLS10` | `1` | el ATLS 10.ª ed. en español como tercer manual (`PLAN_INDEXAR_ATLS10.md`); encendido por defecto desde el 24/10 (usuario). `0` = dos manuales, 1.400 tokens sin cuota, como antes (`retrieve.libros_apagados`) |
 | `CUOTA_GUIAS` | el de `ATLS10` | cada libro que pasa la guarda recibe una parte igual de `PRESUPUESTO_GUIAS` (decisión 2, 23/10: con el ATLS 10, cuota y 1.800 tokens; sin él, como antes) |
 | `SENAL_TRAUMA` | `1` | guarda por señal de trauma (`rag/senal.py`, decisión 5, 23/10): sin mecanismo, lesión ni procedimiento de trauma en la consulta, las guardas piden más |
 | `UMBRAL_GUIAS_SIN_SENAL` | `0.65` | libros, ruta rerank, sin señal: mejor fragmento mínimo. Frena sangrado vaginal en el embarazo (0,541), hipoglucemia y ACV |
@@ -876,7 +880,7 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
 | `COLECCION_GUIAS` | `guias` | colección de Qdrant con los libros (17/10) |
 | `FRAGMENTACION_GUIAS` | `fijo-256` | configuración de `rag/fragmentar.py` al indexar los libros |
 | `RUTA_GUIAS` | `auto` | libros: `rerank` con ≥ 7 GB de VRAM, si no `densa` |
-| `PRESUPUESTO_GUIAS` | `1400` (`1800` con `ATLS10`) | tokens de fragmentos de los libros para el prompt; 1.800 con el ATLS 10 por la decisión 2 (23/10) |
+| `PRESUPUESTO_GUIAS` | `1800` (`1400` con `ATLS10=0`) | tokens de fragmentos de los libros para el prompt; 1.800 con el ATLS 10 por la decisión 2 (23/10) |
 | `UMBRAL_GUIAS` | `0.34` | ruta `rerank`: prob. mínima del mejor fragmento. 0,2 hasta el 19/10; con las transcripciones, fuera de dominio máx. 0,326 (`neg-09`), sección 00 |
 | `GUIAS_TRANSCRIPCIONES` | `anonimizacion/data/transcripciones_guias.yaml` | flujogramas y tablas del HUV transcritos a mano (19/10); fuera de git, viaja con los PDF |
 | `UMBRAL_GUIAS_COSENO` | `0.60` | ruta `densa` (sin reranker en GPU): coseno mínimo del mejor fragmento; separa mal |

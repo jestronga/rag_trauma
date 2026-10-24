@@ -157,10 +157,10 @@ python -m rag.index --fuente guias      # fijo-256: 4.013 fragmentos, ~30 s en G
 
 Desde el 23/10 son tres libros: el ATLS 11.ª ed. (inglés), el manual del HUV y
 el **ATLS 10.ª ed. en español** (`ATLS_10_ed_espanol.pdf`: la edición anterior,
-en una traducción automática no oficial; `PLAN_INDEXAR_ATLS10.md`). El ATLS 10
-se indexa siempre, pero **solo se busca con `ATLS10=1`**: así, sin la variable,
-el asistente responde como antes. Encendido, el presupuesto de los manuales
-pasa a 1.800 tokens repartidos por libro (`CUOTA_GUIAS`).
+en una traducción automática no oficial; `PLAN_INDEXAR_ATLS10.md`). **Se busca
+por defecto desde el 24/10** (`ATLS10=1`), con 1.800 tokens de manuales
+repartidos por libro (`CUOTA_GUIAS`). Con `$env:ATLS10 = "0"` el asistente
+vuelve a dos manuales y 1.400 tokens, como antes.
 
 Cada fuente vive en su colección del mismo Qdrant (`trauma` y `guias`) y
 reindexar una no borra la otra. `--fuente todas` hace las dos.
@@ -247,9 +247,8 @@ python scripts\preparar_demo.py
 Revisa la GPU, la configuración de los manuales (con el ATLS 10 y la guarda por
 señal de trauma), que Ollama tenga el modelo entero en la VRAM (100 %) y pasa
 las consultas de la demo por el sistema completo (campo `boton` de
-`eval/consultas.yaml` y `eval/consultas_guias.yaml`; la 7 solo con `ATLS10=1`).
-Para mostrar el ATLS 10, lanzar las dos cosas con la variable:
-`$env:ATLS10 = "1"`.
+`eval/consultas.yaml` y `eval/consultas_guias.yaml`; la 7, la del ATLS 10, se
+salta con `ATLS10=0`).
 Debe terminar en "Todo listo". Después: `streamlit run app.py`. Al abrir, la
 app precarga los modelos (~30 s, una sola vez) y el modelo queda cargado 2 horas
 (`KEEP_ALIVE`).
@@ -300,13 +299,17 @@ masiva"*. Una pregunta de procedimiento: no hay casos que se parezcan y
 responden solo el ATLS y el manual del HUV. Es lo que pidió la reunión del
 30/09: que el asistente no dependa solo de lo que se hizo en el hospital.
 
-**7b · El ATLS en español** (7, solo con `ATLS10=1`) — *"TCE leve con pérdida
+**7b · El ATLS en español** (7) — *"TCE leve con pérdida
 de conciencia transitoria"*. Sin el ATLS 10, los manuales no responden esta
 consulta; con él, responde la 10.ª edición, y la prosa lo dice. Abre
 "Fragmentos de los manuales": es la **edición anterior (2018), en una
 traducción no oficial al español** (el aviso del apartado y la cabecera de cada
 pasaje lo dicen), y la tarjeta indica dónde está lo mismo en la 11.ª. El
-sistema no elige entre ediciones.
+sistema no elige entre ediciones. Con tres manuales, el modelo a veces atribuye
+un pasaje al manual equivocado ("La 11.ª edición…" con un pasaje de la 10.ª).
+El verificador lo detecta, pero en la demo la prosa se muestra igual: si
+alguien lo nota, la cita en rojo lleva al pasaje real en "Fragmentos de los
+manuales".
 
 **8 · Abstención** (5) — *"manejo de cetoacidosis diabética en
 urgencias"*. Ni los casos ni los manuales responden: el sistema dice que no

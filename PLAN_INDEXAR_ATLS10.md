@@ -708,9 +708,13 @@ Plan original:
   - con `ATLS10=0`, nada del ATLS 10 en pantalla.
 - Tests: 300.
 
-**Pendiente para encender el ATLS 10 en la demo (decisión del usuario):** con
-`PROSA_SIEMPRE=True`, las oraciones que atribuyen un pasaje al manual
-equivocado se muestran igual (fase 5). Hoy `ATLS10=0`.
+**Encendido el 24/10 (usuario): `ATLS10=1` es el valor por defecto**, con cuota
+y 1.800 tokens. `preparar_demo.py` sin variables: "Todo listo", y los tests
+pasan con `ATLS10` en 0 y en 1. Riesgo aceptado: con `PROSA_SIEMPRE=True`, las
+oraciones que atribuyen un pasaje al manual equivocado se muestran igual (fase
+5). En la corrida de ese día le pasó al botón 6 ("atribuye a la 11.ª edición
+del ATLS un pasaje de otro manual"); en la anterior, no. `ATLS10=0` vuelve a
+dos manuales.
 
 Plan original:
 
