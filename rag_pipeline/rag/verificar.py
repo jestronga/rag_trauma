@@ -52,8 +52,10 @@ from .retrieve import FragmentoGuia, Resultado
 # `[12345]`. Si no se reconoce, una cita inventada pasaría sin marcarse.
 RX_CITA = re.compile(r"\[(?:caso[:\s]+)?([0-9]{1,8})\]", re.IGNORECASE)
 # `[guía: HUV-11-003]` (la sección). Se acepta también el ID del fragmento
-# (`HUV-11-003-02`), que se lee como su sección.
-RX_CITA_GUIA = re.compile(r"\[gu[ií]as?[:\s]+([a-z]{2,5}-\d{2}-\d{3})(?:-\d{2})?\]", re.IGNORECASE)
+# (`HUV-11-003-02`), que se lee como su sección. El libro puede llevar
+# dígitos: `ATLS10-03-005` (PLAN_INDEXAR_ATLS10.md).
+RX_CITA_GUIA = re.compile(r"\[gu[ií]as?[:\s]+([a-z][a-z0-9]{1,6}-\d{2}-\d{3})(?:-\d{2})?\]",
+                          re.IGNORECASE)
 _RX_CIFRA = re.compile(r"\d+(?:[.,]\d+)*")
 
 _RX_ORACION = re.compile(r"(?<=[.;!?])\s+|\n+")

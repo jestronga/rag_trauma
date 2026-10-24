@@ -1,8 +1,8 @@
 """
 Extrae las secciones de los libros de trauma (fase 1 de PLAN_INDEXAR_LIBROS.md).
 
-    python scripts/extraer_guias.py                 # los dos libros
-    python scripts/extraer_guias.py --libro huv
+    python scripts/extraer_guias.py                 # todos los libros
+    python scripts/extraer_guias.py --libro huv     # uno (clave de guias/perfiles.yaml)
     python scripts/extraer_guias.py --muestra 30    # + muestra para revisar a mano
 
 Lee los PDF de LIBROS_DIR (anonimizacion/data/) con los perfiles de
@@ -12,6 +12,7 @@ los libros tienen derechos de autor.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import random
 import statistics
@@ -24,9 +25,17 @@ from rag import config  # noqa: E402
 from rag.guias import Extractor, cargar_perfiles, cargar_transcripciones  # noqa: E402
 
 
+def huella(registros: list[dict]) -> str:
+    """IDs y títulos de las secciones: si cambia, los IDs anotados en
+    eval/consultas_guias.yaml pueden apuntar a otras secciones."""
+    ids = [r["id"] + "|" + " > ".join(r["titulos"]) for r in registros]
+    return f"{len(ids)} {hashlib.sha1(chr(10).join(ids).encode()).hexdigest()[:12]}"
+
+
 def main() -> None:
+    perfiles = cargar_perfiles()
     ap = argparse.ArgumentParser(description="Extrae las secciones de los libros de trauma")
-    ap.add_argument("--libro", choices=["atls", "huv", "todos"], default="todos")
+    ap.add_argument("--libro", choices=[*perfiles, "todos"], default="todos")
     ap.add_argument("--salida", type=Path, default=config.GUIAS_SECCIONES)
     ap.add_argument("--muestra", type=int, default=0,
                     help="escribe N secciones al azar en guias/muestra_revision.md")
@@ -34,7 +43,6 @@ def main() -> None:
 
     import pymupdf
 
-    perfiles = cargar_perfiles()
     transcripciones = cargar_transcripciones()
     if not transcripciones:
         print(f"[aviso] falta {config.GUIAS_TRANSCRIPCIONES}: los flujogramas del HUV entran como "
@@ -65,6 +73,7 @@ def main() -> None:
         sin_texto = sorted({c for c in (n for n, *_ in perfil["capitulos"])} - caps)
         if sin_texto:
             print(f"    ¡capítulos sin secciones!: {sin_texto}")
+        print(f"    huella: {huella(secciones)}")
 
     args.salida.parent.mkdir(parents=True, exist_ok=True)
     with args.salida.open("w", encoding="utf-8") as f:

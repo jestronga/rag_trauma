@@ -394,3 +394,168 @@ def test_transcripciones_reales_bien_formadas():
             assert pagina in paginas, pagina
             assert "(transcripción de" in titulo and titulo.endswith(")."), pagina
             assert filas and all(f.strip() for f in filas), pagina
+
+
+# ---------------------------------------------------------------------------
+# ATLS 10.ª ed. en español (PLAN_INDEXAR_ATLS10.md): traducción automática,
+# una sola familia tipográfica, roles por color. Medido sobre el PDF el 23/10.
+# ---------------------------------------------------------------------------
+ATLS10 = PERFILES["atls10"]
+ARIAL, ARIAL_B = "ArialUnicodeMS", "ArialUnicodeMS-Bold"
+CUERPO10, ROJO_TIT, ROJO, OCRE, VERDE, GRIS, ROTULO = (
+    0x383837, 0xAC1A25, 0xAD1D23, 0xC98505, 0x138E76, 0x616060, 0x171615)
+
+
+@pytest.mark.parametrize("b, rol", [
+    # encabezado de página (PDF 61)
+    (bloque("CAPÍTULO 1 Evaluación y Tratamiento inicial", y0=39, y1=48, fuente=ARIAL, tam=8,
+            color=ROTULO), "margen"),
+    # títulos: blanco sobre franja, rojo, ocre y verde en negrita (PDF 105, 102)
+    (bloque("El tratamiento inicial del shock hemorrágico", fuente=ARIAL, tam=11.2, color=BLANCO), "titulo1"),
+    (bloque("examen físico", fuente=ARIAL, tam=10.4, color=ROJO_TIT), "titulo2"),
+    (bloque("presión intracraneal", fuente=ARIAL, tam=10.0, color=ROJO), "titulo2"),
+    (bloque("Airway y respiración", fuente=ARIAL_B, tam=7.6, color=OCRE), "titulo3"),
+    (bloque("choque neurogénica", fuente=ARIAL_B, tam=7.0, color=VERDE), "titulo3"),
+    # en blanco como los títulos, pero son de su tabla o recuadro
+    (bloque("trampa \nprevención", fuente=ARIAL, tam=10.4, color=BLANCO), "material"),
+    (bloque("trabajo en equipo", fuente=ARIAL, tam=9.6, color=BLANCO), "material"),
+    # el pie de tabla va por el color: "TABLA 3-1 esboza…" también abre párrafos
+    (bloque("Tabla 3-1 signos y síntomas de hemorragia por clase", fuente=ARIAL, tam=8.8,
+            color=BLANCO), "pie"),
+    (bloque("TABLA 3-1 esboza la pérdida estimada de sangre", fuente=ARIAL, tam=7.0,
+            color=CUERPO10), "cuerpo"),
+    # cuerpo resaltado en rojo; leyenda de figura en rojo y su continuación en gris
+    (bloque("Un neumotórax simple puede ser convertido", fuente=ARIAL, tam=7.1, color=ROJO), "cuerpo"),
+    (bloque("FIGURA 1-4 técnica de limitación de movimiento", fuente=ARIAL, tam=5.4, color=ROJO), "leyenda"),
+    (bloque("Cuando se retira el collar cervical", fuente=ARIAL, tam=6.0, color=GRIS), "leyenda"),
+    # rótulos y créditos de las figuras; "A B C" traducido (PDF 160, 88)
+    (bloque("Libélula Media Group", fuente=ARIAL, tam=6.4, color=ROTULO), "descartar"),
+    (bloque("UN segundo do", fuente=ARIAL, tam=7.0, color=CUERPO10), "descartar"),
+    (bloque("bibliografía", fuente=ARIAL, tam=12.8, color=ROJO_TIT), "referencias"),
+])
+def test_clasificar_atls10(b, rol):
+    assert guias.clasificar(b, ATLS10) == rol
+
+
+def _pagina_con_cajas(lineas: list[tuple]) -> SimpleNamespace:
+    """Un bloque con una caja por renglón: (texto, bbox)."""
+    caja = (min(c[0] for _, c in lineas), min(c[1] for _, c in lineas),
+            max(c[2] for _, c in lineas), max(c[3] for _, c in lineas))
+    dic = {"blocks": [{"type": 0, "bbox": caja,
+                       "lines": [{"bbox": c, "spans": [_span(t, ARIAL, 7.0, CUERPO10)]} for t, c in lineas]}]}
+    return SimpleNamespace(get_text=lambda modo: dic, rect=SimpleNamespace(width=603))
+
+
+def test_deduplicar_lineas_superpuestas():
+    # PDF 32: la misma línea ×3 en la misma caja; PDF 103: las copias difieren
+    # en milésimas y round() las separaba (81,501 → 82, 81,499 → 81)
+    pagina = _pagina_con_cajas([
+        ("los segundo pico se produce en ", (73, 137, 319, 146)),
+        ("los segundo pico se produce en", (73, 137, 319, 146)),
+        ("los segundo pico se produce en ", (73.2, 137, 319, 146)),
+        ("un El exceso de base es", (81.501, 683, 530.7, 690)),
+        ("un El exceso de base es", (81.499, 683, 530.7, 690)),
+        ("los segundo pico se produce en ", (73, 160, 319, 169)),     # otra caja: otra línea
+    ])
+    (b,) = guias.bloques_de_pagina(pagina, deduplicar=True)
+    assert [l.strip() for l in b.lineas] == ["los segundo pico se produce en", "un El exceso de base es",
+                                             "los segundo pico se produce en"]
+    assert len(b.cajas) == 3
+    (sin,) = guias.bloques_de_pagina(pagina)
+    assert len(sin.lineas) == 6
+
+
+def test_corregir_con_los_reemplazos_del_perfil():
+    reemplazos = guias.Extractor(ATLS10).reemplazos
+    corregir = lambda l: guias.corregir(l, reemplazos)
+    # la viñeta traducida como "norte", en medio y al final del bloque
+    assert corregir("en el campo ( norte FIGURA 1-1 ).") == "en el campo ( FIGURA 1-1 )."
+    assert corregir("se muestra en ( norte") == "se muestra en ("
+    # la letra capitular traducida aparte (PDF 57, 159)
+    assert corregir("W gallina que tratan a pacientes heridos, médicos ") == \
+        "Cuando tratan a pacientes heridos, los médicos "
+    assert corregir("MARIDO lesiones EAD se encuentran entre los más comunes") == \
+        "Las lesiones de la cabeza se encuentran entre los más comunes"
+    # la letra solo se arregla al empezar el renglón de la capitular
+    assert corregir("la palabra MARIDO lesiones EAD") == "la palabra MARIDO lesiones EAD"
+    # las partes de una figura (PDF 100)
+    assert corregir("A. el pecho; SEGUNDO. el abdomen; DO. la pelvis; y RE. los huesos") == \
+        "A. el pecho; B. el abdomen; C. la pelvis; y D. los huesos"
+
+
+def test_pagina_impresa_por_tramos():
+    # medido con los números de los encabezados: coinciden en las 362 páginas
+    assert [guias.pagina_impresa(ATLS10, p) for p in (57, 74, 77, 128, 356, 360, 436, 459)] == \
+        [4, 21, 23, 73, 300, 303, 378, 401]
+    assert guias.pagina_impresa(ATLS, 119) == 100           # desfase fijo, como antes
+
+
+def test_capitulos_con_ultima_pagina_explicita():
+    # el apéndice G termina antes del índice alfabético (PDF 435-449)
+    caps = {c.numero: c for c in guias.capitulos(ATLS10)}
+    assert (caps[20].pdf_ini, caps[20].pdf_fin) == (392, 434)
+    assert (caps[21].pdf_ini, caps[23].pdf_fin) == (450, 464)
+    assert caps[13].pdf_fin == 312 and not caps[18].clinico and caps[16].clinico
+
+
+def test_tabla_trampa_prevencion_por_columnas():
+    # PDF 61: cada renglón es un bloque; con _filas se intercalaban las celdas
+    b = lambda texto, *caja: Bloque(*caja, lineas=[texto], cajas=[caja])
+    partes = [
+        Bloque(333, 85, 458, 99, lineas=["trampa ", "prevención"], cajas=[(333, 85, 368, 99), (407, 85, 458, 99)]),
+        b("Falla en el ", 333, 113, 364, 122), b("equipo", 333, 125, 352, 134),
+        b("• El equipo de pruebas con regularidad. ", 407, 115, 493, 121),
+        Bloque(407, 125, 527, 134, lineas=["•", "Asegurarse que el equipo y baterías de repuesto "],
+               cajas=[(407, 125, 410, 134), (416, 127, 527, 134)]),
+        b("están fácilmente disponibles. ", 416, 139, 483, 146),
+        b("intubación sin ", 333, 161, 374, 170), b("éxito  ", 333, 173, 350, 182),
+        Bloque(407, 161, 528, 170, lineas=["•", "Identificar a los pacientes con anatomía de la vía"],
+               cajas=[(407, 161, 410, 170), (416, 163, 528, 170)]),
+        b("aérea difícil. ", 416, 175, 445, 182),
+    ]
+    assert guias._filas_por_columnas(partes).split("\n") == [
+        "trampa | prevención",
+        "Falla en el equipo | • El equipo de pruebas con regularidad. • Asegurarse que el equipo y "
+        "baterías de repuesto están fácilmente disponibles.",
+        "intubación sin éxito | • Identificar a los pacientes con anatomía de la vía aérea difícil.",
+    ]
+
+
+def test_tabla_con_filas_enteras_por_columnas():
+    # Tabla 3-1 (PDF 103): un bloque por fila, una caja por celda
+    fila = lambda y, *celdas: Bloque(81, y, 400, y + 7, lineas=list(celdas),
+                                     cajas=[(x, y, x + 40, y + 7) for x in (81, 200, 280)][:len(celdas)])
+    texto = guias._filas_por_columnas([fila(481, "Ritmo cardiaco ", "↔", "↔ / ↑ "),
+                                       fila(505, "Presión sanguínea ", "↔", "↔")])
+    assert texto == "Ritmo cardiaco | ↔ | ↔ / ↑\nPresión sanguínea | ↔ | ↔"
+
+
+def test_sin_repeticiones():
+    # PDF 179: la traducción repite la oración en otra caja
+    o = "antibióticos de amplio espectro profilácticos son recomendados en la lesión penetrante."
+    assert guias.sin_repeticiones(f"Antes. {o} ( {o} ( {o} ( Gestión de pene- trar.") == \
+        f"Antes. {o} ( Gestión de pene- trar."
+    # las cortas no se tocan
+    assert guias.sin_repeticiones("Sí. Sí. Sí.") == "Sí. Sí. Sí."
+
+
+def test_extractor_atls10_titulo_partido_y_leyenda_en_dos_bloques():
+    perfil = dict(ATLS10, capitulos=[[3, "Choque", 1]], fin=1, saltar=[], recortar_arriba={})
+    doc = [_pagina([
+        ("El shock hemorrágico", (72, 60, 300, 75), ARIAL, 11.2, BLANCO),
+        # PDF 104: un título de dos renglones en dos bloques
+        ("15% a 30% la pérdida de volumen de sangre: Hemorragia", (72, 80, 300, 90), ARIAL_B, 7.0, OCRE),
+        ("Clase II", (72, 92, 120, 100), ARIAL_B, 7.0, OCRE),
+        ("Los signos clínicos de la hemorragia de clase II incluyen taquicardia.", (72, 110, 300, 140),
+         ARIAL, 7.0, CUERPO10),
+        ("Libélula Media Group", (100, 200, 200, 208), ARIAL, 6.4, ROTULO),
+        # PDF 100: la leyenda en rojo y su continuación en gris, en otro bloque
+        ("norte FIGURA 3-2 El uso de ultrasonidos (FAST)", (72, 300, 300, 308), ARIAL, 5.4, ROJO),
+        ("para buscar la causa del shock.", (72, 310, 300, 318), ARIAL, 6.0, GRIS),
+    ])]
+    (s,) = list(guias.Extractor(perfil).secciones(doc))
+    assert s["id"] == "ATLS10-03-001"
+    assert s["titulos"] == ["El shock hemorrágico", "15% a 30% la pérdida de volumen de sangre: Hemorragia Clase II"]
+    assert s["parrafos"] == ["Los signos clínicos de la hemorragia de clase II incluyen taquicardia."]
+    assert s["anexos"] == ["FIGURA 3-2 El uso de ultrasonidos (FAST) para buscar la causa del shock."]
+    assert s["pagina_ini"] == 1 - 53

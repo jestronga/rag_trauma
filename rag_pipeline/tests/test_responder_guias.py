@@ -10,8 +10,9 @@ import pytest
 from rag import config, generate
 from rag.build_prompt import (
     AVISO_DOS_FUENTES, AVISO_SOLO_CASOS, AVISO_SOLO_GUIAS, INSTRUCCION_PROSA_GUIAS, INSTRUCCION_PROSA_SOLO_GUIAS,
-    ROTULO_CASOS, ROTULO_MANUALES, ROTULO_SUGERENCIAS, SISTEMA_PROSA, SISTEMA_PROSA_GUIAS, agrupar_guias,
-    aviso_pasajes, cabecera_guia, construir_prompt, construir_prompt_guias, texto_guia,
+    ROTULO_CASOS, ROTULO_MANUALES, ROTULO_SUGERENCIAS, RX_LINEA_RESPALDO, SISTEMA_PROSA, SISTEMA_PROSA_GUIAS,
+    agrupar_guias, aviso_pasajes, cabecera_guia, construir_prompt, construir_prompt_guias, linea_respaldo,
+    texto_guia,
 )
 from rag.hallazgos import elegibles
 from rag.retrieve import FragmentoGuia, Resultado
@@ -230,6 +231,17 @@ def seccion(r, fuente: str) -> str:
     return next((s.texto for s in r.secciones if s.fuente == fuente), "")
 
 
+def test_la_pantalla_quita_el_respaldo_pero_no_la_similitud_baja(casos):
+    # app.py borra la línea de respaldo (demo, 19/10): la regex tiene que
+    # seguir al formato de linea_respaldo, y el aviso de similitud baja queda
+    texto = f"Prosa [caso: 101].\n\n{linea_respaldo(casos, 'los casos consultados')}"
+    assert RX_LINEA_RESPALDO.sub("", texto).strip() == "Prosa [caso: 101]."
+    bajos = [Resultado(c.record_id, c.text, c.metadata, score=0.4, score_norm=0.4) for c in casos]
+    sin_respaldo = RX_LINEA_RESPALDO.sub("", f"Prosa.\n\n{linea_respaldo(bajos)}")
+    assert "Respaldo" not in sin_respaldo and "**Similitud baja:**" in sin_respaldo
+    assert sin_respaldo.startswith("Prosa.\n\n**Similitud baja:**")
+
+
 def test_las_dos_fuentes(entorno, guias):
     entorno(f"{CASOS_OK} {HUV_OK}")
     r = generate.responder(CONSULTA)
@@ -339,3 +351,11 @@ def test_verificar_citas_de_guias(casos, guias):
     validas, invalidas = generate.verificar_citas(
         "Algo [caso: 101]. Otro [guía: HUV-11-007]. Otro más [guía: ATLS-99-001].", casos, guias)
     assert validas == ["101", "HUV-11-007"] and invalidas == ["ATLS-99-001"]
+
+
+def test_la_cita_acepta_libros_con_digitos():
+    # ATLS 10 (PLAN_INDEXAR_ATLS10.md): sin esto, "[guía: ATLS10-03-005]" no
+    # se leería como cita y una inventada pasaría sin marcarse
+    from rag.verificar import RX_CITA_GUIA
+    texto = "Uno [guía: ATLS10-03-005]. Otro [guía: ATLS-07-019-02]. Otro [guía: HUV-11-003]."
+    assert RX_CITA_GUIA.findall(texto) == ["ATLS10-03-005", "ATLS-07-019", "HUV-11-003"]
