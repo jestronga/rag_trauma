@@ -202,12 +202,18 @@ de trauma") y filtrar los casos por mecanismo, región y desenlace en vivo —
 
 Cada respuesta va en dos apartados, uno debajo del otro:
 
-- **Casos similares del registro**: la prosa sobre los casos, la línea de
-  respaldo (cuántos casos y su similitud) y debajo el desplegable "Casos
-  consultados" con el texto completo de cada caso.
+- **Casos similares del registro**: la prosa sobre los casos (con el aviso de
+  similitud baja, si corresponde) y debajo el desplegable "Casos consultados"
+  con el texto completo de cada caso y la confianza de la búsqueda.
 - **Manuales de trauma (ATLS y HUV)**: la prosa sobre los manuales y debajo el
   desplegable "Fragmentos de los manuales", con libro, capítulo, sección,
   página y texto de cada pasaje (el ATLS en inglés, tal cual).
+
+Las citas `[caso: ID]` y `[guía: ID]` van en rojo. Para la demo (19/10) no se
+muestran la línea de respaldo ("Respaldo: 5 casos del registro · similitud…")
+ni el aviso de que casos y manuales pueden no coincidir: lo dice "Alcance", en
+la barra lateral (`app.APARTADOS_OCULTOS` y `RX_LINEA_RESPALDO`; siguen en
+`Respuesta.texto`).
 
 Si una fuente no responde, su apartado lo dice. Con `PROSA_SIEMPRE=0`, la parte
 de la redacción del modelo que no pasó la verificación se muestra armada desde
@@ -250,7 +256,8 @@ hipoventilación"*. Dos miradas: lo que se hizo en casos similares, con
 **"Casos consultados"** y **"Fragmentos de los manuales"**: el texto completo
 de cada caso y de cada pasaje (libro, capítulo, página). **Todo lo que dice la
 sugerencia se puede comprobar ahí.** Los casos son de hasta 2018 y pueden no
-coincidir con los manuales: el sistema lo dice y no elige.
+coincidir con los manuales: el sistema no elige. Dilo tú; en pantalla solo lo
+dice "Alcance", en la barra lateral.
 
 **3 · Cómo se evita que invente.** El modelo redacta, pero el código revisa cada
 oración antes de mostrarla contra su fuente: que lo que nombra esté en los

@@ -18,7 +18,9 @@ import streamlit as st
 warnings.filterwarnings("ignore")
 
 from rag import config                                    # noqa: E402
-from rag.build_prompt import agrupar_guias, cabecera_guia, desenlace_visible, texto_guia  # noqa: E402
+from rag.build_prompt import (                                 # noqa: E402
+    RX_LINEA_RESPALDO, agrupar_guias, cabecera_guia, desenlace_visible, texto_guia,
+)
 from rag.generate import ollama_disponible, responder, resumir_caso, usar_guias   # noqa: E402
 from rag.hallazgos import resaltar_html                        # noqa: E402
 from rag.retrieve import RUTAS, Filtros, hay_guias, ruta_por_defecto  # noqa: E402
@@ -308,16 +310,35 @@ def desplegable_guias(respuesta, consulta: str) -> None:
             st.markdown(tarjeta_guia(seccion, fragmentos, buscada), unsafe_allow_html=True)
 
 
+# Pedido del usuario para la demo (19/10): en pantalla no van la línea de
+# respaldo ("Respaldo: 5 casos del registro · similitud…") ni el aviso de que
+# casos y manuales pueden no coincidir (apartado "pie"); siguen en
+# Respuesta.texto, para el historial y los scripts. El aviso de similitud baja
+# sí se muestra. Las citas van en rojo, con el color de texto de Streamlit.
+APARTADOS_OCULTOS = {"pie"}
+RX_CITA_PANTALLA = re.compile(r"\[(caso|guía): ([^\]\n]+)\]")
+
+
+def citas_en_rojo(texto: str) -> str:
+    """[caso: ID] y [guía: ID] en rojo (`:red[…]` de Streamlit, corchetes escapados)."""
+    return RX_CITA_PANTALLA.sub(lambda m: f":red[\\[{m.group(1)}: {m.group(2)}\\]]", texto)
+
+
 def cuerpo_respuesta(respuesta, consulta: str, de_a_poco: bool = False) -> None:
-    """La respuesta por apartados: casos (prosa, línea de respaldo y su
-    desplegable) y manuales (prosa o aviso de los pasajes, y su desplegable).
-    Sin apartados (abstención, resumen de un caso), el texto y los
-    desplegables al final."""
+    """La respuesta por apartados: casos (prosa y su desplegable) y manuales
+    (prosa o aviso de los pasajes, y su desplegable). Sin apartados
+    (abstención, resumen de un caso), el texto y los desplegables al final."""
     def escribir(texto: str) -> None:
-        if de_a_poco:
-            st.write_stream(escribir_de_a_poco(texto, segundos_max=1.0))
-        else:
-            st.markdown(texto)
+        texto = RX_LINEA_RESPALDO.sub("", texto).strip()
+        if not de_a_poco:
+            st.markdown(citas_en_rojo(texto))
+            return
+        # Como st.write_stream, pero el color se pone sobre lo acumulado: una
+        # cita a medio escribir sale sin color hasta que se cierra.
+        lugar, acumulado = st.empty(), ""
+        for trozo in escribir_de_a_poco(texto, segundos_max=1.0):
+            acumulado += trozo
+            lugar.markdown(citas_en_rojo(acumulado))
 
     if not respuesta.secciones:
         escribir(respuesta.texto)
@@ -325,6 +346,8 @@ def cuerpo_respuesta(respuesta, consulta: str, de_a_poco: bool = False) -> None:
         desplegable_guias(respuesta, consulta)
         return
     for seccion in respuesta.secciones:
+        if seccion.fuente in APARTADOS_OCULTOS:
+            continue
         escribir(seccion.texto)
         if seccion.fuente == "casos":
             desplegable_casos(respuesta, consulta)
