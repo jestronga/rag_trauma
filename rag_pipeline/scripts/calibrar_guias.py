@@ -35,7 +35,7 @@ from comparar_fragmentacion import cargar_consultas               # noqa: E402
 from rag import config                                            # noqa: E402
 from rag.index import cargar_secciones                            # noqa: E402
 from rag.retrieve import (_reranker_cabe, candidatos_guias,       # noqa: E402
-                          seleccionar_guias, umbral_guias)
+                          libros_activos, seleccionar_guias, umbral_guias)
 
 UMBRALES = {"rerank": [0.05, 0.1, 0.15, 0.18, 0.2, 0.25, 0.3, 0.34, 0.4],
             "densa": [0.5, 0.52, 0.55, 0.57, 0.59, 0.6, 0.62]}
@@ -47,23 +47,6 @@ def grupo(c: dict) -> str:
     if c["conjunto"] == "sintetico":
         return "sintetico"
     return "proc" if c["categoria"] == "procedimiento" else "trauma"
-
-
-def libros_indexados() -> set[str]:
-    """Los libros (`fuente`) que se pueden recuperar: los de la colección,
-    menos los apagados. secciones.jsonl puede traer uno extraído y anotado que
-    no se busca (el ATLS 10 desde el 23/10, PLAN_INDEXAR_ATLS10.md: sin indexar
-    hasta la fase 3, apagado con ATLS10=0): sus secciones no se pueden
-    recuperar y, si contaran, R@ppto bajaría sin que la búsqueda haya cambiado."""
-    from rag.retrieve import _qdrant, libros_apagados
-    libros: set[str] = set()
-    siguiente = None
-    while True:
-        puntos, siguiente = _qdrant().scroll(config.COLECCION_GUIAS, limit=1000, offset=siguiente,
-                                             with_payload=["fuente"], with_vectors=False)
-        libros |= {p.payload["fuente"] for p in puntos}
-        if siguiente is None:
-            return libros - libros_apagados()
 
 
 def recall(seleccion, relevantes: dict[str, int]) -> float | None:
@@ -95,7 +78,10 @@ def main() -> None:
     args = ap.parse_args()
     rutas = args.rutas.split(",") if args.rutas else (["rerank", "densa"] if _reranker_cabe() else ["densa"])
 
-    libros = libros_indexados()
+    # solo cuentan los libros que se buscan: uno extraído y anotado pero sin
+    # indexar, o apagado (el ATLS 10 con ATLS10=0), no se puede recuperar y
+    # bajaría R@ppto sin que la búsqueda haya cambiado
+    libros = set(libros_activos())
     consultas = cargar_consultas({s["id"]: s for s in cargar_secciones()}, args.conjunto, libros)
     n = {g: sum(grupo(c) == g for c in consultas) for g in ("trauma", "proc", "fuera")}
     print(f"{len(consultas)} consultas ({n['trauma']} de trauma, {n['proc']} de procedimiento, "

@@ -52,8 +52,8 @@ sys.path.insert(0, str(RAIZ))
 from eval.evaluate import relevancia                                        # noqa: E402
 from rag import config                                                      # noqa: E402
 from rag.generate import (                                                  # noqa: E402
-    _ollama, armar_secciones, eleccion_modelo, elegir_sugerencias, ensamblar, filtrar_relevantes,
-    fuentes_en_prosa, generar_eleccion, generar_prosa, mensajes_prosa, porcentaje_gpu,
+    _ollama, armar_secciones, eleccion_modelo, elegir_sugerencias, ensamblar, fuentes_en_prosa,
+    guarda_casos, generar_eleccion, generar_prosa, mensajes_prosa, porcentaje_gpu,
     prosa_por_fuente, usar_guias,
 )
 from rag.hallazgos import elegibles                                         # noqa: E402
@@ -69,10 +69,8 @@ def recuperar(c: dict, ruta: str, con_guias: bool = False) -> dict:
     t0 = time.perf_counter()
     conf = confianza(c["texto"])
     t1 = time.perf_counter()
-    casos = [] if conf < config.UMBRAL_ABSTENCION else filtrar_relevantes(
-        buscar(c["texto"], k=config.TOP_K, ruta=ruta))
-    if len(casos) < config.MIN_CASOS:
-        casos = []
+    casos = [] if conf < config.UMBRAL_ABSTENCION else guarda_casos(
+        c["texto"], buscar(c["texto"], k=config.TOP_K, ruta=ruta))[0]
     t2 = time.perf_counter()
     guias = buscar_guias(c["texto"]) if con_guias else []
     t3 = time.perf_counter()

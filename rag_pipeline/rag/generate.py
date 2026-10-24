@@ -265,9 +265,7 @@ def responder(
     if conf >= umbral:
         casos = buscar(consulta, k=k or config.TOP_K, ruta=ruta, filtros=filtros)
         relevancia = max((c.relevancia for c in casos if c.relevancia is not None), default=None)
-        casos = filtrar_relevantes(casos, umbral_rerank)
-        if len(casos) < config.MIN_CASOS:
-            casos, descartados = [], casos
+        casos, descartados = guarda_casos(consulta, casos, umbral_rerank)
     # Guarda de los libros (decisión 3: mismo peso, cualquiera de las dos basta)
     con_guias = usar_guias(guias)
     fragmentos = buscar_guias(consulta) if con_guias else []
@@ -454,6 +452,26 @@ def filtrar_relevantes(casos: list[Resultado], umbral: float | None = None) -> l
     """
     umbral = config.UMBRAL_RERANK if umbral is None else umbral
     return [c for c in casos if c.relevancia is None or c.relevancia >= umbral]
+
+
+def guarda_casos(consulta: str, casos: list[Resultado],
+                 umbral_rerank: float | None = None) -> tuple[list[Resultado], list[Resultado]]:
+    """(casos para el prompt, descartados). Pasan los relevantes
+    (filtrar_relevantes) si son al menos MIN_CASOS. Si la consulta no tiene
+    señal de trauma (rag/senal.py), además MIN_CASOS de ellos tienen que llegar
+    a UMBRAL_RERANK_SIN_SENAL (decisión 5 de PLAN_INDEXAR_ATLS10.md):
+    apendicitis, ACV e insuficiencia cardiaca encontraban casos con 0,2-0,58.
+    Los que entran al prompt siguen filtrados con el umbral de siempre."""
+    relevantes = filtrar_relevantes(casos, umbral_rerank)
+    exigente = relevantes
+    if config.SENAL_TRAUMA and any(c.relevancia is not None for c in casos):
+        from .senal import senal_trauma
+        if not senal_trauma(consulta):
+            exigente = filtrar_relevantes(casos, max(config.UMBRAL_RERANK_SIN_SENAL,
+                                                     umbral_rerank or config.UMBRAL_RERANK))
+    if len(relevantes) < config.MIN_CASOS or len(exigente) < config.MIN_CASOS:
+        return [], relevantes
+    return relevantes, []
 
 
 MIN_SUGERENCIAS = 3

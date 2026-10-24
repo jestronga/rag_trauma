@@ -102,9 +102,9 @@ indexado) deja el asistente como hoy, byte a byte.
 
    Las fases 1 a 3 sirven para las tres opciones: se puede empezar sin
    decidir.
-2. **Espacio en el prompt.** Recomendado: **cuota por libro**, para que el ATLS
-   10 no desplace al 11 ni al HUV. Se decide con la tabla de la fase 4.
-   Retoma la decisión abierta de la cuota por libro (fase 4 de los libros).
+2. ~~**Espacio en el prompt.**~~ **Decidido (usuario, 23/10): cuota por libro y
+   1.800 tokens cuando el ATLS 10 esté encendido** (fase 4). Retoma la decisión
+   abierta de la cuota por libro (fase 4 de los libros).
 3. **Cómo se nombra en la prosa.** Recomendado: la oración dice la edición ("La
    10.ª edición del ATLS recomienda…") y el verificador rechaza "el ATLS
    recomienda" con una cita del ATLS 10.
@@ -113,7 +113,9 @@ indexado) deja el asistente como hoy, byte a byte.
    la 11.ª". El asistente no elige entre ediciones, igual que no elige entre
    casos y manuales. Si se quiere que diga "donde difieran, rige la 11.ª", lo
    decide el médico.
-5. **Las guardas con 20 consultas fuera de dominio** (nueva, 23/10, fase 2).
+5. ~~**Las guardas con 20 consultas fuera de dominio**~~ **Decidido (usuario,
+   23/10): guarda por señal de trauma.** Sin señal, libros 0,65 y casos 0,7
+   (fase 4). Lo que sigue es el planteo original.
    Con los umbrales de hoy responderían 3 de 20 (neg-05, neg-15, neg-19). Ni
    subir `UMBRAL_GUIAS` ni `UMBRAL_RERANK` sale gratis:
    - `UMBRAL_GUIAS` de 0,34 a 0,40 frena a neg-15 en los libros, pero deja
@@ -414,7 +416,117 @@ Plan original:
 - `meta.json` y el payload no cambian de formato (`fuente: ATLS10`,
   `idioma: es`).
 
-## Fase 4 — Recuperación: que no desplace a los otros (2 días)
+## Fase 4 — Recuperación: que no desplace a los otros (hecha el 23/10/2026)
+
+**Decisiones tomadas (usuario, 23/10), ya en el código:**
+- **Decisión 2: cuota por libro con 1.800 tokens**, solo con el ATLS 10. En
+  `config.py`, `CUOTA_GUIAS` y `PRESUPUESTO_GUIAS` toman su valor de `ATLS10`:
+  apagado, 1.400 sin cuota, como antes; encendido, 1.800 con cuota.
+  `CANDIDATOS_POR_LIBRO` queda apagado.
+- **Decisión 5: guarda por señal de trauma** (`rag/senal.py`, `SENAL_TRAUMA`).
+  Si la consulta no nombra un mecanismo, una lesión ni un procedimiento de
+  trauma, los libros piden que el mejor fragmento llegue a 0,65
+  (`UMBRAL_GUIAS_SIN_SENAL`, ruta rerank) y los casos piden 2 con 0,7 o más
+  (`UMBRAL_RERANK_SIN_SENAL`; al prompt siguen entrando los de 0,2 o más). Sin
+  señal no se abstiene: 63 de las 127 sintéticas no la tienen.
+  - Las listas se escribieron antes de medir: los mecanismos de la
+    anonimización y listas generales de lesiones y procedimientos, sin regiones
+    ni léxico de enfermedades. Lo único que se corrigió después fue un defecto:
+    patrones sin límite de palabra ("riña" en "warfarina" y "urinaria", "ácido"
+    en "cetoacidosis").
+  - Medido con `scripts/comparar_guardas.py`:
+    | Sin señal | Libros: fuera de dominio que pasan | Sintéticas sin libros | Casos: fuera de dominio que responden | Trauma que se abstiene |
+    |---|---|---|---|---|
+    | como hoy (0,34 / 0,2) | 3 | 2/127 | 3 | 0/25 |
+    | **0,65 / 0,7** | **0** | 5/127 | **0** | **0/25** |
+
+    Ninguna fuera de dominio tiene señal; de las de dominio no la tienen 1 de
+    25 de trauma ("qemadura", mal escrita; sus casos puntúan 0,95) y 2 de 16 de
+    procedimiento (0,99 en los libros). El margen sobre la fuera de dominio
+    más alta es de 0,11 en los libros (sangrado vaginal, 0,541) y de 0,12 en
+    los casos (ACV, 0,580).
+  - **De punta a punta** (las guardas reales de `responder`, vía
+    `comparar_modelos.recuperar`, sin el modelo): con `ATLS10=1` responden las
+    25 de trauma (16 con las dos fuentes, 9 solo casos) y las 16 de
+    procedimiento, y se abstienen las 20 fuera de dominio. Con `ATLS10=0` (la app
+    de hoy, que ya lleva esta guarda) las de trauma responden como antes (13 y
+    12) y las fuera de dominio que responden bajan de 3 a 0.
+  - Tests: `tests/test_senal.py` (16); en total, 290.
+- **Estado del "Hecho cuando":** el ATLS 11 (0,209 ≥ 0,203) y el HUV (0,569 ≥
+  0,494) se mantienen, 0 fuera de dominio (mejor que la meta) y la búsqueda
+  tarda 0,80 s. No se cumple que el ATLS 11 conserve su parte del prompt (18 %,
+  antes 24 %): con tres libros no puede.
+
+**Mediciones de la fase 4** (lo que llevó a las decisiones):
+
+**Qué se programó** (todo apagado por defecto: la app sigue como hoy):
+- `retrieve.seleccionar_guias(..., cuota=True)` (`CUOTA_GUIAS`): cada libro
+  cuyo mejor fragmento pasa la guarda recibe una parte igual del presupuesto;
+  lo que sobra vuelve al orden de siempre.
+- `retrieve.candidatos_guias(..., por_libro=True)` (`CANDIDATOS_POR_LIBRO`):
+  los 30 primeros de cada libro, no de los tres juntos.
+- `retrieve.libros_activos()`: los libros del índice menos los apagados (lo
+  usan la búsqueda por libro y `calibrar_guias.py`).
+- `scripts/comparar_libros.py`: las cuatro configuraciones con 1.400 y 1.800
+  tokens, R@ppto por libro, % del prompt por libro, consultas sin libros,
+  fuera de dominio y una grilla de guardas. Escribe
+  `reports/comparar_libros.csv`. Tests: 274.
+
+**Resultados** (ruta `rerank`, umbral 0,34; R@ppto en las 41 anotadas, salvo
+"sint."; "% prompt" = fragmentos del prompt en las de trauma y procedimiento):
+| Configuración | Tokens | R@ppto | ATLS 11 | ATLS 10 | HUV | sint. | % prompt ATLS 11 / 10 / HUV | Trauma sin libros | Búsqueda |
+|---|---|---|---|---|---|---|---|---|---|
+| **Hoy, sin ATLS 10** (común) | 1.400 | 0,327 | **0,203** | — | **0,563** | 0,854 | 24 / — / 76 | 12 | 0,82 s |
+| común | 1.400 | 0,221 | 0,149 | 0,202 | 0,437 | 0,780 | **8** / 39 / 53 | 9 | 0,80 s |
+| común | 1.800 | 0,256 | 0,171 | 0,236 | 0,534 | 0,803 | 12 / 36 / 52 | 9 | 0,80 s |
+| cuota | 1.400 | 0,223 | 0,142 | 0,214 | 0,425 | 0,811 | 15 / 35 / 49 | 9 | 0,80 s |
+| **cuota** | **1.800** | 0,272 | **0,209** | 0,239 | **0,569** | 0,811 | 18 / 36 / 47 | 9 | 0,80 s |
+| por libro | 1.400 | 0,240 | 0,162 | 0,220 | 0,448 | 0,780 | 10 / 37 / 52 | 8 | 1,37 s |
+| por libro + cuota | 1.800 | 0,279 | 0,160 | 0,258 | 0,552 | 0,819 | 18 / 35 / 47 | 8 | 1,37 s |
+
+(R@ppto total no es comparable entre la primera fila y las demás: con el
+ATLS 10 el denominador suma sus secciones de grado 2. Las columnas por libro
+sí lo son.)
+
+- **El ATLS 10 desplaza al ATLS 11, como se temía:** con el presupuesto común,
+  el ATLS 11 pasa del 24 % al 8 % del prompt y su R@ppto de 0,203 a 0,149. El
+  HUV también pierde (0,563 a 0,437).
+- **Cuota con 1.800 tokens es la única configuración que deja al ATLS 11 y
+  al HUV donde están hoy** (0,209 y 0,569) y agrega el ATLS 10 (0,239). Baja
+  las consultas de trauma sin libros de 12 a 9 y no cambia la latencia. El
+  ATLS 11 queda en el 18 % del prompt, no en el 24 %: no se cumple esa parte
+  del "Hecho cuando". Con 1.400 tokens la cuota no alcanza, porque un tercio
+  son ~2 fragmentos por libro.
+- **Los candidatos por libro no compensan:** +0,57 s de búsqueda (el reranker
+  ve 90), una consulta menos sin libros, y el ATLS 11 sale peor (0,160).
+- Con 41 consultas, una sola mueve ~2,5 puntos por libro.
+
+**Guardas, con el ATLS 10** (candidatos juntos; consultas de trauma sin libros
+/ fuera de dominio que pasan, de 25 y de 20):
+| Guarda | Trauma sin libros | Fuera de dominio | R@ppto (cuota 1.800) |
+|---|---|---|---|
+| mejor ≥ 0,34 (hoy) | 9 | 3 (neg-12 0,541, neg-20 0,475, neg-15 0,362) | 0,272 |
+| mejor ≥ 0,50 | 11 | 1 (neg-12) | 0,272 |
+| mejor ≥ 0,55 | 11 | **0** | 0,272 |
+| mejor ≥ 0,34 y 2.º de otra sección ≥ 0,10 | 12 | 1 (neg-12) | 0,261 |
+
+- **Subir el umbral no baja R@ppto:** las consultas de trauma que pierden los
+  libros entre 0,34 y 0,55 (fin-04, 0,351, y fin-01, 0,463) no recibían
+  ninguna de sus secciones relevantes.
+- **Pero el margen es mínimo:** neg-12 ("sangrado vaginal en el primer
+  trimestre") está en 0,541 y la consulta de trauma siguiente, ort-03
+  ("luxación de hombro por caída"), en 0,553. Un umbral de 0,55 está calibrado
+  a este conjunto, no separa de verdad.
+- **La guarda de dos pasajes sirve menos de lo esperado:** frena neg-15 y
+  neg-20, pero deja sin libros a 3 de trauma más y no frena neg-12 (su segundo
+  pasaje, 0,214, es una tabla real de embarazo).
+- Las tres fuera de dominio que pasan no tienen mecanismo ni lesión: sangrado
+  en el embarazo, hipoglucemia, ACV. Otra guarda posible, no medida: exigir
+  señal de trauma en la consulta (mecanismo, región o lesión del léxico) o un
+  umbral más alto cuando falta. Serviría también para la guarda de los casos,
+  que deja pasar neg-05, neg-15 y neg-19 por razones parecidas.
+
+Plan original:
 
 Es la fase que decide (decisión 2). `scripts/calibrar_guias.py` y
 `comparar_fragmentacion.py` pasan a medir por libro: R@ppto y % de fragmentos

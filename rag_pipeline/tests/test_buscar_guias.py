@@ -12,8 +12,8 @@ from rag.retrieve import FragmentoGuia, seleccionar_guias
 
 
 def frag(fid: str, coseno: float, relevancia: float | None = None, tokens: int = 200,
-         contexto: str | None = None) -> FragmentoGuia:
-    return FragmentoGuia(id=fid, seccion_id=fid.rsplit("-", 1)[0], fuente="ATLS", libro="ATLS",
+         contexto: str | None = None, fuente: str = "ATLS") -> FragmentoGuia:
+    return FragmentoGuia(id=fid, seccion_id=fid.rsplit("-", 1)[0], fuente=fuente, libro=fuente,
                          capitulo="Breathing", titulos=["HEMOTHORAX"], pagina_ini=80, pagina_fin=81,
                          tipo="texto", idioma="en", texto=f"texto {fid}",
                          texto_contexto=contexto or f"texto {fid}", n_tokens_contexto=tokens,
@@ -49,6 +49,27 @@ def test_no_repite_un_contexto_ya_incluido():
     assert [f.id for f in seleccionar_guias(cands, 0.2, 1400)] == ["A-01-001-01", "A-01-002-01"]
 
 
+def test_cuota_por_libro():
+    # PLAN_INDEXAR_ATLS10.md, fase 4: con presupuesto común, el libro con más
+    # puntaje se lleva todo; con cuota, cada libro que pasa la guarda tiene su
+    # parte y lo que sobra vuelve al orden de siempre
+    cands = [frag("ATLS10-04-007-01", 0.6, 0.9, fuente="ATLS10"),
+             frag("ATLS10-04-008-01", 0.6, 0.8, fuente="ATLS10"),
+             frag("ATLS10-04-009-01", 0.6, 0.7, fuente="ATLS10"),
+             frag("ATLS-05-012-01", 0.6, 0.5),
+             frag("ATLS-05-028-01", 0.6, 0.4),
+             frag("HUV-11-007-01", 0.6, 0.1, fuente="HUV")]      # no pasa la guarda: sin parte
+    ids = lambda fs: [f.id for f in fs]                           # noqa: E731
+    assert ids(seleccionar_guias(cands, 0.34, 600)) == ["ATLS10-04-007-01", "ATLS10-04-008-01",
+                                                         "ATLS10-04-009-01"]
+    # 300 por libro: uno de cada uno; los 200 que sobran, al siguiente del orden
+    assert ids(seleccionar_guias(cands, 0.34, 600, cuota=True)) == [
+        "ATLS10-04-007-01", "ATLS10-04-008-01", "ATLS-05-012-01"]
+    # con un solo libro sobre la guarda, la cuota es el presupuesto común
+    assert ids(seleccionar_guias(cands[:3] + cands[5:], 0.34, 600, cuota=True)) == \
+        ids(seleccionar_guias(cands[:3] + cands[5:], 0.34, 600))
+
+
 def test_el_puntaje_es_la_probabilidad_si_hubo_reranker_y_si_no_el_coseno():
     assert frag("A-01-001-01", 0.61).puntaje == 0.61
     assert frag("A-01-001-01", 0.61, 0.05).puntaje == 0.05
@@ -57,9 +78,9 @@ def test_el_puntaje_es_la_probabilidad_si_hubo_reranker_y_si_no_el_coseno():
 # ---------------------------------------------------------------------------
 # candidatos_guias y buscar_guias, con Qdrant y reranker falsos
 # ---------------------------------------------------------------------------
-def _punto(fid: str, score: float) -> SimpleNamespace:
+def _punto(fid: str, score: float, fuente: str = "ATLS") -> SimpleNamespace:
     return SimpleNamespace(score=score, payload={
-        "record_id": fid, "seccion_id": fid.rsplit("-", 1)[0], "fuente": "ATLS", "libro": "ATLS",
+        "record_id": fid, "seccion_id": fid.rsplit("-", 1)[0], "fuente": fuente, "libro": fuente,
         "capitulo": "Breathing", "titulos": ["HEMOTHORAX"], "pagina_ini": 80, "pagina_fin": 81,
         "tipo": "texto", "idioma": "en", "text": f"ATLS › Breathing › HEMOTHORAX\ntexto {fid}",
         "texto_contexto": f"ATLS › Breathing › HEMOTHORAX\ntexto {fid}", "n_tokens": 200,
@@ -75,7 +96,10 @@ class _FalsoQdrant:
     def query_points(self, coleccion, query, limit, with_payload, query_filter=None):
         self.coleccion = coleccion
         self.filtro = query_filter
-        return SimpleNamespace(points=self.puntos[:limit])
+        puntos = self.puntos
+        if query_filter is not None and query_filter.must:          # un libro solo
+            puntos = [p for p in puntos if p.payload["fuente"] == query_filter.must[0].match.value]
+        return SimpleNamespace(points=puntos[:limit])
 
 
 @pytest.fixture
@@ -108,6 +132,27 @@ def test_el_atls10_apagado_no_se_busca(qdrant, monkeypatch):
     monkeypatch.setattr(retrieve.config, "ATLS10", True)
     retrieve.candidatos_guias("hemotórax", "densa")
     assert qdrant.filtro is None and retrieve.libros_apagados() == set()
+
+
+def test_candidatos_por_libro(monkeypatch):
+    # entre los primeros de los tres libros juntos, el ATLS 11 (en inglés)
+    # puede no estar; por libro, cada uno trae los suyos (fase 4)
+    falso = _FalsoQdrant([_punto("ATLS10-04-007-01", 0.62, "ATLS10"), _punto("ATLS10-04-008-01", 0.61, "ATLS10"),
+                          _punto("HUV-11-007-01", 0.60, "HUV"), _punto("ATLS-05-012-01", 0.45)])
+    monkeypatch.setattr(retrieve, "_qdrant", lambda: falso)
+    monkeypatch.setattr(retrieve, "hay_guias", lambda: True)
+    monkeypatch.setattr(retrieve, "_vector_consulta", lambda consulta: np.zeros(4))
+    monkeypatch.setattr(retrieve, "libros_indexados", lambda: ("ATLS", "ATLS10", "HUV"))
+    monkeypatch.setattr(retrieve.config, "ATLS10", True)
+    juntos = retrieve.candidatos_guias("neumotórax", "densa", profundidad=2, por_libro=False)
+    assert [f.fuente for f in juntos] == ["ATLS10", "ATLS10"]
+    por_libro = retrieve.candidatos_guias("neumotórax", "densa", profundidad=2, por_libro=True)
+    assert [f.id for f in por_libro] == ["ATLS10-04-007-01", "ATLS10-04-008-01", "HUV-11-007-01",
+                                         "ATLS-05-012-01"]                # todo, por coseno
+    # con el ATLS 10 apagado, por libro no lo busca
+    monkeypatch.setattr(retrieve.config, "ATLS10", False)
+    assert {f.fuente for f in retrieve.candidatos_guias("x", "densa", profundidad=2, por_libro=True)} == \
+        {"HUV", "ATLS"}
 
 
 def test_densa_no_llama_al_reranker(qdrant, monkeypatch):

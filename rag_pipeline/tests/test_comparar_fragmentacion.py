@@ -20,6 +20,23 @@ cf = _modulo("comparar_fragmentacion")
 gp = _modulo("generar_preguntas_guias")
 
 
+def test_comparar_libros_segundo_mejor_y_recall_por_libro():
+    # fase 4 de PLAN_INDEXAR_ATLS10.md: la guarda de dos pasajes mira el mejor
+    # fragmento de OTRA sección; el recall por libro solo cuenta los suyos
+    import sys
+    sys.path.insert(0, str(SCRIPTS))
+    cl = _modulo("comparar_libros")
+    from types import SimpleNamespace as F
+    cands = [F(seccion_id="ATLS10-12-025", puntaje=0.54), F(seccion_id="ATLS10-12-025", puntaje=0.30),
+             F(seccion_id="ATLS10-12-028", puntaje=0.21)]
+    assert cl.segundo_mejor(cands) == 0.21 and cl.segundo_mejor([]) == 0.0
+    sel = [F(seccion_id="ATLS-05-012"), F(seccion_id="ATLS10-04-007")]
+    rel = {"ATLS-05-012": 2, "ATLS-05-013": 2, "ATLS10-04-007": 2, "HUV-11-007": 1}
+    assert cl.recall_libro(sel, rel, "ATLS") == 0.5
+    assert cl.recall_libro(sel, rel, "ATLS10") == 1.0
+    assert cl.recall_libro(sel, rel, "HUV") is None          # sin secciones de grado 2
+
+
 def contar(texto: str) -> int:
     return len(texto.split())
 

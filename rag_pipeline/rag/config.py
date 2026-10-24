@@ -87,7 +87,12 @@ RUTA_GUIAS = _env("RUTA_GUIAS", "auto")            # auto | densa | rerank
 # fijo-256 son ~6 fragmentos. Medido (17/10/2026, ruta rerank con
 # UMBRAL_GUIAS, 41 consultas anotadas): 1.000 → 0,286 · 1.400 → 0,331 ·
 # 1.800 → 0,354. Ojo: el prompt de la fase 5 suma esto a los casos y las reglas.
-PRESUPUESTO_GUIAS = _env_int("PRESUPUESTO_GUIAS", 1400)
+# El ATLS 10.ª ed. en español (PLAN_INDEXAR_ATLS10.md). Desde la fase 3 está en
+# la colección de los libros, pero apagado no se busca: la respuesta es la de
+# siempre hasta que el prompt y el verificador lo conozcan (fase 5). Encendido,
+# el presupuesto pasa a 1.800 y se reparte con cuota (decisión 2, abajo).
+ATLS10 = _env_bool("ATLS10", False)
+PRESUPUESTO_GUIAS = _env_int("PRESUPUESTO_GUIAS", 1800 if ATLS10 else 1400)
 # Guarda de los libros: si el MEJOR fragmento no llega, los libros no hablan
 # (y responden los casos, si pasan su guarda). Si llega, el presupuesto se
 # llena en orden: filtrar fragmento por fragmento recuperaba menos (0,297
@@ -114,10 +119,15 @@ UMBRAL_GUIAS_COSENO = _env_float("UMBRAL_GUIAS_COSENO", 0.60)
 # la colección indexada) la respuesta es la de antes, solo con casos: sirve
 # para la ablación y para un PC sin los PDF.
 GUIAS = _env_bool("GUIAS", True)
-# El ATLS 10.ª ed. en español (PLAN_INDEXAR_ATLS10.md). Desde la fase 3 está en
-# la colección de los libros, pero apagado no se busca: la respuesta es la de
-# siempre hasta que el prompt y el verificador lo conozcan (fase 5).
-ATLS10 = _env_bool("ATLS10", False)
+# Cómo se reparte el espacio entre los libros (PLAN_INDEXAR_ATLS10.md, fase 4).
+# CUOTA_GUIAS: cada libro que pasa la guarda recibe una parte igual de
+# PRESUPUESTO_GUIAS. Decisión 2 (usuario, 23/10): con el ATLS 10, cuota y 1.800
+# tokens; es la única configuración medida que deja al ATLS 11 (0,209) y al
+# HUV (0,569) como estaban y suma el ATLS 10. Sin el ATLS 10, todo como antes.
+# CANDIDATOS_POR_LIBRO: el reranker ve los PROFUNDIDAD_RERANK primeros de cada
+# libro, no de todos juntos; medido: +0,57 s y no compensa.
+CUOTA_GUIAS = _env_bool("CUOTA_GUIAS", ATLS10)
+CANDIDATOS_POR_LIBRO = _env_bool("CANDIDATOS_POR_LIBRO", False)
 
 # --- modelos ---------------------------------------------------------------
 MODELO_EMBEDDING = _env("MODELO_EMBEDDING", "BAAI/bge-m3")
@@ -172,6 +182,21 @@ PROFUNDIDAD_RERANK = _env_int("PROFUNDIDAD_RERANK", 30)
 # La consulta de trauma más baja: "agresión con objeto romo en región craneal",
 # 0,22. Con coseno solo, 8 de 10 fuera de dominio pasaban el umbral de 0,45.
 UMBRAL_RERANK = _env_float("UMBRAL_RERANK", 0.2)
+# Guardas con señal de trauma (PLAN_INDEXAR_ATLS10.md, decisión 5; usuario,
+# 23/10/2026). Si la consulta no nombra un mecanismo, una lesión ni un
+# procedimiento de trauma (rag/senal.py), las dos guardas piden más:
+#   · casos: al menos MIN_CASOS con probabilidad ≥ UMBRAL_RERANK_SIN_SENAL
+#     (los que entran al prompt siguen filtrados con UMBRAL_RERANK);
+#   · libros (ruta rerank): el mejor fragmento ≥ UMBRAL_GUIAS_SIN_SENAL.
+# Medido (scripts/comparar_guardas.py, 20 fuera de dominio, ninguna con señal):
+# frena apendicitis, ACV e insuficiencia cardiaca en los casos (máx. 0,580) y
+# sangrado vaginal en el embarazo, hipoglucemia y ACV en los libros (máx.
+# 0,541), con 0,1 de margen o más. Precio: ninguna de las 25 de trauma ni de
+# las 16 de procedimiento; 5 de 127 sintéticas sin libros (2 sin la guarda).
+# No se abstiene sin señal: 63 de las 127 sintéticas no la tienen.
+SENAL_TRAUMA = _env_bool("SENAL_TRAUMA", True)
+UMBRAL_RERANK_SIN_SENAL = _env_float("UMBRAL_RERANK_SIN_SENAL", 0.7)
+UMBRAL_GUIAS_SIN_SENAL = _env_float("UMBRAL_GUIAS_SIN_SENAL", 0.65)
 
 # --- abstención ------------------------------------------------------------
 # Si el mejor caso no supera este coseno, el sistema dice que no encontró nada

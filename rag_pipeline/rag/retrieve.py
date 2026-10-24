@@ -363,14 +363,14 @@ class FragmentoGuia:
     5") de hallazgos.py, la tabla y verificar.py."""
     id: str                     # ATLS-07-019-02: sección + número de fragmento
     seccion_id: str
-    fuente: str                 # ATLS | HUV
+    fuente: str                 # ATLS | HUV | ATLS10
     libro: str
     capitulo: str
     titulos: list[str]
     pagina_ini: int             # páginas impresas: las que se citan
     pagina_fin: int
     tipo: str                   # texto | tabla
-    idioma: str                 # en (ATLS) | es (HUV)
+    idioma: str                 # en (ATLS) | es (HUV, ATLS10)
     texto: str                  # lo que se embebe: ruta de títulos + texto
     texto_contexto: str         # lo que va al prompt
     n_tokens_contexto: int
@@ -406,14 +406,35 @@ def libros_apagados() -> set[str]:
     return set() if config.ATLS10 else {"ATLS10"}
 
 
-def _filtro_libros():
-    """Filtro de Qdrant que deja fuera los libros apagados (None si no hay)."""
+def _filtro_libros(libro: str | None = None):
+    """Filtro de Qdrant: un libro solo (`libro`), o todos menos los apagados
+    (None si no hay apagados)."""
+    from qdrant_client import models
+    if libro:
+        return models.Filter(must=[models.FieldCondition(key="fuente", match=models.MatchValue(value=libro))])
     apagados = libros_apagados()
     if not apagados:
         return None
-    from qdrant_client import models
     return models.Filter(must_not=[models.FieldCondition(
         key="fuente", match=models.MatchAny(any=sorted(apagados)))])
+
+
+@lru_cache(maxsize=1)
+def libros_indexados() -> tuple[str, ...]:
+    """Los libros (`fuente`) que hay en la colección, apagados incluidos."""
+    libros: set[str] = set()
+    siguiente = None
+    while True:
+        puntos, siguiente = _qdrant().scroll(config.COLECCION_GUIAS, limit=1000, offset=siguiente,
+                                             with_payload=["fuente"], with_vectors=False)
+        libros |= {p.payload["fuente"] for p in puntos}
+        if siguiente is None:
+            return tuple(sorted(libros))
+
+
+def libros_activos() -> list[str]:
+    """Los libros que se buscan: los indexados menos los apagados."""
+    return [l for l in libros_indexados() if l not in libros_apagados()]
 
 
 def _fragmento(punto) -> FragmentoGuia:
@@ -429,26 +450,37 @@ def _fragmento(punto) -> FragmentoGuia:
     )
 
 
-def candidatos_guias(consulta: str, ruta: str | None = None,
-                     profundidad: int | None = None) -> list[FragmentoGuia]:
+def candidatos_guias(consulta: str, ruta: str | None = None, profundidad: int | None = None,
+                     por_libro: bool | None = None) -> list[FragmentoGuia]:
     """Los `profundidad` fragmentos más cercanos por la densa, de mejor a peor;
     con la ruta rerank, reordenados por el cross-encoder. Sin guarda ni
     presupuesto: eso lo hace `seleccionar_guias` (y así calibrar_guias.py
-    prueba varios umbrales sin repetir la búsqueda)."""
+    prueba varios umbrales sin repetir la búsqueda).
+
+    `por_libro` (CANDIDATOS_POR_LIBRO): los `profundidad` primeros de CADA
+    libro activo, no de todos juntos. Una consulta en español prefiere el texto
+    en español: entre los 30 primeros de los tres libros, el ATLS 11 (en
+    inglés) puede no estar aunque tenga la respuesta (PLAN_INDEXAR_ATLS10.md,
+    fase 4). Cuesta más reranker: 30 por libro."""
     ruta = (ruta or ruta_guias_por_defecto()).lower()
     if ruta not in RUTAS_GUIAS:
         raise ValueError(f"Ruta de libros desconocida: {ruta!r}. Opciones: {', '.join(RUTAS_GUIAS)}")
     if not hay_guias():
         raise SystemExit(f"Falta la colección de los libros ({config.COLECCION_GUIAS!r}). "
                          "Corre: python -m rag.index --fuente guias")
-    puntos = _qdrant().query_points(
-        config.COLECCION_GUIAS,
-        query=_vector_consulta(consulta).tolist(),
-        query_filter=_filtro_libros(),
-        limit=profundidad or config.PROFUNDIDAD_RERANK,
-        with_payload=True,
-    ).points
-    frags = [_fragmento(p) for p in puntos]
+    por_libro = config.CANDIDATOS_POR_LIBRO if por_libro is None else por_libro
+    vector = _vector_consulta(consulta).tolist()
+    filtros = [_filtro_libros(l) for l in libros_activos()] if por_libro else [_filtro_libros()]
+    puntos = []
+    for filtro in filtros:
+        puntos += _qdrant().query_points(
+            config.COLECCION_GUIAS,
+            query=vector,
+            query_filter=filtro,
+            limit=profundidad or config.PROFUNDIDAD_RERANK,
+            with_payload=True,
+        ).points
+    frags = sorted((_fragmento(p) for p in puntos), key=lambda f: f.coseno, reverse=True)
     if ruta == "rerank" and frags:
         for f, p in zip(frags, _probabilidades([(consulta, f.texto) for f in frags])):
             f.relevancia = float(p)
@@ -456,31 +488,64 @@ def candidatos_guias(consulta: str, ruta: str | None = None,
     return frags
 
 
-def seleccionar_guias(candidatos: list[FragmentoGuia], umbral: float,
-                      presupuesto: int) -> list[FragmentoGuia]:
+def seleccionar_guias(candidatos: list[FragmentoGuia], umbral: float, presupuesto: int,
+                      cuota: bool = False) -> list[FragmentoGuia]:
     """Guarda y presupuesto. Si el mejor fragmento no llega a `umbral`, los
     libros se abstienen (lista vacía). Si llega, entran en orden mientras
     quepan en `presupuesto` tokens, sin repetir contexto (small-to-big trae el
     mismo padre para varios hijos). Se corta en el primero que no cabe, como
     R@ppto en scripts/comparar_fragmentacion.py: así lo medido es lo que llega
-    al prompt."""
+    al prompt.
+
+    `cuota` (CUOTA_GUIAS): cada libro cuyo mejor fragmento pasa `umbral`
+    recibe una parte igual del presupuesto y la llena en su orden; lo que
+    sobra va, en el orden de siempre, a los fragmentos que quedaron fuera. Así
+    un libro no desplaza a otro que también trata la consulta (el ATLS 10 en
+    español al ATLS 11 en inglés, PLAN_INDEXAR_ATLS10.md, fase 4)."""
     if not candidatos or max(f.puntaje for f in candidatos) < umbral:
         return []
-    salida, tokens, vistos = [], 0, set()
-    for f in candidatos:
-        if f.texto_contexto in vistos:
-            continue
-        if tokens + f.n_tokens_contexto > presupuesto:
-            break
-        vistos.add(f.texto_contexto)
-        tokens += f.n_tokens_contexto
-        salida.append(f)
-    return salida
+    elegidos: list[FragmentoGuia] = []
+    vistos: set[str] = set()
+
+    def llenar(fragmentos, disponible: int) -> int:
+        usado = 0
+        for f in fragmentos:
+            if f.texto_contexto in vistos:
+                continue
+            if usado + f.n_tokens_contexto > disponible:
+                break
+            vistos.add(f.texto_contexto)
+            usado += f.n_tokens_contexto
+            elegidos.append(f)
+        return usado
+
+    if not cuota:
+        llenar(candidatos, presupuesto)
+        return elegidos
+    libros = sorted({f.fuente for f in candidatos if f.puntaje >= umbral})
+    parte = presupuesto // len(libros)
+    usado = sum(llenar([f for f in candidatos if f.fuente == l], parte) for l in libros)
+    llenar(candidatos, presupuesto - usado)          # los ya elegidos los salta `vistos`
+    orden = {id(f): i for i, f in enumerate(candidatos)}
+    return sorted(elegidos, key=lambda f: orden[id(f)])
+
+
+def umbral_guias_consulta(consulta: str, ruta: str) -> float:
+    """El umbral de la guarda de los libros para esta consulta: sin señal de
+    trauma (rag/senal.py), UMBRAL_GUIAS_SIN_SENAL en la ruta rerank
+    (decisión 5 de PLAN_INDEXAR_ATLS10.md). La densa queda como estaba: su
+    escala es el coseno y no se midió."""
+    umbral = umbral_guias(ruta)
+    if ruta == "rerank" and config.SENAL_TRAUMA:
+        from .senal import senal_trauma           # senal → hallazgos → retrieve
+        if not senal_trauma(consulta):
+            umbral = max(umbral, config.UMBRAL_GUIAS_SIN_SENAL)
+    return umbral
 
 
 def buscar_guias(consulta: str, ruta: str | None = None) -> list[FragmentoGuia]:
     """Fragmentos de los libros para el prompt; vacío si los libros no tratan
     la consulta (la guarda de esta fuente no pasa)."""
     ruta = (ruta or ruta_guias_por_defecto()).lower()
-    return seleccionar_guias(candidatos_guias(consulta, ruta), umbral_guias(ruta),
-                             config.PRESUPUESTO_GUIAS)
+    return seleccionar_guias(candidatos_guias(consulta, ruta), umbral_guias_consulta(consulta, ruta),
+                             config.PRESUPUESTO_GUIAS, cuota=config.CUOTA_GUIAS)
