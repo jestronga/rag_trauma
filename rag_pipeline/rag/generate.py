@@ -34,10 +34,10 @@ from . import config
 from .build_prompt import (
     AVISO_DOS_FUENTES, AVISO_SOLO_CASOS, AVISO_SOLO_GUIAS, ROTULO_CASOS, ROTULO_MANUALES,
     ROTULO_SINTESIS, ROTULO_SUGERENCIAS, SIN_SUGERENCIAS, SISTEMA, SISTEMA_PROSA,
-    SISTEMA_PROSA_GUIAS, SISTEMA_RESUMEN, TITULO_CASOS, TITULO_LIMITES, TITULO_SUGERENCIAS,
+    SISTEMA_RESUMEN, TITULO_CASOS, TITULO_LIMITES, TITULO_SUGERENCIAS,
     conclusion_calculada, construir_prompt, construir_prompt_guias, contexto_elemento,
-    aviso_pasajes, limites_calculados, linea_base, linea_respaldo, para_afinar, resumen_de_caso,
-    tabla_casos,
+    aviso_ediciones, aviso_pasajes, limites_calculados, linea_base, linea_respaldo, para_afinar,
+    resumen_de_caso, sistema_prosa_guias, tabla_casos,
 )
 from .hallazgos import PROCEDIMIENTOS_QUIRURGICOS, Elemento, elegibles, elemento_mencionado, extraer
 from .retrieve import FragmentoGuia, Filtros, Resultado, buscar, buscar_guias, confianza, hay_guias
@@ -326,7 +326,7 @@ def mensajes_prosa(consulta: str, casos: list[Resultado],
             return None
         return [{"role": "system", "content": SISTEMA_PROSA},
                 {"role": "user", "content": construir_prompt(consulta, casos, elementos, prosa=True)}]
-    return [{"role": "system", "content": SISTEMA_PROSA_GUIAS},
+    return [{"role": "system", "content": sistema_prosa_guias(guias)},
             {"role": "user", "content": construir_prompt_guias(consulta, casos, elementos, guias)}]
 
 
@@ -411,6 +411,10 @@ def armar_secciones(casos: list[Resultado], consulta: str, guias: list[Fragmento
     secciones = [Seccion("casos", f"{ROTULO_CASOS}\n\n{texto_casos}")]
     if con_guias:
         texto_guias = ((prosa_guias or aviso_pasajes(guias)) if guias else AVISO_SOLO_CASOS)
+        # con pasajes del ATLS 10, su edición y su origen (decisiones 1 y 4 de
+        # PLAN_INDEXAR_ATLS10.md); va en el apartado, que la app sí muestra
+        if aviso := aviso_ediciones(guias):
+            texto_guias += f"\n\n{aviso}"
         secciones.append(Seccion("guias", f"{ROTULO_MANUALES}\n\n{texto_guias}"))
         if casos and guias:
             secciones.append(Seccion("pie", AVISO_DOS_FUENTES))

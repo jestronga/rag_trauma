@@ -88,8 +88,9 @@ indexado) deja el asistente como hoy, byte a byte.
 
 ## Decisiones para el usuario (antes de la fase 4)
 
-1. **¿Quién lo pidió sabe que es una traducción automática de la edición
-   anterior?** Esto decide el papel del libro:
+1. ~~**¿Quién lo pidió sabe que es una traducción automática de la edición
+   anterior?**~~ **Sí (usuario, 23/10): opción a), tercer manual citable con la
+   etiqueta de edición y origen.** Las opciones eran:
    - **a) Tercer manual, citable** (lo que se pidió), con la etiqueta "10.ª
      ed. (2018), traducción no oficial" en cada cita y tarjeta.
      **Recomendado si quien lo pidió lo confirma sabiendo lo anterior.**
@@ -105,10 +106,13 @@ indexado) deja el asistente como hoy, byte a byte.
 2. ~~**Espacio en el prompt.**~~ **Decidido (usuario, 23/10): cuota por libro y
    1.800 tokens cuando el ATLS 10 esté encendido** (fase 4). Retoma la decisión
    abierta de la cuota por libro (fase 4 de los libros).
-3. **Cómo se nombra en la prosa.** Recomendado: la oración dice la edición ("La
+3. **Cómo se nombra en la prosa.** **Decidido (usuario, 23/10): lo recomendado.**
+   La oración dice la edición ("La
    10.ª edición del ATLS recomienda…") y el verificador rechaza "el ATLS
    recomienda" con una cita del ATLS 10.
-4. **Si aparecen las dos ediciones en una respuesta.** Recomendado: un aviso
+4. **Si aparecen las dos ediciones en una respuesta.** **Decidido (usuario,
+   23/10): lo recomendado**, más un aviso cuando solo hay pasajes del ATLS 10
+   (por la decisión 1). Un aviso
    del código, no del modelo: "La 10.ª edición del ATLS (2018) es anterior a
    la 11.ª". El asistente no elige entre ediciones, igual que no elige entre
    casos y manuales. Si se quiere que diga "donde difieran, rige la 11.ª", lo
@@ -562,7 +566,82 @@ Más:
 varias deberían encontrar pasajes del ATLS 10 (hoy fallan por el idioma, las
 abreviaturas o la ortografía). Medirlo: es el argumento para la reunión.
 
-## Fase 5 — Prompt y verificación (1 a 2 días)
+## Fase 5 — Prompt y verificación (hecha el 23/10/2026)
+
+**Qué se programó** (sin pasajes del ATLS 10, el prompt y la respuesta quedan
+como antes, byte a byte):
+- **Nombre del libro** (`config.NOMBRES_LIBROS`): "ATLS 10.ª ed. (2018, edición
+  anterior, traducción no oficial)", en la cabecera de cada pasaje del prompt
+  y en la de la tarjeta (decisión 1). Los apéndices se muestran como
+  "Apéndice A: Trauma ocular", sin el número interno (14).
+- **Prompt con tres manuales** (`build_prompt.SISTEMA_PROSA_GUIAS_ATLS10` y
+  las dos instrucciones `_ATLS10`). Se usan solo si entre los pasajes hay
+  alguno del ATLS 10 (`sistema_prosa_guias`, `construir_prompt_guias`):
+  - presentan los tres manuales;
+  - piden empezar con "La 11.ª edición del ATLS recomienda", "La 10.ª edición
+    del ATLS recomienda" o "El manual del HUV recomienda";
+  - prohíben comparar una edición con la otra.
+- **Verificador** (`verificar._manual_nombrado`, regla 8 por edición): la
+  edición nombrada es la citada. "El ATLS recomienda" con una cita del ATLS 10
+  se rechaza ("sin decir la edición"); sin el ATLS 10, la regla es la de antes.
+  La edición ("10.ª edición", "11.ª ed.") se quita antes de revisar cifras y
+  vocabulario, y el separador de oraciones ya no corta en "ed.". Las reglas
+  de términos y vocabulario (10) se aplican al ATLS 10 porque está en
+  español: queda más vigilado que el ATLS 11.
+- **Avisos del código** en el apartado de los manuales (decisiones 1 y 4),
+  que la app sí muestra:
+  - `AVISO_EDICIONES`, con pasajes de las dos ediciones: son dos ediciones,
+    pueden no coincidir y el asistente no elige;
+  - `AVISO_ATLS10`, con pasajes solo de la 10.ª: es la edición anterior, en
+    traducción no oficial.
+- `comparar_modelos.py` cuenta los pasajes del ATLS 10 citados y el rechazo
+  "sin la edición". Tests: `tests/test_atls10_prosa.py` (9); 299 en total.
+
+**Medido** (`comparar_modelos.py --modos prosa --consultas guias`, 41 consultas;
+la verificación no depende de `PROSA_SIEMPRE`; `reports/comparar_modelos_atls10.csv`):
+| | ATLS10=0 (hoy) | ATLS10=1 |
+|---|---|---|
+| Prosa verificada completa | **18 de 41** | 14 de 41 |
+| Con las dos fuentes: completa / alguna parte en prosa | 7 / 18 de 20 | 6 / 15 de 23 |
+| Solo manuales: completa | 3 de 9 | 2 de 9 |
+| Cita algún pasaje del ATLS 10 (si lo tiene) | — | **22 de 24** |
+| Cita algún pasaje del ATLS 11 | 13 | 15 |
+| Rechazos "sin decir la edición" | — | **0** |
+| Mediana / peor | 7,4 s / 10,6 s | 8,6 s / 11,8 s |
+| Tokens del prompt / de salida (mediana) | 2.368 / 239 | 3.787 / 306 |
+| Fuera de dominio que responden; de dominio que se abstienen | 0 de 20; 0 de 41 | 0 de 20; 0 de 41 |
+
+Generador 100 % en GPU, sin JSON cortados.
+
+- **El modelo usa bien el ATLS 10:** lo cita en 22 de las 24 consultas que
+  traen pasajes suyos, siempre como "La 10.ª edición del ATLS recomienda…", y
+  el ATLS 11 se sigue citando igual que antes.
+- **La prosa verificada baja de 18 a 14.** Leídas, las oraciones del ATLS 10
+  que no pasan se rechazan por:
+  - **órdenes copiadas del libro**: la traducción es imperativa ("debe
+    aumentar el índice de sospecha"); 6 rechazos por "orden" contra 2;
+  - **términos clínicos que no están en el pasaje citado** ("hipercapnia"
+    donde el pasaje dice que el CO₂ se acumula; "equimosis", "hemoneumotórax",
+    "paraesternal": probablemente traducidos de un pasaje del ATLS 11 y
+    atribuidos al ATLS 10). Rechazos justos;
+  - **palabras de redacción** ("garantiza", "indique", "señala") y
+    "correcciones" de la traducción ("motriz" donde el pasaje dice "respuesta
+    del motor"): falsos rechazos, pero solo 2 consultas se rechazan
+    únicamente por eso. No se agregaron a `PALABRAS_COMUNES`: aflojarían el
+    verificador en los tres libros.
+- **No se cumplen dos metas del "Hecho cuando":** el % verificado baja (14 contra
+  18) y la mediana pasa de 8,5 s (8,6 s; son 1.400 tokens más de prompt).
+  Con `PROSA_SIEMPRE=True` (la demo) la prosa se muestra igual: hay más
+  oraciones sin verificar en pantalla, el riesgo aceptado el 18/10.
+- **Segunda iteración, sin medir:** la instrucción con el ATLS 10 pide escribir
+  como recomendación lo que el pasaje dice como orden (`_TONO_TRES`). La
+  corrida se cortó el 23/10: Claude Code la detuvo porque el equipo se quedó
+  sin memoria. Para repetirla, con el chatbot cerrado: `ATLS10=1 python
+  scripts\comparar_modelos.py --modos prosa --consultas guias --salida
+  reports\comparar_modelos_atls10.csv` (unos 7 min). La primera iteración quedó
+  en el scratchpad de la sesión.
+
+Plan original:
 
 - `config.NOMBRES_LIBROS`: `"ATLS10": "ATLS 10.ª ed. (2018)"`.
 - `build_prompt.py`:

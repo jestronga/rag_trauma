@@ -356,6 +356,46 @@ y termina con su cita [guía: ID].
 - No agregues razones, condiciones ni detalles que no estén escritos.
 - Sin títulos ni viñetas."""
 
+# Con pasajes del ATLS 10.ª ed. (PLAN_INDEXAR_ATLS10.md, fase 5): tres
+# manuales, y la oración nombra la edición (decisión 3), porque el verificador
+# rechaza "el ATLS recomienda" con una cita del ATLS 10. Sin pasajes del ATLS 10,
+# los textos de arriba sin cambios.
+_DOS_MANUALES = "fragmentos de dos manuales, el ATLS (en inglés) y el manual de manejo inicial del HUV"
+_TRES_MANUALES = ("fragmentos de manuales: la 11.ª edición del ATLS (en inglés), la 10.ª edición del "
+                  "ATLS (2018, la edición anterior, en una traducción no oficial al español) y el manual "
+                  "de manejo inicial del HUV")
+_COMO_EMPIEZA = '"El ATLS recomienda" o "El manual del HUV recomienda"'
+_COMO_EMPIEZA_TRES = ('"La 11.ª edición del ATLS recomienda", "La 10.ª edición del ATLS recomienda" o '
+                      '"El manual del HUV recomienda"')
+_NO_COMPARES = "No compares los casos con los manuales"
+_NO_COMPARES_TRES = "No compares los casos con los manuales ni una edición del ATLS con la otra"
+# La traducción de la 10.ª edición es imperativa y el modelo copiaba sus
+# órdenes (medido el 23/10: 6 rechazos por "orden" en 41 consultas, 2 sin ella)
+_TONO = '- Usa "conviene", "se puede considerar" o "recomienda"; nunca "se debe", "debe" ni "hay que".'
+_TONO_TRES = (_TONO + ' Aunque el fragmento lo diga como orden ("debe", "se requiere"), escríbelo como '
+              'recomendación.')
+
+
+def _con_tres_manuales(texto: str) -> str:
+    for viejo, nuevo in ((_DOS_MANUALES, _TRES_MANUALES), (_COMO_EMPIEZA, _COMO_EMPIEZA_TRES),
+                         (_NO_COMPARES, _NO_COMPARES_TRES), (_TONO, _TONO_TRES)):
+        texto = texto.replace(viejo, nuevo)
+    return texto
+
+
+SISTEMA_PROSA_GUIAS_ATLS10 = _con_tres_manuales(SISTEMA_PROSA_GUIAS)
+INSTRUCCION_PROSA_GUIAS_ATLS10 = _con_tres_manuales(INSTRUCCION_PROSA_GUIAS)
+INSTRUCCION_PROSA_SOLO_GUIAS_ATLS10 = _con_tres_manuales(INSTRUCCION_PROSA_SOLO_GUIAS)
+
+
+def con_atls10(fragmentos: list[FragmentoGuia]) -> bool:
+    return any(f.fuente == "ATLS10" for f in fragmentos)
+
+
+def sistema_prosa_guias(fragmentos: list[FragmentoGuia]) -> str:
+    return SISTEMA_PROSA_GUIAS_ATLS10 if con_atls10(fragmentos) else SISTEMA_PROSA_GUIAS
+
+
 # Los apartados de la respuesta (generate.armar_secciones): uno por fuente,
 # cada uno con su información y, en la app, su desplegable de texto completo.
 ROTULO_CASOS = "### Casos similares del registro"
@@ -372,6 +412,21 @@ AVISO_SOLO_CASOS =("*Los manuales (ATLS y manual del HUV) no tratan esta situaci
                     "sale solo de los casos del registro.*")
 AVISO_SOLO_GUIAS = ("*No hay casos suficientemente similares en el registro: la sugerencia sale "
                     "solo de los manuales.*")
+# Decisiones 1 y 4 de PLAN_INDEXAR_ATLS10.md: lo dice el código, no el modelo,
+# y no elige entre ediciones (como no elige entre casos y manuales).
+AVISO_ATLS10 = ("*Los pasajes de la 10.ª edición del ATLS (2018) son de la edición anterior, en una "
+                "traducción no oficial al español.*")
+AVISO_EDICIONES = ("*Los pasajes del ATLS son de dos ediciones: la 11.ª (en inglés) y la 10.ª (2018), "
+                   "anterior y en una traducción no oficial al español. Pueden no coincidir: el "
+                   "asistente no elige entre ellas.*")
+
+
+def aviso_ediciones(fragmentos: list[FragmentoGuia]) -> str:
+    """El aviso del apartado de los manuales si hay pasajes del ATLS 10 (vacío si no)."""
+    fuentes = {f.fuente for f in fragmentos}
+    if "ATLS10" not in fuentes:
+        return ""
+    return AVISO_EDICIONES if "ATLS" in fuentes else AVISO_ATLS10
 
 
 def agrupar_guias(fragmentos: list[FragmentoGuia]) -> dict[str, list[FragmentoGuia]]:
@@ -413,7 +468,10 @@ def cabecera_guia(fragmentos: list[FragmentoGuia]) -> str:
     """Libro, capítulo, títulos y páginas impresas: lo que permite ir al libro."""
     f = fragmentos[0]
     libro = config.NOMBRES_LIBROS.get(f.fuente, f.fuente)
-    capitulo = f"cap. {f.capitulo_num} {f.capitulo}" if f.capitulo_num else f.capitulo
+    # los apéndices del ATLS 10 van numerados del 14 al 20 por dentro: "cap.
+    # 14 Apéndice A" confundiría al buscarlo en el libro
+    capitulo = (f"cap. {f.capitulo_num} {f.capitulo}" if f.capitulo_num
+                and not f.capitulo.startswith("Apéndice") else f.capitulo)
     ini = min(x.pagina_ini for x in fragmentos)
     fin = max(x.pagina_fin for x in fragmentos)
     paginas = f"p. {ini}" if ini == fin else f"pp. {ini}–{fin}"
@@ -438,8 +496,12 @@ def construir_prompt_guias(consulta: str, casos: list[Resultado], elementos: lis
         partes += [f"CASOS SIMILARES DEL REGISTRO ({len(casos)}):\n\n{bloques}",
                    f"ELEMENTOS DOCUMENTADOS EN LOS CASOS (única fuente de lo que digas sobre los "
                    f"casos):\n{formatear(elementos, len(casos))}"]
+    if con_atls10(guias):
+        instruccion = INSTRUCCION_PROSA_GUIAS_ATLS10 if casos else INSTRUCCION_PROSA_SOLO_GUIAS_ATLS10
+    else:
+        instruccion = INSTRUCCION_PROSA_GUIAS if casos else INSTRUCCION_PROSA_SOLO_GUIAS
     partes += [f"FRAGMENTOS DE LOS MANUALES ({len(agrupar_guias(guias))}):\n\n{bloque_guias(guias)}",
-               INSTRUCCION_PROSA_GUIAS if casos else INSTRUCCION_PROSA_SOLO_GUIAS]
+               instruccion]
     return "\n\n".join(partes)
 
 
@@ -585,6 +647,12 @@ def linea_respaldo(casos: list[Resultado], revisar: str = "la tabla") -> str:
         salida += ("\n\n**Similitud baja:** estos casos pueden no corresponder a la consulta. "
                    f"Revisar {revisar} antes de usarlos.")
     return salida
+
+
+# La línea "*Respaldo: …*" de linea_respaldo, para quitarla de la pantalla
+# (app.py, pedido del usuario para la demo, 19/10). El aviso de similitud baja
+# va aparte y se sigue mostrando.
+RX_LINEA_RESPALDO = re.compile(r"^\*Respaldo: [^\n]*\*$\n*", re.M)
 
 
 def tabla_casos(casos: list[Resultado], consulta: str = "") -> str:

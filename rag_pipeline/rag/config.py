@@ -304,6 +304,8 @@ ETIQUETAS_REGION = {
 NOMBRES_LIBROS = {
     "ATLS": "ATLS 11.ª ed.",
     "HUV": "manual del HUV",
+    # decisión 1 de PLAN_INDEXAR_ATLS10.md: edición y origen en cada cabecera
+    "ATLS10": "ATLS 10.ª ed. (2018, edición anterior, traducción no oficial)",
 }
 ETIQUETAS_DESENLACE = {
     "fallecimiento": "Fallecimiento",

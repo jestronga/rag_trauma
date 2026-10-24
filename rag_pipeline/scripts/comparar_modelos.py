@@ -142,6 +142,7 @@ _TIPOS_MOTIVO = [("cita inventada", "no están entre los recuperados"),
                  ("guía inventada", "fragmentos recuperados"),
                  ("mezcla fuentes", "mezcla citas"),
                  ("manual equivocado", "pasaje de otro manual"),
+                 ("sin la edición", "sin decir la edición"),            # ATLS 10, decisión 3
                  ("cifra", ("no está en la guía", "cifras sin citar")),
                  ("término fuera de la guía", "no consta en la guía"),
                  ("palabra fuera de la guía", "no aparecen en la guía")]
@@ -182,6 +183,8 @@ def medir_prosa(c: dict, rec: dict) -> dict:
         "pasajes": len(secciones),
         "pasajes_citados": len(citadas),
         "pasajes_citados_atls": sum(s.startswith("ATLS-") for s in citadas),
+        "pasajes_atls10": sum(s.startswith("ATLS10-") for s in secciones),
+        "pasajes_citados_atls10": sum(s.startswith("ATLS10-") for s in citadas),
         "s_generacion": round(t1 - t0, 2),
         "s_carga": round(metricas.get("s_carga", 0.0), 2),
         "s_prompt": round(metricas.get("s_prompt", 0.0), 2),
@@ -313,7 +316,9 @@ def main() -> None:
                 for fuentes, h in g.groupby("fuentes"):
                     con_pasajes = h[h["pasajes"] > 0]
                     citan = (f" · citan algún pasaje {int((con_pasajes['pasajes_citados'] > 0).sum())} de "
-                             f"{len(con_pasajes)} (del ATLS: {int((con_pasajes['pasajes_citados_atls'] > 0).sum())})"
+                             f"{len(con_pasajes)} (del ATLS: {int((con_pasajes['pasajes_citados_atls'] > 0).sum())}"
+                             f", del ATLS 10: {int((con_pasajes['pasajes_citados_atls10'] > 0).sum())} de "
+                             f"{int((con_pasajes['pasajes_atls10'] > 0).sum())} con pasajes suyos)"
                              if len(con_pasajes) else "")
                     en_prosa = h["en_prosa"].fillna("").replace("", "determinista").value_counts().to_dict()
                     print(f"  {fuentes or 'sin fuentes'}: {int(h['verificada'].sum())} de {len(h)} "

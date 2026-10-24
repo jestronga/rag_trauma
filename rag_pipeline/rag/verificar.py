@@ -28,10 +28,13 @@ cita [guía: ID] se revisa contra los fragmentos que cita, no contra los casos:
   7. citas      toda [guía: ID] está entre las secciones recuperadas
   8. separación no cita casos y guías a la vez: cada afirmación tiene una sola
                 fuente, y así no se atribuye a un caso lo que dice un manual.
-                Si nombra un manual (ATLS, HUV), cita un pasaje de ese manual
-  9. cifras     cada número está escrito en el fragmento citado
- 10. términos y vocabulario (reglas 2 y 6) contra el fragmento, solo si es
-                del manual del HUV (en español). Del ATLS (en inglés) solo se
+                Si nombra un manual (ATLS, HUV), cita un pasaje de ese manual.
+                Con el ATLS 10 (PLAN_INDEXAR_ATLS10.md, decisión 3), la edición:
+                "el ATLS recomienda" con una cita del ATLS 10 no pasa
+  9. cifras     cada número está escrito en el fragmento citado (sin contar
+                la edición: "10.ª edición")
+ 10. términos y vocabulario (reglas 2 y 6) contra el fragmento, solo si está
+                en español (HUV, ATLS 10). Del ATLS 11 (en inglés) solo se
                 revisan la cita, las cifras y el tono (decisión 2 del plan: no se
                 traduce, y la app muestra el fragmento original)
  11. con fragmentos en el prompt, una oración sin citas no puede dar cifras
@@ -58,7 +61,8 @@ RX_CITA_GUIA = re.compile(r"\[gu[ií]as?[:\s]+([a-z][a-z0-9]{1,6}-\d{2}-\d{3})(?
                           re.IGNORECASE)
 _RX_CIFRA = re.compile(r"\d+(?:[.,]\d+)*")
 
-_RX_ORACION = re.compile(r"(?<=[.;!?])\s+|\n+")
+# No corta después de "ed." ("el ATLS 11.ª ed. recomienda…" es una oración)
+_RX_ORACION = re.compile(r"(?<=[.;!?])(?<!\bed\.)\s+|\n+")
 
 _NUMEROS = {"un": 1, "una": 1, "uno": 1, "dos": 2, "tres": 3, "cuatro": 4, "cinco": 5,
             "seis": 6, "siete": 7, "ocho": 8, "nueve": 9, "diez": 10}
@@ -173,6 +177,37 @@ def _sin_citas(oracion: str) -> str:
     return RX_CITA.sub(" ", RX_CITA_GUIA.sub(" ", oracion))
 
 
+# La edición del ATLS que nombra una oración ("La 10.ª edición del ATLS", "el
+# ATLS 11.ª ed."), sobre el texto normalizado (sin tildes ni "ª"). Se quita
+# antes de revisar cifras y vocabulario: "10" no es una cifra del pasaje.
+_RX_EDICION = {
+    "ATLS10": re.compile(r"\b10\s*\.?\s*a?\s*(edicion|ed\b)|\bdecima\s+edicion|\batls\s*10\b"),
+    "ATLS": re.compile(r"\b11\s*\.?\s*a?\s*(edicion|ed\b)|\bundecima\s+edicion|\batls\s*11\b"),
+}
+_RX_EDICION_CRUDA = re.compile(r"\b1[01]\s*\.?\s*[ªºa]?\s*(edici[oó]n|ed\b\.?)|\b(d[eé]cima|und[eé]cima)"
+                               r"\s+edici[oó]n|\bATLS\s*1[01]\b", re.IGNORECASE)
+
+
+def _manual_nombrado(norm: str, libros: set[str]) -> list[str]:
+    """Regla 8: el manual que nombra la oración es el que cita. Con el ATLS 10
+    (decisión 3 de PLAN_INDEXAR_ATLS10.md), la oración dice la edición: "el
+    ATLS recomienda" con una cita del ATLS 10 no basta."""
+    motivos = []
+    if re.search(r"\bhuv\b", norm) and "HUV" not in libros:
+        motivos.append("atribuye al HUV un pasaje de otro manual")
+    nombra = {libro for libro, rx in _RX_EDICION.items() if rx.search(norm)}
+    if "ATLS10" in nombra and "ATLS10" not in libros:
+        motivos.append("atribuye a la 10.ª edición del ATLS un pasaje de otro manual")
+    if "ATLS" in nombra and "ATLS" not in libros:
+        motivos.append("atribuye a la 11.ª edición del ATLS un pasaje de otro manual")
+    if not nombra and re.search(r"\batls\b", norm):
+        if "ATLS10" in libros:
+            motivos.append("cita la 10.ª edición del ATLS sin decir la edición")
+        elif "ATLS" not in libros:
+            motivos.append("atribuye al ATLS un pasaje de otro manual")
+    return motivos
+
+
 def _verificar_oracion_guia(oracion: str, citadas: set[str], textos: dict[str, str],
                             idioma: dict[str, str], consulta: str, de_consulta: set[str]) -> list[str]:
     """Reglas 7 a 10, para una oración que cita manuales."""
@@ -181,7 +216,8 @@ def _verificar_oracion_guia(oracion: str, citadas: set[str], textos: dict[str, s
     if inventadas:
         motivos.append(f"cita a guías que no están entre los fragmentos recuperados: "
                        f"{', '.join(sorted(inventadas))}")
-    limpia = _sin_citas(oracion)
+    norm_con_edicion = normalizar(_sin_citas(oracion))
+    limpia = _RX_EDICION_CRUDA.sub(" ", _sin_citas(oracion))
     norm = normalizar(limpia)
     orden = _RX_ORDEN.search(norm)
     if orden:
@@ -190,10 +226,7 @@ def _verificar_oracion_guia(oracion: str, citadas: set[str], textos: dict[str, s
     if not validas:
         return motivos
     # "El ATLS recomienda… [guía: HUV-04-013]": el manual nombrado es el citado
-    for fuente_nombrada in ("ATLS", "HUV"):
-        if re.search(rf"\b{fuente_nombrada.lower()}\b", norm) and \
-                not any(s.startswith(f"{fuente_nombrada}-") for s in validas):
-            motivos.append(f"atribuye al {fuente_nombrada} un pasaje de otro manual")
+    motivos.extend(_manual_nombrado(norm_con_edicion, {s.split("-")[0] for s in validas}))
     fuente = " ".join(textos[s] for s in validas)
     en_fuente = cifras(fuente)
     for m in _RX_CIFRA.finditer(limpia):
