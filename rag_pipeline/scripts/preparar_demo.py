@@ -65,6 +65,15 @@ def main() -> int:
         if config.SENAL_TRAUMA:
             print(f"{OK} guarda por señal de trauma: sin señal, libros {config.UMBRAL_GUIAS_SIN_SENAL} "
                   f"y casos {config.UMBRAL_RERANK_SIN_SENAL}")
+        # cómo se sigue la conversación (PLAN_CHATBOT_CLINICO.md, fase 2)
+        print(f"{OK} conversación: " + ("ficha del paciente armada por el código, sin reescribir"
+                                        if config.CONVERSACION == "ficha" else
+                                        "el modelo reescribe cada seguimiento (CONVERSACION=llm)"))
+        # las preguntas (fase 3): sus respuestas se suman a la ficha
+        if config.PREGUNTAS and config.CONVERSACION != "ficha":
+            print(f"{AVISO} PREGUNTAS=1 necesita CONVERSACION=ficha: no se van a mostrar")
+        elif config.PREGUNTAS:
+            print(f"{OK} preguntas: hasta 2 bajo cada respuesta, en el orden xABCDE")
         # la consulta de los manuales (PLAN_CHATBOT_CLINICO.md, fase 1)
         if config.ABREV_LIBROS and not diccionario():
             print(f"{AVISO} ABREV_LIBROS=1 pero no encuentro {config.ABREVIATURAS_YAML}: "

@@ -1,0 +1,380 @@
+# ---------------------------------------------------------------------------
+# Conversaciones de evaluación de la ficha del paciente
+# (PLAN_CHATBOT_CLINICO.md, fase 2). Escritas ANTES de las reglas de
+# rag/ficha.py, en registro clínico como consultas.yaml.
+#
+# Cada turno trae el tipo esperado y la ficha esperada DESPUÉS del turno:
+#   tipo: nuevo (paciente nuevo) · seguimiento · caso (un número de caso)
+#   ficha: lo que no se pone va vacío (listas, signos) o nulo.
+#     mecanismo, regiones: las claves de config.ETIQUETAS_MECANISMO y
+#       ETIQUETAS_REGION (las del corpus);
+#     afirmados, negados: términos del léxico de rag/hallazgos.py (de las tres
+#       categorías). Lo que se pregunta ("¿le hago FAST?") no es un hecho: no
+#       entra. Lo que se plantea ("¿y si está hipotenso?") sí;
+#     signos: TA, FC, FR, SatO2, Glasgow, con el valor como se escribió;
+#     grupo: niño · adulto · adulto mayor · embarazada;
+#     estado: estable · inestable (lo dicho, o TA sistólica < 90).
+#
+# Trampas (plan): negaciones, un paciente nuevo sin decirlo, un seguimiento que
+# solo dice "¿y en niños?", un cambio de mecanismo planteado como hipótesis.
+# El último turno de cada conversación sirve además de proxy de recuperación,
+# como en consultas.yaml: ¿los casos coinciden en mecanismo y región?
+# ---------------------------------------------------------------------------
+
+conversaciones:
+
+  - id: conv-01
+    nota: el escenario de la demo (fase 5 del plan)
+    turnos:
+      - texto: HPAF en abdomen
+        tipo: nuevo
+        ficha: {mecanismo: arma_de_fuego, regiones: [abdomen]}
+      - texto: hipotenso, TA 80/50
+        tipo: seguimiento
+        ficha: {mecanismo: arma_de_fuego, regiones: [abdomen], afirmados: [hipotensión o choque],
+                signos: {TA: 80/50}, estado: inestable}
+      - texto: ¿qué dice el ATLS del FAST?
+        tipo: seguimiento
+        ficha: {mecanismo: arma_de_fuego, regiones: [abdomen], afirmados: [hipotensión o choque],
+                signos: {TA: 80/50}, estado: inestable}
+
+  - id: conv-02
+    nota: negación en el seguimiento; la pregunta por un manejo no lo vuelve un hecho
+    turnos:
+      - texto: herida por arma cortopunzante en hemitórax izquierdo con hipoventilación
+        tipo: nuevo
+        ficha: {mecanismo: cortopunzante, regiones: [torax], afirmados: [hipoventilación]}
+      - texto: no está hipotenso, FC 95
+        tipo: seguimiento
+        ficha: {mecanismo: cortopunzante, regiones: [torax], afirmados: [hipoventilación],
+                negados: [hipotensión o choque], signos: {FC: '95'}, estado: estable}
+      - texto: ¿hay que poner tubo de tórax?
+        tipo: seguimiento
+        ficha: {mecanismo: cortopunzante, regiones: [torax], afirmados: [hipoventilación],
+                negados: [hipotensión o choque], signos: {FC: '95'}, estado: estable}
+
+  - id: conv-03
+    nota: el seguimiento que solo dice "¿y en niños?"
+    turnos:
+      - texto: quemadura por agua caliente en tórax y miembro superior
+        tipo: nuevo
+        ficha: {mecanismo: quemadura, regiones: [torax, miembro_superior]}
+      - texto: ¿y en niños?
+        tipo: seguimiento
+        ficha: {mecanismo: quemadura, regiones: [torax, miembro_superior], grupo: niño}
+
+  - id: conv-04
+    nota: un paciente nuevo sin decirlo
+    turnos:
+      - texto: HPACP en zona II de cuello sin sangrado activo
+        tipo: nuevo
+        ficha: {mecanismo: cortopunzante, regiones: [cuello], negados: [sangrado activo]}
+      - texto: mujer de 75 años con fractura de cadera por caída de propia altura
+        tipo: nuevo
+        ficha: {mecanismo: caida, regiones: [pelvis], afirmados: [fractura], grupo: adulto mayor}
+      - texto: Glasgow 15, estable
+        tipo: seguimiento
+        ficha: {mecanismo: caida, regiones: [pelvis], afirmados: [fractura], grupo: adulto mayor,
+                signos: {Glasgow: '15'}, estado: estable}
+
+  - id: conv-05
+    nota: hallazgos y estudios que se suman; una pregunta al final
+    turnos:
+      - texto: trauma craneoencefálico por accidente de tránsito, Glasgow 13
+        tipo: nuevo
+        ficha: {mecanismo: accidente_transito, regiones: [craneo_encefalo],
+                afirmados: [alteración del Glasgow], signos: {Glasgow: '13'}}
+      - texto: presenta vómito y cefalea
+        tipo: seguimiento
+        ficha: {mecanismo: accidente_transito, regiones: [craneo_encefalo],
+                afirmados: [alteración del Glasgow, emesis, cefalea], signos: {Glasgow: '13'}}
+      - texto: le hicieron TAC con hematoma epidural
+        tipo: seguimiento
+        ficha: {mecanismo: accidente_transito, regiones: [craneo_encefalo],
+                afirmados: [alteración del Glasgow, emesis, cefalea, TAC], signos: {Glasgow: '13'}}
+      - texto: ¿cuándo está indicada la cirugía?
+        tipo: seguimiento
+        ficha: {mecanismo: accidente_transito, regiones: [craneo_encefalo],
+                afirmados: [alteración del Glasgow, emesis, cefalea, TAC], signos: {Glasgow: '13'}}
+
+  - id: conv-06
+    nota: cambio de mecanismo planteado como hipótesis (mismo paciente, otro mecanismo)
+    turnos:
+      - texto: herida por arma de fuego en muslo derecho con sangrado activo
+        tipo: nuevo
+        ficha: {mecanismo: arma_de_fuego, regiones: [miembro_inferior], afirmados: [sangrado activo]}
+      - texto: ¿y si fuera por arma cortopunzante?
+        tipo: seguimiento
+        ficha: {mecanismo: cortopunzante, regiones: [miembro_inferior], afirmados: [sangrado activo]}
+
+  - id: conv-07
+    nota: paciente nuevo dicho
+    turnos:
+      - texto: fractura de radio distal tras caída de propia altura
+        tipo: nuevo
+        ficha: {mecanismo: caida, regiones: [miembro_superior], afirmados: [fractura]}
+      - texto: 'otro paciente: atropellado por moto, con dolor abdominal y FAST positivo'
+        tipo: nuevo
+        ficha: {mecanismo: accidente_transito, regiones: [abdomen], afirmados: [ecografía / FAST]}
+
+  - id: conv-08
+    nota: signos que se acumulan; el estado sale de la TA y se va con ella
+    turnos:
+      - texto: politraumatizado por accidente de tránsito
+        tipo: nuevo
+        ficha: {mecanismo: accidente_transito}
+      - texto: TA 70/40, FC 130, FR 28, SatO2 88%
+        tipo: seguimiento
+        ficha: {mecanismo: accidente_transito, signos: {TA: 70/40, FC: '130', FR: '28', SatO2: '88'},
+                estado: inestable}
+      - texto: se le pasaron 2 litros de cristaloides y responde, TA 100/70
+        tipo: seguimiento
+        ficha: {mecanismo: accidente_transito, signos: {TA: 100/70, FC: '130', FR: '28', SatO2: '88'}}
+
+  - id: conv-09
+    nota: embarazada; un número de caso en medio no toca la ficha
+    turnos:
+      - texto: embarazada de 30 semanas con trauma abdominal cerrado por accidente de tránsito
+        tipo: nuevo
+        ficha: {mecanismo: accidente_transito, regiones: [abdomen], grupo: embarazada}
+      - texto: caso 3377
+        tipo: caso
+        ficha: {mecanismo: accidente_transito, regiones: [abdomen], grupo: embarazada}
+      - texto: ¿qué dice el manual del HUV sobre la monitoría fetal?
+        tipo: seguimiento
+        ficha: {mecanismo: accidente_transito, regiones: [abdomen], grupo: embarazada}
+
+  - id: conv-10
+    nota: una hipótesis suma el hallazgo; lo hecho entra como hecho
+    turnos:
+      - texto: HPAF en tórax derecho
+        tipo: nuevo
+        ficha: {mecanismo: arma_de_fuego, regiones: [torax]}
+      - texto: ¿y si tiene neumotórax a tensión?
+        tipo: seguimiento
+        ficha: {mecanismo: arma_de_fuego, regiones: [torax], afirmados: [neumotórax]}
+      - texto: ya se le puso tubo de tórax y sigue hipotenso
+        tipo: seguimiento
+        ficha: {mecanismo: arma_de_fuego, regiones: [torax],
+                afirmados: [neumotórax, tubo de tórax, hipotensión o choque], estado: inestable}
+
+  - id: conv-11
+    nota: lactante; negación con coma
+    turnos:
+      - texto: lactante de 8 meses con caída de la cama y hematoma en cuero cabelludo
+        tipo: nuevo
+        ficha: {mecanismo: caida, regiones: [craneo_encefalo], grupo: niño}
+      - texto: sin pérdida de conciencia, Glasgow 15
+        tipo: seguimiento
+        ficha: {mecanismo: caida, regiones: [craneo_encefalo], grupo: niño,
+                negados: [pérdida de conciencia], signos: {Glasgow: '15'}}
+      - texto: ¿necesita TAC?
+        tipo: seguimiento
+        ficha: {mecanismo: caida, regiones: [craneo_encefalo], grupo: niño,
+                negados: [pérdida de conciencia], signos: {Glasgow: '15'}}
+
+  - id: conv-12
+    nota: la edad como dato suelto
+    turnos:
+      - texto: quemadura de segundo grado en cara y cuello por gasolina
+        tipo: nuevo
+        ficha: {mecanismo: quemadura, regiones: [cara, cuello]}
+      - texto: tiene 40 años y estridor
+        tipo: seguimiento
+        ficha: {mecanismo: quemadura, regiones: [cara, cuello], grupo: adulto}
+      - texto: ¿cuándo intubar?
+        tipo: seguimiento
+        ficha: {mecanismo: quemadura, regiones: [cara, cuello], grupo: adulto}
+
+  - id: conv-13
+    nota: '"el paciente…" es el mismo paciente'
+    turnos:
+      - texto: herida por arma cortopunzante en abdomen con evisceración
+        tipo: nuevo
+        ficha: {mecanismo: cortopunzante, regiones: [abdomen]}
+      - texto: el paciente está hemodinámicamente estable
+        tipo: seguimiento
+        ficha: {mecanismo: cortopunzante, regiones: [abdomen], estado: estable}
+      - texto: Blumberg positivo
+        tipo: seguimiento
+        ficha: {mecanismo: cortopunzante, regiones: [abdomen], estado: estable,
+                afirmados: [irritación peritoneal]}
+
+  - id: conv-14
+    nota: las pupilas no son trauma ocular; "paciente con…" es otro paciente
+    turnos:
+      - texto: TCE severo por agresión física con Glasgow 7
+        tipo: nuevo
+        ficha: {mecanismo: contundente, regiones: [craneo_encefalo],
+                afirmados: [alteración del Glasgow], signos: {Glasgow: '7'}}
+      - texto: pupilas con anisocoria
+        tipo: seguimiento
+        ficha: {mecanismo: contundente, regiones: [craneo_encefalo],
+                afirmados: [alteración del Glasgow, anisocoria], signos: {Glasgow: '7'}}
+      - texto: paciente con fractura de fémur por accidente de moto
+        tipo: nuevo
+        ficha: {mecanismo: accidente_transito, regiones: [miembro_inferior], afirmados: [fractura]}
+
+  - id: conv-15
+    nota: cuatro turnos; la última es una pregunta general
+    turnos:
+      - texto: paciente con trauma cerrado de tórax por caída de 3 metros, con fracturas costales
+        tipo: nuevo
+        ficha: {mecanismo: caida, regiones: [torax], afirmados: [fractura]}
+      - texto: SatO2 85% y hipoventilación derecha
+        tipo: seguimiento
+        ficha: {mecanismo: caida, regiones: [torax], afirmados: [fractura, hipoventilación],
+                signos: {SatO2: '85'}}
+      - texto: ¿y en adulto mayor?
+        tipo: seguimiento
+        ficha: {mecanismo: caida, regiones: [torax], afirmados: [fractura, hipoventilación],
+                signos: {SatO2: '85'}, grupo: adulto mayor}
+      - texto: ¿cuál es el manejo del dolor?
+        tipo: seguimiento
+        ficha: {mecanismo: caida, regiones: [torax], afirmados: [fractura, hipoventilación],
+                signos: {SatO2: '85'}, grupo: adulto mayor}
+
+  - id: conv-16
+    nota: lo negado que después se afirma; "nuevo caso" dicho
+    turnos:
+      - texto: herida por arma de fuego en abdomen sin hipotensión
+        tipo: nuevo
+        ficha: {mecanismo: arma_de_fuego, regiones: [abdomen], negados: [hipotensión o choque],
+                estado: estable}
+      - texto: ahora está hipotenso
+        tipo: seguimiento
+        ficha: {mecanismo: arma_de_fuego, regiones: [abdomen], afirmados: [hipotensión o choque],
+                estado: inestable}
+      - texto: nuevo caso, herida por arma cortopunzante en antebrazo
+        tipo: nuevo
+        ficha: {mecanismo: cortopunzante, regiones: [miembro_superior]}
+
+# ---------------------------------------------------------------------------
+# Control: escritas el 24/10 DESPUÉS de las reglas de rag/ficha.py, que se
+# armaron mirando las de arriba (47 de 47 a la primera, así que esas no miden
+# nada nuevo). Estas se miden sin ajustar las reglas a ellas. La ficha esperada
+# es la clínica, aunque el léxico no la alcance ("sin sangrado" es "sin
+# sangrado activo"; "mordida por perro", una mordedura).
+# ---------------------------------------------------------------------------
+control:
+
+  - id: ctl-01
+    turnos:
+      - texto: masculino de 25 años con herida por proyectil de arma de fuego en flanco izquierdo
+        tipo: nuevo
+        ficha: {mecanismo: arma_de_fuego, regiones: [abdomen], grupo: adulto}
+      - texto: FC de 120 y presión arterial de 85/60
+        tipo: seguimiento
+        ficha: {mecanismo: arma_de_fuego, regiones: [abdomen], grupo: adulto,
+                signos: {FC: '120', TA: 85/60}, estado: inestable}
+      - texto: ¿se debe hacer laparotomía?
+        tipo: seguimiento
+        ficha: {mecanismo: arma_de_fuego, regiones: [abdomen], grupo: adulto,
+                signos: {FC: '120', TA: 85/60}, estado: inestable}
+
+  - id: ctl-02
+    turnos:
+      - texto: niña de 6 años mordida por perro en la cara
+        tipo: nuevo
+        ficha: {mecanismo: mordedura, regiones: [cara], grupo: niño}
+      - texto: sin compromiso de vía aérea
+        tipo: seguimiento
+        ficha: {mecanismo: mordedura, regiones: [cara], grupo: niño}
+      - texto: ¿qué antibiótico se recomienda?
+        tipo: seguimiento
+        ficha: {mecanismo: mordedura, regiones: [cara], grupo: niño}
+
+  - id: ctl-03
+    turnos:
+      - texto: accidente de tránsito como conductor de moto, con fractura abierta de tibia
+        tipo: nuevo
+        ficha: {mecanismo: accidente_transito, regiones: [miembro_inferior], afirmados: [fractura]}
+      - texto: pulsos distales ausentes
+        tipo: seguimiento
+        ficha: {mecanismo: accidente_transito, regiones: [miembro_inferior],
+                afirmados: [fractura, compromiso vascular]}
+      - texto: ¿y si además tiene TCE?
+        tipo: seguimiento
+        ficha: {mecanismo: accidente_transito, regiones: [miembro_inferior, craneo_encefalo],
+                afirmados: [fractura, compromiso vascular]}
+
+  - id: ctl-04
+    turnos:
+      - texto: paciente de 80 años que se cayó en el baño, con dolor en cadera derecha
+        tipo: nuevo
+        ficha: {mecanismo: caida, regiones: [pelvis], grupo: adulto mayor}
+      - texto: está anticoagulado con warfarina
+        tipo: seguimiento
+        ficha: {mecanismo: caida, regiones: [pelvis], grupo: adulto mayor}
+      - texto: Glasgow 14
+        tipo: seguimiento
+        ficha: {mecanismo: caida, regiones: [pelvis], grupo: adulto mayor,
+                afirmados: [alteración del Glasgow], signos: {Glasgow: '14'}}
+
+  - id: ctl-05
+    nota: paciente nuevo sin decirlo ni presentarlo
+    turnos:
+      - texto: HPACP en hemitórax derecho con neumotórax
+        tipo: nuevo
+        ficha: {mecanismo: cortopunzante, regiones: [torax], afirmados: [neumotórax]}
+      - texto: quemadura eléctrica en mano derecha
+        tipo: nuevo
+        ficha: {mecanismo: quemadura, regiones: [miembro_superior]}
+
+  - id: ctl-06
+    turnos:
+      - texto: mujer de 35 años con trauma abdominal por accidente de tránsito
+        tipo: nuevo
+        ficha: {mecanismo: accidente_transito, regiones: [abdomen], grupo: adulto}
+      - texto: la paciente tiene FAST positivo
+        tipo: seguimiento
+        ficha: {mecanismo: accidente_transito, regiones: [abdomen], grupo: adulto,
+                afirmados: [ecografía / FAST]}
+      - texto: está en choque
+        tipo: seguimiento
+        ficha: {mecanismo: accidente_transito, regiones: [abdomen], grupo: adulto,
+                afirmados: [ecografía / FAST, hipotensión o choque], estado: inestable}
+
+  - id: ctl-07
+    nota: el choque vial no es shock
+    turnos:
+      - texto: choque de moto contra carro, con trauma en rodilla izquierda
+        tipo: nuevo
+        ficha: {mecanismo: accidente_transito, regiones: [miembro_inferior]}
+      - texto: ¿necesita radiografía?
+        tipo: seguimiento
+        ficha: {mecanismo: accidente_transito, regiones: [miembro_inferior]}
+
+  - id: ctl-08
+    turnos:
+      - texto: trauma ocular por objeto contundente
+        tipo: nuevo
+        ficha: {mecanismo: contundente, regiones: [ojo]}
+      - texto: agudeza visual disminuida y sin sangrado
+        tipo: seguimiento
+        ficha: {mecanismo: contundente, regiones: [ojo], negados: [sangrado activo]}
+
+  - id: ctl-09
+    turnos:
+      - texto: adulto mayor con caída de su propia altura y TCE leve
+        tipo: nuevo
+        ficha: {mecanismo: caida, regiones: [craneo_encefalo], grupo: adulto mayor}
+      - texto: ¿y si toma anticoagulantes?
+        tipo: seguimiento
+        ficha: {mecanismo: caida, regiones: [craneo_encefalo], grupo: adulto mayor}
+      - texto: 'otro caso: joven con herida por arma blanca en región lumbar'
+        tipo: nuevo
+        ficha: {mecanismo: cortopunzante, regiones: [columna], grupo: adulto}
+
+  - id: ctl-10
+    turnos:
+      - texto: herida por arma de fuego en pelvis
+        tipo: nuevo
+        ficha: {mecanismo: arma_de_fuego, regiones: [pelvis]}
+      - texto: ¿y si es una embarazada?
+        tipo: seguimiento
+        ficha: {mecanismo: arma_de_fuego, regiones: [pelvis], grupo: embarazada}
+      - texto: TA 90/60 y FC 110
+        tipo: seguimiento
+        ficha: {mecanismo: arma_de_fuego, regiones: [pelvis], grupo: embarazada,
+                signos: {TA: 90/60, FC: '110'}}

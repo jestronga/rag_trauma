@@ -41,7 +41,9 @@ MECANISMOS = {
                     r"me\s+pegaron(?!\s+un\s+tiro)", r"\bpuno\b", r"\bpatada", r"\bpalo\b", r"\bpiedra",
                     r"\brina\b", r"\bpelea", r"agresion\s+fisica"],
     "quemadura": [r"quemadur", r"\bscq\b", r"escaldadura", r"\bacido\b", r"electrocucion"],
-    "mordedura": [r"mordedur", r"mordio", r"mordieron", r"canino", r"serpiente", r"ofidic"],
+    # "mordida por perro" (24/10: sin esto, ctl-02 de eval/conversaciones.yaml se abstenía)
+    "mordedura": [r"mordedur", r"mordio", r"mordieron", r"\bmordid[oa]s?\b", r"canino", r"serpiente",
+                  r"ofidic"],
     "cuerpo_extrano": [r"cuerpo\s+extrano", r"\bce\s+en\b"],
     "intoxicacion": [r"intoxica", r"envenenamiento", r"sobredosis", r"ingesta\s+de"],
     "autoinfligido": [r"autolitic", r"autoinfligid", r"intento\s+suicid"],

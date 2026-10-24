@@ -22,6 +22,8 @@ from rag.consulta import para_libros                           # noqa: E402
 from rag.build_prompt import (                                 # noqa: E402
     RX_LINEA_RESPALDO, agrupar_guias, cabecera_guia, desenlace_visible, texto_guia,
 )
+from rag.ficha import RX_CASO                                  # noqa: E402
+from rag.preguntas import descartar                            # noqa: E402
 from rag.generate import ollama_disponible, responder, resumir_caso, usar_guias   # noqa: E402
 from rag.guias import cargar_perfiles, equivalentes_atls11      # noqa: E402
 from rag.hallazgos import resaltar_html                        # noqa: E402
@@ -30,7 +32,7 @@ from rag.retrieve import RUTAS, Filtros, hay_guias, ruta_por_defecto  # noqa: E4
 st.set_page_config(page_title="Asistente Clínico de Trauma",
                    page_icon="🩺", layout="wide")
 
-RX_ID = re.compile(r"^\s*(?:caso|id|registro)?\s*#?\s*(\d{3,8})\s*$", re.IGNORECASE)
+CON_FICHA = config.CONVERSACION == "ficha"      # PLAN_CHATBOT_CLINICO.md, fase 2
 
 CSS = """
 <style>
@@ -57,6 +59,7 @@ CSS = """
   .guia-box { border-left:4px solid #1F6FB2; }
   .nota { font-size:0.95rem; padding:8px 12px; margin-bottom:10px; border-radius:6px;
           border-left:4px solid #B26B00; background:rgba(178,107,0,.08); line-height:1.45; }
+  .nota.ficha { border-left-color:#1F6FB2; background:rgba(31,111,178,.08); }
   .tiempo { font-size:0.8rem; opacity:.45; text-align:right; margin-top:2px;
             font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
   .aviso { font-size:0.9rem; opacity:.75; line-height:1.45; }
@@ -182,8 +185,18 @@ with st.sidebar:
         f"(<code>[FECHA]</code>, <code>[EDAD:30-39]</code>).</div>",
         unsafe_allow_html=True,
     )
+    if CON_FICHA:
+        st.markdown("### Paciente")
+        ficha_actual = st.session_state.get("ficha")
+        st.caption(ficha_actual.linea() if ficha_actual and ficha_actual.es_paciente() else
+                   "Sin paciente: la próxima consulta empieza uno nuevo.")
+        if st.button("Paciente nuevo", use_container_width=True,
+                     help="Borra la ficha: la próxima consulta no se suma al paciente anterior."):
+            st.session_state.ficha = None
+            st.rerun()
     if st.button("Limpiar conversación", use_container_width=True):
         st.session_state.mensajes = []
+        st.session_state.ficha = None
         st.rerun()
 
 
@@ -192,6 +205,8 @@ with st.sidebar:
 # ---------------------------------------------------------------------------
 if "mensajes" not in st.session_state:
     st.session_state.mensajes = []
+if "ficha" not in st.session_state:
+    st.session_state.ficha = None
 
 st.markdown(
     f"<div class='cabecera'>"
@@ -322,7 +337,8 @@ def desplegable_casos(respuesta, consulta: str) -> None:
     buscada = respuesta.consulta_reescrita or consulta
     etiqueta = f"Casos consultados ({len(respuesta.casos)}) · texto completo"
     if respuesta.consulta_reescrita:
-        etiqueta += "  ·  consulta reescrita"
+        etiqueta += ("  ·  búsqueda con la ficha del paciente" if respuesta.ficha is not None
+                     else "  ·  consulta reescrita")
     with st.expander(etiqueta):
         if respuesta.consulta_reescrita:
             st.caption(f"Búsqueda realizada: «{respuesta.consulta_reescrita}»")
@@ -420,27 +436,113 @@ def escribir_de_a_poco(texto: str, segundos_max: float = 2.0):
         time.sleep(0.008)
 
 
+def encabezado_paciente(respuesta) -> None:
+    """Arriba de la respuesta, lo que entendió el código (CONVERSACION=ficha):
+    la ficha, si cambió de paciente y qué cambió respecto de la anterior."""
+    if respuesta.ficha is None or respuesta.tipo == "caso":
+        return
+    lineas = []
+    if respuesta.otro_paciente:
+        lineas.append("<b>Paciente nuevo</b>: no se suma al anterior.")
+    if respuesta.ficha.es_paciente():
+        lineas.append(html.escape(respuesta.ficha.linea()))
+    if respuesta.cambio:
+        lineas.append(html.escape(respuesta.cambio))
+    if lineas:
+        st.markdown(f"<div class='nota ficha'>{'<br>'.join(lineas)}</div>", unsafe_allow_html=True)
+
+
 def pintar(rol: str, contenido: str, respuesta=None, segundos: float | None = None,
            consulta: str = "") -> None:
     with st.chat_message(rol):
         if respuesta is None or respuesta.error:
             st.markdown(contenido)
         else:
+            encabezado_paciente(respuesta)
             nota_verificacion(respuesta)
             cuerpo_respuesta(respuesta, consulta)
         if respuesta is not None:
             detalle_respuesta(respuesta, segundos)
 
 
+def corregir(indice: int, tipo: str) -> None:
+    """El código se equivocó de paciente: se quita el turno y se repite con el
+    tipo corregido. Solo si sigue siendo el último (un botón viejo no hace nada)."""
+    mensajes = st.session_state.mensajes
+    if indice != len(mensajes) - 1:
+        return
+    turno = mensajes.pop()
+    mensajes.pop()                                 # la pregunta
+    st.session_state.ficha = turno.get("ficha_previa")
+    st.session_state.repetir = (turno["consulta"], tipo)
+
+
+def boton_corregir() -> None:
+    """Bajo la última respuesta: "Es otro paciente" si se sumó a la ficha, "Era
+    el mismo paciente" si empezó una nueva."""
+    if not CON_FICHA or not st.session_state.mensajes:
+        return
+    ultimo = st.session_state.mensajes[-1]
+    r = ultimo.get("respuesta")
+    if ultimo["role"] != "assistant" or r is None or r.tipo not in ("nuevo", "seguimiento"):
+        return
+    if r.tipo == "nuevo" and not r.otro_paciente:
+        return
+    otro = "seguimiento" if r.tipo == "nuevo" else "nuevo"
+    indice = len(st.session_state.mensajes) - 1
+    st.button("Era el mismo paciente" if otro == "seguimiento" else "Es otro paciente",
+              on_click=corregir, args=(indice, otro), key=f"corregir-{indice}",
+              help="El código lo tomó como " + ("un paciente nuevo." if r.tipo == "nuevo" else
+                                                 "el mismo paciente.") + " Responde de nuevo.")
+
+
+def contestar(indice: int, clave: str, llave: str) -> None:
+    """Un clic en una opción: con dato, se suma como seguimiento y se responde
+    de nuevo; "No se sabe" solo deja de preguntarlo (preguntas.descartar)."""
+    mensajes = st.session_state.mensajes
+    if indice != len(mensajes) - 1:
+        return
+    pregunta = next(p for p in mensajes[-1]["respuesta"].preguntas if p.clave == clave)
+    opcion = next((o for o in pregunta.opciones if o.etiqueta == st.session_state.get(llave)), None)
+    if opcion is None:
+        return
+    if opcion.mensaje is None:
+        if st.session_state.ficha is not None:
+            st.session_state.ficha = descartar(st.session_state.ficha, clave)
+    else:
+        st.session_state.repetir = (opcion.mensaje, "seguimiento")
+
+
+def botones_preguntas() -> None:
+    """Bajo la última respuesta, lo que falta (PREGUNTAS=1; rag/preguntas.py)."""
+    if not (CON_FICHA and config.PREGUNTAS) or not st.session_state.mensajes:
+        return
+    ultimo = st.session_state.mensajes[-1]
+    r = ultimo.get("respuesta")
+    if ultimo["role"] != "assistant" or r is None or not r.preguntas:
+        return
+    sin_dato = set(st.session_state.ficha.sin_dato) if st.session_state.ficha else set()
+    indice = len(st.session_state.mensajes) - 1
+    for p in r.preguntas:
+        if p.clave in sin_dato:
+            continue
+        llave = f"pregunta-{indice}-{p.clave}"
+        st.pills(p.texto, [o.etiqueta for o in p.opciones], key=llave,
+                 on_change=contestar, args=(indice, p.clave, llave))
+
+
 for m in st.session_state.mensajes:
     pintar(m["role"], m["content"], m.get("respuesta"), m.get("segundos"), m.get("consulta", ""))
+botones_preguntas()
+boton_corregir()
 
 
 # ---------------------------------------------------------------------------
 # Turno
 # ---------------------------------------------------------------------------
 escrita = st.chat_input("Ej.: varón joven con herida por arma cortopunzante en cuello, estable")
-pregunta = escrita
+# el botón de corregir repite la última pregunta con el tipo corregido
+pregunta, forzar = (escrita, None) if escrita else st.session_state.pop("repetir", (None, None))
 
 if pregunta:
     st.session_state.mensajes.append({"role": "user", "content": pregunta})
@@ -448,29 +550,39 @@ if pregunta:
 
     historial = [{"role": m["role"], "content": m["content"]}
                  for m in st.session_state.mensajes[:-1]]
+    # la respuesta anterior a la que se compara un seguimiento (no un resumen de caso)
+    anterior = next((m["respuesta"] for m in reversed(st.session_state.mensajes)
+                     if m.get("respuesta") is not None and m["respuesta"].tipo in ("nuevo", "seguimiento")),
+                    None)
+    ficha_previa = st.session_state.ficha
 
     with st.chat_message("assistant"):
         t0 = time.perf_counter()
         with st.spinner("Pensando…"):
-            m = RX_ID.match(pregunta)
-            if m:
+            m = RX_CASO.match(pregunta)
+            if m and not forzar:
                 r = resumir_caso(m.group(1))
             else:
                 r = responder(pregunta, historial=historial, ruta=ruta, k=k,
                               filtros=filtros, umbral=umbral, umbral_rerank=umbral_rerank,
-                              guias=con_guias)
+                              guias=con_guias, ficha=ficha_previa, anterior=anterior, tipo=forzar)
         segundos = time.perf_counter() - t0
+        if r.ficha is not None:
+            st.session_state.ficha = r.ficha
 
         if r.error:
             st.error(r.error)
             texto = f"_{r.error}_"
         else:
             texto = r.texto
+            encabezado_paciente(r)
             nota_verificacion(r)
             cuerpo_respuesta(r, pregunta, de_a_poco=True)
         detalle_respuesta(r, segundos)
 
     st.session_state.mensajes.append(
         {"role": "assistant", "content": texto, "respuesta": r, "segundos": segundos,
-         "consulta": pregunta}
+         "consulta": pregunta, "ficha_previa": ficha_previa}
     )
+    if CON_FICHA:
+        st.rerun()           # el botón de corregir y la ficha de la barra lateral, al día

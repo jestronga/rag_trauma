@@ -160,6 +160,22 @@ def terminos(texto: str) -> dict[str, list[str]]:
     return salida
 
 
+def menciones(texto: str) -> tuple[list[str], list[str]]:
+    """(afirmados, negados) de un texto suelto, de las tres categorías:
+    negado es el término mencionado y nunca afirmado (rag/ficha.py)."""
+    t = normalizar(texto)
+    afirmados, negados = [], []
+    for _, term, patron in _LEXICO:
+        if _afirmado(t, patron):
+            afirmados.append(term)
+        elif patron.search(t):
+            negados.append(term)
+    return afirmados, negados
+
+
+CATEGORIA = {term: cat for cat, term, _ in LEXICO}
+
+
 # "herida penetrante" no le dice nada a quien consulta por una herida por arma.
 _RX_HERIDA = re.compile(r"herida|\bh(p)?a(f|cp|c)\b|arma|pu[nñ]al|disparo|tiro")
 

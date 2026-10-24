@@ -24,6 +24,7 @@ from rag.senal import senal_trauma
     ("delirium en adulto mayor con infección urinaria", []),
     ("manejo de cetoacidosis diabética en urgencias", []),
     ("quemadura por ácido en la mano", ["mecanismo:quemadura", "lesion"]),
+    ("niña de 6 años mordida por perro en la cara", ["mecanismo:mordedura"]),
     # legítimas sin señal: por eso sin señal no se abstiene, se pide más
     ("cuándo activar el protocolo de transfusión masiva", []),
 ])

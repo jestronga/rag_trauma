@@ -39,6 +39,8 @@ from .build_prompt import (
     aviso_ediciones, aviso_pasajes, limites_calculados, linea_base, linea_respaldo, para_afinar,
     resumen_de_caso, sistema_prosa_guias, tabla_casos,
 )
+from .ficha import Ficha, actualizar, que_cambio
+from .preguntas import Pregunta, preguntar
 from .hallazgos import PROCEDIMIENTOS_QUIRURGICOS, Elemento, elegibles, elemento_mencionado, extraer
 from .retrieve import FragmentoGuia, Filtros, Resultado, buscar, buscar_guias, confianza, hay_guias
 from .verificar import RX_CITA, RX_CITA_GUIA, Verificacion, suavizar, verificar_por_fuente
@@ -75,6 +77,15 @@ class Respuesta:
     # La respuesta por apartados (texto = su unión). Vacío en la abstención, el
     # resumen de un caso y los errores: ahí basta `texto`.
     secciones: list[Seccion] = field(default_factory=list)
+    # CONVERSACION=ficha: la ficha después del mensaje, su tipo ("nuevo",
+    # "seguimiento"), si el mensaje cambió de paciente y la línea que compara
+    # con la respuesta anterior (rag/ficha.py). None con CONVERSACION=llm.
+    ficha: Ficha | None = None
+    tipo: str | None = None
+    otro_paciente: bool = False
+    cambio: str | None = None
+    # PREGUNTAS=1: lo que falta, con botones (rag/preguntas.py)
+    preguntas: list[Pregunta] = field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
@@ -248,33 +259,41 @@ def responder(
     reescribir_consulta: bool = True,
     umbral_rerank: float | None = None,
     guias: bool | None = None,
+    ficha: Ficha | None = None,
+    anterior: Respuesta | None = None,
+    tipo: str | None = None,
 ) -> Respuesta:
+    """Con CONVERSACION=ficha, `ficha` es la del paciente hasta aquí, `anterior`
+    la respuesta previa (para la línea de qué cambió) y `tipo` corrige al
+    código ("nuevo" o "seguimiento"); el historial no se usa."""
     historial = historial or []
-    umbral = config.UMBRAL_ABSTENCION if umbral is None else umbral
 
     consulta = pregunta
     reescrita = None
-    if reescribir_consulta and historial:
+    conversacion = {}
+    if config.CONVERSACION == "ficha":
+        tipo, nueva = actualizar(ficha, pregunta, forzar=tipo)
+        if tipo == "seguimiento":
+            consulta = nueva.consulta(pregunta)
+            reescrita = consulta if consulta != pregunta else None
+        conversacion = {"ficha": nueva, "tipo": tipo,
+                        "otro_paciente": tipo == "nuevo" and ficha is not None and ficha.es_paciente()}
+    elif reescribir_consulta and historial:
         reescrita = reescribir(pregunta, historial)
         if reescrita != pregunta:
             consulta = reescrita
 
-    # Guarda de los casos: coseno del mejor y, con el reranker, MIN_CASOS relevantes.
-    conf = confianza(consulta, filtros)
-    casos, descartados, relevancia = [], [], None
-    if conf >= umbral:
-        casos = buscar(consulta, k=k or config.TOP_K, ruta=ruta, filtros=filtros)
-        relevancia = max((c.relevancia for c in casos if c.relevancia is not None), default=None)
-        casos, descartados = guarda_casos(consulta, casos, umbral_rerank)
-    # Guarda de los libros (decisión 3: mismo peso, cualquiera de las dos basta)
-    con_guias = usar_guias(guias)
-    fragmentos = buscar_guias(consulta) if con_guias else []
+    rec = recuperar(consulta, ruta=ruta, k=k, filtros=filtros, umbral=umbral,
+                    umbral_rerank=umbral_rerank, guias=guias)
+    conf, casos, descartados, relevancia = rec.confianza, rec.casos, rec.descartados, rec.relevancia
+    con_guias, fragmentos = rec.con_guias, rec.fragmentos
     if not casos and not fragmentos:
         mensaje = MENSAJE_ABSTENCION_GUIAS if con_guias else MENSAJE_ABSTENCION
         return Respuesta(
             texto=mensaje.format(cobertura=config.COBERTURA_TEMPORAL),
             casos=descartados, confianza=conf, abstuvo=True, consulta_reescrita=reescrita,
-            relevancia=relevancia,
+            relevancia=relevancia, **conversacion,
+            preguntas=_preguntas(conversacion.get("ficha"), [], consulta, abstuvo=True),
         )
 
     prosa_verificada, motivos = None, []
@@ -295,16 +314,58 @@ def responder(
     except Exception as e:
         return Respuesta(texto="", casos=casos, guias=fragmentos, confianza=conf,
                          consulta_reescrita=reescrita,
-                         error=f"No se pudo generar la respuesta: {e}")
+                         error=f"No se pudo generar la respuesta: {e}", **conversacion)
 
     texto = "\n\n".join(s.texto for s in secciones)
     validas, invalidas = verificar_citas(texto, casos, fragmentos)
-    return Respuesta(texto=texto, casos=casos, guias=fragmentos, confianza=conf,
-                     citas_validas=validas, citas_invalidas=invalidas,
-                     consulta_reescrita=reescrita, relevancia=relevancia,
-                     prosa_verificada=prosa_verificada, motivos=motivos,
-                     fuentes_en_prosa=[n for n, p in (("casos", prosa_casos), ("guias", prosa_guias)) if p],
-                     secciones=secciones)
+    respuesta = Respuesta(texto=texto, casos=casos, guias=fragmentos, confianza=conf,
+                          citas_validas=validas, citas_invalidas=invalidas,
+                          consulta_reescrita=reescrita, relevancia=relevancia,
+                          prosa_verificada=prosa_verificada, motivos=motivos,
+                          fuentes_en_prosa=[n for n, p in (("casos", prosa_casos), ("guias", prosa_guias)) if p],
+                          secciones=secciones, **conversacion,
+                          preguntas=_preguntas(conversacion.get("ficha"), casos, consulta))
+    if respuesta.tipo == "seguimiento":
+        respuesta.cambio = que_cambio(anterior, respuesta, ficha, respuesta.ficha)
+    return respuesta
+
+
+@dataclass
+class Recuperado:
+    """Lo que pasó cada guarda (generate.recuperar)."""
+    confianza: float
+    casos: list[Resultado]
+    descartados: list[Resultado]
+    relevancia: float | None
+    con_guias: bool
+    fragmentos: list[FragmentoGuia]
+
+
+def recuperar(consulta: str, ruta: str | None = None, k: int | None = None,
+              filtros: Filtros | None = None, umbral: float | None = None,
+              umbral_rerank: float | None = None, guias: bool | None = None) -> Recuperado:
+    """Las dos guardas, sin generar: los casos y los pasajes con que se
+    respondería. responder() y scripts/probar_preguntas.py."""
+    umbral = config.UMBRAL_ABSTENCION if umbral is None else umbral
+    # Guarda de los casos: coseno del mejor y, con el reranker, MIN_CASOS relevantes.
+    conf = confianza(consulta, filtros)
+    casos, descartados, relevancia = [], [], None
+    if conf >= umbral:
+        casos = buscar(consulta, k=k or config.TOP_K, ruta=ruta, filtros=filtros)
+        relevancia = max((c.relevancia for c in casos if c.relevancia is not None), default=None)
+        casos, descartados = guarda_casos(consulta, casos, umbral_rerank)
+    # Guarda de los libros (decisión 3: mismo peso, cualquiera de las dos basta)
+    con_guias = usar_guias(guias)
+    fragmentos = buscar_guias(consulta) if con_guias else []
+    return Recuperado(conf, casos, descartados, relevancia, con_guias, fragmentos)
+
+
+def _preguntas(ficha: Ficha | None, casos: list[Resultado], consulta: str,
+               abstuvo: bool = False) -> list[Pregunta]:
+    """Las preguntas de rag/preguntas.py (PREGUNTAS=1, con la ficha)."""
+    if not config.PREGUNTAS or ficha is None:
+        return []
+    return preguntar(ficha, casos, consulta, abstuvo)
 
 
 def mensajes_prosa(consulta: str, casos: list[Resultado],

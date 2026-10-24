@@ -183,7 +183,7 @@ Con `ATLS10=0`: de 12 a 10 de 25 sin manuales, 0 de 20 fuera de dominio.
 
 ---
 
-## Fase 2 — Mejora 3: que siga la conversación sobre el mismo paciente (3 días)
+## Fase 2 — Mejora 3: que siga la conversación sobre el mismo paciente (hecha el 24/10/2026)
 
 **Hoy.** Cada seguimiento ("¿y si está hipotenso?") pasa por
 `generate.reescribir`: el modelo reescribe la pregunta con los últimos 4
@@ -240,9 +240,62 @@ la etiqueta "consulta reescrita" en el desplegable.
 conversación mezcla dos pacientes, y un seguimiento tarda lo mismo o menos que
 hoy (se ahorra la llamada de reescritura).
 
+**Resultado (24/10, RTX 4060).** `rag/ficha.py`, `eval/conversaciones.yaml`,
+`scripts/probar_conversaciones.py`; **`CONVERSACION=ficha` por defecto**
+(`llm` vuelve a la reescritura).
+
+| | ficha | reescritura (`llm`) |
+|---|---|---|
+| ficha correcta, desarrollo (16 conversaciones, 47 turnos) | 47 de 47 | — |
+| ficha correcta, control (10 conversaciones, 27 turnos) | 23 de 27 antes de corregir; 26 de 27 después | — |
+| tipo de mensaje correcto | 74 de 74 | — |
+| conversaciones que mezclan dos pacientes | 0 | — |
+| seguimiento, mediana (desarrollo / control) | 9,9 s / 9,3 s | 13,8 s / 12,5 s (2,7 s de reescritura) |
+| último turno, casos con mecanismo y región (grado 2) | 0,74 / 0,64 | 0,64 / 0,52 |
+| prosa verificada | 19 de 46 / 10 de 25 | 12 de 45 / 10 de 26 |
+
+- **El 100 % de desarrollo no mide nada nuevo.** Las conversaciones se
+  escribieron antes que las reglas, pero las reglas se armaron mirándolas. Por
+  eso se escribió el conjunto de control después, sin ajustar las reglas a él.
+  Dio 23 de 27 (85 %, debajo del 90 %):
+  - "mordida por perro" no era mordedura. Se agregó a `senal.py` y no solo a la
+    ficha, porque sin señal de trauma la consulta se abstenía entera. Las
+    guardas quedan igual: 25 de 25, 0 de 20, R@ppto 0,280 y 0,819;
+  - "sin sangrado" no es "sin sangrado activo" para el léxico, que es el de los
+    casos. Queda así.
+- **Desvío del plan: la búsqueda son las palabras del médico,** no un texto
+  armado con las etiquetas. Son las cláusulas del paciente, sin lo negado y sin
+  lo que un mensaje posterior negó, con el mecanismo de la ficha si una
+  hipótesis lo cambió, más lo que pregunta el mensaje de ahora. Las etiquetas
+  perdían "zona II", "orificio de entrada parietal" o "evisceración". El primer
+  mensaje de cada paciente se busca tal cual, como antes.
+- **Lo que hacía mal la reescritura,** visto en las búsquedas:
+  - perdía al paciente: "Glasgow 15, estable" quedó como "pacientes con Glasgow
+    15, estable", sin la fractura de cadera, y ese turno dio 0 casos de grado
+    2;
+  - agregaba datos que nadie dijo, sacados de la respuesta anterior:
+    "lesión punzante en mejilla derecha", "hipoventilación basal derecha";
+  - "¿cuál es el manejo del dolor?" (conv-15) quedó sin señal de trauma y se
+    abstuvo.
+- **Reglas que se agregaron mirando los datos:**
+  - "choque de moto" es una colisión, no shock;
+  - las pupilas y el Glasgow no son una región;
+  - "el paciente…" es el mismo, "paciente con…" es otro;
+  - "TCE severo" es un paciente, aunque no nombre mecanismo ni hallazgo del
+    léxico. Se vio en la fase 3; sin eso, un "¿y en niños?" después habría
+    empezado un paciente nuevo.
+- **La app:**
+  - "Paciente: arma de fuego · abdomen · hipotensión o choque · TA 80/50 ·
+    inestable" arriba de cada respuesta;
+  - "Paciente nuevo: no se suma al anterior" cuando cambia de paciente;
+  - la línea de qué cambió;
+  - el botón "Paciente nuevo" en la barra lateral, con la ficha actual;
+  - bajo la última respuesta, "Es otro paciente" o "Era el mismo paciente", que
+    corrige y responde de nuevo.
+
 ---
 
-## Fase 3 — Mejora 1: que pregunte lo que falta (2 días)
+## Fase 3 — Mejora 1: que pregunte lo que falta (hecha el 24/10/2026; falta el juicio del médico)
 
 **Idea.** Un clínico no responde igual ante un paciente estable que ante uno
 en choque, y los manuales tampoco: 9 de las 25 transcripciones de flujogramas
@@ -295,6 +348,48 @@ usted haría?".
 **Hecho cuando:** ninguna pregunta por algo que la consulta ya dice, dos como
 máximo por respuesta y, como objetivo, que al menos la mitad de las respuestas
 a las preguntas cambien lo que se recupera.
+
+**Resultado (24/10, RTX 4060).** `rag/preguntas.py`,
+`scripts/probar_preguntas.py` (solo recupera, con `generate.recuperar`, sin
+generar) y `reports/probar_preguntas.csv`, con la columna vacía
+`medico_la_haria`. **`PREGUNTAS=1` por defecto**, con `CONVERSACION=ficha`.
+
+| En las 25 de trauma | |
+|---|---|
+| preguntas | 46 en 24 consultas (2 como máximo) |
+| por lo que la consulta ya dice | 0 |
+| qué se pregunta | grupo 19 · C 11 · D 10 · B 2 · E-superficie 1 · lo que separa los casos 3 |
+| respuestas que cambian lo recuperado | 148 de 153 (97 %); las 46 preguntas tienen alguna opción que cambia |
+| cuánto cambia | 2,2 casos nuevos de 5 en promedio (D 3,6 · B 3,0 · C 3,0 · grupo 1,3) y 2,4 secciones nuevas de los manuales |
+
+- **El 97 % es una medida floja:** casi cualquier texto que se agregue a la
+  búsqueda cambia algún caso del top 5. Dice que las preguntas mueven la
+  recuperación, no que la mejoren. Si es la pregunta que haría, lo dice el
+  médico con la columna `medico_la_haria`.
+- **Sin pregunta:** ort-04 ("qemadura por gasolina…"). Con la falta de
+  ortografía no se reconoce la quemadura.
+- **Antes de responder** se pregunta el mecanismo y la región solo si la
+  consulta nombra una lesión de trauma ("paciente con trauma"). En la primera
+  medición, sin esa condición, 17 de las 20 fuera de dominio preguntaban el
+  mecanismo ("cuál es la capital de Colombia") y la región no cambiaba nada.
+  Ahora, 0 de 20. **Desvío del plan:** las preguntas van debajo del mensaje de
+  abstención, no en su lugar, para que se vea por qué no respondió.
+- **Las respuestas se suman a la ficha:**
+  - el Glasgow acepta rangos ("Glasgow 13-14", "8 o menos");
+  - "No se sabe" no responde de nuevo, solo deja de preguntarlo
+    (`Ficha.sin_dato`);
+  - un clic es siempre un seguimiento (`tipo="seguimiento"`).
+- **La C no se pregunta:**
+  - por una lesión ocular aislada;
+  - si la consulta ya dice el estado, la TA o "choque" (pero "choque de moto"
+    no cuenta).
+- **La app:** `st.pills` bajo la última respuesta. Probado con `AppTest` de
+  Streamlit:
+  1. "HPAF en abdomen" pregunta la C y el grupo;
+  2. el clic en "Hipotenso o en choque" responde de nuevo con "Con hipotensión o
+     choque e inestable: entran 3 casos nuevos…";
+  3. "Es otro paciente" lo rehace como paciente nuevo.
+- `preparar_demo.py`: "Todo listo".
 
 ---
 

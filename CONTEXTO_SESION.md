@@ -63,6 +63,15 @@ abreviaturas expandidas y el nombre del mecanismo ("sujeto baleado (herida por
 arma de fuego)"); los casos, con la consulta original. Trauma sin manuales de
 9 a 6 de 25, R@ppto 0,272 → 0,280 y 0,819 igual, fuera de dominio 0 de 20
 (`ABREV_LIBROS`, `MECANISMO_LIBROS`, encendidas). La prosa no se volvió a medir.
+**Fase 2 hecha el 24/10** (`rag/ficha.py`, `CONVERSACION=ficha` por defecto):
+la ficha del paciente la arma el código y reemplaza la reescritura del modelo.
+Correcta en 47 de 47 turnos de desarrollo y en 26 de 27 de control (23 antes
+de corregir); ninguna conversación mezcla pacientes; el seguimiento tarda 9,9 s
+contra 13,8 s (`scripts/probar_conversaciones.py`). **Fase 3 hecha el 24/10**
+(`rag/preguntas.py`, `PREGUNTAS=1`): hasta 2 preguntas con botones en el orden
+xABCDE. En las 25 de trauma salen 46 y ninguna repite lo ya dicho
+(`scripts/probar_preguntas.py`); falta que el médico diga si son las que haría.
+Sigue la fase 4 (orden xABCDE de la respuesta).
 
 ---
 
@@ -359,7 +368,7 @@ rag_trauma/
                          verificar, guias (extracción de los libros), fragmentar
     guias/               perfiles.yaml (en git) y el texto extraído de los libros (no está en git)
     indices/             BM25 + Qdrant local (casos: 8.198 puntos; guias: 2.201) — no está en git
-    tests/               323 tests del extractor, los libros, la respuesta y el verificador (sin Ollama ni índices)
+    tests/               385 tests del extractor, los libros, la respuesta y el verificador (sin Ollama ni índices)
     scripts/             revisar_entorno, probar_respuestas, exportar_revision, preparar_demo,
                          calibrar_umbral/_guias, comparar_modelos/_fragmentacion, extraer_guias
     eval/                consultas.yaml (35 consultas), consultas_guias.yaml (51, libros), evaluate.py,
@@ -885,6 +894,8 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
 | `ABREV_LIBROS` | `1` | los manuales se buscan con las abreviaturas expandidas ("HPAF (herida por arma de fuego)"; `rag/consulta.py`, fase 1 de `PLAN_CHATBOT_CLINICO.md`, 24/10). Sin `tx`, `qx`, `ha` ni las que los manuales ya usan (FAST, GCS, Rx, Fr…) |
 | `MECANISMO_LIBROS` | `1` | y con el nombre del mecanismo de `rag/senal.py` cuando la consulta lo dice con otras palabras ("baleado" → herida por arma de fuego). Las dos juntas, 24/10: trauma sin manuales de 9 a 6 de 25 |
 | `ABREVIATURAS_YAML` | `anonimizacion/config/abreviaturas.yaml` | el diccionario de la anonimización, leído como dato |
+| `CONVERSACION` | `ficha` | cómo se sigue la conversación: `ficha` = la ficha del paciente armada por el código (`rag/ficha.py`, fase 2 de `PLAN_CHATBOT_CLINICO.md`, 24/10), sin llamar al modelo; `llm` = el modelo reescribe cada seguimiento con el historial (`generate.reescribir`), como hasta el 24/10. Con la ficha: 9,9 s contra 13,8 s por seguimiento y más casos del mecanismo y la región |
+| `PREGUNTAS` | `1` | hasta 2 preguntas con botones bajo la respuesta, en el orden xABCDE (`rag/preguntas.py`, fase 3, 24/10). Necesita `CONVERSACION=ficha` |
 | `MAX_TOKENS_PROSA` | `600` | 400 hasta el 17/10: con los libros se cortaba el JSON |
 | `COLECCION_GUIAS` | `guias` | colección de Qdrant con los libros (17/10) |
 | `FRAGMENTACION_GUIAS` | `fijo-256` | configuración de `rag/fragmentar.py` al indexar los libros |

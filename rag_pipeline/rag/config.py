@@ -273,6 +273,20 @@ NUM_CTX = _env_int("NUM_CTX", 6144 if GUIAS else 3072)
 # ocupa VRAM), NUM_GPU=-1. Solo se aplica con la ventana NUM_CTX.
 NUM_GPU = _env_int("NUM_GPU", 99)
 VENTANA_HISTORIAL = _env_int("VENTANA_HISTORIAL", 4)   # turnos para reescribir la consulta
+# Cómo se sigue la conversación (PLAN_CHATBOT_CLINICO.md, fase 2): "ficha" = la
+# ficha del paciente, armada por el código (rag/ficha.py); "llm" = el modelo
+# reescribe cada seguimiento con el historial (generate.reescribir), como hasta
+# el 24/10. Medido ese día (scripts/probar_conversaciones.py, 26 conversaciones):
+# con la ficha, el seguimiento tarda 9,9 s de mediana contra 13,8 s, los casos
+# del último turno coinciden más (0,74 contra 0,64) y el modelo, al reescribir,
+# perdía al paciente o agregaba datos que nadie dijo.
+CONVERSACION = _env("CONVERSACION", "ficha")
+# Lo que falta, preguntado con botones bajo la respuesta (rag/preguntas.py;
+# PLAN_CHATBOT_CLINICO.md, fase 3). Necesita CONVERSACION=ficha: la respuesta
+# a una pregunta se suma a la ficha. Medido el 24/10 (scripts/probar_preguntas.py):
+# 46 preguntas en las 25 de trauma, 2 como máximo, ninguna por lo ya dicho; la
+# pertinencia la juzga el médico.
+PREGUNTAS = _env_bool("PREGUNTAS", True)
 # Cuánto deja Ollama el modelo cargado tras cada llamada. Su valor por defecto
 # son 5 min: en una demo, la pregunta después de una pausa recargaba el modelo
 # (25-35 s en la GTX 1650). Se envía en cada llamada: no hace falta
