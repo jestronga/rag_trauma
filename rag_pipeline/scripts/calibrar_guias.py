@@ -50,11 +50,12 @@ def grupo(c: dict) -> str:
 
 
 def libros_indexados() -> set[str]:
-    """Los libros (`fuente`) que hay en la colección. secciones.jsonl puede
-    traer uno extraído y anotado que todavía no se indexó (el ATLS 10 desde el
-    23/10, PLAN_INDEXAR_ATLS10.md): sus secciones no se pueden recuperar y, si
-    contaran, R@ppto bajaría sin que la búsqueda haya cambiado."""
-    from rag.retrieve import _qdrant
+    """Los libros (`fuente`) que se pueden recuperar: los de la colección,
+    menos los apagados. secciones.jsonl puede traer uno extraído y anotado que
+    no se busca (el ATLS 10 desde el 23/10, PLAN_INDEXAR_ATLS10.md: sin indexar
+    hasta la fase 3, apagado con ATLS10=0): sus secciones no se pueden
+    recuperar y, si contaran, R@ppto bajaría sin que la búsqueda haya cambiado."""
+    from rag.retrieve import _qdrant, libros_apagados
     libros: set[str] = set()
     siguiente = None
     while True:
@@ -62,7 +63,7 @@ def libros_indexados() -> set[str]:
                                              with_payload=["fuente"], with_vectors=False)
         libros |= {p.payload["fuente"] for p in puntos}
         if siguiente is None:
-            return libros
+            return libros - libros_apagados()
 
 
 def recall(seleccion, relevantes: dict[str, int]) -> float | None:

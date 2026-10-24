@@ -354,7 +354,54 @@ Plan original:
 Las anotaciones las valida el médico junto con las 51 que faltan (fase 7 de
 los libros).
 
-## Fase 3 — Fragmentación e indexación (medio día)
+## Fase 3 — Fragmentación e indexación (hecha el 23/10/2026)
+
+**Resultado:**
+- **`fijo-256` confirmado para el ATLS 10.**
+  `comparar_fragmentacion.py --libros ATLS10` (opción nueva: un libro solo,
+  con sus secciones y sus relevantes) da `reports/comparar_fragmentacion_atls10.csv`:
+  | R@ppto, solo el ATLS 10 | anotadas (41) | sintéticas (38) |
+  |---|---|---|
+  | fijo-256, densa | **0,411** | **0,842** |
+  | semantico, densa | 0,351 | 0,789 |
+  | fijo-256, rerank-densa | **0,458** | 0,868 |
+  | semantico, rerank-densa | 0,416 | **0,895** |
+
+  `fijo-256` gana en las anotadas con las dos rutas. `semantico` gana en las
+  sintéticas con el reranker por una sola pregunta (2,6 puntos), que es ruido.
+- **Indexado** (`python -m rag.index --fuente guias`, 28 s): **4.013
+  fragmentos** (ATLS 1.652, ATLS 10 1.812 con 408 de tablas, HUV 549), todos
+  de 256 tokens o menos, sin secciones sin fragmentos. La colección `trauma`
+  sigue con 8.198 puntos. El índice del 19/10 quedó respaldado en el
+  scratchpad de la sesión.
+- **Interruptor `ATLS10`** (`config.py`, apagado por defecto): con el ATLS 10
+  en el índice, `retrieve.candidatos_guias` lo deja fuera con un filtro de
+  Qdrant (`libros_apagados`). Todo pasa por ahí: la app, `generate.responder`
+  y los scripts. `calibrar_guias.py` tampoco cuenta sus relevantes si está
+  apagado. Test en `test_buscar_guias.py`; 271 tests.
+- **Con `ATLS10=0` se reproduce la línea base** en el punto de operación
+  (`UMBRAL_GUIAS` 0,34, 1.400 tokens): R@ppto 0,327 y 0,854, 12 de 25 de trauma
+  sin libros, 1 de 20 fuera de dominio (neg-15, 0,361). Con otros presupuestos
+  hay diferencias de 0,005 a 0,011 (a 1.000 tokens, 0,276 contra 0,281), que
+  probablemente vienen de volver a calcular los embeddings en fp16 con lotes
+  de otra composición.
+
+**Vista previa para la fase 4** (`ATLS10=1`, presupuesto común, la
+configuración a):
+| | ATLS10=0 | ATLS10=1 |
+|---|---|---|
+| Trauma sin libros (de 25) | 12 | **9** |
+| Fuera de dominio que pasan (de 20) | 1 (neg-15) | **3** (neg-15 0,362, neg-20 0,475, neg-12 0,541) |
+| R@ppto anotadas · sintéticas | 0,327 · 0,854 | 0,221 · 0,780 |
+
+- El ATLS 10 rescata 3 de las 12 consultas sin libros, pero el capítulo de
+  embarazo atrae "sangrado vaginal en el primer trimestre" y algo del libro
+  atrae "hipoglucemia en diabético". Con 0,40 de umbral seguirían pasando 2.
+- **R@ppto no es comparable entre las dos columnas:** con `ATLS10=1` el
+  denominador suma las 137 secciones de grado 2 del ATLS 10. Si el ATLS 11
+  pierde lugar se mide en la fase 4, con R@ppto por libro.
+
+Plan original:
 
 - **`fijo-256`, como los otros dos.** No se repite la comparación de 7
   configuraciones. Solo una confirmación con la densa sobre las preguntas

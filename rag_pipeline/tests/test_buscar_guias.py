@@ -70,9 +70,11 @@ class _FalsoQdrant:
     def __init__(self, puntos):
         self.puntos = puntos
         self.coleccion = None
+        self.filtro = "sin llamar"
 
-    def query_points(self, coleccion, query, limit, with_payload):
+    def query_points(self, coleccion, query, limit, with_payload, query_filter=None):
         self.coleccion = coleccion
+        self.filtro = query_filter
         return SimpleNamespace(points=self.puntos[:limit])
 
 
@@ -94,6 +96,18 @@ def test_rerank_reordena_y_conserva_el_coseno(qdrant):
     assert [f.id for f in frags] == ["ATLS-22-009-01", "ATLS-05-013-01", "ATLS-05-031-02"]
     assert (frags[0].relevancia, frags[0].coseno) == (0.9, 0.50)
     assert frags[0].pagina_ini == 80 and frags[0].texto.startswith("ATLS › Breathing")
+
+
+def test_el_atls10_apagado_no_se_busca(qdrant, monkeypatch):
+    # PLAN_INDEXAR_ATLS10.md: indexado desde la fase 3, pero con ATLS10=0 la
+    # búsqueda lo deja fuera y la respuesta es la de siempre
+    monkeypatch.setattr(retrieve.config, "ATLS10", False)
+    retrieve.candidatos_guias("hemotórax", "densa")
+    (condicion,) = qdrant.filtro.must_not
+    assert condicion.key == "fuente" and condicion.match.any == ["ATLS10"]
+    monkeypatch.setattr(retrieve.config, "ATLS10", True)
+    retrieve.candidatos_guias("hemotórax", "densa")
+    assert qdrant.filtro is None and retrieve.libros_apagados() == set()
 
 
 def test_densa_no_llama_al_reranker(qdrant, monkeypatch):

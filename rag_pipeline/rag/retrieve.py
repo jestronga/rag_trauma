@@ -401,6 +401,21 @@ def hay_guias() -> bool:
     return config.QDRANT_PATH.exists() and _qdrant().collection_exists(config.COLECCION_GUIAS)
 
 
+def libros_apagados() -> set[str]:
+    """Libros indexados que no se buscan: el ATLS 10 mientras ATLS10=0."""
+    return set() if config.ATLS10 else {"ATLS10"}
+
+
+def _filtro_libros():
+    """Filtro de Qdrant que deja fuera los libros apagados (None si no hay)."""
+    apagados = libros_apagados()
+    if not apagados:
+        return None
+    from qdrant_client import models
+    return models.Filter(must_not=[models.FieldCondition(
+        key="fuente", match=models.MatchAny(any=sorted(apagados)))])
+
+
 def _fragmento(punto) -> FragmentoGuia:
     p = punto.payload
     return FragmentoGuia(
@@ -429,6 +444,7 @@ def candidatos_guias(consulta: str, ruta: str | None = None,
     puntos = _qdrant().query_points(
         config.COLECCION_GUIAS,
         query=_vector_consulta(consulta).tolist(),
+        query_filter=_filtro_libros(),
         limit=profundidad or config.PROFUNDIDAD_RERANK,
         with_payload=True,
     ).points

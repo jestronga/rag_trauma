@@ -215,6 +215,7 @@ def metricas(orden: list[int], frags: list[dict], relevantes: dict[str, int],
         "R@ppto": recall(cubiertas),
         "R@ppto_ATLS": recall(cubiertas, "ATLS-"),
         "R@ppto_HUV": recall(cubiertas, "HUV-"),
+        "R@ppto_ATLS10": recall(cubiertas, "ATLS10-"),
         "frags_ppto": len(vistos),
         "tokens_ppto": tokens,
     }
@@ -232,12 +233,18 @@ def main() -> None:
     ap.add_argument("--precision", default="fp32", help="en CPU: fp32 o bf16 (en CUDA siempre fp16)")
     ap.add_argument("--lote", type=int, default=config.LOTE_INDEXACION)
     ap.add_argument("--salida", type=Path, default=SALIDA)
+    ap.add_argument("--libros", default=None,
+                    help="solo estos libros, separados por coma (campo fuente: ATLS10). Para "
+                         "medir un libro solo: sus secciones y sus relevantes")
     args = ap.parse_args()
 
     from rank_bm25 import BM25Okapi
 
     todas = [json.loads(l) for l in config.GUIAS_SECCIONES.read_text(encoding="utf-8").splitlines()]
-    consultas = cargar_consultas({s["id"]: s for s in todas}, args.conjunto)
+    libros = set(args.libros.split(",")) if args.libros else None
+    if libros:
+        todas = [s for s in todas if s["fuente"] in libros]
+    consultas = cargar_consultas({s["id"]: s for s in todas}, args.conjunto, libros)
     secciones = recortar(todas, consultas, args.limite)
     ids = {s["id"] for s in secciones}
     for c in consultas:
@@ -284,7 +291,8 @@ def resumen(df: pd.DataFrame) -> None:
         t = g.groupby(["config", "ruta"])[cols].mean().round(3)
         print(t.sort_values("R@ppto", ascending=False).to_string())
         print("\n--- R@ppto por libro (secciones de grado 2 de cada libro) ---")
-        print(g.groupby(["config", "ruta"])[["R@ppto_ATLS", "R@ppto_HUV"]].mean().round(3).to_string())
+        print(g.groupby(["config", "ruta"])[["R@ppto_ATLS", "R@ppto_HUV", "R@ppto_ATLS10"]]
+              .mean().round(3).to_string())
         if conjunto == "anotado":
             print("\n--- R@ppto por categoría (ruta rrf si está, si no densa) ---")
             ruta = "rrf" if "rrf" in set(g["ruta"]) else "densa"

@@ -114,6 +114,10 @@ UMBRAL_GUIAS_COSENO = _env_float("UMBRAL_GUIAS_COSENO", 0.60)
 # la colección indexada) la respuesta es la de antes, solo con casos: sirve
 # para la ablación y para un PC sin los PDF.
 GUIAS = _env_bool("GUIAS", True)
+# El ATLS 10.ª ed. en español (PLAN_INDEXAR_ATLS10.md). Desde la fase 3 está en
+# la colección de los libros, pero apagado no se busca: la respuesta es la de
+# siempre hasta que el prompt y el verificador lo conozcan (fase 5).
+ATLS10 = _env_bool("ATLS10", False)
 
 # --- modelos ---------------------------------------------------------------
 MODELO_EMBEDDING = _env("MODELO_EMBEDDING", "BAAI/bge-m3")
