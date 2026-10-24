@@ -560,7 +560,7 @@ seguir ese orden. Sin rótulos ni regla nueva.
 
 ---
 
-## Fase 5 — Demo (1 día)
+## Fase 5 — Demo (hecha el 24/10/2026)
 
 - `preparar_demo.py`: un escenario de tres turnos, "HPAF en abdomen" → botón
   "Hipotenso o en choque" → "¿qué dice el ATLS del FAST?". Debe terminar en
@@ -568,6 +568,42 @@ seguir ese orden. Sin rótulos ni regla nueva.
 - Guion en `SETUP.md` §6: qué mostrar de cada mejora y la frase del
   principio.
 - `CONTEXTO_SESION.md` al día y los tests.
+
+**Resultado.**
+- **`preparar_demo.py`** tiene una sección 4 nueva:
+  - **el guion de `SETUP.md` §6 escrito en un solo chat:** el tipo que da la
+    ficha a cada mensaje, solo con las reglas y sin el modelo;
+  - **los tres turnos por `generate.responder`**, como los pasa la app, con
+    estas comprobaciones:
+    1. la ficha (arma de fuego, abdomen) y la pregunta C con "Hipotenso o en
+       choque";
+    2. la hipotensión sumada, el estado inestable, la línea de qué cambió y que
+       la C no se vuelva a preguntar;
+    3. que la búsqueda lleve al paciente y la pregunta, que respondan los
+       manuales y que el FAST no entre en la ficha.
+
+  Termina en "Todo listo": los turnos tardan 10,6, 8,5 y 11,4 s. En el tercero
+  responde la 10.ª edición del ATLS.
+- **`SETUP.md`:**
+  - §5: lo nuevo en pantalla;
+  - §6: la frase "más sofisticado no es más libre", el paso 6 (la
+    conversación), las letras y las preguntas en el paso 2, la abreviatura que
+    ahora llega a los manuales (con la advertencia de abr-01: los pasajes no son
+    de cráneo) y "Paciente nuevo" antes de la pregunta de procedimiento;
+  - las variables nuevas y `PRESUPUESTO_GUIAS` 1800.
+- **Lo que destapó el guion: en un solo chat, cada consulta se sumaba al
+  paciente anterior,** también la de la abstención ("manejo de cetoacidosis
+  diabética" quedaba con el paciente de un TCE). Las reglas de la fase 2 solo
+  reconocían un paciente nuevo si cambiaba el mecanismo o si el mensaje decía
+  quién era ("mujer de 75 años…"). Se agregó a `ficha.tipo_de_mensaje`:
+  - un hecho que nombra un mecanismo o una lesión es otro paciente, salvo que
+    continúe ("le hicieron…", "tiene…", "el paciente…", "además", "también");
+  - una consulta general sin señal de trauma empieza de cero.
+
+  En las 74 conversaciones de evaluación nada cambia: 47 de 47 y 26 de 27.
+  Una pregunta ("¿cuándo activar el protocolo de transfusión masiva?") se sigue
+  sumando al paciente anterior, a propósito: en la guardia es útil. Por eso el
+  guion pide "Paciente nuevo" antes del paso 7a.
 
 ---
 

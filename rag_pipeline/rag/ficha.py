@@ -38,7 +38,7 @@ from dataclasses import dataclass, field
 from . import config
 from .consulta import NOMBRES_MECANISMO
 from .hallazgos import _LEXICO, CATEGORIA, _normalizar_alineado, extraer, menciones, normalizar
-from .senal import LESIONES, PROCEDIMIENTOS
+from .senal import LESIONES, PROCEDIMIENTOS, senal_trauma
 from .senal import MECANISMOS as _MECANISMOS_SENAL
 
 # Un número de caso, solo ("caso 3377", "#3377"): el resumen de ese caso.
@@ -113,6 +113,10 @@ _RX_PRESENTA = re.compile(
     r"|sujeto|individuo|politraumatizad[oa])\b"
     r"(?=\s*(?:de\s+\d|con\b|que\b|por\b|en\b|masculino|femenino|joven|adult|ancian|mayor|\d|,|$))")
 _RX_DICE_NUEVO = re.compile(r"\b(otro|nuevo|siguiente)\s+(paciente|caso)\b|\b(paciente|caso)\s+nuevo\b")
+# Un seguimiento que nombra una lesión empieza como continuación ("le hicieron
+# TAC con hematoma", "tiene fractura") o lo dice ("además", "también").
+_RX_CONTINUA = re.compile(r"^(el|la|le|les|se|ya|tiene|presenta|esta|sigue|fue|hay|con|sin|ahora|luego|despues)\b"
+                          r"|\b(ademas|tambien)\b")
 _RX_PREGUNTA = re.compile(r"^(que|cual(es)?|cuando|como|cuant[oa]s?|donde|por que|para que)\b")
 # sobre el texto normalizado; el "si" condicional, aparte y con tildes: "sí" no lo es
 _RX_HIPOTESIS = re.compile(r"^(y|e)\s+(en|con|por|sin|si|para|cuando|ante|de)\b|que pasa si\b|en caso de")
@@ -142,6 +146,8 @@ class Lectura:
     dice_nuevo: bool = False
     lesion: bool = False                                   # nombra una lesión de trauma
     general: bool = False                                  # una pregunta de procedimiento
+    presentacion: bool = False      # un hecho que nombra mecanismo o lesión, sin continuar a otro
+    sin_senal: bool = False         # sin mecanismo, lesión ni procedimiento de trauma (rag/senal.py)
 
 
 @dataclass
@@ -315,11 +321,15 @@ def leer(mensaje: str) -> Lectura:
     """Lo que dice un mensaje, por reglas."""
     lec = Lectura()
     oraciones = _oraciones(mensaje)
+    texto = normalizar(mensaje.strip(" ¿?¡!"))
     if oraciones:
         primera, clase = oraciones[0]
-        lec.presenta = clase == "hecho" and bool(_RX_PRESENTA.search(normalizar(primera)))
+        n_primera = _analizable(primera)
+        lec.presenta = clase == "hecho" and bool(_RX_PRESENTA.search(n_primera))
+        lec.presentacion = (clase == "hecho" and not _RX_CONTINUA.search(n_primera)
+                            and bool(_primero(_MEC, n_primera) or _LESION.search(n_primera)))
+        lec.sin_senal = clase == "hecho" and not senal_trauma(mensaje)
     lec.dice_nuevo = bool(_RX_DICE_NUEVO.search(normalizar(mensaje)))
-    texto = normalizar(mensaje.strip(" ¿?¡!"))
     lec.general = bool(_RX_GENERAL.search(texto) or _PROCEDIMIENTO.search(texto))
     explicito = None
     for oracion, clase in oraciones:
@@ -391,6 +401,13 @@ def tipo_de_mensaje(ficha: Ficha | None, mensaje: str, lec: Lectura | None = Non
     if ficha is None or not ficha.es_paciente() or lec.dice_nuevo or lec.presenta:
         return "nuevo"
     if lec.mecanismo_es_hecho and ficha.mecanismo and lec.mecanismo != ficha.mecanismo:
+        return "nuevo"
+    # Una presentación ("HPAF en abdomen", "TCE leve con pérdida de conciencia")
+    # es otro paciente aunque repita el mecanismo; una consulta general sin
+    # señal de trauma ("manejo de cetoacidosis diabética") empieza de cero. Visto
+    # al armar el guion de la demo (24/10): en el mismo chat, cada consulta se
+    # sumaba al paciente anterior, también la de la abstención.
+    if lec.presentacion or (lec.general and lec.sin_senal):
         return "nuevo"
     return "seguimiento"
 

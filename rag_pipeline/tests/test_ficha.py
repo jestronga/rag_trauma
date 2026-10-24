@@ -36,6 +36,16 @@ def conversacion(*mensajes: str) -> list[tuple[str, Ficha]]:
     ("¿y si se hubiera caído de un segundo piso?", "seguimiento"), # hipótesis: el mismo
     ("fue por arma cortopunzante", "seguimiento"),                 # el mismo mecanismo
     ("TA 100/60", "seguimiento"),
+    # una presentación es otro paciente aunque repita el mecanismo (guion de la demo, 24/10)
+    ("herida por arma cortopunzante en muslo", "nuevo"),
+    ("TCE leve con pérdida de conciencia", "nuevo"),
+    ("le hicieron TAC con hematoma epidural", "seguimiento"),      # continúa
+    ("tiene fractura de fémur", "seguimiento"),
+    ("fractura de fémur también", "seguimiento"),
+    # una consulta general sin señal de trauma empieza de cero; una pregunta, no
+    ("manejo de cetoacidosis diabética en urgencias", "nuevo"),
+    ("está anticoagulado con warfarina", "seguimiento"),
+    ("¿cuándo activar el protocolo de transfusión masiva?", "seguimiento"),
 ])
 def test_tipo_de_mensaje(mensaje, tipo):
     _, previa = actualizar(None, "herida por arma cortopunzante en abdomen")

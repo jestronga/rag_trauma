@@ -233,6 +233,31 @@ su fuente y una nota arriba de la respuesta dice cuál y por qué.
 
 Escribir solo un número (`40887`) recupera y resume ese caso concreto.
 
+Desde el 24/10 (`PLAN_CHATBOT_CLINICO.md`), con un paciente presentado:
+
+- **La ficha del paciente** (`CONVERSACION=ficha`). Arriba de cada respuesta,
+  lo que entendió el código: "Paciente: arma de fuego · abdomen · hipotensión o
+  choque · TA 80/50 · inestable". En un seguimiento, una línea dice qué cambió
+  ("Con hipotensión o choque: entran 3 casos nuevos; aparece transfusión (2 de
+  5)"). Si el mensaje empezó un paciente nuevo, lo dice.
+  - En la barra lateral, "Paciente nuevo" borra la ficha.
+  - Bajo la última respuesta, "Es otro paciente" o "Era el mismo paciente"
+    corrige al código y responde de nuevo.
+  - No se llama al modelo para entender el seguimiento.
+- **Preguntas** (`PREGUNTAS=1`). Bajo la última respuesta, hasta dos preguntas
+  con botones, en el orden de la revisión primaria: "C · Circulación — ¿cómo
+  está hemodinámicamente?", "D · Neurológico — ¿qué Glasgow tiene?"… Un clic
+  suma el dato a la ficha y responde de nuevo; "No se sabe" deja de
+  preguntarlo.
+- **Por letras** (`ORDEN_ATLS=1`). Dentro de cada apartado, la prosa va por
+  letras ("**B · Respiración.**", "**C · Circulación.**", "**Después de la
+  revisión primaria.**"). La letra la pone el código, no el modelo. Las
+  preguntas de procedimiento ("¿cuándo está indicado colocar un tubo de
+  tórax?") siguen con la prosa de siempre y sin preguntas.
+- **La búsqueda de los manuales** expande las abreviaturas y nombra el
+  mecanismo. "Fragmentos de los manuales" muestra la búsqueda usada: «HPAF
+  (herida por arma de fuego) en abdomen».
+
 ---
 
 ## 6. Guion sugerido para la demostración
@@ -245,18 +270,28 @@ python scripts\preparar_demo.py
 ```
 
 Revisa la GPU, la configuración de los manuales (con el ATLS 10 y la guarda por
-señal de trauma), que Ollama tenga el modelo entero en la VRAM (100 %) y pasa
-las consultas de la demo por el sistema completo (campo `boton` de
-`eval/consultas.yaml` y `eval/consultas_guias.yaml`; la 7, la del ATLS 10, se
-salta con `ATLS10=0`).
+señal de trauma), la de la conversación (ficha, preguntas, letras), que Ollama
+tenga el modelo entero en la VRAM (100 %) y pasa por el sistema completo:
+
+- las consultas de la demo (campo `boton` de `eval/consultas.yaml` y
+  `eval/consultas_guias.yaml`; la 7, la del ATLS 10, se salta con `ATLS10=0`);
+- la conversación del paso 6 (sección 4), con la ficha y la respuesta anterior
+  como las pasa la app.
+
 Debe terminar en "Todo listo". Después: `streamlit run app.py`. Al abrir, la
 app precarga los modelos (~30 s, una sola vez) y el modelo queda cargado 2 horas
 (`KEEP_ALIVE`).
 
 En el PC de 8 GB (RTX 4060) corre el reranker para casos y manuales. Cada
-respuesta con las dos fuentes tarda **~8 s** (solo casos, ~5 s).
+respuesta con las dos fuentes tarda **~9-10 s** (por letras; solo casos, ~5 s).
+Un seguimiento tarda lo mismo: ya no hay una llamada para reescribirlo.
 
-Las consultas ya no son botones de la app: se escriben. Ocho minutos, en este orden:
+**La frase de la reunión: más sofisticado no es más libre.** El asistente
+pregunta como un clínico, ordena como el ATLS y recuerda al paciente, y todo
+sigue citado. Las preguntas, la ficha y el orden los pone el código; el modelo
+solo redacta, y lo que redacta se verifica.
+
+Las consultas ya no son botones de la app: se escriben. Diez minutos, en este orden:
 
 **1 · Encuadre, antes de escribir nada.** El registro cubre atención de trauma
 **hasta 2018**. El sistema sugiere a partir de lo que se hizo en casos
@@ -266,38 +301,84 @@ de la demo, es un agujero.
 
 **2 · Caso directo** (1) — *"herida por arma de fuego en tórax con
 hipoventilación"*. Dos miradas: lo que se hizo en casos similares, con
-`[caso: ID]`, y lo que recomiendan los manuales, con `[guía: ID]`. Abre
-**"Casos consultados"** y **"Fragmentos de los manuales"**: el texto completo
-de cada caso y de cada pasaje (libro, capítulo, página). **Todo lo que dice la
-sugerencia se puede comprobar ahí.** Los casos son de hasta 2018 y pueden no
-coincidir con los manuales: el sistema no elige. Dilo tú; en pantalla solo lo
-dice "Alcance", en la barra lateral.
+`[caso: ID]`, y lo que recomiendan los manuales, con `[guía: ID]`.
+- **Las dos van ordenadas como la revisión primaria:** "B · Respiración"
+  (hipoventilación, tubo de tórax), "C · Circulación", "Después de la revisión
+  primaria". La letra de cada cosa la decide el código con una tabla que tiene
+  que validar el médico; el modelo solo redacta dentro de cada letra.
+- **Arriba, la ficha** ("Paciente: arma de fuego · tórax · hipoventilación").
+  **Abajo, las preguntas** de lo que falta: "C · ¿cómo está
+  hemodinámicamente?" y el grupo de edad.
+- **Abre "Casos consultados" y "Fragmentos de los manuales":** el texto
+  completo de cada caso y de cada pasaje (libro, capítulo, página). **Todo lo
+  que dice la sugerencia se puede comprobar ahí.**
+- Los casos son de hasta 2018 y pueden no coincidir con los manuales: el
+  sistema no elige. Dilo tú; en pantalla solo lo dice "Alcance", en la barra
+  lateral.
 
-**3 · Cómo se evita que invente.** El modelo redacta, pero el código revisa cada
-oración antes de mostrarla contra su fuente: que lo que nombra esté en los
-casos o en el pasaje citado, que el caso o el pasaje citado lo tenga, que las
-cifras estén en el manual, que no cuente mal y que oriente en vez de ordenar.
-**Para la demo todo va en prosa** (`PROSA_SIEMPRE=1`, decisión del 18/10): el
-verificador corre igual y deja sus motivos, pero no reemplaza nada. Fuera de la
-demo, con `PROSA_SIEMPRE=0`, la parte que no pasa se muestra armada desde las
-fuentes y una nota arriba dice por qué.
+**3 · Cómo se evita que invente.**
+- El modelo redacta, pero el código revisa cada oración contra su fuente antes
+  de mostrarla: que lo que nombra esté en los casos o en el pasaje citado, que
+  el caso o el pasaje citado lo tenga, que las cifras estén en el manual, que no
+  cuente mal y que oriente en vez de ordenar.
+- Por letras, además, que cada cosa esté en su letra: la hipoventilación no va
+  en C.
+- **Para la demo todo va en prosa** (`PROSA_SIEMPRE=1`, decisión del 18/10; por
+  letras, `PROSA_SIEMPRE_ATLS` toma ese valor): el verificador corre igual y
+  deja sus motivos, pero no reemplaza nada.
+- Fuera de la demo, con `PROSA_SIEMPRE=0`, la parte (o la letra) que no pasa se
+  muestra armada desde las fuentes y una nota arriba dice cuál.
 
 **4 · Brecha de vocabulario** (2) — *"paciente apuñalado en el pecho,
 herida penetrante"*. El corpus dice `HPACP en tórax` o `ME APUÑALARON`. Por eso
 hay búsqueda densa y no solo por palabras.
 
 **5 · Abreviatura** (3) — *"HPAF en cráneo con orificio de entrada
-parietal"*. Funciona gracias a la expansión de abreviaturas. Aquí los manuales
-no responden (la abreviatura no la entiende su búsqueda): la respuesta lo dice y
-sale solo de los casos.
+parietal"*.
+- Los casos la entienden porque el corpus trae las abreviaturas expandidas.
+- Desde el 24/10, los manuales también: su búsqueda se hace con «HPAF (herida
+  por arma de fuego) en cráneo…». Ábrelo en "Fragmentos de los manuales": dice
+  la búsqueda usada.
+- **Ojo:** los pasajes que llegan son del HUV sobre arma de fuego en general y
+  trauma penetrante de tórax y abdomen, no de cráneo. "Herida por arma de
+  fuego" pesa más que "cráneo", porque la búsqueda está en español y lo del
+  cráneo está en el ATLS 11, en inglés. Si alguien lo pregunta, esa es la
+  respuesta.
 
-**6 · Caso grave** (4) — *"herida por arma de fuego con desenlace fatal"*.
+**6 · La conversación sobre el mismo paciente** — tres turnos.
+1. Escribe *"HPAF en abdomen"*. La ficha dice "Paciente: arma de fuego ·
+   abdomen" y debajo salen dos preguntas: el estado hemodinámico (C) y el
+   grupo.
+2. Haz clic en **"Hipotenso o en choque"**. No hay que reescribir nada: el dato
+   se suma a la ficha ("· hipotensión o choque · inestable") y el asistente
+   responde de nuevo. Una línea dice qué cambió respecto de la respuesta
+   anterior ("entran 3 casos nuevos; aparece…"); la escribe el código, no el
+   modelo.
+3. Escribe *"¿qué dice el ATLS del FAST?"*. Es un seguimiento: busca con el
+   paciente ("HPAF en abdomen, hipotenso o en choque, qué dice el ATLS del
+   FAST"), visible en "Casos consultados". El FAST no entra en la ficha, porque
+   preguntar por él no es un hecho. Responde la 10.ª edición del ATLS, en
+   español.
+
+Para mostrar que se corrige con un clic: escribe *"mujer de 75 años con fractura
+de cadera"*. El código lo toma como **paciente nuevo** y lo dice; si fuera el
+mismo, "Era el mismo paciente" lo rehace. "Paciente nuevo", en la barra lateral,
+empieza de cero.
+
+**7 · Caso grave** (4) — *"herida por arma de fuego con desenlace fatal"*.
 Con la barra lateral se puede filtrar por mecanismo, región o desenlace en vivo.
+Es otro paciente y el código lo toma así: una presentación (un mecanismo o una
+lesión, sin "le hicieron…", "tiene…", "además…") empieza una ficha nueva.
 
-**7 · Solo los manuales** (6) — *"cuándo activar el protocolo de transfusión
-masiva"*. Una pregunta de procedimiento: no hay casos que se parezcan y
-responden solo el ATLS y el manual del HUV. Es lo que pidió la reunión del
-30/09: que el asistente no dependa solo de lo que se hizo en el hospital.
+**7a · Solo los manuales** (6) — **antes, "Paciente nuevo"** en la barra
+lateral. Luego *"cuándo activar el protocolo de transfusión masiva"*.
+- Es una pregunta de procedimiento: no hay casos que se parezcan y responden
+  solo el ATLS y el manual del HUV. Es lo que pidió la reunión del 30/09: que el
+  asistente no dependa solo de lo que se hizo en el hospital.
+- No presenta a un paciente: va con la prosa de siempre, sin letras ni
+  preguntas.
+- Sin "Paciente nuevo", una pregunta se toma como del paciente anterior: buscaría
+  con él, y responderían también los casos.
 
 **7b · El ATLS en español** (7) — *"TCE leve con pérdida
 de conciencia transitoria"*. Sin el ATLS 10, los manuales no responden esta
@@ -322,10 +403,17 @@ ninguna: si la consulta no nombra un mecanismo, una lesión ni un procedimiento
 de trauma, las dos guardas piden más (guarda por señal de trauma,
 `rag/senal.py`). Una pregunta que no está en esas 20 no está medida.
 
-**Evitar en la demo:** escribir un número de caso para resumirlo. Ese resumen
-todavía lo escribe el modelo sin verificación y a veces cambia términos
-(pendiente 4 de `CONTEXTO_SESION.md`). Para mostrar trazabilidad, usar
-"Casos consultados".
+**Evitar en la demo:**
+- **Escribir un número de caso para resumirlo.** Ese resumen todavía lo escribe
+  el modelo sin verificación y a veces cambia términos (pendiente 4 de
+  `CONTEXTO_SESION.md`). Para mostrar trazabilidad, usar "Casos consultados".
+- **Hacer una pregunta general después de un paciente sin "Paciente nuevo".**
+  Una presentación ("HPAF en abdomen", "mujer de 75 años con…", "TCE leve…") y
+  una consulta general sin trauma ("manejo de cetoacidosis…") empiezan de cero
+  solas. Una pregunta ("¿cuándo…?", "¿qué dice…?") se suma al paciente
+  anterior. `preparar_demo.py` revisa este guion escrito en un solo chat
+  (sección 4). La ficha lo muestra y se corrige con un clic, pero en la demo
+  distrae.
 
 ---
 
@@ -354,7 +442,13 @@ todavía lo escribe el modelo sin verificación y a veces cambia términos
 | `COLECCION_GUIAS` | `guias` | colección de Qdrant con los libros de trauma |
 | `FRAGMENTACION_GUIAS` | `fijo-256` | configuración de `rag/fragmentar.py` al indexar los libros (reindexar si cambia) |
 | `RUTA_GUIAS` | `auto` | libros: `rerank` (densa + reranker sobre 30) si el reranker cabe en la GPU, si no `densa` |
-| `PRESUPUESTO_GUIAS` | `1400` | tokens de fragmentos de los libros que van al prompt (~6 con `fijo-256`) |
+| `PRESUPUESTO_GUIAS` | `1800` (`1400` con `ATLS10=0`) | tokens de fragmentos de los libros que van al prompt, con cuota por libro si está el ATLS 10 |
+| `ABREV_LIBROS` | encendido | los manuales se buscan con las abreviaturas expandidas («HPAF (herida por arma de fuego)»), salvo las que los manuales ya usan (FAST, GCS, Rx…) |
+| `MECANISMO_LIBROS` | encendido | y con el nombre del mecanismo cuando la consulta lo dice con otras palabras ("baleado" → herida por arma de fuego) |
+| `CONVERSACION` | `ficha` | la ficha del paciente la arma el código (`rag/ficha.py`); `llm` = el modelo reescribe cada seguimiento, como antes del 24/10 |
+| `PREGUNTAS` | encendido | hasta 2 preguntas con botones bajo la respuesta (`rag/preguntas.py`); necesita `CONVERSACION=ficha` |
+| `ORDEN_ATLS` | encendido | la prosa por letras de la revisión primaria (xABCDE) dentro de cada apartado, solo con un paciente (`rag/prioridades.py`) |
+| `PROSA_SIEMPRE_ATLS` | el de `PROSA_SIEMPRE` | por letras: `1` = la letra que no pasa la verificación se muestra igual; `0` = va armada desde su fuente (decisión 3 del plan, pendiente) |
 | `UMBRAL_GUIAS` | `0.34` | ruta `rerank`: probabilidad mínima del mejor fragmento para que los libros hablen (0,2 hasta el 19/10). Calibrar con `scripts\calibrar_guias.py` |
 | `UMBRAL_GUIAS_COSENO` | `0.60` | ruta `densa` (sin el reranker en GPU): coseno mínimo del mejor fragmento. Separa mal: con 0,60 frena las 10 fuera de dominio pero deja sin libros a 16 de 25 consultas de trauma |
 

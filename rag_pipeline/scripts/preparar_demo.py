@@ -15,6 +15,11 @@ Qué revisa:
      tiempo, si se abstuvo (solo el de "fuera de alcance" debe hacerlo), qué
      fuentes respondieron (casos, manuales), qué quedó en prosa verificada y
      que no haya citas inválidas.
+  4. La conversación de la demo (PLAN_CHATBOT_CLINICO.md, fase 5), como en la
+     app: "HPAF en abdomen" → el botón "Hipotenso o en choque" → "¿qué dice el
+     ATLS del FAST?". Que la ficha siga al paciente, que salga la pregunta y su
+     respuesta se sume, que se diga qué cambió y que la respuesta vaya por
+     letras (xABCDE).
 
 Al final deja el modelo cargado (KEEP_ALIVE) para que la primera pregunta de
 la demo no espere la carga.
@@ -170,9 +175,127 @@ def main() -> int:
             print(f"        {f}")
         problemas += bool(fallos)
 
+    print("\n4 · Conversación de la demo (ficha, preguntas, letras)")
+    if config.CONVERSACION != "ficha":
+        print(f"{AVISO} CONVERSACION={config.CONVERSACION}: la conversación de la demo necesita la ficha")
+    else:
+        problemas += secuencia_guion()
+        problemas += conversacion_demo(con_guias)
+
     print(f"\n{'Todo listo' if not problemas else f'{problemas} problema(s): ver arriba'}. "
           f"Abrir el chatbot desde rag_pipeline\\: streamlit run app.py")
     return 1 if problemas else 0
+
+
+# El guion de SETUP.md §6, escrito en un solo chat: el tipo que debe dar la
+# ficha a cada mensaje (solo reglas, sin el modelo). "Paciente nuevo" = el botón
+# de la barra lateral. Si una regla de rag/ficha.py cambia, esto lo avisa.
+GUION = [
+    ("herida por arma de fuego en tórax con hipoventilación", "nuevo"),       # 2
+    ("paciente apuñalado en el pecho, herida penetrante", "nuevo"),           # 4
+    ("HPAF en cráneo con orificio de entrada parietal", "nuevo"),             # 5
+    ("HPAF en abdomen", "nuevo"),                                             # 6
+    ("hipotenso o en choque", "seguimiento"),                                 # 6, el botón
+    ("¿qué dice el ATLS del FAST?", "seguimiento"),                           # 6
+    ("mujer de 75 años con fractura de cadera", "nuevo"),                     # 6, la corrección
+    ("herida por arma de fuego con desenlace fatal en sala de urgencias", "nuevo"),   # 7
+    ("Paciente nuevo", None),                                                 # 7a, el botón
+    ("cuándo activar el protocolo de transfusión masiva", "nuevo"),           # 7a
+    ("TCE leve con pérdida de conciencia transitoria", "nuevo"),              # 7b
+    ("manejo de cetoacidosis diabética en urgencias", "nuevo"),               # 8
+]
+
+
+def secuencia_guion() -> int:
+    """El guion en un solo chat: ninguna consulta se suma al paciente anterior
+    salvo los seguimientos del paso 6."""
+    from rag.ficha import actualizar
+    ficha, fallos = None, []
+    for texto, esperado in GUION:
+        if esperado is None:
+            ficha = None
+            continue
+        forzar = "seguimiento" if texto == "hipotenso o en choque" else None   # el clic
+        tipo, ficha = actualizar(ficha, texto, forzar)
+        if tipo != esperado:
+            fallos.append(f"«{texto}»: {tipo}, se esperaba {esperado}")
+    print(f"{MAL if fallos else OK} el guion en un solo chat: {len(GUION) - 1 - len(fallos)} de "
+          f"{len(GUION) - 1} mensajes con el tipo esperado")
+    for f in fallos:
+        print(f"        {f}")
+    return int(bool(fallos))
+
+
+# La conversación del guion (SETUP.md §6, paso 6): tres turnos como en la app.
+TURNO_1 = "HPAF en abdomen"
+RESPUESTA_C = "Hipotenso o en choque"          # el botón de la pregunta C (rag/preguntas.py)
+TURNO_3 = "¿qué dice el ATLS del FAST?"
+
+
+def _turno(nombre: str, s: float, r, fallos: list[str], detalle: str) -> int:
+    if r.error:
+        fallos.insert(0, r.error)
+    print(f"{MAL if fallos else OK} {nombre:28} {s:5.1f} s  {detalle}")
+    for f in fallos:
+        print(f"        {f}")
+    return int(bool(fallos))
+
+
+def conversacion_demo(con_guias: bool) -> int:
+    """Los tres turnos de la demo por generate.responder, con la ficha y la
+    respuesta anterior como los pasa la app. Devuelve cuántos turnos fallan."""
+    problemas = 0
+    t0 = time.perf_counter()
+    r1 = responder(TURNO_1)
+    s = time.perf_counter() - t0
+    fallos = []
+    if r1.abstuvo or r1.tipo != "nuevo" or r1.ficha is None:
+        fallos.append(f"esperaba un paciente nuevo con respuesta (tipo {r1.tipo}, abstuvo {r1.abstuvo})")
+    elif r1.ficha.mecanismo != "arma_de_fuego" or "abdomen" not in r1.ficha.regiones:
+        fallos.append(f"la ficha no tiene arma de fuego y abdomen: {r1.ficha.linea()}")
+    c = next((p for p in r1.preguntas if p.clave == "C"), None)
+    opcion = next((o for o in c.opciones if o.etiqueta == RESPUESTA_C), None) if c else None
+    if config.PREGUNTAS and opcion is None:
+        fallos.append(f"no sale la pregunta C con «{RESPUESTA_C}»: {[p.clave for p in r1.preguntas]}")
+    if config.ORDEN_ATLS and not r1.orden_atls:
+        fallos.append("la respuesta no va por letras (ORDEN_ATLS)")
+    problemas += _turno("a · " + TURNO_1, s, r1, fallos,
+                        f"{r1.ficha.linea() if r1.ficha else ''} · preguntas {[p.clave for p in r1.preguntas]}")
+    if fallos or not config.PREGUNTAS:
+        if not config.PREGUNTAS:
+            print(f"{AVISO} PREGUNTAS=0: el turno b (el botón) se salta")
+        return problemas
+
+    t0 = time.perf_counter()
+    r2 = responder(opcion.mensaje, ficha=r1.ficha, anterior=r1, tipo="seguimiento")   # el clic
+    s = time.perf_counter() - t0
+    fallos = []
+    if r2.abstuvo or r2.tipo != "seguimiento":
+        fallos.append(f"esperaba un seguimiento con respuesta (tipo {r2.tipo}, abstuvo {r2.abstuvo})")
+    elif r2.ficha.estado != "inestable" or "hipotensión o choque" not in r2.ficha.afirmados:
+        fallos.append(f"la respuesta no se sumó a la ficha: {r2.ficha.linea()}")
+    if not r2.cambio:
+        fallos.append("no dice qué cambió respecto de la respuesta anterior")
+    if any(p.clave == "C" for p in r2.preguntas):
+        fallos.append("vuelve a preguntar la C")
+    problemas += _turno(f"b · botón «{RESPUESTA_C}»", s, r2, fallos, r2.cambio or "")
+
+    t0 = time.perf_counter()
+    r3 = responder(TURNO_3, ficha=r2.ficha, anterior=r2)
+    s = time.perf_counter() - t0
+    fallos = []
+    busqueda = r3.consulta_reescrita or ""
+    if r3.abstuvo or r3.tipo != "seguimiento":
+        fallos.append(f"esperaba un seguimiento con respuesta (tipo {r3.tipo}, abstuvo {r3.abstuvo})")
+    elif "HPAF" not in busqueda or "FAST" not in busqueda:
+        fallos.append(f"la búsqueda perdió al paciente o la pregunta: «{busqueda}»")
+    if con_guias and not r3.guias:
+        fallos.append("los manuales no responden la pregunta del FAST")
+    if r3.ficha and "ecografía / FAST" in r3.ficha.afirmados:
+        fallos.append("tomó la pregunta por el FAST como un hecho")
+    libros = sorted({f.fuente for f in r3.guias})
+    problemas += _turno("c · " + TURNO_3, s, r3, fallos, f"busca «{busqueda}» · manuales {libros}")
+    return problemas
 
 
 if __name__ == "__main__":

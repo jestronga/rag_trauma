@@ -81,7 +81,19 @@ siempre (18 fuentes de 45 contra 20). Faltan dos cosas:
   `PROSA_SIEMPRE`. Con 0, la letra que no pasa va armada desde su fuente, y en
   16 de 20 respuestas los manuales quedarían como una lista de pasajes.
 
-Sigue la fase 5 (la demo).
+**Fase 5 hecha el 24/10:** `preparar_demo.py` revisa el guion escrito en un solo
+chat y la conversación de tres turnos ("HPAF en abdomen" → "Hipotenso o en
+choque" → "¿qué dice el ATLS del FAST?"), y termina en "Todo listo". El guion
+está en `SETUP.md` §6. Al armarlo se vio que, en un solo chat, cada consulta se
+sumaba al paciente anterior; ahora una presentación nueva o una consulta
+general sin trauma empiezan de cero.
+
+**Pendientes del plan del chatbot:**
+- el médico: la pertinencia de las preguntas (`reports/probar_preguntas.csv`)
+  y la tabla de letras (`prioridades.DUDOSOS`);
+- el usuario: la decisión 3 (`PROSA_SIEMPRE_ATLS`);
+- la fase 0: las notas de la demo de la GTX 1650 y qué le faltó a quien hizo
+  el pedido.
 
 ---
 
@@ -378,7 +390,7 @@ rag_trauma/
                          verificar, guias (extracción de los libros), fragmentar
     guias/               perfiles.yaml (en git) y el texto extraído de los libros (no está en git)
     indices/             BM25 + Qdrant local (casos: 8.198 puntos; guias: 2.201) — no está en git
-    tests/               400 tests del extractor, los libros, la respuesta y el verificador (sin Ollama ni índices)
+    tests/               408 tests del extractor, los libros, la respuesta y el verificador (sin Ollama ni índices)
     scripts/             revisar_entorno, probar_respuestas, exportar_revision, preparar_demo,
                          calibrar_umbral/_guias, comparar_modelos/_fragmentacion, extraer_guias
     eval/                consultas.yaml (35 consultas), consultas_guias.yaml (51, libros), evaluate.py,
