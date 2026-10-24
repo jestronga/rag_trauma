@@ -41,6 +41,7 @@ from . import config
 from .hallazgos import (
     PROCEDIMIENTOS_QUIRURGICOS, Elemento, extraer, formatear, normalizar, obvios, terminos,
 )
+from .prioridades import NOMBRES as NOMBRES_LETRAS
 from .retrieve import FragmentoGuia, Resultado
 
 # Títulos del protocolo con el modelo: la plantilla se los pide y generate.py
@@ -502,6 +503,89 @@ def construir_prompt_guias(consulta: str, casos: list[Resultado], elementos: lis
         instruccion = INSTRUCCION_PROSA_GUIAS if casos else INSTRUCCION_PROSA_SOLO_GUIAS
     partes += [f"FRAGMENTOS DE LOS MANUALES ({len(agrupar_guias(guias))}):\n\n{bloque_guias(guias)}",
                instruccion]
+    return "\n\n".join(partes)
+
+
+# --- Ordenada como la revisión primaria (ORDEN_ATLS; PLAN_CHATBOT_CLINICO.md, fase 4) ---
+# El código decide la letra de cada elemento y de cada pasaje (rag/prioridades.py)
+# y los entrega agrupados; el modelo escribe una oración por letra, con la letra
+# restringida (enum) a las que eligió el código, y el código pone los rótulos.
+# Los casos y los manuales siguen en apartados separados (decisión 2 del plan).
+def _encabezado_letra(letra: str) -> str:
+    return f"[{letra}] {NOMBRES_LETRAS[letra]}"
+
+
+def formatear_por_letra(elementos: list[Elemento], n_casos: int, letras: dict[str, str]) -> str:
+    """La lista de elementos (hallazgos.formatear) agrupada por letra; `letras`:
+    término -> letra, solo los de las letras que se piden."""
+    bloques = []
+    for letra in dict.fromkeys(letras.values()):
+        de_letra = [e for e in elementos if letras.get(e.termino) == letra]
+        lineas = [f"- {e.termino}: {len(e.casos)} de {n_casos} casos {_citas(e.casos)}" for e in de_letra]
+        bloques.append(f"{_encabezado_letra(letra)}:\n" + "\n".join(lineas))
+    return "\n".join(bloques)
+
+
+def bloque_guias_por_letra(fragmentos: list[FragmentoGuia], letras: dict[str, str]) -> str:
+    """bloque_guias agrupado por letra; `letras`: sección -> letra."""
+    grupos = agrupar_guias(fragmentos)
+    bloques = []
+    for letra in dict.fromkeys(letras.values()):
+        de_letra = [sid for sid in grupos if letras.get(sid) == letra]
+        pasajes = []
+        for sid in de_letra:
+            fs = grupos[sid]
+            idioma = " (en inglés)" if fs[0].idioma == "en" else ""
+            pasajes.append(f"--- [guía: {sid}] {cabecera_guia(fs)}{idioma} ---\n{texto_guia(fs)}")
+        bloques.append(f"{_encabezado_letra(letra)}:\n\n" + "\n\n".join(pasajes))
+    return "\n\n".join(bloques)
+
+
+_ATLS_CASOS = ('- En "casos", para cada letra de "ELEMENTOS DOCUMENTADOS EN LOS CASOS", UNA sola '
+               'oración sobre lo que se hizo en los casos similares, solo con los elementos de esa '
+               'letra, que termina con sus citas [caso: ID].\n')
+_ATLS_MANUALES = (f'- En "manuales", para cada letra de "FRAGMENTOS DE LOS MANUALES", UNA sola oración '
+                  f'que empieza por {_COMO_EMPIEZA}, según el manual del fragmento que cita, y termina '
+                  f'con la cita [guía: ID] de un fragmento de esa letra.\n')
+_ATLS_REGLAS = f"""\
+- La letra la pone el código: no escribas su nombre ni títulos.
+- Cada oración habla de una sola fuente. {_NO_COMPARES} ni juzgues lo que se hizo: quien lee \
+tiene las dos miradas a la vista.
+- Cifras solo si están escritas en el fragmento que citas.
+{_TONO}
+- No agregues razones, condiciones ni detalles que no estén escritos ("si no hay…", "por \
+presentar…").
+- Sin cantidades de casos ni viñetas."""
+
+
+def instruccion_atls(letras_casos: list[str], letras_manuales: list[str]) -> str:
+    """Una clave por letra pedida: la salida tiene exactamente una oración por
+    letra (con una lista, el 4B repetía la misma letra hasta cortarse)."""
+    def objeto(letras: list[str]) -> str:
+        return "{" + ", ".join(f'"{letra}": "…"' for letra in letras) + "}"
+    claves = [f'"{k}": {objeto(ls)}' for k, ls in (("casos", letras_casos), ("manuales", letras_manuales)) if ls]
+    return (f"Redacta la sugerencia en el orden de la revisión primaria del ATLS y responde SOLO con "
+            f"JSON:\n{{{', '.join(claves)}}}\n{_ATLS_CASOS if letras_casos else ''}"
+            f"{_ATLS_MANUALES if letras_manuales else ''}{_ATLS_REGLAS}")
+
+
+def construir_prompt_atls(consulta: str, casos: list[Resultado], elementos: list[Elemento],
+                          guias: list[FragmentoGuia], letras_elementos: dict[str, str],
+                          letras_pasajes: dict[str, str]) -> str:
+    """El prompt de la prosa por letras: los elementos y los pasajes agrupados
+    por la letra que les dio el código."""
+    partes = [f"CONSULTA:\n{consulta}"]
+    if casos:
+        bloques = "\n\n".join(_bloque_caso(c, i) for i, c in enumerate(casos, start=1))
+        partes += [f"CASOS SIMILARES DEL REGISTRO ({len(casos)}):\n\n{bloques}",
+                   f"ELEMENTOS DOCUMENTADOS EN LOS CASOS, por letra (única fuente de lo que digas "
+                   f"sobre los casos):\n{formatear_por_letra(elementos, len(casos), letras_elementos)}"]
+    if guias:
+        partes.append(f"FRAGMENTOS DE LOS MANUALES, por letra ({len(agrupar_guias(guias))}):\n\n"
+                      f"{bloque_guias_por_letra(guias, letras_pasajes)}")
+    instruccion = instruccion_atls(list(dict.fromkeys(letras_elementos.values())) if casos else [],
+                                   list(dict.fromkeys(letras_pasajes.values())) if guias else [])
+    partes.append(_con_tres_manuales(instruccion) if con_atls10(guias) else instruccion)
     return "\n\n".join(partes)
 
 

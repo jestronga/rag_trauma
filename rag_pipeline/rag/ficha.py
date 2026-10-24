@@ -38,7 +38,7 @@ from dataclasses import dataclass, field
 from . import config
 from .consulta import NOMBRES_MECANISMO
 from .hallazgos import _LEXICO, CATEGORIA, _normalizar_alineado, extraer, menciones, normalizar
-from .senal import LESIONES
+from .senal import LESIONES, PROCEDIMIENTOS
 from .senal import MECANISMOS as _MECANISMOS_SENAL
 
 # Un número de caso, solo ("caso 3377", "#3377"): el resumen de ese caso.
@@ -71,6 +71,14 @@ REGIONES = {
 _MEC = {k: [re.compile(p) for p in ps] for k, ps in MECANISMOS.items()}
 _REG = {k: [re.compile(p) for p in ps] for k, ps in REGIONES.items()}
 _LESION = re.compile("|".join(LESIONES))      # "TCE", "trauma", "fractura"… (rag/senal.py)
+# Una pregunta general, de procedimiento ("¿cuándo está indicado colocar un tubo
+# de tórax en trauma?", las proc-* de consultas_guias.yaml), no presenta a un
+# paciente aunque nombre una lesión: no lleva preguntas (fase 3) ni orden xABCDE
+# (fase 4).
+_RX_GENERAL = re.compile(
+    r"^(como|cuando|que|cual(es)?|indicaciones|criterios|tecnica|protocolo|dosis|uso|manejo"
+    r"|prevencion|estabilizacion)\b|paso a paso|\bindicad[oa]s?\b|\bcriterios\b|\btecnica\b")
+_PROCEDIMIENTO = re.compile("|".join(PROCEDIMIENTOS))
 
 _VALOR = r"\s*(?:de\s+|:\s*|=\s*|en\s+|al?\s+)?"
 SIGNOS = {
@@ -91,7 +99,9 @@ _RX_NINO = re.compile(r"\bnin[oa]s?\b|lactante|pediatric|\bbebes?\b|recien nacid
 _RX_MAYOR = re.compile(r"adult[oa]s? mayor|ancian[oa]|geriatric|tercera edad")
 _RX_ADULTO = re.compile(r"\badult[oa]s?\b(?!\s+mayor)|\bjoven(es)?\b")
 
-_RX_INESTABLE = re.compile(r"\binestab|\b(no|nunca)\s+(esta\s+|se encuentra\s+)?estable\b")
+# la hemodinámica, no la mecánica ("fractura de pelvis con inestabilidad", proc-11)
+_RX_INESTABLE = re.compile(r"(?<!pelvis )(?<!pelvica )(?<!fractura )\binestable\b|inestabilidad hemodinamica"
+                           r"|\b(no|nunca)\s+(esta\s+|se encuentra\s+)?estable\b")
 _RX_ESTABLE = re.compile(r"\bestable\b|normotens|hemodinamicamente normal")
 HIPOTENSION = "hipotensión o choque"
 
@@ -131,6 +141,7 @@ class Lectura:
     presenta: bool = False
     dice_nuevo: bool = False
     lesion: bool = False                                   # nombra una lesión de trauma
+    general: bool = False                                  # una pregunta de procedimiento
 
 
 @dataclass
@@ -146,12 +157,17 @@ class Ficha:
     clausulas: list[str] = field(default_factory=list)   # las palabras del médico, para buscar
     sin_dato: list[str] = field(default_factory=list)    # "No se sabe": no se vuelve a preguntar (preguntas.py)
     lesion: bool = False                                   # nombró una lesión ("TCE severo")
+    general: bool = False                                  # empezó con una pregunta de procedimiento
 
     def es_paciente(self) -> bool:
         """¿Hay un paciente? Las regiones solas no bastan: "¿cuándo poner un
-        tubo de tórax?" deja tórax y no presenta a nadie; "TCE severo", sí."""
+        tubo de tórax?" deja tórax y no presenta a nadie; "TCE severo", sí. Una
+        pregunta de procedimiento ("manejo del neumotórax a tensión") tampoco,
+        salvo que traiga mecanismo, signos, grupo o estado."""
+        if self.mecanismo or self.signos or self.grupo or self.estado:
+            return True
         hallazgos = [t for t in self.afirmados + self.negados if CATEGORIA[t] == "Hallazgos"]
-        return bool(self.mecanismo or hallazgos or self.signos or self.grupo or self.estado or self.lesion)
+        return not self.general and bool(hallazgos or self.lesion)
 
     def datos(self) -> dict:
         """Lo que se compara con eval/conversaciones.yaml."""
@@ -303,6 +319,8 @@ def leer(mensaje: str) -> Lectura:
         primera, clase = oraciones[0]
         lec.presenta = clase == "hecho" and bool(_RX_PRESENTA.search(normalizar(primera)))
     lec.dice_nuevo = bool(_RX_DICE_NUEVO.search(normalizar(mensaje)))
+    texto = normalizar(mensaje.strip(" ¿?¡!"))
+    lec.general = bool(_RX_GENERAL.search(texto) or _PROCEDIMIENTO.search(texto))
     explicito = None
     for oracion, clase in oraciones:
         for c in (c for c in _RX_CLAUSULA.split(oracion) if c and c.strip()):
@@ -362,6 +380,8 @@ def _sumar(f: Ficha, lec: Lectura, presentacion: bool) -> None:
             f.estado, f.estado_por_ta = None, False
     # la presentación entra entera, con lo que pregunta; los seguimientos, sus hechos
     f.clausulas += (lec.hechos + lec.preguntas) if presentacion else lec.hechos
+    if presentacion:
+        f.general = lec.general
 
 
 def tipo_de_mensaje(ficha: Ficha | None, mensaje: str, lec: Lectura | None = None) -> str:

@@ -40,7 +40,8 @@ MECANISMOS = {
     "contundente": [r"contundente", r"\bhpco\b", r"me\s+golpearon", r"le\s+golpearon",
                     r"me\s+pegaron(?!\s+un\s+tiro)", r"\bpuno\b", r"\bpatada", r"\bpalo\b", r"\bpiedra",
                     r"\brina\b", r"\bpelea", r"agresion\s+fisica"],
-    "quemadura": [r"quemadur", r"\bscq\b", r"escaldadura", r"\bacido\b", r"electrocucion"],
+    # "ácido tranexámico" no es una quemadura química (proc-03, 24/10)
+    "quemadura": [r"quemadur", r"\bscq\b", r"escaldadura", r"\bacido\b(?!\s+tranexamico)", r"electrocucion"],
     # "mordida por perro" (24/10: sin esto, ctl-02 de eval/conversaciones.yaml se abstenía)
     "mordedura": [r"mordedur", r"mordio", r"mordieron", r"\bmordid[oa]s?\b", r"canino", r"serpiente",
                   r"ofidic"],

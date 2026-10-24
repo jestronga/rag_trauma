@@ -109,6 +109,7 @@ def test_responder_trae_las_preguntas(monkeypatch):
     monkeypatch.setattr(config, "PREGUNTAS", True)
     monkeypatch.setattr(config, "GUIAS", False)
     monkeypatch.setattr(config, "SALIDA", "prosa")
+    monkeypatch.setattr(config, "ORDEN_ATLS", False)
     monkeypatch.setattr(config, "SINTESIS_LLM", False)
     monkeypatch.setattr(generate, "confianza", lambda *a, **k: 0.9)
     monkeypatch.setattr(generate, "buscar", lambda *a, **k: casos)

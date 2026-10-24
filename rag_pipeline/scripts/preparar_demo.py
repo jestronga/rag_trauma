@@ -74,6 +74,9 @@ def main() -> int:
             print(f"{AVISO} PREGUNTAS=1 necesita CONVERSACION=ficha: no se van a mostrar")
         elif config.PREGUNTAS:
             print(f"{OK} preguntas: hasta 2 bajo cada respuesta, en el orden xABCDE")
+        # la respuesta por letras (fase 4)
+        print(f"{OK} respuesta: " + ("por letras de la revisión primaria (xABCDE) dentro de cada apartado, "
+                                     "con un paciente" if config.ORDEN_ATLS else "prosa de siempre (ORDEN_ATLS=0)"))
         # la consulta de los manuales (PLAN_CHATBOT_CLINICO.md, fase 1)
         if config.ABREV_LIBROS and not diccionario():
             print(f"{AVISO} ABREV_LIBROS=1 pero no encuentro {config.ABREVIATURAS_YAML}: "

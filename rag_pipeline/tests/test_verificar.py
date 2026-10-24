@@ -103,6 +103,7 @@ def entorno(casos, monkeypatch):
     # el respaldo determinista se prueba con PROSA_SIEMPRE apagado, sea cual
     # sea el valor por defecto (la demo lo usa encendido)
     monkeypatch.setattr(config, "PROSA_SIEMPRE", False)
+    monkeypatch.setattr(config, "ORDEN_ATLS", False)       # la prosa de siempre (fase 4 aparte)
     monkeypatch.setattr(generate, "confianza", lambda *a, **k: 0.9)
     monkeypatch.setattr(generate, "buscar", lambda *a, **k: casos)
     # un PC sin los libros indexados: la respuesta es la de solo casos

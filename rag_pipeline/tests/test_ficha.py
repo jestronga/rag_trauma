@@ -201,6 +201,7 @@ def pipeline(monkeypatch):
     buscadas = []
     monkeypatch.setattr(config, "CONVERSACION", "ficha")
     monkeypatch.setattr(config, "SALIDA", "prosa")
+    monkeypatch.setattr(config, "ORDEN_ATLS", False)
     monkeypatch.setattr(config, "SINTESIS_LLM", False)
     monkeypatch.setattr(config, "GUIAS", False)
     monkeypatch.setattr(generate, "confianza", lambda consulta, *a, **k: buscadas.append(consulta) or 0.9)

@@ -210,6 +210,7 @@ def entorno(casos, guias, monkeypatch):
     monkeypatch.setattr(config, "SALIDA", "prosa")
     monkeypatch.setattr(config, "SINTESIS_LLM", False)
     monkeypatch.setattr(config, "PROSA_SIEMPRE", False)
+    monkeypatch.setattr(config, "ORDEN_ATLS", False)       # la prosa de siempre (fase 4 aparte)
     monkeypatch.setattr(config, "GUIAS", True)
     monkeypatch.setattr(generate, "confianza", lambda *a, **k: 0.9)
     monkeypatch.setattr(generate, "buscar", lambda *a, **k: casos)

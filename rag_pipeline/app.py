@@ -22,7 +22,7 @@ from rag.consulta import para_libros                           # noqa: E402
 from rag.build_prompt import (                                 # noqa: E402
     RX_LINEA_RESPALDO, agrupar_guias, cabecera_guia, desenlace_visible, texto_guia,
 )
-from rag.ficha import RX_CASO                                  # noqa: E402
+from rag.ficha import RX_CASO, unir                            # noqa: E402
 from rag.preguntas import descartar                            # noqa: E402
 from rag.generate import ollama_disponible, responder, resumir_caso, usar_guias   # noqa: E402
 from rag.guias import cargar_perfiles, equivalentes_atls11      # noqa: E402
@@ -304,6 +304,13 @@ def nota_verificacion(respuesta) -> None:
     """Qué parte de la respuesta armó el código porque la redacción del modelo
     no pasó la verificación (o no la hubo). Va arriba de la respuesta: como
     caption gris al pie nadie la veía (pendiente 13 de CONTEXTO_SESION.md)."""
+    if respuesta is not None and respuesta.orden_atls:
+        # por letras (fase 4): las que no pasaron van armadas desde su fuente
+        if respuesta.letras_armadas:
+            st.markdown(f"<div class='nota'>Va armado desde las fuentes, sin redactar: "
+                        f"{html.escape(unir(respuesta.letras_armadas))} (la redacción del modelo no pasó "
+                        f"la verificación).</div>", unsafe_allow_html=True)
+        return
     if respuesta is None or respuesta.prosa_verificada is not False or config.PROSA_SIEMPRE:
         return
     nombres = {"casos": "los casos", "guias": "los manuales"}

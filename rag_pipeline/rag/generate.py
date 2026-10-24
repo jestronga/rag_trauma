@@ -26,6 +26,7 @@ cualquiera y se abstiene solo si no pasa ninguna. La prosa da las dos miradas
 from __future__ import annotations
 
 import json
+import re
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
@@ -34,16 +35,20 @@ from . import config
 from .build_prompt import (
     AVISO_DOS_FUENTES, AVISO_SOLO_CASOS, AVISO_SOLO_GUIAS, ROTULO_CASOS, ROTULO_MANUALES,
     ROTULO_SINTESIS, ROTULO_SUGERENCIAS, SIN_SUGERENCIAS, SISTEMA, SISTEMA_PROSA,
-    SISTEMA_RESUMEN, TITULO_CASOS, TITULO_LIMITES, TITULO_SUGERENCIAS,
-    conclusion_calculada, construir_prompt, construir_prompt_guias, contexto_elemento,
-    aviso_ediciones, aviso_pasajes, limites_calculados, linea_base, linea_respaldo, para_afinar,
-    resumen_de_caso, sistema_prosa_guias, tabla_casos,
+    SISTEMA_RESUMEN, TITULO_CASOS, TITULO_LIMITES, TITULO_SUGERENCIAS, agrupar_guias,
+    conclusion_calculada, construir_prompt, construir_prompt_atls, construir_prompt_guias,
+    contexto_elemento, aviso_ediciones, aviso_pasajes, limites_calculados, linea_base,
+    linea_respaldo, para_afinar, resumen_de_caso, sistema_prosa_guias, tabla_casos, texto_guia,
 )
-from .ficha import Ficha, actualizar, que_cambio
+from .ficha import Ficha, actualizar, que_cambio, unir
+from .hallazgos import (
+    PROCEDIMIENTOS_QUIRURGICOS, Elemento, elegibles, elemento_mencionado, extraer, obvios, terminos,
+)
 from .preguntas import Pregunta, preguntar
-from .hallazgos import PROCEDIMIENTOS_QUIRURGICOS, Elemento, elegibles, elemento_mencionado, extraer
+from .prioridades import DESPUES, LETRAS, letra_pasaje, letra_termino, ordenar, rotulo
+from .prioridades import NOMBRES as NOMBRES_LETRAS
 from .retrieve import FragmentoGuia, Filtros, Resultado, buscar, buscar_guias, confianza, hay_guias
-from .verificar import RX_CITA, RX_CITA_GUIA, Verificacion, suavizar, verificar_por_fuente
+from .verificar import RX_CITA, RX_CITA_GUIA, Verificacion, oraciones, suavizar, verificar_por_fuente
 
 
 @dataclass
@@ -86,6 +91,10 @@ class Respuesta:
     cambio: str | None = None
     # PREGUNTAS=1: lo que falta, con botones (rag/preguntas.py)
     preguntas: list[Pregunta] = field(default_factory=list)
+    # ORDEN_ATLS=1 y una presentación de paciente: la prosa va por letras (xABCDE);
+    # las letras que no pasaron y van armadas desde su fuente ("C de los casos")
+    orden_atls: bool = False
+    letras_armadas: list[str] = field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
@@ -298,8 +307,18 @@ def responder(
 
     prosa_verificada, motivos = None, []
     prosa_casos = prosa_guias = eleccion = ""
+    orden_atls, letras_armadas = False, []
     try:
-        if config.SALIDA == "prosa" and not config.SINTESIS_LLM:
+        if (config.SALIDA == "prosa" and not config.SINTESIS_LLM and config.ORDEN_ATLS
+                and es_presentacion(conversacion.get("ficha"), consulta)):
+            # ordenada como la revisión primaria, dentro de cada apartado (fase 4)
+            orden_atls = True
+            prosa_casos, prosa_guias, prosa_verificada, motivos, detalle = prosa_atls(
+                consulta, casos, fragmentos, config.PROSA_SIEMPRE_ATLS)
+            if not config.PROSA_SIEMPRE_ATLS:
+                letras_armadas = [f"{t.letra} de {'los casos' if t.fuente == 'casos' else 'los manuales'}"
+                                  for t in detalle["textos"] if t.motivos]
+        elif config.SALIDA == "prosa" and not config.SINTESIS_LLM:
             prosa = generar_prosa(consulta, casos, guias=fragmentos)
             v = verificar_por_fuente(prosa, casos, consulta, fragmentos)
             prosa_verificada, motivos = v.pasa, v.motivos
@@ -323,7 +342,8 @@ def responder(
                           consulta_reescrita=reescrita, relevancia=relevancia,
                           prosa_verificada=prosa_verificada, motivos=motivos,
                           fuentes_en_prosa=[n for n, p in (("casos", prosa_casos), ("guias", prosa_guias)) if p],
-                          secciones=secciones, **conversacion,
+                          secciones=secciones, **conversacion, orden_atls=orden_atls,
+                          letras_armadas=letras_armadas,
                           preguntas=_preguntas(conversacion.get("ficha"), casos, consulta))
     if respuesta.tipo == "seguimiento":
         respuesta.cambio = que_cambio(anterior, respuesta, ficha, respuesta.ficha)
@@ -414,6 +434,215 @@ def generar_prosa(consulta: str, casos: list[Resultado], metricas: dict | None =
     except json.JSONDecodeError:
         # cortado por MAX_TOKENS_PROSA, o un modelo que ignora el formato
         return ""
+
+
+# ---------------------------------------------------------------------------
+# Prosa ordenada como la revisión primaria (ORDEN_ATLS; PLAN_CHATBOT_CLINICO.md, fase 4)
+# ---------------------------------------------------------------------------
+MAX_LETRAS_CASOS = 4
+MAX_LETRAS_MANUALES = 3
+# Tope de cada texto en el esquema (Ollama lo cumple: corta y cierra el JSON).
+# Con 9 pasajes en "después", el 4B escribía una oración por pasaje en la misma
+# letra hasta agotar los tokens (abr-04, 24/10). 400 caracteres son una oración
+# larga; 7 letras así caben en MAX_TOKENS_ATLS.
+MAX_CARACTERES_LETRA = 400
+
+
+@dataclass
+class Letras:
+    """La letra de cada elemento y de cada pasaje, y las que se le piden al modelo."""
+    elementos: list[Elemento]
+    de_termino: dict[str, str]          # término -> letra (solo las letras pedidas)
+    de_seccion: dict[str, str]          # sección -> letra (todas)
+    casos: list[str]                    # letras pedidas, en orden
+    manuales: list[str]
+
+
+def letras_atls(consulta: str, casos: list[Resultado], guias: list[FragmentoGuia]) -> Letras:
+    elementos = elegibles(casos, consulta) if casos else []
+    letras_c = ordenar(letra_termino(e.termino) for e in elementos)[:MAX_LETRAS_CASOS]
+    de_termino = {e.termino: letra_termino(e.termino) for e in elementos
+                  if letra_termino(e.termino) in letras_c}
+    de_seccion = {sid: letra_pasaje(fs[0].fuente, fs[0].capitulo_num, texto_guia(fs))
+                  for sid, fs in agrupar_guias(guias).items()}
+    letras_g = ordenar(de_seccion.values())[:MAX_LETRAS_MANUALES]
+    return Letras(elementos, de_termino, {s: l for s, l in de_seccion.items() if l in letras_g},
+                  letras_c, letras_g)
+
+
+def mensajes_atls(consulta: str, casos: list[Resultado], guias: list[FragmentoGuia],
+                  letras: Letras) -> list[dict] | None:
+    """Como mensajes_prosa: None si el modelo no tiene nada que nombrar."""
+    if casos and not letras.elementos:
+        return None
+    if not casos and not guias:
+        return None
+    sistema = sistema_prosa_guias(guias) if guias else SISTEMA_PROSA
+    prompt = construir_prompt_atls(consulta, casos, letras.elementos, guias, letras.de_termino,
+                                   letras.de_seccion)
+    return [{"role": "system", "content": sistema}, {"role": "user", "content": prompt}]
+
+
+def esquema_atls(letras: Letras, con_casos: bool, con_guias: bool) -> dict:
+    """JSON Schema: una clave por letra que eligió el código, todas obligatorias
+    y ninguna más. Con una lista de {"letra", "texto"} (el enum del plan), el 4B
+    repetía la misma letra hasta agotar los tokens (medido el 24/10: 2 de 3)."""
+    def objeto(permitidas: list[str]) -> dict:
+        return {"type": "object", "properties": {letra: {"type": "string", "maxLength": MAX_CARACTERES_LETRA}
+                                                 for letra in permitidas},
+                "required": permitidas, "additionalProperties": False}
+    propiedades = {}
+    if con_casos and letras.casos:
+        propiedades["casos"] = objeto(letras.casos)
+    if con_guias and letras.manuales:
+        propiedades["manuales"] = objeto(letras.manuales)
+    return {"type": "object", "properties": propiedades, "required": list(propiedades)}
+
+
+def generar_atls(consulta: str, casos: list[Resultado], guias: list[FragmentoGuia], letras: Letras,
+                 metricas: dict | None = None) -> dict | None:
+    """{"casos": {letra: texto}, "manuales": {letra: texto}} del modelo; {} si
+    no hay nada que nombrar; None si la salida no es un JSON válido."""
+    mensajes = mensajes_atls(consulta, casos, guias, letras)
+    if mensajes is None:
+        return {}
+    formato = esquema_atls(letras, bool(casos), bool(guias))
+    salida = _ollama(mensajes, formato=formato, max_tokens=config.MAX_TOKENS_ATLS, metricas=metricas)
+    try:
+        datos = json.loads(salida)
+    except json.JSONDecodeError:
+        return None                        # cortada por MAX_TOKENS_ATLS
+    return datos if isinstance(datos, dict) else None
+
+
+@dataclass
+class TextoLetra:
+    fuente: str                          # "casos" o "guias"
+    letra: str
+    texto: str
+    motivos: list[str] = field(default_factory=list)
+
+
+def _limpiar_texto_letra(texto: str, letra: str) -> str:
+    """Sin el rótulo, si el modelo lo copió ("B · Respiración: …"), sin la
+    oración que cortó el tope (MAX_CARACTERES_LETRA) y en tono de orientación."""
+    nombre = re.escape(NOMBRES_LETRAS[letra])
+    texto = re.sub(rf"^\W*(?:{re.escape(letra)}\s*[·.:-]\s*)?(?:{nombre})?\W*\s*", "", texto.strip(),
+                   flags=re.IGNORECASE) if letra != DESPUES else texto.strip()
+    partes = oraciones(texto)
+    if partes and not re.search(r"[.!?\]]\s*$", partes[-1]):
+        partes = partes[:-1]                     # cortada a la mitad
+    texto = suavizar(" ".join(partes))
+    return texto[:1].upper() + texto[1:]
+
+
+def _letra_de_lo_citado(texto: str, letra: str, letras: Letras) -> str:
+    """La letra de una oración de los manuales la da el pasaje que cita: si
+    todos los citados son de una misma letra de la revisión primaria, esa. Medido
+    el 24/10: en 9 de 16 rechazos por letra, el modelo ponía en "después" una
+    oración que citaba un pasaje de C."""
+    primarias = {letras.de_seccion[m.group(1).upper()] for m in RX_CITA_GUIA.finditer(texto)
+                 if m.group(1).upper() in letras.de_seccion} - {DESPUES}
+    return primarias.pop() if len(primarias) == 1 else letra
+
+
+def verificar_atls(datos: dict, casos: list[Resultado], consulta: str, guias: list[FragmentoGuia],
+                   letras: Letras) -> list[TextoLetra]:
+    """Cada texto con verificar_por_fuente, como la prosa de siempre, más la
+    regla de la letra: lo que nombra un texto de los casos es de su letra o de
+    "después" (la hipoventilación no va en C; la laparotomía sí), y el pasaje
+    que cita un texto de los manuales es de su letra o de "después". Un texto
+    de los manuales que cita pasajes de una sola letra primaria va en esa letra
+    (_letra_de_lo_citado): la letra del pasaje la decide el código."""
+    de_consulta = {t for ts in terminos(consulta).values() for t in ts} | obvios(consulta)
+    salida: dict[tuple[str, str], TextoLetra] = {}
+    for clave, fuente, pedidas in (("casos", "casos", letras.casos), ("manuales", "guias", letras.manuales)):
+        por_letra = datos.get(clave)
+        if not isinstance(por_letra, dict):
+            continue
+        for letra in pedidas:
+            crudo = str(por_letra.get(letra) or "").strip()
+            texto = _limpiar_texto_letra(crudo, letra)
+            if not texto:
+                if crudo and (fuente, letra) not in salida:     # el tope cortó la única oración
+                    salida[(fuente, letra)] = TextoLetra(fuente, letra, "", ["la oración quedó cortada"])
+                continue
+            if fuente == "guias":
+                letra = _letra_de_lo_citado(texto, letra, letras)
+            previo = salida.get((fuente, letra))
+            salida[(fuente, letra)] = TextoLetra(fuente, letra, f"{previo.texto} {texto}" if previo else texto)
+    for t in salida.values():
+        if not t.texto:                          # cortada: va armada desde su fuente
+            continue
+        v = verificar_por_fuente(t.texto, casos, consulta, guias)
+        if t.fuente == "casos":
+            t.motivos += v.motivos_casos
+            if v.oraciones_guias:
+                t.motivos.append("cita un manual en el apartado de los casos")
+            # una letra de la revisión primaria puede nombrar lo que se hizo
+            # ("con hemoperitoneo se realizó laparotomía"): lo de "después" pasa
+            # en cualquiera; lo de otra letra primaria, no (medido el 24/10: la
+            # regla estricta rechazaba esa oración, y "laparotomía" es también
+            # "cirugía" para el léxico)
+            nombrados = {x for ts in terminos(RX_CITA.sub(" ", t.texto)).values() for x in ts} - de_consulta
+            t.motivos += [f"«{x}» es de la letra {letra_termino(x)}, no de la {t.letra}"
+                          for x in sorted(nombrados)
+                          if letra_termino(x) != t.letra and letra_termino(x) != DESPUES]
+        else:
+            t.motivos += v.motivos_guias
+            if v.oraciones_casos:
+                t.motivos.append("una oración del apartado de los manuales no cita un manual")
+            citadas = {m.group(1).upper() for m in RX_CITA_GUIA.finditer(t.texto)}
+            t.motivos += [f"cita [guía: {s}], que es de la letra {letras.de_seccion[s]}"
+                          for s in sorted(citadas) if s in letras.de_seccion
+                          and letras.de_seccion[s] not in (t.letra, DESPUES)]
+    return [salida[k] for k in sorted(salida, key=lambda k: (k[0], LETRAS.index(k[1])))]
+
+
+def _determinista_letra(t: TextoLetra, letras: Letras) -> str:
+    """Una letra que no pasó, armada desde su fuente."""
+    if t.fuente == "casos":
+        de_letra = [e for e in letras.elementos if letras.de_termino.get(e.termino) == t.letra]
+        partes = [f"{e.termino} {' '.join(f'[caso: {rid}]' for rid in e.casos)}" for e in de_letra]
+        return f"En casos similares consta {unir(partes)}." if partes else ""
+    secciones = [s for s, l in letras.de_seccion.items() if l == t.letra]
+    citas = ", ".join(f"[guía: {s}]" for s in secciones)
+    return f"Pasajes de esta letra: {citas}; su texto está en «Fragmentos de los manuales»." if citas else ""
+
+
+def prosa_atls(consulta: str, casos: list[Resultado], guias: list[FragmentoGuia], siempre: bool,
+               metricas: dict | None = None) -> tuple[str, str, bool | None, list[str], dict]:
+    """(prosa de los casos, prosa de los manuales, verificada, motivos, detalle).
+    Con `siempre` (PROSA_SIEMPRE) se muestra lo que escribió el modelo; sin él,
+    la letra que no pasa va armada desde su fuente. Una prosa vacía deja la
+    versión determinista de siempre (generate.armar_secciones)."""
+    letras = letras_atls(consulta, casos, guias)
+    datos = generar_atls(consulta, casos, guias, letras, metricas)
+    detalle = {"letras_casos": letras.casos, "letras_manuales": letras.manuales,
+               "json_invalido": datos is None, "textos": []}
+    if not datos:
+        motivo = ("la salida no es un JSON válido (cortada)" if datos is None else
+                  "no hay prosa que mostrar (sin elementos que sugerir)")
+        return "", "", False, [motivo], detalle
+    textos = verificar_atls(datos, casos, consulta, guias, letras)
+    detalle["textos"] = textos
+    partes = {"casos": [], "guias": []}
+    for t in textos:
+        mostrado = (t.texto if t.texto and (siempre or not t.motivos)
+                    else _determinista_letra(t, letras))
+        if mostrado:
+            partes[t.fuente].append(f"{rotulo(t.letra)} {mostrado}")
+    motivos = [f"{t.letra} · {m}" for t in textos for m in t.motivos]
+    if not textos:
+        motivos = ["no hay prosa que mostrar (sin letras escritas)"]
+    return ("\n\n".join(partes["casos"]), "\n\n".join(partes["guias"]), not motivos, motivos, detalle)
+
+
+def es_presentacion(ficha: Ficha | None, consulta: str) -> bool:
+    """¿La consulta presenta a un paciente? Las de procedimiento ("¿cuándo poner
+    un tubo de tórax?") siguen con la prosa de siempre (fase 4 del plan)."""
+    ficha = ficha or actualizar(None, consulta)[1]
+    return ficha.es_paciente()
 
 
 def fuentes_en_prosa(v: Verificacion, casos: list[Resultado],

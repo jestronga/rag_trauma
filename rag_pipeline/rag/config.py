@@ -287,6 +287,16 @@ CONVERSACION = _env("CONVERSACION", "ficha")
 # 46 preguntas en las 25 de trauma, 2 como máximo, ninguna por lo ya dicho; la
 # pertinencia la juzga el médico.
 PREGUNTAS = _env_bool("PREGUNTAS", True)
+# La respuesta ordenada como la revisión primaria del ATLS, xABCDE, dentro de
+# cada apartado (rag/prioridades.py; PLAN_CHATBOT_CLINICO.md, fase 4, decisión 2).
+# Solo para la presentación de un paciente: las preguntas de procedimiento
+# siguen con la prosa de siempre.
+ORDEN_ATLS = _env_bool("ORDEN_ATLS", False)
+MAX_TOKENS_ATLS = _env_int("MAX_TOKENS_ATLS", 1000)   # 7 letras de 400 caracteres (generate)
+# Decisión 3 del plan: con el orden por letras, ¿se muestra la letra que no pasó
+# la verificación (como PROSA_SIEMPRE) o se arma desde su fuente? Recomendado:
+# medir y, si el % verificado baja, armarla desde su fuente (0).
+PROSA_SIEMPRE_ATLS = _env_bool("PROSA_SIEMPRE_ATLS", False)
 # Cuánto deja Ollama el modelo cargado tras cada llamada. Su valor por defecto
 # son 5 min: en una demo, la pregunta después de una pausa recargaba el modelo
 # (25-35 s en la GTX 1650). Se envía en cada llamada: no hace falta

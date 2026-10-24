@@ -52,15 +52,16 @@ sys.path.insert(0, str(RAIZ))
 from eval.evaluate import relevancia                                        # noqa: E402
 from rag import config                                                      # noqa: E402
 from rag.generate import (                                                  # noqa: E402
-    _ollama, armar_secciones, eleccion_modelo, elegir_sugerencias, ensamblar, fuentes_en_prosa,
-    guarda_casos, generar_eleccion, generar_prosa, mensajes_prosa, porcentaje_gpu,
-    prosa_por_fuente, usar_guias,
+    _ollama, armar_secciones, eleccion_modelo, elegir_sugerencias, ensamblar, es_presentacion,
+    fuentes_en_prosa, guarda_casos, generar_eleccion, generar_prosa, mensajes_prosa, porcentaje_gpu,
+    prosa_atls, prosa_por_fuente, usar_guias,
 )
 from rag.hallazgos import elegibles                                         # noqa: E402
 from rag.retrieve import buscar, buscar_guias, confianza, ruta_por_defecto  # noqa: E402
 from rag.verificar import RX_CITA, RX_CITA_GUIA, verificar_por_fuente       # noqa: E402
 
-MODOS = {"texto": False, "json": True, "prosa": None}   # prosa: SALIDA=prosa
+# prosa: SALIDA=prosa; atls: SALIDA=prosa con ORDEN_ATLS (PLAN_CHATBOT_CLINICO.md, fase 4)
+MODOS = {"texto": False, "json": True, "prosa": None, "atls": None}
 
 
 def recuperar(c: dict, ruta: str, con_guias: bool = False) -> dict:
@@ -145,7 +146,11 @@ _TIPOS_MOTIVO = [("cita inventada", "no están entre los recuperados"),
                  ("sin la edición", "sin decir la edición"),            # ATLS 10, decisión 3
                  ("cifra", ("no está en la guía", "cifras sin citar")),
                  ("término fuera de la guía", "no consta en la guía"),
-                 ("palabra fuera de la guía", "no aparecen en la guía")]
+                 ("palabra fuera de la guía", "no aparecen en la guía"),
+                 # por letras (modo atls)
+                 ("letra equivocada", ("es de la letra", "que es de la letra")),
+                 ("fuente cruzada", ("cita un manual en el apartado", "no cita un manual")),
+                 ("json inválido", "no es un JSON válido")]
 
 
 def tipo_motivo(motivo: str) -> str:
@@ -196,6 +201,52 @@ def medir_prosa(c: dict, rec: dict) -> dict:
         "citados": len(citados),
         "precision_recuperados": precision(casos, c),
         "precision_citados": precision(citados, c),
+        "verificada": ok,
+        "motivos": " || ".join(motivos),
+        "tipos_motivo": " | ".join(sorted({tipo_motivo(m) for m in motivos})),
+        "finales": "prosa" if ok else "determinista",
+        "prosa": prosa,
+    }
+
+
+def medir_atls(c: dict, rec: dict) -> dict:
+    """La prosa por letras (ORDEN_ATLS): si pasa, cuántas letras escribe de las
+    pedidas, si cada texto es de su letra y si el JSON llega entero. Las
+    preguntas de procedimiento no van por letras (fase 4): se miden como prosa."""
+    if not es_presentacion(None, c["texto"]):
+        return {**medir_prosa(c, rec), "orden": False}
+    casos, guias = rec["casos"], rec["guias"]
+    metricas: dict = {}
+    t0 = time.perf_counter()
+    p_casos, p_guias, ok, motivos, detalle = prosa_atls(c["texto"], casos, guias, siempre=True, metricas=metricas)
+    t1 = time.perf_counter()
+    textos = detalle["textos"]
+    prosa = "\n\n".join(p for p in (p_casos, p_guias) if p)
+    ids = {m.group(1) for m in RX_CITA.finditer(prosa)}
+    citados = [x for x in casos if x.record_id in ids]
+    secciones = {f.seccion_id for f in guias}
+    citadas = {m.group(1).upper() for m in RX_CITA_GUIA.finditer(prosa)} & secciones
+    return {
+        "orden": True,
+        "fuentes": "+".join(n for n, hay in (("casos", casos), ("guias", guias)) if hay),
+        "en_prosa": "+".join(f for f in ("casos", "guias")
+                             if any(t.fuente == f for t in textos) and all(not t.motivos for t in textos
+                                                                           if t.fuente == f)),
+        "pasajes": len(secciones), "pasajes_citados": len(citadas),
+        "letras_pedidas": len(detalle["letras_casos"]) + len(detalle["letras_manuales"]),
+        "letras_escritas": len(textos),
+        "letras_verificadas": sum(not t.motivos for t in textos),
+        "letras_equivocadas": sum(any("de la letra" in m for m in t.motivos) for t in textos),
+        "json_invalido": detalle["json_invalido"],
+        "s_generacion": round(t1 - t0, 2),
+        "s_carga": round(metricas.get("s_carga", 0.0), 2),
+        "s_prompt": round(metricas.get("s_prompt", 0.0), 2),
+        "s_salida": round(metricas.get("s_salida", 0.0), 2),
+        "s_ensamblado": 0.0,
+        "tokens_prompt": metricas.get("tokens_prompt", 0),
+        "tokens_salida": metricas.get("tokens_salida", 0),
+        "recuperados": len(casos), "citados": len(citados),
+        "precision_recuperados": precision(casos, c), "precision_citados": precision(citados, c),
         "verificada": ok,
         "motivos": " || ".join(motivos),
         "tipos_motivo": " | ".join(sorted({tipo_motivo(m) for m in motivos})),
@@ -260,21 +311,25 @@ def main() -> None:
             for c in dentro:
                 rec = recs[c["id"]]
                 # sin casos, los modos texto y json no tienen qué elegir
-                if rec["abstiene"] or (modo != "prosa" and not rec["casos"]):
+                if rec["abstiene"] or (modo not in ("prosa", "atls") and not rec["casos"]):
                     continue
                 descargar(modelo)
+                medida = (medir_prosa(c, rec) if modo == "prosa" else medir_atls(c, rec) if modo == "atls"
+                          else medir(c, rec, MODOS[modo]))
                 fila = {"modelo": modelo, "modo": modo, "id": c["id"], "categoria": c["categoria"],
                         "s_coseno": round(rec["s_coseno"], 3),
-                        "s_recuperacion": round(rec["s_recuperacion"], 3),
-                        **(medir_prosa(c, rec) if modo == "prosa" else medir(c, rec, MODOS[modo]))}
+                        "s_recuperacion": round(rec["s_recuperacion"], 3), **medida}
                 fila["gpu_pct"] = porcentaje_gpu(modelo)     # tras cada recarga
                 # como en el chatbot con el modelo ya cargado: sin la recarga forzada
                 fila["s_total"] = round(fila["s_coseno"] + fila["s_recuperacion"]
                                         + fila["s_generacion"] - fila["s_carga"]
                                         + fila["s_ensamblado"], 2)
                 filas.append(fila)
-                if modo == "prosa":
+                if modo in ("prosa", "atls"):
                     detalle = fila["tipos_motivo"] or "verificada"
+                    if fila.get("orden"):
+                        detalle += f"  · letras {fila['letras_verificadas']}/{fila['letras_escritas']} de " \
+                                   f"{fila['letras_pedidas']}"
                 else:
                     detalle = f"descartadas {fila['descartadas']}  → {fila['finales']}"
                 print(f"  {c['id']:8} {modo:5} {fila['s_total']:6.1f} s  "
@@ -304,6 +359,21 @@ def main() -> None:
         prec_citados=("precision_citados", "mean"))
     u["citados/recuperados"] = u["citados"] / u["recuperados"]
     print(u.round(3).to_string())
+
+    if "orden" in df and df["orden"].fillna(False).astype(bool).any():
+        at = df[(df["modo"] == "atls") & df["orden"].fillna(False).astype(bool)]
+        print("\n=== Por letras (ORDEN_ATLS), solo las presentaciones de un paciente ===")
+        for modelo, g in at.groupby("modelo"):
+            pr_mismas = df[(df["modo"] == "prosa") & df["id"].isin(g["id"]) & (df["modelo"] == modelo)]
+            tipos = pd.Series([t for ts in g["tipos_motivo"].fillna("") if ts for t in ts.split(" | ")])
+            print(f"{modelo}: {int(g['verificada'].sum())} de {len(g)} verificadas enteras "
+                  f"(la prosa de siempre, en las mismas: {int(pr_mismas['verificada'].sum())} de "
+                  f"{len(pr_mismas)}) · JSON inválido {int(g['json_invalido'].sum())} · letras "
+                  f"verificadas {int(g['letras_verificadas'].sum())} de {int(g['letras_escritas'].sum())} "
+                  f"escritas ({int(g['letras_pedidas'].sum())} pedidas) · de la letra equivocada "
+                  f"{int(g['letras_equivocadas'].sum())} · mediana {g['s_total'].median():.1f} s, "
+                  f"{g['tokens_salida'].median():.0f} tokens de salida"
+                  + (f"\n  rechazos por: {tipos.value_counts().to_dict()}" if len(tipos) else ""))
 
     if "verificada" in df:
         pr = df[df["modo"] == "prosa"]

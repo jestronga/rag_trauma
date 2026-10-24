@@ -393,7 +393,7 @@ generar) y `reports/probar_preguntas.csv`, con la columna vacía
 
 ---
 
-## Fase 4 — Mejora 2: que ordene la respuesta como el ATLS (3 a 4 días)
+## Fase 4 — Mejora 2: que ordene la respuesta como el ATLS (en curso el 24/10/2026; decisión 2: dentro de cada apartado)
 
 **Idea.** El ATLS 11 organiza la revisión primaria como xABCDE: hemorragia
 exanguinante, vía aérea, respiración, circulación, déficit neurológico y
@@ -458,6 +458,72 @@ inválido, letras coherentes, tokens de salida y mediana de tiempo. Al médico:
 **Hecho cuando:** 0 JSON inválidos, el % verificado no baja respecto de la
 línea base, mediana de 10 s o menos y la tabla de letras revisada por el
 médico.
+
+**Avance (24/10, RTX 4060).** Decisión 2 del usuario: dentro de cada apartado.
+Para la decisión 3 se sigue lo recomendado: medir y, si el % verificado baja,
+armar desde su fuente la letra que no pasa (`PROSA_SIEMPRE_ATLS=0`).
+`ORDEN_ATLS` sigue apagado hasta terminar de medir.
+
+- **`rag/prioridades.py`:**
+  - una letra para cada término del léxico, con las del plan; un test cuida
+    que ninguno quede sin letra;
+  - 7 dudosos para el médico (`DUDOSOS`): sangrado activo (x o C), compromiso
+    vascular, toracotomía, convulsión, irritación peritoneal, laparotomía y
+    angiografía;
+  - la letra de cada pasaje sale del capítulo (ATLS 11, del 3 al 8; HUV 3, 5,
+    6 y, al mirar los títulos, 20 vascular → x, 21 ultrasonido → C, 22
+    toracostomía → B; ATLS 10, 2, 3 y 15) y, si no, en español, de sus
+    términos;
+  - en un pasaje, "hemorragia" es C, no x: con x, 74 secciones del ATLS 10
+    quedaban en "hemorragia exanguinante".
+- **Pasajes con letra**, entre los recuperados en las 41 consultas: HUV 59 %,
+  ATLS 10 60 %, ATLS 11 44 %. El resto va en "Después". No se agregó la lista
+  de términos en inglés.
+- **Formato:**
+  - una clave por letra pedida, obligatoria, con un tope de 400 caracteres
+    (`maxLength`, que Ollama cumple). Con la lista de `{"letra", "texto"}` y
+    `enum` del plan, el 4B repetía la misma letra hasta cortarse (2 de 3
+    consultas de prueba);
+  - sin el tope, abr-04, con 9 pasajes en "Después", escribía una oración por
+    pasaje hasta agotar los tokens;
+  - el código quita la oración que el tope dejó a medias y pone los rótulos;
+  - `MAX_TOKENS_ATLS` es 1000.
+- **Verificación por letra:** `verificar_por_fuente` de siempre, más la regla
+  de la letra.
+  - **Casos:** un texto nombra su letra y lo de "Después" (lo que se hizo:
+    "con hemoperitoneo se realizó laparotomía"), no otra letra primaria. La
+    regla estricta del plan rechazaba esa oración; además, "laparotomía" es
+    "cirugía" para el léxico.
+  - **Manuales:** la oración va en la letra primaria de los pasajes que cita
+    (la letra la decide el código); si cita pasajes de dos letras primarias,
+    no pasa. Antes, 9 de 16 rechazos por letra eran una oración en "Después"
+    que citaba un pasaje de C.
+- **Solo con un paciente** (`Ficha.es_paciente`). Las preguntas de
+  procedimiento ("¿cuándo está indicado colocar un tubo de tórax?", "técnica…",
+  "manejo del…") no son un paciente aunque nombren una lesión: siguen con la
+  prosa de siempre y no llevan preguntas. "Ácido tranexámico" ya no se lee
+  como quemadura química.
+- **La app:** los rótulos en negrita dentro de cada apartado y, arriba, qué
+  letras van armadas desde su fuente.
+
+| 25 presentaciones (`comparar_modelos.py --modos prosa,atls --consultas guias`) | por letras, 1.ª | por letras, 2.ª (letra por lo citado) | prosa de siempre |
+|---|---|---|---|
+| JSON inválido | 0 | 1 (abr-04, cortado) | — |
+| verificadas enteras | 5 | 7 | 7 |
+| fuentes en prosa (de 45) | 18 | 19 | 20 |
+| letras verificadas | 55 de 97 | 53 de 89 | — |
+| mediana | 9,4 s | 9,7 s | 8,7 s |
+| tokens de salida | 359 | 363 | 305 |
+
+- **La 3.ª medición**, con el tope de 400 caracteres para abr-04, se detuvo por
+  falta de memoria antes de empezar a generar. Hay que repetirla:
+  `comparar_modelos.py --modos atls --consultas guias`.
+- **Lo que queda en los rechazos** es lo de siempre: palabras fuera de la guía
+  citada, el manual equivocado (la "11.ª edición" con una cita del HUV) y el
+  tono, más algunos de letra que son errores de verdad (hemotórax y tubo de
+  tórax en "Después").
+- **La prosa de siempre también varía entre corridas:** 9 de 41 en esta,
+  contra 15 de 41 en la línea base.
 
 **Riesgo principal.** Un formato más rico es más difícil para el 4B:
 `MAX_TOKENS_PROSA` ya se subió a 600 porque se cortaba el JSON. **Versión
