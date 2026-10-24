@@ -52,11 +52,17 @@ otra). Falta la fase 7, la revisión médica. Cinco decisiones para el usuario; 
 primera es si quien lo pidió sabe lo de la traducción.
 
 **Próxima reunión (pedido del 19/10): "un chatbot mucho más sofisticado".**
-Plan en **`PLAN_CHATBOT_CLINICO.md`** (raíz), sin empezar: que pregunte lo que
-falta, que ordene la respuesta como el ATLS (xABCDE), una ficha del paciente
-para seguir la conversación y abreviaturas expandidas para buscar en los
-manuales. Orden: fase 0 (traer las notas de la demo y línea base) → 4 → 3 → 1
-→ 2. Tiene cuatro decisiones abiertas para el usuario.
+Plan en **`PLAN_CHATBOT_CLINICO.md`** (raíz): que pregunte lo que falta, que
+ordene la respuesta como el ATLS (xABCDE), una ficha del paciente para seguir
+la conversación y abreviaturas expandidas para buscar en los manuales. Orden:
+fase 0 (traer las notas de la demo y línea base) → 4 → 3 → 1 → 2. Tiene cuatro
+decisiones abiertas para el usuario. **Fase 0: línea base hecha el 24/10**
+(`reports/linea_base_chatbot.csv`; faltan las notas de la demo). **Fase 1
+hecha el 24/10** (`rag/consulta.py`): los manuales se buscan con las
+abreviaturas expandidas y el nombre del mecanismo ("sujeto baleado (herida por
+arma de fuego)"); los casos, con la consulta original. Trauma sin manuales de
+9 a 6 de 25, R@ppto 0,272 → 0,280 y 0,819 igual, fuera de dominio 0 de 20
+(`ABREV_LIBROS`, `MECANISMO_LIBROS`, encendidas). La prosa no se volvió a medir.
 
 ---
 
@@ -353,7 +359,7 @@ rag_trauma/
                          verificar, guias (extracción de los libros), fragmentar
     guias/               perfiles.yaml (en git) y el texto extraído de los libros (no está en git)
     indices/             BM25 + Qdrant local (casos: 8.198 puntos; guias: 2.201) — no está en git
-    tests/               300 tests del extractor, los libros, la respuesta y el verificador (sin Ollama ni índices)
+    tests/               323 tests del extractor, los libros, la respuesta y el verificador (sin Ollama ni índices)
     scripts/             revisar_entorno, probar_respuestas, exportar_revision, preparar_demo,
                          calibrar_umbral/_guias, comparar_modelos/_fragmentacion, extraer_guias
     eval/                consultas.yaml (35 consultas), consultas_guias.yaml (51, libros), evaluate.py,
@@ -876,6 +882,9 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
 | `UMBRAL_GUIAS_SIN_SENAL` | `0.65` | libros, ruta rerank, sin señal: mejor fragmento mínimo. Frena sangrado vaginal en el embarazo (0,541), hipoglucemia y ACV |
 | `UMBRAL_RERANK_SIN_SENAL` | `0.7` | casos sin señal: MIN_CASOS con esta probabilidad (al prompt entran los de `UMBRAL_RERANK`). Frena ACV (0,580), apendicitis e insuficiencia cardiaca |
 | `CANDIDATOS_POR_LIBRO` | `0` | el reranker ve los 30 primeros de cada libro; medido el 23/10: +0,57 s y no compensa |
+| `ABREV_LIBROS` | `1` | los manuales se buscan con las abreviaturas expandidas ("HPAF (herida por arma de fuego)"; `rag/consulta.py`, fase 1 de `PLAN_CHATBOT_CLINICO.md`, 24/10). Sin `tx`, `qx`, `ha` ni las que los manuales ya usan (FAST, GCS, Rx, Fr…) |
+| `MECANISMO_LIBROS` | `1` | y con el nombre del mecanismo de `rag/senal.py` cuando la consulta lo dice con otras palabras ("baleado" → herida por arma de fuego). Las dos juntas, 24/10: trauma sin manuales de 9 a 6 de 25 |
+| `ABREVIATURAS_YAML` | `anonimizacion/config/abreviaturas.yaml` | el diccionario de la anonimización, leído como dato |
 | `MAX_TOKENS_PROSA` | `600` | 400 hasta el 17/10: con los libros se cortaba el JSON |
 | `COLECCION_GUIAS` | `guias` | colección de Qdrant con los libros (17/10) |
 | `FRAGMENTACION_GUIAS` | `fijo-256` | configuración de `rag/fragmentar.py` al indexar los libros |

@@ -34,6 +34,7 @@ sys.path.insert(0, str(RAIZ))
 
 from rag import config                                                      # noqa: E402
 from rag.build_prompt import SISTEMA_PROSA, SISTEMA_PROSA_GUIAS, SISTEMA_PROSA_GUIAS_ATLS10  # noqa: E402
+from rag.consulta import diccionario                                         # noqa: E402
 from rag.generate import (_ollama, ollama_disponible, porcentaje_gpu, responder,  # noqa: E402
                           usar_guias)
 from rag.retrieve import (dispositivo_reranker, libros_indexados, ruta_guias_por_defecto,  # noqa: E402
@@ -64,6 +65,14 @@ def main() -> int:
         if config.SENAL_TRAUMA:
             print(f"{OK} guarda por señal de trauma: sin señal, libros {config.UMBRAL_GUIAS_SIN_SENAL} "
                   f"y casos {config.UMBRAL_RERANK_SIN_SENAL}")
+        # la consulta de los manuales (PLAN_CHATBOT_CLINICO.md, fase 1)
+        if config.ABREV_LIBROS and not diccionario():
+            print(f"{AVISO} ABREV_LIBROS=1 pero no encuentro {config.ABREVIATURAS_YAML}: "
+                  f"los manuales se buscan sin expandir las abreviaturas")
+        else:
+            print(f"{OK} búsqueda en los manuales: abreviaturas "
+                  f"{'expandidas' if config.ABREV_LIBROS else 'sin expandir'} · nombre del mecanismo "
+                  f"{'sí' if config.MECANISMO_LIBROS else 'no'}")
         # el ATLS 10 (PLAN_INDEXAR_ATLS10.md): indexado desde la fase 3, se busca con ATLS10=1
         indexado = "ATLS10" in libros_indexados()
         if config.ATLS10 and not indexado:

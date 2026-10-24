@@ -18,6 +18,7 @@ import streamlit as st
 warnings.filterwarnings("ignore")
 
 from rag import config                                    # noqa: E402
+from rag.consulta import para_libros                           # noqa: E402
 from rag.build_prompt import (                                 # noqa: E402
     RX_LINEA_RESPALDO, agrupar_guias, cabecera_guia, desenlace_visible, texto_guia,
 )
@@ -338,14 +339,18 @@ def desplegable_guias(respuesta, consulta: str) -> None:
     if not respuesta.guias:
         return
     buscada = respuesta.consulta_reescrita or consulta
+    # la de los manuales, con abreviaturas y mecanismo (retrieve.candidatos_guias)
+    en_libros = para_libros(buscada)
     grupos = agrupar_guias(respuesta.guias)
     with st.expander(f"Fragmentos de los manuales ({len(grupos)}) · texto completo"):
+        if en_libros != buscada:
+            st.caption(f"Búsqueda en los manuales: «{en_libros}»")
         st.caption("Pasajes que pasaron la guarda de los manuales, del más al menos relevante. "
                    "Páginas impresas del libro; el ATLS 11, en su idioma original"
                    + ("; el ATLS 10, tal como viene en la traducción no oficial, sin corregir."
                       if config.ATLS10 else "."))
         for seccion, fragmentos in grupos.items():
-            st.markdown(tarjeta_guia(seccion, fragmentos, buscada), unsafe_allow_html=True)
+            st.markdown(tarjeta_guia(seccion, fragmentos, en_libros), unsafe_allow_html=True)
 
 
 # Pedido del usuario para la demo (19/10): en pantalla no van la línea de

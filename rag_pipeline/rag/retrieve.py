@@ -469,6 +469,9 @@ def candidatos_guias(consulta: str, ruta: str | None = None, profundidad: int | 
         raise SystemExit(f"Falta la colección de los libros ({config.COLECCION_GUIAS!r}). "
                          "Corre: python -m rag.index --fuente guias")
     por_libro = config.CANDIDATOS_POR_LIBRO if por_libro is None else por_libro
+    if config.ABREV_LIBROS or config.MECANISMO_LIBROS:
+        from .consulta import para_libros       # consulta → hallazgos → retrieve
+        consulta = para_libros(consulta)
     vector = _vector_consulta(consulta).tolist()
     filtros = [_filtro_libros(l) for l in libros_activos()] if por_libro else [_filtro_libros()]
     puntos = []

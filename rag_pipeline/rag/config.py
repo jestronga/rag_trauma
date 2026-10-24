@@ -129,6 +129,14 @@ GUIAS = _env_bool("GUIAS", True)
 # libro, no de todos juntos; medido: +0,57 s y no compensa.
 CUOTA_GUIAS = _env_bool("CUOTA_GUIAS", ATLS10)
 CANDIDATOS_POR_LIBRO = _env_bool("CANDIDATOS_POR_LIBRO", False)
+# La consulta con que se buscan los manuales (rag/consulta.py; PLAN_CHATBOT_CLINICO.md,
+# fase 1): abreviaturas expandidas, con el diccionario de la anonimización leído
+# como dato, y el nombre del mecanismo ("baleado" → herida por arma de fuego).
+# Medido el 24/10: trauma sin manuales de 9 a 6 de 25, R@ppto 0,272 → 0,280 y
+# 0,819 igual, fuera de dominio 0 de 20. Los casos se buscan con la original.
+ABREV_LIBROS = _env_bool("ABREV_LIBROS", True)
+MECANISMO_LIBROS = _env_bool("MECANISMO_LIBROS", True)
+ABREVIATURAS_YAML = Path(_env("ABREVIATURAS_YAML", str(RAIZ_ANONIMIZACION / "config" / "abreviaturas.yaml")))
 
 # --- modelos ---------------------------------------------------------------
 MODELO_EMBEDDING = _env("MODELO_EMBEDDING", "BAAI/bge-m3")
