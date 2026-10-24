@@ -456,7 +456,7 @@ de trauma, las dos guardas piden más (guarda por señal de trauma,
 | `CONVERSACION` | `ficha` | la ficha del paciente la arma el código (`rag/ficha.py`); `llm` = el modelo reescribe cada seguimiento, como antes del 24/10 |
 | `PREGUNTAS` | encendido | hasta 2 preguntas con botones bajo la respuesta (`rag/preguntas.py`); necesita `CONVERSACION=ficha` |
 | `ORDEN_ATLS` | encendido | la prosa por letras de la revisión primaria (xABCDE) dentro de cada apartado, solo con un paciente (`rag/prioridades.py`) |
-| `PROSA_SIEMPRE_ATLS` | el de `PROSA_SIEMPRE` | por letras: `1` = la letra que no pasa la verificación se muestra igual; `0` = va armada desde su fuente (decisión 3 del plan, pendiente) |
+| `PROSA_SIEMPRE_ATLS` | el de `PROSA_SIEMPRE` | por letras: `1` = la letra que no pasa la verificación se muestra igual; `0` = va armada desde su fuente (decisión 3 del plan, 24/10: se deja como `PROSA_SIEMPRE`) |
 | `UMBRAL_GUIAS` | `0.34` | ruta `rerank`: probabilidad mínima del mejor fragmento para que los libros hablen (0,2 hasta el 19/10). Calibrar con `scripts\calibrar_guias.py` |
 | `UMBRAL_GUIAS_COSENO` | `0.60` | ruta `densa` (sin el reranker en GPU): coseno mínimo del mejor fragmento. Separa mal: con 0,60 frena las 10 fuera de dominio pero deja sin libros a 16 de 25 consultas de trauma |
 

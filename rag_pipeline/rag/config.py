@@ -301,7 +301,7 @@ MAX_TOKENS_ATLS = _env_int("MAX_TOKENS_ATLS", 1000)   # 7 letras de 400 caracter
 # lo mismo que PROSA_SIEMPRE, que el usuario eligió para la demo (18/10). Medido
 # el 24/10: con 0, en 16 de las 20 respuestas con manuales alguna letra de los
 # manuales queda como una lista de pasajes (pasan enteros 4 de 20, como con la
-# prosa de siempre).
+# prosa de siempre). El usuario decidió dejarlo así (24/10).
 PROSA_SIEMPRE_ATLS = _env_bool("PROSA_SIEMPRE_ATLS", PROSA_SIEMPRE)
 # Cuánto deja Ollama el modelo cargado tras cada llamada. Su valor por defecto
 # son 5 min: en una demo, la pregunta después de una pausa recargaba el modelo

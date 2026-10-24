@@ -19,6 +19,14 @@ prosa, y por eso lleva su propia verificación y su respaldo determinista.
 Para la reunión: **más sofisticado no es más libre.** Pregunta como un
 clínico, ordena como el ATLS, recuerda al paciente, y todo sigue citado.
 
+**Plan cerrado el 24/10/2026.** Las cinco fases están hechas y las cuatro
+decisiones, tomadas (al final). Lo que falta no es código:
+- **El médico, en la fase 7 de los libros:** la pertinencia de las preguntas y
+  la tabla de letras.
+- **El usuario:** las notas de la demo y qué le faltó a quien hizo el pedido.
+
+Los dos pendientes siguen en `CONTEXTO_SESION.md` §5 (pendientes 1 y 12).
+
 Cada mejora va detrás de una variable de `config.py`, como `GUIAS`: apagada,
 el asistente responde como hoy. La demo tiene marcha atrás.
 
@@ -393,7 +401,7 @@ generar) y `reports/probar_preguntas.csv`, con la columna vacía
 
 ---
 
-## Fase 4 — Mejora 2: que ordene la respuesta como el ATLS (hecha el 24/10/2026; decisión 2: dentro de cada apartado; faltan la tabla del médico y la decisión 3)
+## Fase 4 — Mejora 2: que ordene la respuesta como el ATLS (hecha el 24/10/2026; decisiones 2 y 3 tomadas; falta la tabla del médico, en la fase 7)
 
 **Idea.** El ATLS 11 organiza la revisión primaria como xABCDE: hemorragia
 exanguinante, vía aérea, respiración, circulación, déficit neurológico y
@@ -460,9 +468,9 @@ línea base, mediana de 10 s o menos y la tabla de letras revisada por el
 médico.
 
 **Resultado (24/10, RTX 4060).** Decisión 2 del usuario: dentro de cada
-apartado. **`ORDEN_ATLS=1` por defecto** desde la 3.ª medición (abajo). La
-decisión 3 queda para el usuario: `PROSA_SIEMPRE_ATLS` toma el valor de
-`PROSA_SIEMPRE` (encendido para la demo, 18/10).
+apartado. **`ORDEN_ATLS=1` por defecto** desde la 3.ª medición (abajo).
+Decisión 3 del usuario (24/10): se deja como está. `PROSA_SIEMPRE_ATLS` toma el
+valor de `PROSA_SIEMPRE`, encendido para la demo desde el 18/10.
 
 - **`rag/prioridades.py`:**
   - una letra para cada término del léxico, con las del plan; un test cuida
@@ -529,7 +537,7 @@ decisión 3 queda para el usuario: `PROSA_SIEMPRE_ATLS` toma el valor de
 - **Falta la tabla del médico** (letras de los términos y los capítulos, con
   los 7 dudosos), como en la fase 3.
 
-**La decisión 3, con datos (para el usuario):**
+**La decisión 3, con los datos con que se tomó (24/10, se deja como está):**
 - **Con `PROSA_SIEMPRE_ATLS=0`,** la letra que no pasa va armada desde su
   fuente:
   - en los casos, "En casos similares consta hemotórax [caso: …] y tubo de
@@ -607,19 +615,24 @@ seguir ese orden. Sin rótulos ni regla nueva.
 
 ---
 
-## Decisiones para el usuario
+## Decisiones del usuario (todas tomadas)
 
 1. **¿Preguntar antes o después de responder?** Recomendado: después, salvo
-   cuando no hay con qué buscar.
+   cuando no hay con qué buscar. **Se hizo así** (fase 3).
 2. **¿El orden xABCDE dentro de cada apartado, o un solo bloque con las dos
    fuentes?** Recomendado: dentro de cada apartado. Respeta la decisión 3 de
    los libros y el verificador ya trabaja por fuente. Un solo bloque se lee
-   mejor, pero mezcla las fuentes en la pantalla.
+   mejor, pero mezcla las fuentes en la pantalla. **Decidido: dentro de cada
+   apartado** (24/10).
 3. **`PROSA_SIEMPRE` con el formato nuevo.** Más prosa es más oraciones sin
    verificar en pantalla. Recomendado: medir primero y, si el % verificado
-   baja, mostrar armada desde su fuente la letra que no pasa.
+   baja, mostrar armada desde su fuente la letra que no pasa. **Decidido (24/10):
+   se deja como está.** `PROSA_SIEMPRE_ATLS` toma el valor de `PROSA_SIEMPRE`.
+   La letra que no pasa se muestra igual y sin marca en pantalla, como la prosa
+   de siempre; sus motivos quedan en `Respuesta.motivos`.
 4. **Quién valida las tablas** (letra por término y por capítulo, preguntas y
-   cuándo se hacen): el médico, en la fase 7 de los libros.
+   cuándo se hacen): el médico, en la fase 7 de los libros. **Se deja así**
+   (24/10).
 
 Fuera de este plan: cambiar de modelo (pendiente 9), un chat libre de
 medicina y quitar el verificador.

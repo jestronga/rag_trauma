@@ -55,8 +55,8 @@ primera es si quien lo pidió sabe lo de la traducción.
 Plan en **`PLAN_CHATBOT_CLINICO.md`** (raíz): que pregunte lo que falta, que
 ordene la respuesta como el ATLS (xABCDE), una ficha del paciente para seguir
 la conversación y abreviaturas expandidas para buscar en los manuales. Orden:
-fase 0 (traer las notas de la demo y línea base) → 4 → 3 → 1 → 2. Tiene cuatro
-decisiones abiertas para el usuario. **Fase 0: línea base hecha el 24/10**
+fase 0 (traer las notas de la demo y línea base) → 4 → 3 → 1 → 2. **Cerrado el
+24/10, con las cuatro decisiones tomadas.** **Fase 0: línea base hecha el 24/10**
 (`reports/linea_base_chatbot.csv`; faltan las notas de la demo). **Fase 1
 hecha el 24/10** (`rag/consulta.py`): los manuales se buscan con las
 abreviaturas expandidas y el nombre del mecanismo ("sujeto baleado (herida por
@@ -75,11 +75,11 @@ xABCDE. En las 25 de trauma salen 46 y ninguna repite lo ya dicho
 `ORDEN_ATLS=1`): la prosa por letras de la revisión primaria, dentro de cada
 apartado (decisión 2), solo con un paciente. En las 25 presentaciones: 0 JSON
 inválidos, 9,1 s de mediana, y lo verificado un poco debajo de la prosa de
-siempre (18 fuentes de 45 contra 20). Faltan dos cosas:
-- que el médico revise la tabla de letras (`prioridades.DUDOSOS`);
-- la decisión 3, del usuario. `PROSA_SIEMPRE_ATLS` toma el valor de
-  `PROSA_SIEMPRE`. Con 0, la letra que no pasa va armada desde su fuente, y en
-  16 de 20 respuestas los manuales quedarían como una lista de pasajes.
+siempre (18 fuentes de 45 contra 20). Decisión 3 del usuario (24/10): se deja
+como está. `PROSA_SIEMPRE_ATLS` toma el valor de `PROSA_SIEMPRE`, y la letra que
+no pasa se muestra igual. Con 0 iría armada desde su fuente, y en 16 de 20
+respuestas los manuales quedarían como una lista de pasajes. Falta que el
+médico revise la tabla de letras (`prioridades.DUDOSOS`).
 
 **Fase 5 hecha el 24/10:** `preparar_demo.py` revisa el guion escrito en un solo
 chat y la conversación de tres turnos ("HPAF en abdomen" → "Hipotenso o en
@@ -99,12 +99,12 @@ Respiración" que no hablaba de respiración. Ahora un texto de una letra
 primaria tiene que nombrar algo de esa letra para pasar la verificación; con
 `PROSA_SIEMPRE_ATLS=1` se muestra igual (decisión 3).
 
-**Pendientes del plan del chatbot:**
-- el médico: la pertinencia de las preguntas (`reports/probar_preguntas.csv`)
-  y la tabla de letras (`prioridades.DUDOSOS`);
-- el usuario: la decisión 3 (`PROSA_SIEMPRE_ATLS`);
-- la fase 0: las notas de la demo de la GTX 1650 y qué le faltó a quien hizo
-  el pedido.
+**Lo que queda del plan del chatbot no es código** (está en la §5):
+- **el médico, en el pendiente 1:** la pertinencia de las preguntas
+  (`reports/probar_preguntas.csv`) y la tabla de letras
+  (`prioridades.DUDOSOS`);
+- **el usuario, en el pendiente 12:** las notas de la demo de la GTX 1650 y qué
+  le faltó a quien hizo el pedido.
 
 ---
 
@@ -787,7 +787,12 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
    el formato anterior con el actual. **Cada error que marque se vuelve un
    test** en `tests/test_hallazgos.py`. Si se cambia el formato, regenerar la
    planilla con `INDICE_DIR` apuntando a una copia de los índices si el
-   chatbot está abierto.
+   chatbot está abierto. Del plan del chatbot (decisión 4: lo valida el
+   médico), además:
+   - si haría las preguntas: la columna `medico_la_haria` de
+     `reports/probar_preguntas.csv`;
+   - la letra de cada término y de cada capítulo (`rag/prioridades.py`), con
+     los 7 dudosos de `DUDOSOS`.
 2. **Seguir mejorando las sugerencias** (el principio de la sección 0). Ideas
    abiertas:
    - el léxico solo reconoce lo que tiene. En quemaduras no hay hallazgos que
@@ -840,7 +845,8 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
 11. ~~Restos de truncados en `consultas.yaml` y en el guion de `SETUP.md`~~
     Hecho el 28/09 (sección 2.11).
 12. **Después de la demo (sección 2.12):** notas de `PREGUNTAS_DEMO.md` →
-    pendientes; ~~decidir `PROSA_SIEMPRE`~~ decidido para la demo (18/10):
+    pendientes, y preguntarle a quien hizo el pedido qué le faltó (fase 0 de
+    `PLAN_CHATBOT_CLINICO.md`); ~~decidir `PROSA_SIEMPRE`~~ decidido para la demo (18/10):
     `True` (sección 00). ~~Actualizar el guion de `SETUP.md`
     §6; correr los tests y abrir la app~~ hecho el 17/10 (fase 6 de los libros:
     220 tests, app probada con `AppTest`, `preparar_demo.py` en "Todo listo").
@@ -930,7 +936,7 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
 | `CONVERSACION` | `ficha` | cómo se sigue la conversación: `ficha` = la ficha del paciente armada por el código (`rag/ficha.py`, fase 2 de `PLAN_CHATBOT_CLINICO.md`, 24/10), sin llamar al modelo; `llm` = el modelo reescribe cada seguimiento con el historial (`generate.reescribir`), como hasta el 24/10. Con la ficha: 9,9 s contra 13,8 s por seguimiento y más casos del mecanismo y la región |
 | `PREGUNTAS` | `1` | hasta 2 preguntas con botones bajo la respuesta, en el orden xABCDE (`rag/preguntas.py`, fase 3, 24/10). Necesita `CONVERSACION=ficha` |
 | `ORDEN_ATLS` | `1` | la prosa por letras de la revisión primaria (xABCDE) dentro de cada apartado, solo con un paciente (`rag/prioridades.py`, `generate.prosa_atls`, fase 4, 24/10). `0` = la prosa de siempre |
-| `PROSA_SIEMPRE_ATLS` | el de `PROSA_SIEMPRE` | con `ORDEN_ATLS`: `1` = la letra que no pasa la verificación se muestra igual; `0` = va armada desde su fuente (lo recomendado en la decisión 3, pendiente del usuario: con 0, los manuales quedan como lista en 16 de 20) |
+| `PROSA_SIEMPRE_ATLS` | el de `PROSA_SIEMPRE` | con `ORDEN_ATLS`: `1` = la letra que no pasa la verificación se muestra igual; `0` = va armada desde su fuente (decisión 3, 24/10: se deja como `PROSA_SIEMPRE`; con 0, los manuales quedan como lista en 16 de 20) |
 | `MAX_TOKENS_ATLS` | `1000` | salida de la prosa por letras: 7 letras de 400 caracteres como máximo |
 | `MAX_TOKENS_PROSA` | `600` | 400 hasta el 17/10: con los libros se cortaba el JSON |
 | `COLECCION_GUIAS` | `guias` | colección de Qdrant con los libros (17/10) |
