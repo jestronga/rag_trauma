@@ -35,7 +35,8 @@ from comparar_fragmentacion import cargar_consultas               # noqa: E402
 from rag import config                                            # noqa: E402
 from rag.index import cargar_secciones                            # noqa: E402
 from rag.retrieve import (_reranker_cabe, candidatos_guias,       # noqa: E402
-                          libros_activos, seleccionar_guias, umbral_guias)
+                          libros_activos, seleccionar_guias, umbral_guias,
+                          umbral_guias_consulta)
 
 UMBRALES = {"rerank": [0.05, 0.1, 0.15, 0.18, 0.2, 0.25, 0.3, 0.34, 0.4],
             "densa": [0.5, 0.52, 0.55, 0.57, 0.59, 0.6, 0.62]}
@@ -56,11 +57,14 @@ def recall(seleccion, relevantes: dict[str, int]) -> float | None:
     return len({f.seccion_id for f in seleccion} & dos) / len(dos)
 
 
-def evaluar(filas: list[dict], umbral: float, presupuesto: int) -> dict:
+def evaluar(filas: list[dict], umbral: float | None, presupuesto: int) -> dict:
+    """Con `umbral` None, el de la app para cada consulta (umbral_app: más alto
+    sin señal de trauma). La selección, con la cuota si la app la usa."""
     r = {"anotado": [], "sintetico": []}
     sin_libros = {"trauma": 0, "proc": 0, "fuera": 0}
     for f in filas:
-        sel = seleccionar_guias(f["cands"], umbral, presupuesto)
+        u = f["umbral_app"] if umbral is None else umbral
+        sel = seleccionar_guias(f["cands"], u, presupuesto, cuota=config.CUOTA_GUIAS)
         if f["grupo"] in sin_libros:
             sin_libros[f["grupo"]] += not sel
         rc = recall(sel, f["relevantes"])
@@ -86,7 +90,8 @@ def main() -> None:
     n = {g: sum(grupo(c) == g for c in consultas) for g in ("trauma", "proc", "fuera")}
     print(f"{len(consultas)} consultas ({n['trauma']} de trauma, {n['proc']} de procedimiento, "
           f"{n['fuera']} fuera de dominio, el resto sintéticas) · rutas {rutas} · "
-          f"presupuesto {config.PRESUPUESTO_GUIAS} tokens · libros {', '.join(sorted(libros))}")
+          f"presupuesto {config.PRESUPUESTO_GUIAS} tokens{' con cuota' if config.CUOTA_GUIAS else ''}"
+          f" · libros {', '.join(sorted(libros))}")
 
     for ruta in rutas:
         candidatos_guias("calentamiento", ruta)              # carga los modelos
@@ -97,7 +102,8 @@ def main() -> None:
             tiempos.append(time.perf_counter() - t0)
             filas.append({"id": c["id"], "texto": c["texto"], "grupo": grupo(c), "conjunto": c["conjunto"],
                           "relevantes": c["relevantes"], "cands": cands,
-                          "mejor": max((f.puntaje for f in cands), default=0.0)})
+                          "mejor": max((f.puntaje for f in cands), default=0.0),
+                          "umbral_app": umbral_guias_consulta(c["texto"], ruta)})
         actual = umbral_guias(ruta)
         escala = "probabilidad del reranker" if ruta == "rerank" else "coseno"
         print(f"\n=== ruta {ruta} · guarda: {escala} del mejor fragmento · "
@@ -119,6 +125,12 @@ def main() -> None:
             marca = "  ← actual" if abs(u - actual) < 1e-9 else ""
             print(f"{u:6.2f} {e['anot']:11.3f} {e['sint']:11.3f} {e['trauma']:>12}/{n['trauma']} "
                   f"{e['proc']:>10}/{n['proc']} {n['fuera'] - e['fuera']:>10}/{n['fuera']}{marca}")
+
+        e = evaluar(filas, None, config.PRESUPUESTO_GUIAS)
+        print(f"{'app':>6} {e['anot']:11.3f} {e['sint']:11.3f} {e['trauma']:>12}/{n['trauma']} "
+              f"{e['proc']:>10}/{n['proc']} {n['fuera'] - e['fuera']:>10}/{n['fuera']}  ← la guarda "
+              f"de la app: sin señal de trauma, {config.UMBRAL_GUIAS_SIN_SENAL}"
+              if ruta == "rerank" and config.SENAL_TRAUMA else "")
 
         fuera = [f["mejor"] for f in filas if f["grupo"] == "fuera"]
         if fuera:

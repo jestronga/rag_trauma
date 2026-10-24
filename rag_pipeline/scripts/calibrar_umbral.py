@@ -39,7 +39,8 @@ sys.path.insert(0, str(RAIZ))
 from rag import config                                   # noqa: E402
 from rag.retrieve import (buscar_rerank, candidatos_guias, confianza,  # noqa: E402
                           dispositivo_reranker, hay_guias, ruta_guias_por_defecto,
-                          umbral_guias)
+                          umbral_guias, umbral_guias_consulta)
+from rag.senal import senal_trauma                       # noqa: E402
 
 
 def main() -> None:
@@ -65,7 +66,10 @@ def main() -> None:
                        if libros else None)
         filas.append({"id": c["id"], "fuera": bool(c.get("espera_abstencion")),
                       "coseno": conf, "p1": probas[0] if probas else 0.0, "decisiva": decisiva,
-                      "libros": mejor_libro, "texto": c["texto"]})
+                      "libros": mejor_libro, "texto": c["texto"],
+                      # la guarda por señal de trauma de la app (decisión 5 de PLAN_INDEXAR_ATLS10.md)
+                      "senal": bool(senal_trauma(c["texto"])),
+                      "umbral_libros": umbral_guias_consulta(c["texto"], ruta_libros) if libros else None})
 
     print(f"Profundidad {args.profundidad} · {dispositivo_reranker()} · "
           f"rerank {sorted(tiempos)[len(tiempos) // 2]:.2f} s mediana, {max(tiempos):.2f} s peor\n")
@@ -103,10 +107,18 @@ def main() -> None:
         u_lib = umbral_guias(ruta_libros)
 
         def responde(f) -> tuple[bool, bool]:
-            return not abstiene(f, config.UMBRAL_RERANK), f["libros"] >= u_lib
+            """Como la app: sin señal de trauma, los casos piden MIN_CASOS con
+            UMBRAL_RERANK_SIN_SENAL (generate.guarda_casos) y los libros, su
+            umbral sin señal (retrieve.umbral_guias_consulta)."""
+            exigente = config.SENAL_TRAUMA and not f["senal"]
+            u_casos = max(config.UMBRAL_RERANK, config.UMBRAL_RERANK_SIN_SENAL) if exigente \
+                else config.UMBRAL_RERANK
+            return not abstiene(f, u_casos), f["libros"] >= f["umbral_libros"]
 
-        print(f"\nLas dos guardas juntas (decisión 3), con los umbrales actuales "
-              f"(libros: ruta {ruta_libros}, umbral {u_lib}):")
+        senal = (f", sin señal de trauma {config.UMBRAL_GUIAS_SIN_SENAL}; casos sin señal "
+                 f"{config.UMBRAL_RERANK_SIN_SENAL}" if config.SENAL_TRAUMA else "")
+        print(f"\nLas dos guardas juntas (decisión 3), como en la app "
+              f"(libros: ruta {ruta_libros}, umbral {u_lib}{senal}):")
         for nombre, grupo in (("trauma", dentro), ("fuera de dominio", fuera)):
             r = [responde(f) for f in grupo]
             print(f"  {nombre:16} solo casos {sum(c and not l for c, l in r):>2} · solo libros "
