@@ -10,9 +10,10 @@ nuevo; "No se sabe" no responde de nuevo: solo deja de preguntarlo
 (Ficha.sin_dato).
 
   | Falta                    | Cuándo                                              |
+  | impacto o por encima     | peatón (su tarjeta, PLAN_RESPUESTA_IDEAL.md)        |
   | B · ventilación          | región tórax                                        |
   | C · estado hemodinámico  | arma, herida penetrante, sangrado, o tórax, abdomen, |
-  |                          | pelvis o cuello                                     |
+  |                          | pelvis o cuello, o un mecanismo con tarjeta         |
   | D · Glasgow              | cráneo, caída o tránsito                            |
   | E · superficie, profundidad | quemadura                                        |
   | grupo                    | no se dijo la edad                                  |
@@ -34,9 +35,9 @@ import copy
 import re
 from dataclasses import dataclass
 
-from . import config
+from . import config, tarjetas
 from .consulta import NOMBRES_MECANISMO
-from .ficha import HIPOTENSION, Ficha, _analizable
+from .ficha import _VAR, HIPOTENSION, Ficha, _analizable
 from .hallazgos import _LEXICO, extraer, menciones, normalizar, obvios
 
 MAX_PREGUNTAS = 2
@@ -92,6 +93,14 @@ _GRUPO = Pregunta("grupo", "Paciente — ¿es niño, adulto, adulto mayor o emba
 _MECANISMO = Pregunta("mecanismo", "Si es un trauma — ¿cuál fue el mecanismo?", [
     Opcion(config.ETIQUETAS_MECANISMO[k], NOMBRES_MECANISMO[k])
     for k in ("arma_de_fuego", "cortopunzante", "accidente_transito", "caida", "contundente", "quemadura")
+])
+# La de la tarjeta del peatón (PLAN_RESPUESTA_IDEAL.md, fase 3): decide si van
+# las viñetas del aplastamiento. Las respuestas las lee ficha.VARIANTES; ninguna
+# nombra el mecanismo, que la haría leer como otro paciente.
+_ARROLLAMIENTO = Pregunta("aplastamiento", "Peatón — ¿fue un impacto o las ruedas le pasaron por encima?", [
+    Opcion("Impacto", "fue solo el impacto"),
+    Opcion("Le pasaron por encima", "las ruedas le pasaron por encima"),
+    NO_SE_SABE,
 ])
 _FRASE_REGION = {"craneo_encefalo": "en cráneo"}
 _REGION = Pregunta("region", "Si es un trauma — ¿en qué región?", [
@@ -154,11 +163,17 @@ def preguntar(ficha: Ficha | None, casos=(), consulta: str = "", abstuvo: bool =
     conocidos = set(ficha.afirmados) | set(ficha.negados) | obvios(_analizable(consulta))
     regiones = set(ficha.regiones)
     quemadura = ficha.mecanismo == "quemadura" or bool(_RX_QUEMADURA.search(dicho))
+    # con tarjeta, lo que decide sus viñetas: si las ruedas pasaron por encima y,
+    # con el estado hemodinámico, sus ramas de estable e inestable
+    tarjeta = tarjetas.cargar().get(tarjetas.clave(ficha)) if config.TARJETAS else None
     candidatas = []
+    if (tarjeta is not None and tarjeta.clave == "peaton"
+            and not {"impacto", "aplastamiento"} & set(ficha.variantes)):
+        candidatas.append(_ARROLLAMIENTO)
     if "torax" in regiones and not ({"hipoventilación", "neumotórax", "hemotórax"} & conocidos
                                     or _RX_VENTILACION.search(dicho)):
         candidatas.append(_B)
-    if ((ficha.mecanismo in _PENETRANTES or regiones & _REGIONES_C
+    if ((ficha.mecanismo in _PENETRANTES or regiones & _REGIONES_C or tarjeta is not None
          or {"herida penetrante", "sangrado activo"} & set(ficha.afirmados))
             and not (regiones and regiones <= {"ojo"})          # el trauma ocular aislado, no
             and not (ficha.estado or "TA" in ficha.signos or HIPOTENSION in conocidos
@@ -201,4 +216,6 @@ def ya_dicho(pregunta: Pregunta, consulta: str) -> bool:
     if pregunta.clave.startswith("afinar:"):
         afirmados, negados = menciones(n)
         return pregunta.clave.split(":", 1)[1] in afirmados + negados
+    if pregunta.clave == "aplastamiento":
+        return any(p.search(n) for k in ("impacto", "aplastamiento") for p in _VAR[k])
     return False

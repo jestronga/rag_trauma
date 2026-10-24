@@ -303,6 +303,14 @@ MAX_TOKENS_ATLS = _env_int("MAX_TOKENS_ATLS", 1000)   # 7 letras de 400 caracter
 # manuales queda como una lista de pasajes (pasan enteros 4 de 20, como con la
 # prosa de siempre). El usuario decidió dejarlo así (24/10).
 PROSA_SIEMPRE_ATLS = _env_bool("PROSA_SIEMPRE_ATLS", PROSA_SIEMPRE)
+# Tarjetas por mecanismo (PLAN_RESPUESTA_IDEAL.md, decisión 1 del usuario): con
+# un paciente de un mecanismo que tiene tarjeta, el apartado de los manuales es
+# el protocolo escrito de antemano desde los pasajes (rag/tarjetas.py), y el
+# modelo escribe solo sobre los casos. Apagado, todo como antes. Las tarjetas y
+# los conteos del registro van en git (tarjetas/); el texto de los libros, no.
+TARJETAS = _env_bool("TARJETAS", True)
+TARJETAS_YAML = Path(_env("TARJETAS_YAML", str(RAIZ / "tarjetas" / "tarjetas.yaml")))
+PATRONES_REGISTRO = Path(_env("PATRONES_REGISTRO", str(RAIZ / "tarjetas" / "patrones_registro.json")))
 # Cuánto deja Ollama el modelo cargado tras cada llamada. Su valor por defecto
 # son 5 min: en una demo, la pregunta después de una pausa recargaba el modelo
 # (25-35 s en la GTX 1650). Se envía en cada llamada: no hace falta

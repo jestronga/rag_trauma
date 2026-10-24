@@ -47,7 +47,10 @@ from .hallazgos import (
 from .preguntas import Pregunta, preguntar
 from .prioridades import DESPUES, LETRAS, letra_pasaje, letra_termino, ordenar, rotulo
 from .prioridades import NOMBRES as NOMBRES_LETRAS
-from .retrieve import FragmentoGuia, Filtros, Resultado, buscar, buscar_guias, confianza, hay_guias
+from .retrieve import (
+    FragmentoGuia, Filtros, Resultado, buscar, buscar_guias, confianza, fragmentos_de, hay_guias,
+)
+from .tarjetas import armar as armar_tarjeta, elegir as elegir_tarjeta, linea_registro
 from .verificar import RX_CITA, RX_CITA_GUIA, Verificacion, oraciones, suavizar, verificar_por_fuente
 
 
@@ -95,6 +98,11 @@ class Respuesta:
     # las letras que no pasaron y van armadas desde su fuente ("C de los casos")
     orden_atls: bool = False
     letras_armadas: list[str] = field(default_factory=list)
+    # TARJETAS=1 (PLAN_RESPUESTA_IDEAL.md): la tarjeta que va como apartado de
+    # los manuales y los pasajes que cita (no los buscó la búsqueda: están en
+    # `guias` solo si también los encontró)
+    tarjeta: str | None = None
+    pasajes_tarjeta: list[FragmentoGuia] = field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
@@ -308,8 +316,30 @@ def responder(
     prosa_verificada, motivos = None, []
     prosa_casos = prosa_guias = eleccion = ""
     orden_atls, letras_armadas = False, []
+    texto_tarjeta, pasajes_tarjeta = "", []
+    ficha_actual = conversacion.get("ficha") or actualizar(None, consulta)[1]
+    tarjeta = (elegir_tarjeta(ficha_actual, pregunta, con_guias)
+               if config.SALIDA == "prosa" and not config.SINTESIS_LLM else None)
     try:
-        if (config.SALIDA == "prosa" and not config.SINTESIS_LLM and config.ORDEN_ATLS
+        if tarjeta is not None:
+            # El protocolo sale de la tarjeta, ajustado a la ficha; el modelo
+            # escribe solo sobre los casos (decisión 1 de PLAN_RESPUESTA_IDEAL.md)
+            texto_tarjeta, citas = armar_tarjeta(tarjeta, ficha_actual)
+            pasajes_tarjeta = fragmentos_de(citas)
+            if aviso := aviso_ediciones(pasajes_tarjeta):
+                texto_tarjeta += f"\n\n{aviso}"
+            if config.ORDEN_ATLS:
+                orden_atls = True
+                prosa_casos, _, prosa_verificada, motivos, detalle = prosa_atls(
+                    consulta, casos, [], config.PROSA_SIEMPRE_ATLS)
+                if not config.PROSA_SIEMPRE_ATLS:
+                    letras_armadas = [f"{t.letra} de los casos" for t in detalle["textos"] if t.motivos]
+            else:
+                prosa = generar_prosa(consulta, casos)
+                v = verificar_por_fuente(prosa, casos, consulta)
+                prosa_verificada, motivos = v.pasa, v.motivos
+                prosa_casos, _ = prosa_por_fuente(v, casos, None, config.PROSA_SIEMPRE)
+        elif (config.SALIDA == "prosa" and not config.SINTESIS_LLM and config.ORDEN_ATLS
                 and es_presentacion(conversacion.get("ficha"), consulta)):
             # ordenada como la revisión primaria, dentro de cada apartado (fase 4)
             orden_atls = True
@@ -329,14 +359,15 @@ def responder(
         elif casos:
             eleccion = generar_eleccion(consulta, casos)
         secciones = armar_secciones(casos, consulta, fragmentos, con_guias,
-                                    prosa_casos, prosa_guias, eleccion)
+                                    prosa_casos, prosa_guias, eleccion, tarjeta=texto_tarjeta,
+                                    registro=linea_registro(tarjeta.clave) if texto_tarjeta else "")
     except Exception as e:
         return Respuesta(texto="", casos=casos, guias=fragmentos, confianza=conf,
                          consulta_reescrita=reescrita,
                          error=f"No se pudo generar la respuesta: {e}", **conversacion)
 
     texto = "\n\n".join(s.texto for s in secciones)
-    validas, invalidas = verificar_citas(texto, casos, fragmentos)
+    validas, invalidas = verificar_citas(texto, casos, fragmentos + pasajes_tarjeta)
     respuesta = Respuesta(texto=texto, casos=casos, guias=fragmentos, confianza=conf,
                           citas_validas=validas, citas_invalidas=invalidas,
                           consulta_reescrita=reescrita, relevancia=relevancia,
@@ -344,7 +375,9 @@ def responder(
                           fuentes_en_prosa=[n for n, p in (("casos", prosa_casos), ("guias", prosa_guias)) if p],
                           secciones=secciones, **conversacion, orden_atls=orden_atls,
                           letras_armadas=letras_armadas,
-                          preguntas=_preguntas(conversacion.get("ficha"), casos, consulta))
+                          preguntas=_preguntas(conversacion.get("ficha"), casos, consulta),
+                          tarjeta=tarjeta.clave if texto_tarjeta else None,
+                          pasajes_tarjeta=pasajes_tarjeta)
     if respuesta.tipo == "seguimiento":
         respuesta.cambio = que_cambio(anterior, respuesta, ficha, respuesta.ficha)
     return respuesta
@@ -683,7 +716,7 @@ def prosa_por_fuente(v: Verificacion, casos: list[Resultado], guias: list[Fragme
 
 def armar_secciones(casos: list[Resultado], consulta: str, guias: list[FragmentoGuia] | None = None,
                     con_guias: bool = False, prosa_casos: str = "", prosa_guias: str = "",
-                    eleccion: str = "") -> list[Seccion]:
+                    eleccion: str = "", tarjeta: str = "", registro: str = "") -> list[Seccion]:
     """La respuesta en apartados, uno por fuente, cada uno con su título (la app
     pone debajo de cada uno el desplegable con el texto completo):
 
@@ -695,7 +728,11 @@ def armar_secciones(casos: list[Resultado], consulta: str, guias: list[Fragmento
         página y texto de cada pasaje, en el desplegable (sin lista: pedido
         del usuario, 18/10). Sin prosa, una línea que remite al desplegable.
       · Pie: con las dos fuentes, que pueden no coincidir (decisión 3).
-    Si una fuente no pasó su guarda, su apartado lo dice."""
+    Si una fuente no pasó su guarda, su apartado lo dice.
+
+    Con `tarjeta` (PLAN_RESPUESTA_IDEAL.md), el protocolo va primero, en lugar
+    del apartado de los manuales (decisiones 1 y 3 del usuario), y `registro`
+    (la línea con los conteos del mecanismo) encabeza los casos."""
     guias = guias or []
     if not casos:
         texto_casos = AVISO_SOLO_GUIAS
@@ -703,7 +740,14 @@ def armar_secciones(casos: list[Resultado], consulta: str, guias: list[Fragmento
         texto_casos = f"{prosa_casos}\n\n{linea_respaldo(casos, 'los casos consultados')}"
     else:
         texto_casos = ensamblar(eleccion, casos, consulta)
+    if registro:
+        texto_casos = f"{registro}\n\n{texto_casos}"
     secciones = [Seccion("casos", f"{ROTULO_CASOS}\n\n{texto_casos}")]
+    if tarjeta:
+        secciones.insert(0, Seccion("tarjeta", tarjeta))
+        if casos:
+            secciones.append(Seccion("pie", AVISO_DOS_FUENTES))
+        return secciones
     if con_guias:
         texto_guias = ((prosa_guias or aviso_pasajes(guias)) if guias else AVISO_SOLO_CASOS)
         # con pasajes del ATLS 10, su edición y su origen (decisiones 1 y 4 de

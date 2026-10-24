@@ -56,12 +56,16 @@ from rag.generate import (                                                  # no
     fuentes_en_prosa, guarda_casos, generar_eleccion, generar_prosa, mensajes_prosa, porcentaje_gpu,
     prosa_atls, prosa_por_fuente, usar_guias,
 )
+from rag.ficha import actualizar                                            # noqa: E402
 from rag.hallazgos import elegibles                                         # noqa: E402
-from rag.retrieve import buscar, buscar_guias, confianza, ruta_por_defecto  # noqa: E402
+from rag.retrieve import buscar, buscar_guias, confianza, fragmentos_de, ruta_por_defecto  # noqa: E402
+from rag.tarjetas import armar as armar_tarjeta, elegir as elegir_tarjeta   # noqa: E402
 from rag.verificar import RX_CITA, RX_CITA_GUIA, verificar_por_fuente       # noqa: E402
 
-# prosa: SALIDA=prosa; atls: SALIDA=prosa con ORDEN_ATLS (PLAN_CHATBOT_CLINICO.md, fase 4)
-MODOS = {"texto": False, "json": True, "prosa": None, "atls": None}
+# prosa: SALIDA=prosa; atls: SALIDA=prosa con ORDEN_ATLS (PLAN_CHATBOT_CLINICO.md, fase 4);
+# tarjeta: como atls, pero con la tarjeta del mecanismo en lugar de la prosa de los
+# manuales cuando la hay (TARJETAS, PLAN_RESPUESTA_IDEAL.md)
+MODOS = {"texto": False, "json": True, "prosa": None, "atls": None, "tarjeta": None}
 
 
 def recuperar(c: dict, ruta: str, con_guias: bool = False) -> dict:
@@ -255,6 +259,55 @@ def medir_atls(c: dict, rec: dict) -> dict:
     }
 
 
+def medir_tarjeta(c: dict, rec: dict) -> dict:
+    """Como en la app con TARJETAS: si el mecanismo tiene tarjeta, el apartado
+    de los manuales es la tarjeta (sus viñetas pasan el verificador antes, en
+    tests/test_tarjetas.py) y el modelo escribe solo las letras de los casos.
+    Sin tarjeta, lo mismo que el modo atls."""
+    ficha = actualizar(None, c["texto"])[1]
+    tarjeta = elegir_tarjeta(ficha, c["texto"], rec["con_guias"])
+    if tarjeta is None or not es_presentacion(ficha, c["texto"]):
+        return {**medir_atls(c, rec), "tarjeta": ""}
+    casos = rec["casos"]
+    t0 = time.perf_counter()
+    texto, citas = armar_tarjeta(tarjeta, ficha)
+    pasajes = fragmentos_de(citas)
+    t1 = time.perf_counter()
+    metricas: dict = {}
+    p_casos, _, ok, motivos, detalle = prosa_atls(c["texto"], casos, [], siempre=True, metricas=metricas)
+    t2 = time.perf_counter()
+    textos = detalle["textos"]
+    ids = {m.group(1) for m in RX_CITA.finditer(p_casos)}
+    citados = [x for x in casos if x.record_id in ids]
+    casos_ok = bool(textos) and all(not t.motivos for t in textos)
+    return {
+        "orden": True, "tarjeta": tarjeta.clave,
+        "fuentes": "+".join(n for n, hay in (("casos", casos), ("tarjeta", True)) if hay),
+        "en_prosa": "+".join(f for f, hay in (("casos", casos_ok), ("tarjeta", True)) if hay),
+        "pasajes": len({f.seccion_id for f in rec["guias"]}), "pasajes_citados": 0,
+        "pasajes_tarjeta": len({f.seccion_id for f in pasajes}),
+        "vinetas_tarjeta": texto.count("\n- "),
+        "letras_pedidas": len(detalle["letras_casos"]), "letras_escritas": len(textos),
+        "letras_verificadas": sum(not t.motivos for t in textos),
+        "letras_equivocadas": sum(any("de la letra" in m for m in t.motivos) for t in textos),
+        "json_invalido": detalle["json_invalido"],
+        "s_generacion": round(t2 - t1, 2),
+        "s_carga": round(metricas.get("s_carga", 0.0), 2),
+        "s_prompt": round(metricas.get("s_prompt", 0.0), 2),
+        "s_salida": round(metricas.get("s_salida", 0.0), 2),
+        "s_ensamblado": round(t1 - t0, 3),
+        "tokens_prompt": metricas.get("tokens_prompt", 0),
+        "tokens_salida": metricas.get("tokens_salida", 0),
+        "recuperados": len(casos), "citados": len(citados),
+        "precision_recuperados": precision(casos, c), "precision_citados": precision(citados, c),
+        "verificada": ok,
+        "motivos": " || ".join(motivos),
+        "tipos_motivo": " | ".join(sorted({tipo_motivo(m) for m in motivos})),
+        "finales": "prosa" if ok else "determinista",
+        "prosa": f"{texto}\n\n{p_casos}",
+    }
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="Compara generadores y modos de salida")
     ap.add_argument("--modelos", default=config.MODELO_LLM, help="separados por coma")
@@ -311,11 +364,11 @@ def main() -> None:
             for c in dentro:
                 rec = recs[c["id"]]
                 # sin casos, los modos texto y json no tienen qué elegir
-                if rec["abstiene"] or (modo not in ("prosa", "atls") and not rec["casos"]):
+                if rec["abstiene"] or (modo not in ("prosa", "atls", "tarjeta") and not rec["casos"]):
                     continue
                 descargar(modelo)
                 medida = (medir_prosa(c, rec) if modo == "prosa" else medir_atls(c, rec) if modo == "atls"
-                          else medir(c, rec, MODOS[modo]))
+                          else medir_tarjeta(c, rec) if modo == "tarjeta" else medir(c, rec, MODOS[modo]))
                 fila = {"modelo": modelo, "modo": modo, "id": c["id"], "categoria": c["categoria"],
                         "s_coseno": round(rec["s_coseno"], 3),
                         "s_recuperacion": round(rec["s_recuperacion"], 3), **medida}
@@ -325,11 +378,13 @@ def main() -> None:
                                         + fila["s_generacion"] - fila["s_carga"]
                                         + fila["s_ensamblado"], 2)
                 filas.append(fila)
-                if modo in ("prosa", "atls"):
+                if modo in ("prosa", "atls", "tarjeta"):
                     detalle = fila["tipos_motivo"] or "verificada"
                     if fila.get("orden"):
                         detalle += f"  · letras {fila['letras_verificadas']}/{fila['letras_escritas']} de " \
                                    f"{fila['letras_pedidas']}"
+                    if fila.get("tarjeta"):
+                        detalle += f"  · tarjeta {fila['tarjeta']}"
                 else:
                     detalle = f"descartadas {fila['descartadas']}  → {fila['finales']}"
                 print(f"  {c['id']:8} {modo:5} {fila['s_total']:6.1f} s  "
@@ -374,6 +429,26 @@ def main() -> None:
                   f"{int(g['letras_equivocadas'].sum())} · mediana {g['s_total'].median():.1f} s, "
                   f"{g['tokens_salida'].median():.0f} tokens de salida"
                   + (f"\n  rechazos por: {tipos.value_counts().to_dict()}" if len(tipos) else ""))
+
+    if "tarjeta" in df and (df["modo"] == "tarjeta").any():
+        print("\n=== Con tarjeta (TARJETAS) contra por letras, en las mismas presentaciones ===")
+        for modelo, g in df[(df["modo"] == "tarjeta") & df["orden"].fillna(False).astype(bool)].groupby("modelo"):
+            con = g[g["tarjeta"].fillna("") != ""]
+            at = df[(df["modo"] == "atls") & df["id"].isin(g["id"]) & (df["modelo"] == modelo)]
+
+            def verificadas(h) -> int:
+                return int(sum(len([f for f in str(e).split("+") if f]) for e in h["en_prosa"].fillna("")))
+
+            def fuentes(h) -> int:
+                return int(sum(len([f for f in str(e).split("+") if f]) for e in h["fuentes"].fillna("")))
+            print(f"{modelo}: {len(con)} de {len(g)} presentaciones con tarjeta ({con['tarjeta'].value_counts().to_dict()})"
+                  + f"\n  fuentes verificadas: con tarjeta {verificadas(g)} de {fuentes(g)} · por letras "
+                    f"{verificadas(at)} de {fuentes(at)}"
+                  + f"\n  mediana {g['s_total'].median():.1f} s (peor {g['s_total'].max():.1f}) · por letras "
+                    f"{at['s_total'].median():.1f} s (peor {at['s_total'].max():.1f})"
+                  + f"\n  tokens: prompt {g['tokens_prompt'].median():.0f} contra {at['tokens_prompt'].median():.0f}, "
+                    f"salida {g['tokens_salida'].median():.0f} contra {at['tokens_salida'].median():.0f} · "
+                    f"JSON inválido {int(g['json_invalido'].sum())}")
 
     if "verificada" in df:
         pr = df[df["modo"] == "prosa"]

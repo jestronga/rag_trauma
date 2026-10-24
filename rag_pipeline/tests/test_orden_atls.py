@@ -183,6 +183,7 @@ def entorno(casos, guias, monkeypatch):
     monkeypatch.setattr(config, "SINTESIS_LLM", False)
     monkeypatch.setattr(config, "PROSA_SIEMPRE", False)
     monkeypatch.setattr(config, "ORDEN_ATLS", True)
+    monkeypatch.setattr(config, "TARJETAS", False)       # las tarjetas, en test_tarjetas.py
     monkeypatch.setattr(config, "GUIAS", True)
     monkeypatch.setattr(config, "PREGUNTAS", False)
     monkeypatch.setattr(generate, "confianza", lambda *a, **k: 0.9)

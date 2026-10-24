@@ -1,0 +1,327 @@
+{
+ "peaton": {
+  "nombre": "peatón atropellado",
+  "n": 324,
+  "regiones": [
+   [
+    "miembro inferior",
+    155
+   ],
+   [
+    "cráneo / encéfalo",
+    117
+   ],
+   [
+    "miembro superior",
+    105
+   ],
+   [
+    "cara",
+    88
+   ],
+   [
+    "tórax",
+    45
+   ],
+   [
+    "abdomen",
+    42
+   ]
+  ],
+  "hallazgos": [
+   [
+    "fractura",
+    80
+   ],
+   [
+    "analgesia",
+    56
+   ],
+   [
+    "radiografía",
+    50
+   ],
+   [
+    "inmovilización / férula",
+    48
+   ],
+   [
+    "observación",
+    45
+   ],
+   [
+    "osteosíntesis / reducción",
+    40
+   ]
+  ],
+  "desenlace": {
+   "conocido": 219,
+   "hospitalizacion": 46,
+   "cirugia": 14,
+   "uci": 2,
+   "fallecimiento": 1,
+   "remision": 3,
+   "alta": 153
+  }
+ },
+ "ocupante": {
+  "nombre": "accidente de tránsito sin peatón",
+  "n": 1338,
+  "regiones": [
+   [
+    "miembro inferior",
+    600
+   ],
+   [
+    "miembro superior",
+    577
+   ],
+   [
+    "cráneo / encéfalo",
+    429
+   ],
+   [
+    "cara",
+    357
+   ],
+   [
+    "tórax",
+    203
+   ],
+   [
+    "cuello",
+    190
+   ]
+  ],
+  "hallazgos": [
+   [
+    "analgesia",
+    274
+   ],
+   [
+    "fractura",
+    254
+   ],
+   [
+    "observación",
+    221
+   ],
+   [
+    "radiografía",
+    211
+   ],
+   [
+    "inmovilización / férula",
+    196
+   ],
+   [
+    "sutura",
+    172
+   ]
+  ],
+  "desenlace": {
+   "conocido": 1084,
+   "hospitalizacion": 232,
+   "cirugia": 59,
+   "uci": 6,
+   "fallecimiento": 21,
+   "remision": 18,
+   "alta": 748
+  }
+ },
+ "caida": {
+  "nombre": "caída",
+  "n": 2102,
+  "regiones": [
+   [
+    "miembro superior",
+    809
+   ],
+   [
+    "cráneo / encéfalo",
+    611
+   ],
+   [
+    "miembro inferior",
+    511
+   ],
+   [
+    "cara",
+    353
+   ],
+   [
+    "cuello",
+    188
+   ],
+   [
+    "pelvis",
+    177
+   ]
+  ],
+  "hallazgos": [
+   [
+    "fractura",
+    555
+   ],
+   [
+    "inmovilización / férula",
+    426
+   ],
+   [
+    "radiografía",
+    297
+   ],
+   [
+    "osteosíntesis / reducción",
+    275
+   ],
+   [
+    "cirugía",
+    265
+   ],
+   [
+    "analgesia",
+    259
+   ]
+  ],
+  "desenlace": {
+   "conocido": 1298,
+   "hospitalizacion": 210,
+   "cirugia": 134,
+   "uci": 20,
+   "fallecimiento": 51,
+   "remision": 64,
+   "alta": 819
+  }
+ },
+ "arma_de_fuego": {
+  "nombre": "herida por arma de fuego",
+  "n": 1180,
+  "regiones": [
+   [
+    "cara",
+    406
+   ],
+   [
+    "miembro superior",
+    391
+   ],
+   [
+    "tórax",
+    347
+   ],
+   [
+    "miembro inferior",
+    299
+   ],
+   [
+    "cuello",
+    281
+   ],
+   [
+    "cráneo / encéfalo",
+    248
+   ]
+  ],
+  "hallazgos": [
+   [
+    "fractura",
+    194
+   ],
+   [
+    "cirugía",
+    187
+   ],
+   [
+    "sangrado activo",
+    101
+   ],
+   [
+    "sutura",
+    91
+   ],
+   [
+    "lavado / desbridamiento",
+    89
+   ],
+   [
+    "inmovilización / férula",
+    88
+   ]
+  ],
+  "desenlace": {
+   "conocido": 771,
+   "hospitalizacion": 54,
+   "cirugia": 82,
+   "uci": 38,
+   "fallecimiento": 163,
+   "remision": 56,
+   "alta": 378
+  }
+ },
+ "cortopunzante": {
+  "nombre": "herida por arma cortopunzante",
+  "n": 770,
+  "regiones": [
+   [
+    "miembro superior",
+    410
+   ],
+   [
+    "tórax",
+    261
+   ],
+   [
+    "cara",
+    200
+   ],
+   [
+    "abdomen",
+    114
+   ],
+   [
+    "cuello",
+    100
+   ],
+   [
+    "columna",
+    87
+   ]
+  ],
+  "hallazgos": [
+   [
+    "sutura",
+    302
+   ],
+   [
+    "cirugía",
+    115
+   ],
+   [
+    "tubo de tórax",
+    103
+   ],
+   [
+    "lavado / desbridamiento",
+    86
+   ],
+   [
+    "sangrado activo",
+    84
+   ],
+   [
+    "lesión tendinosa o nerviosa",
+    74
+   ]
+  ],
+  "desenlace": {
+   "conocido": 455,
+   "hospitalizacion": 49,
+   "cirugia": 57,
+   "uci": 0,
+   "fallecimiento": 6,
+   "remision": 52,
+   "alta": 291
+  }
+ }
+}

@@ -1,0 +1,1086 @@
+modelo,modo,id,categoria,s_coseno,s_recuperacion,orden,fuentes,en_prosa,pasajes,pasajes_citados,letras_pedidas,letras_escritas,letras_verificadas,letras_equivocadas,json_invalido,s_generacion,s_carga,s_prompt,s_salida,s_ensamblado,tokens_prompt,tokens_salida,recuperados,citados,precision_recuperados,precision_citados,verificada,motivos,tipos_motivo,finales,prosa,gpu_pct,s_total,caracteres_prompt,pasajes_citados_atls,pasajes_atls10,pasajes_citados_atls10,tarjeta,pasajes_tarjeta,vinetas_tarjeta
+qwen3:4b-instruct,atls,lex-01,lexica,0.334,1.058,True,casos+guias,,6,2,5.0,5.0,1.0,1.0,False,11.43,2.41,1.19,5.76,0.0,4134,380,5,4,1.0,1.0,False,"C · palabras que no aparecen en los casos: inmediato, riesgo || después · «tubo de tórax» es de la letra B, no de la después || A · da una orden («debe») en vez de orientar || A · atribuye al HUV un pasaje de otro manual || B · atribuye a la 11.ª edición del ATLS un pasaje de otro manual || B · palabras que no aparecen en la guía citada: provocar",letra equivocada | manual equivocado | orden | palabra ajena | palabra fuera de la guía,determinista,"**B · Respiración.** En los casos similares se observó hipoventilación asociada a hemotórax en uno de los casos [caso: 33765] y se colocó tubo de torax en tres casos [caso: 28860] [caso: 33765] [caso: 7109].
+
+**C · Circulación.** En un caso se realizó toracotomía para tratamiento de lesión torácica con riesgo inmediato para la vida [caso: 37838].
+
+**Después de la revisión primaria.** En dos casos se realizó cirugía para evaluar lesiones torácicas [caso: 33765] [caso: 37838] y en uno se ordenó remisión para manejo de toracostomía y exploración diafragmática [caso: 28860].
+
+**A · Vía aérea.** El manual del HUV recomienda que la vía aérea debe ser controlada cuidadosamente para evitar la sobrecarga de volumen, lo que puede comprometer aún más el estado respiratorio del paciente [guía: ATLS10-04-018].
+
+**B · Respiración.** La 11.ª edición del ATLS recomienda que en pacientes con trauma torácico penetrante conviene evaluar la presencia de hipoventilación y matidez en las bases pulmonares, y que el hemotórax masivo puede provocar shock hipovolémico [guía: HUV-11-003].",100,10.41,,,,,,,
+qwen3:4b-instruct,atls,lex-02,lexica,0.324,1.053,True,casos+guias,casos,5,2,3.0,3.0,2.0,0.0,False,8.97,2.11,1.22,3.56,0.0,4254,231,5,3,1.0,1.0,False,después · da una orden («deben») en vez de orientar || después · una oración del apartado de los manuales no cita un manual,fuente cruzada | orden,determinista,"**Después de la revisión primaria.** Se realizó radiografía de pelvis en tres casos [caso: 59636] [caso: 57668] [caso: 59062].
+
+**C · Circulación.** El manual del HUV recomienda realizar una revisión completa del paciente teniendo particular cuidado en no descubrirlo completamente y exponerlo al frío [guía: HUV-07-005].
+
+**Después de la revisión primaria.** La 10.ª edición del ATLS recomienda que ante un paciente traumatizado la primera pregunta que se hace la familia o el equipo de APH es: ¿A dónde llevo el paciente? Todo paciente mayor de 65 años con comorbilidades o AIS ≥ 3, o mayor de 70 años independientemente de su AIS, deben ser remitidos a un centro de trauma [guía: HUV-07-004].",100,8.24,,,,,,,
+qwen3:4b-instruct,atls,lex-03,lexica,0.333,1.089,True,casos+guias,,8,2,6.0,6.0,3.0,1.0,False,14.5,2.42,1.59,8.4,0.0,5363,521,5,5,0.0,0.0,False,D · «cuatro casos» no coincide con los casos || D · no nombra nada de la letra D || después · palabras que no aparecen en los casos: asigno || después · palabras que no aparecen en la guía citada: volver,conteo | otro | palabra ajena | palabra fuera de la guía,determinista,"**x · Hemorragia exanguinante.** Se identificó sangrado activo en dos casos [caso: 1949] [caso: 34545]
+
+**A · Vía aérea.** En dos casos se realizó intubación orotraqueal [caso: 1949] [caso: 37876]
+
+**D · Déficit neurológico.** Se observó alteración del Glasgow en cuatro casos [caso: 52055] [caso: 1949] [caso: 37876] [caso: 34545]
+
+**Después de la revisión primaria.** En dos casos se registró emesis [caso: 1949] [caso: 34329]; en uno se observó cefalea [caso: 34329]; en uno se detectó otorragia [caso: 1949]; en dos se realizó TAC [caso: 52055] [caso: 34329]; en uno se asignó UCI [caso: 1949]; en uno se registró remisión [caso: 34545]; en uno se mantuvo observación [caso: 34329]
+
+**A · Vía aérea.** El manual del HUV recomienda asegurar una vía aérea permanente mediante intubación orotraqueal en pacientes con Glasgow menor de 8, y en casos con deterioro del estado de conciencia asociado a hipoxia o shock hemorrágico se puede considerar corregir la oxigenación y ventilación para evitar intubación [guía: HUV-05-010]
+
+**Después de la revisión primaria.** La 10.ª edición del ATLS recomienda volver a evaluar al paciente con frecuencia para detectar cualquier deterioro del estado mental, utilizar narcóticos y sedantes con cautela, y cuando sea necesario, utilizar supervisión de gases en sangre o capnografía para garantizar una ventilación adecuada [guía: ATLS10-06-017];",100,13.5,,,,,,,
+qwen3:4b-instruct,atls,lex-04,lexica,0.247,0.833,True,casos,casos,0,0,1.0,1.0,1.0,0.0,False,5.35,2.09,0.5,0.69,0.0,1807,53,5,1,1.0,1.0,True,,,prosa,"**Después de la revisión primaria.** Conviene considerar curación en el miembro superior con intervalos de 48 horas en el caso de quemadura de segundo grado, [caso: 39310].",100,4.34,,,,,,,
+qwen3:4b-instruct,atls,lex-05,lexica,0.302,0.965,True,casos+guias,casos,7,3,5.0,4.0,3.0,0.0,False,10.33,2.12,1.2,4.92,0.0,4221,319,5,3,0.4,0.3333333333333333,False,"D · palabras que no aparecen en la guía citada: circulacion, oxigeno, respiratoria, saturacion",palabra fuera de la guía,determinista,"**D · Déficit neurológico.** Se evidencia pérdida de conciencia en 1 de 5 casos [caso: 51857].
+
+**Después de la revisión primaria.** Se realizó radiografía en 2 de 5 casos [caso: 21759] [caso: 51857]; se realizó TAC en 1 de 5 casos [caso: 57352]; se llevó a cabo observación en 1 de 5 casos [caso: 21759].
+
+**D · Déficit neurológico.** El manual del HUV recomienda evaluar la circulación con signos como Glasgow <11, pérdida de conciencia >5 minutos, presión arterial <90 mmHg, saturación de oxígeno >90 y frecuencia respiratoria <10 o >29 [guía: HUV-04-011]. El manual del HUV recomienda que el trauma craneoencefálico es la principal causa de muerte en pacientes politraumatizados [guía: HUV-04-015].
+
+**Después de la revisión primaria.** El manual del HUV recomienda realizar TAC corporal total en accidente de tránsito con eyección del paciente [guía: HUV-04-013].",100,9.48,,,,,,,
+qwen3:4b-instruct,atls,lex-06,lexica,0.376,1.129,True,casos+guias,,6,2,6.0,5.0,0.0,2.0,False,11.59,2.1,1.23,6.18,0.0,4207,404,5,5,1.0,1.0,False,"B · palabras que no aparecen en los casos: respiracion || C · «uno de los» no coincide con los casos || C · no nombra nada de la letra C || D · «uno de los» no coincide con los casos || D · no nombra nada de la letra D || después · palabras que no aparecen en los casos: cuatro || C · «40» no está en la guía citada || C · palabras que no aparecen en la guía citada: adicional, aproximadamente || C · «irritación peritoneal» no consta en la guía citada || C · palabras que no aparecen en la guía citada: anormal",cifra | conteo | otro | palabra ajena | palabra fuera de la guía | término fuera de la guía,determinista,"**B · Respiración.** Se evaluó la respiración con hemotórax en uno de los casos [caso: 16159].
+
+**C · Circulación.** Se identificó compromiso vascular en uno de los casos [caso: 16159].
+
+**D · Déficit neurológico.** Se registró alteración del Glasgow en uno de los casos [caso: 16159].
+
+**Después de la revisión primaria.** Se realizó laparotomía exploratoria en cuatro casos [caso: 27722] [caso: 14911] [caso: 16159] [caso: 39256]. En uno de los casos se realizó lavado de heridas [caso: 53018]. En otro caso se dio observación [caso: 16159]. En uno se realizó sutura [caso: 53018]. En uno se registró remisión [caso: 53018].
+
+**C · Circulación.** El manual del HUV recomienda que las heridas por arma cortopunzante en el abdomen que penetran el peritoneo requieren evaluación adicional, y que aproximadamente el 40% de las que penetran al peritoneo requieren cirugía [guía: HUV-15-004]. La 10.ª edición del ATLS recomienda que los pacientes con heridas penetrantes abdominales que presentan signos de irritación peritoneal o hemodinámica anormal requieren laparotomía emergente [guía: ATLS10-05-031].",100,10.99,,,,,,,
+qwen3:4b-instruct,atls,voc-01,vocabulario,0.335,1.231,True,casos+guias,casos,7,2,4.0,4.0,3.0,0.0,False,10.8,2.1,1.23,5.42,0.0,4197,344,5,3,0.2,0.0,False,después · atribuye a la 10.ª edición del ATLS un pasaje de otro manual || después · una oración del apartado de los manuales no cita un manual,fuente cruzada | manual equivocado,determinista,"**C · Circulación.** Se realizó ecografía / FAST en un caso [caso: 23165].
+
+**Después de la revisión primaria.** Se realizó radiografía en un caso [caso: 47485]. Se realizó sutura en dos casos [caso: 23165] [caso: 20887]. Se realizó lavado / desbridamiento en un caso [caso: 47485]. Se colocó inmovilización / férula en un caso [caso: 47485].
+
+**C · Circulación.** El manual del HUV recomienda controlar el sangrado externo con compresión, empaquetamiento o sonda Foley [guía: HUV-09-012].
+
+**Después de la revisión primaria.** La 10.ª edición del ATLS recomienda que las heridas por arma cortopunzante en el tórax no penetran a la pleura y el 80% de las que penetran pueden ser manejadas con un dren pleural sin necesidad de cirugía [guía: HUV-04-007]. El manual del HUV recomienda que la imagen diagnóstica de primera línea en heridas de cuello penetrante sea un Angio TAC de cerebro, cuello y tórax [guía: HUV-09-012]. La 10.",100,10.27,,,,,,,
+qwen3:4b-instruct,atls,voc-02,vocabulario,0.225,0.954,True,casos,casos,0,0,2.0,2.0,2.0,0.0,False,5.82,2.1,0.54,1.12,0.0,1853,83,5,3,1.0,1.0,True,,,prosa,"**x · Hemorragia exanguinante.** Se encontró sangrado activo en un caso [caso: 17934]
+
+**Después de la revisión primaria.** Se encontró fractura en tres casos [caso: 14087] [caso: 17934] [caso: 8845]",100,4.9,,,,,,,
+qwen3:4b-instruct,atls,voc-03,vocabulario,0.249,0.969,True,casos+guias,casos,8,2,5.0,4.0,2.0,0.0,False,10.86,2.11,0.93,5.78,0.0,3245,397,5,4,0.6,0.5,False,"B · atribuye al HUV un pasaje de otro manual || D · atribuye a la 10.ª edición del ATLS un pasaje de otro manual || D · palabras que no aparecen en la guía citada: circulacion, impacto, respiratoria",manual equivocado | palabra fuera de la guía,determinista,"**D · Déficit neurológico.** En uno de los casos se observó pérdida de conciencia [caso: 51857].
+
+**Después de la revisión primaria.** En dos casos se realizó radiografía [caso: 51857] [caso: 24095], en dos se administró analgesia [caso: 29324] [caso: 55308], en uno se realizó reducción cerrada y se colocó inmovilización [caso: 55308].
+
+**B · Respiración.** El manual del HUV recomienda que en impactos laterales de vehículos con peatones se sospechen lesiones craneales, fracturas de columna cervical, neumotórax, rotura diafragmática, fracturas de bazo o hígado y/o riñón, y fracturas de pelvis o acetábulo [guía: ATLS10-01-027].
+
+**D · Déficit neurológico.** La 10.ª edición del ATLS recomienda evaluar la circulación en pacientes con mecanismos de lesión que incluyan impacto de vehículo contra peatón, considerando signos como pérdida de conciencia superior a 5 minutos, presión arterial menor a 90 mmHg o frecuencia respiratoria fuera del rango normal [guía: HUV-04-011]. El manual del HUV recomienda sospechar politrauma en presencia de heridas múltiples, eyección del vehículo, caída superior a 6 metros o lesión por explosión [guía: HUV-04-011].",100,9.97,,,,,,,
+qwen3:4b-instruct,atls,voc-04,vocabulario,0.232,0.904,True,casos+guias,,7,3,5.0,5.0,3.0,0.0,False,9.99,2.1,1.3,4.52,0.0,4452,296,5,2,0.4,0.0,False,x · palabras que no aparecen en los casos: exanguinante || B · atribuye al HUV un pasaje de otro manual,manual equivocado | palabra ajena,determinista,"**x · Hemorragia exanguinante.** En uno de los casos se evidenció sangrado activo con hemorragia exanguinante [caso: 35277]
+
+**Después de la revisión primaria.** En dos casos se evidenció fractura con radiografía [caso: 40958] [caso: 35277].
+
+**B · Respiración.** El manual del HUV recomienda que en mecanismos de caída se considere la posibilidad de lesiones viscerales abdominales y fracturas de pelvis o acetábulo [guía: ATLS10-01-027].
+
+**C · Circulación.** La 10.ª edición del ATLS recomienda mantener un alto índice de sospecha de ruptura aórtica traumática en caídas de altura con historia de fuerza y desaceleración significativa [guía: ATLS10-04-020].
+
+**Después de la revisión primaria.** La 10.ª edición del ATLS recomienda considerar la posición del cuerpo en relación con la superficie de impacto para determinar la extensión de la lesión en caídas [guía: ATLS10-23-013].",100,9.03,,,,,,,
+qwen3:4b-instruct,atls,voc-05,vocabulario,0.305,0.962,True,casos+guias,,6,3,5.0,5.0,2.0,0.0,False,10.86,2.1,1.22,5.47,0.0,4156,359,5,4,0.8,0.75,False,x · palabras que no aparecen en los casos: exanguinante || C · palabras que no aparecen en la guía citada: pegado || después · atribuye al HUV un pasaje de otro manual,manual equivocado | palabra ajena | palabra fuera de la guía,determinista,"**x · Hemorragia exanguinante.** Se observó hemorragia exanguinante en dos casos [caso: 35261] [caso: 7417].
+
+**Después de la revisión primaria.** Se realizó sutura en dos casos [caso: 14955] [caso: 2129].
+
+**C · Circulación.** La 10.ª edición del ATLS recomienda realizar una prueba de Seidel para localizar pequeñas fugas de fluido acuoso desde la cámara anterior y, si un cuerpo extraño está pegado hacia fuera del ojo, cortar una taza de espuma o papel para acomodar el cuerpo extraño, sin colocar vendajes blandos bajo el escudo rígido [guía: ATLS10-14-014].
+
+**D · Déficit neurológico.** La 10.ª edición del ATLS recomienda que las lesiones penetrantes de la columna vertebral suelen dar lugar a un déficit neurológico completo, aunque también pueden resultar de la transferencia de energía asociada con un misil de alta velocidad que pase cerca de la médula espinal [guía: ATLS10-07-019].
+
+**Después de la revisión primaria.** El manual del HUV recomienda que los pacientes politraumatizados están en alto riesgo de muchas lesiones oculares sensibles al tiempo, que los miembros del equipo de trauma puedan encontrar [guía: ATLS10-14-011].",100,10.03,,,,,,,
+qwen3:4b-instruct,atls,voc-06,vocabulario,0.285,1.025,True,casos,casos,0,0,1.0,1.0,1.0,0.0,False,5.08,2.11,0.37,0.55,0.0,1218,42,2,1,0.5,0.0,True,,,prosa,**Después de la revisión primaria.** En caso de fractura parietal deprimida expuesta se realiza esquirlectomia [caso: 12323],100,4.28,,,,,,,
+qwen3:4b-instruct,atls,abr-01,abreviatura,0.348,1.182,True,casos+guias,guias,6,2,3.0,2.0,1.0,0.0,False,7.82,2.1,1.17,2.51,0.0,3980,163,5,1,1.0,1.0,False,después · palabras que no aparecen en los casos: concomitante,palabra ajena,determinista,"**Después de la revisión primaria.** En uno de los casos se documentó fractura craneal concomitante, [caso: 9831].
+
+**C · Circulación.** El manual del HUV recomienda evaluar la base del cráneo en presencia de rinorrea, hematoma bilateral periorbitario, otorrea o hematoma de mastoides, [guía: HUV-04-014]. El manual del HUV recomienda realizar TAC corporal total en pacientes con herida múltiple por arma de fuego, [guía: HUV-04-013].",100,7.25,,,,,,,
+qwen3:4b-instruct,atls,abr-02,abreviatura,0.242,0.968,True,casos+guias,casos+guias,8,2,7.0,7.0,7.0,0.0,False,10.52,2.14,1.19,5.13,0.0,4096,336,5,4,0.8,0.75,True,,,prosa,"**x · Hemorragia exanguinante.** En dos casos se presentó sangrado activo [caso: 22592] [caso: 37867]
+
+**B · Respiración.** En un caso se realizó tubo de tórax [caso: 37867]
+
+**C · Circulación.** En un caso se realizó ecografía / FAST [caso: 26117]
+
+**Después de la revisión primaria.** En un caso se realizó sutura [caso: 35215] y en otro se realizó observación [caso: 35215] y en otro se realizó angiografía / doppler [caso: 26117]
+
+**B · Respiración.** El manual del HUV recomienda iniciar controlando la vía aérea con tubo traqueal o quirúrgica [guía: HUV-09-012]
+
+**C · Circulación.** El manual del HUV recomienda controlar el sangrado externo con compresión, empaquetamiento o sonda Foley [guía: HUV-09-010]
+
+**Después de la revisión primaria.** El manual del HUV recomienda que si el paciente no tiene indicación de cirugía inmediata, la imagen diagnóstica de primera línea es un Angio TAC de cerebro, cuello y tórax [guía: HUV-09-012]",100,9.59,,,,,,,
+qwen3:4b-instruct,atls,abr-03,abreviatura,0.245,0.885,True,casos+guias,casos,3,2,3.0,3.0,2.0,0.0,False,10.06,2.1,1.22,4.69,0.0,4180,301,5,3,0.0,0.0,False,después · la oración quedó cortada,otro,determinista,"**Después de la revisión primaria.** Se realizó TAC en 2 de los casos [caso: 34284] [caso: 22203]. Se evaluó con cefalea en 1 caso [caso: 34284]. Se realizó radiografía en 1 caso [caso: 22203]. Se realizó sutura en 1 caso [caso: 46519]. Se realizó reducción cerrada y inmovilización con férula en 1 caso [caso: 22203].
+
+**D · Déficit neurológico.** La 10.ª edición del ATLS recomienda evaluar cuidadosamente para otras lesiones [guía: ATLS10-06-016].
+
+**Después de la revisión primaria.** Pasajes de esta letra: [guía: ATLS10-06-017]; su texto está en «Fragmentos de los manuales».",100,9.09,,,,,,,
+qwen3:4b-instruct,atls,abr-04,abreviatura,0.275,0.985,True,casos+guias,casos,9,0,3.0,3.0,1.0,0.0,False,12.24,2.14,1.3,6.74,0.0,4395,424,5,5,0.2,0.2,False,C · una oración del apartado de los manuales no cita un manual || después · una oración del apartado de los manuales no cita un manual,fuente cruzada,determinista,"**Después de la revisión primaria.** Se realizó radiografía en tres casos [caso: 35213] [caso: 39001] [caso: 8291]. Se realizó inmovilización con férula o yeso en cinco casos [caso: 35829] [caso: 23278] [caso: 35213] [caso: 39001] [caso: 8291]. Se realizó reducción cerrada en tres casos [caso: 35829] [caso: 35213] [caso: 8291]. Se realizó cirugía en uno de los casos [caso: 8291].
+
+**C · Circulación.** El manual del HUV recomienda que en relación a la médula espinal, por lo subluxaciones de fractura en la columna torácica resultan comúnmente en los déficits neurológicos completos. fracturas por compresión simples son generalmente estables y con frecuencia se trata con un corsé rígido.
+
+**Después de la revisión primaria.** La 10.ª edición del ATLS recomienda que el objetivo de la inmovilización de la fractura inicial es realinear la extremidad lesionada en lo más cercano a la posición anatómica como sea posible y evitar el exceso de movimiento fractura in situ. A. El acortamiento y rotación externa de la pierna derecha debido a una fractura de fémur mitad de la diáfisis B.",100,11.36,,,,,,,
+qwen3:4b-instruct,atls,abr-05,abreviatura,0.348,1.292,True,casos+guias,casos,9,3,7.0,7.0,6.0,0.0,False,14.0,2.1,1.18,8.65,0.0,4011,574,5,5,0.2,0.2,False,B · palabras que no aparecen en la guía citada: coloque,palabra fuera de la guía,determinista,"**A · Vía aérea.** En los casos similares se realizó intubación orotraqueal en todos los pacientes [caso: 12261] [caso: 38400] [caso: 57366] [caso: 32366] [caso: 17357]
+
+**B · Respiración.** En un caso se identificó hemotórax y en dos casos se colocó tubo de tórax [caso: 57366] [caso: 38400] [caso: 57366]
+
+**C · Circulación.** En un caso se observó hipotensión o choque y en otro se evidenció compromiso vascular [caso: 17357] [caso: 12261]
+
+**Después de la revisión primaria.** En un caso se evaluó la presencia de fractura, en uno se realizó radiografía y en tres se decidió ingresar al paciente en UCI [caso: 38400] [caso: 57366] [caso: 12261] [caso: 57366] [caso: 17357]
+
+**A · Vía aérea.** El manual del HUV recomienda que la intubación orotraqueal pueda estar justificada en escenarios prehospitalarios, pero solo si se realiza con prontitud, por personal entrenado y no demora el proceso de remisión [guía: HUV-05-017]
+
+**B · Respiración.** El manual del HUV recomienda que en el ámbito extrahospitalario se coloque un catéter # 14 o 16 Frech en el segundo espacio intercostal con línea medio clavicular o en el 5º espacio intercostal con línea axilar media para lograr la salida inmediata del aire que colapsa el pulmón y el mediastino [guía: HUV-11-007]
+
+**C · Circulación.** El manual del HUV recomienda que en pacientes con hemotórax masivo y requerimiento de toracotomía se considere la apertura del tórax por toracotomía o esternotomía, y que se monitoreen permanentemente los signos vitales, pues todo paciente en shock persistente tiene indicación de cirugía [guía: HUV-11-009]",100,13.54,,,,,,,
+qwen3:4b-instruct,atls,ort-01,ortografica,0.296,1.296,True,casos+guias,casos+guias,6,1,3.0,3.0,3.0,0.0,False,11.62,2.11,1.25,6.18,0.0,4238,403,5,3,0.8,0.6666666666666666,True,,,prosa,"**B · Respiración.** Se evaluó la respiración y se detectó neumotórax en dos casos [caso: 33127] [caso: 34132], hipoventilación en uno [caso: 31492], hemotórax en uno [caso: 34132] y se colocó tubo de toracostomía en tres casos [caso: 33127] [caso: 34132] [caso: 31492]; después de la revisión primaria se realizó radiografía en uno [caso: 33127] y TAC en uno [caso: 31492]; en uno se consideró remisión [caso: 34132]
+
+**Después de la revisión primaria.** En uno de los casos se realizó revisión con radiografía de tórax de control [caso: 33127]; en otro se realizó TAC de torax [caso: 31492]; en uno se consideró remisión [caso: 34132]
+
+**Después de la revisión primaria.** El manual del HUV recomienda evaluar cuidadosamente la trayectoria de la bala en pacientes con heridas por arma de fuego, especialmente cuando hay múltiples orificios o un solo orificio con lesiones en áreas distantes [guía: HUV-04-006];",100,11.1,,,,,,,
+qwen3:4b-instruct,atls,ort-02,ortografica,0.357,1.122,True,casos,,0,0,2.0,2.0,1.0,1.0,False,7.96,2.11,0.6,3.21,0.0,2089,221,5,5,0.4,0.4,False,D · no nombra nada de la letra D,otro,determinista,"**D · Déficit neurológico.** No se evidencia déficit neurológico en los casos similares [caso: 32384] [caso: 35024] [caso: 38742] [caso: 52376]
+
+**Después de la revisión primaria.** Conviene evaluar cefalea en el momento de la consulta en casos con lesión parietal [caso: 32384]; se puede considerar realizar TAC en pacientes con trauma craneoencefalico y lesión parietal [caso: 35063]; se puede considerar observación en pacientes con lesión parietal [caso: 32384] [caso: 35024]; se puede considerar sutura en casos con herida en región parieto-occipital [caso: 35024];",100,7.33,,,,,,,
+qwen3:4b-instruct,atls,ort-03,ortografica,0.238,0.847,True,casos+guias,casos,7,3,3.0,3.0,2.0,0.0,False,11.28,2.11,1.22,5.88,0.0,4129,381,5,3,0.8,1.0,False,C · atribuye al HUV un pasaje de otro manual || C · palabras que no aparecen en la guía citada: circulacion,manual equivocado | palabra fuera de la guía,determinista,"**Después de la revisión primaria.** Se realizó radiografía de hombro en un caso con luxación anterior de cabeza de humero izquierdo [caso: 35045]. Se colocó inmovilización con férula en dos casos, uno con ferula braquiopalmar izquierda y otro con inmovilizador clínico de hombro [caso: 23099] [caso: 35045]. Se administró analgesia en dos casos [caso: 35045] [caso: 915]. Se realizó reducción cerrada en un caso [caso: 35045].
+
+**C · Circulación.** El manual del HUV recomienda considerar la circulación en pacientes con lesiones en articulaciones, y en serie reevaluar el estado vascular y neurológica de la extremidad distal a la lesión [guía: ATLS10-08-041].
+
+**Después de la revisión primaria.** La 10.ª edición del ATLS recomienda evaluar deformidades de luxación de hombro en dirección anterior y posterior con deformidad de encerrado en rotación interna [guía: ATLS10-08-019]. La 10.ª edición del ATLS recomienda aplicar un cabestrillo o franja, que puede ser aumentada por un vendaje thoracobrachial para lesiones del hombro [guía: ATLS10-08-050].",100,10.25,,,,,,,
+qwen3:4b-instruct,atls,ort-04,ortografica,0.255,0.897,False,casos,,0,0,,,,,,6.7,2.1,0.54,2.02,0.012,1860,149,5,3,1.0,1.0,False,«curación» se cita a casos que no lo documentan || palabras que no aparecen en los casos: aereas,mal atribuido | palabra ajena,determinista,Conviene valorar signos de edema ventilatorio en cara y cuello por posible compromiso de vías aéreas [caso: 31110]. Se puede considerar observación en caso de estabilidad hemodinámica y ausencia de signos de dificultad respiratoria [caso: 31110]. En casos similares se hizo escarectomía por quemaduras de segundo grado en cara y cuello [caso: 41061]. Se puede considerar curación con gases vaselinas en heridas de primer grado [caso: 38380].,100,5.76,5498.0,0.0,0.0,0.0,,,
+qwen3:4b-instruct,atls,fin-01,fina,0.296,0.952,True,casos+guias,casos,6,3,3.0,3.0,1.0,0.0,False,11.31,2.12,1.13,6.0,0.0,3892,393,5,5,0.4,0.4,False,C · atribuye al HUV un pasaje de otro manual || C · palabras que no aparecen en la guía citada: volver || después · palabras que no aparecen en la guía citada: reseque,manual equivocado | palabra fuera de la guía,determinista,"**Después de la revisión primaria.** Se realizó sutura en heridas de mano y cara con pérdida de tejido en [caso: 5015], [caso: 48305] y [caso: 25689]. Se realizó lavado y desbridamiento en heridas con pérdida de tejido en [caso: 47838] y [caso: 27812]. Se administró antibiótico intravenoso en una herida de mano en [caso: 47838]. Se aplicó profilaxis antitetánica en una mordedura en pabellón auricular en [caso: 48305].
+
+**C · Circulación.** El manual del HUV recomienda evaluar y heridas de vestir temprana para controlar el sangrado con presión directa y el cierre temporal, y volver a evaluar las heridas y lavar y cerrar de manera definitiva una vez que el paciente se ha estabilizado [guía: ATLS10-03-023].
+
+**Después de la revisión primaria.** El manual del HUV recomienda que en heridas complejas con gran pérdida de tejido testicular se realice orquiectomía [guía: HUV-19-014]. El manual del HUV recomienda que en lesiones de espesor intermedio o profundo se reseque el tejido necrótico en cirugía tan pronto como las condiciones del paciente lo permitan [guía: HUV-08-009].",100,10.44,,,,,,,
+qwen3:4b-instruct,atls,fin-02,fina,0.242,0.9,True,casos+guias,casos,8,3,4.0,4.0,3.0,0.0,False,10.59,2.1,1.26,5.17,0.0,4307,327,4,2,0.25,0.0,False,después · atribuye a la 10.ª edición del ATLS un pasaje de otro manual || después · palabras que no aparecen en la guía citada: molestia,manual equivocado | palabra fuera de la guía,determinista,"**Después de la revisión primaria.** Se realizó radiografía de tórax en uno de los casos [caso: 38091] y TAC de abdomen en otro [caso: 37325]. Se realizó inmovilización en uno de los casos [caso: 37325] y se mantuvo observación en otro [caso: 38091].
+
+**B · Respiración.** El manual del HUV recomienda realizar evaluación de la respiración en pacientes con trauma abdominal cerrado, incluyendo el examen del mecanismo de la lesión para identificar posibles lesiones torácicas [guía: HUV-12-008].
+
+**C · Circulación.** La 10.ª edición del ATLS recomienda evaluar la circulación durante la revisión primaria para detectar posibles hemorragias intra-abdominales o pélvicas en pacientes con trauma cerrado [guía: ATLS10-05-001].
+
+**Después de la revisión primaria.** La 10.ª edición del ATLS recomienda que en la evaluación secundaria se realice una evaluación abdominal siguiendo los pasos de inspección y palpación, con atención al dolor en el área de mayor molestia y a la defensa abdominal [guía: HUV-16-002].",100,9.63,,,,,,,
+qwen3:4b-instruct,atls,fin-03,fina,0.292,0.929,True,casos,casos,0,0,2.0,2.0,2.0,0.0,False,6.55,2.12,0.57,1.81,0.0,1945,133,5,3,0.0,0.0,True,,,prosa,"**D · Déficit neurológico.** Conviene valorar pérdida de conciencia en lactantes con trauma craneal por caída de la cama [caso: 41635]
+
+**Después de la revisión primaria.** Conviene realizar TAC en lactantes con trauma craneal por caída de la cama [caso: 41635] [caso: 21961] y se puede considerar observación por 24 horas [caso: 24998] [caso: 41635]",100,5.65,,,,,,,
+qwen3:4b-instruct,atls,fin-04,fina,0.358,1.118,True,casos+guias,casos,5,4,5.0,5.0,3.0,0.0,False,11.33,2.11,1.1,6.05,0.0,3794,377,5,3,0.0,0.0,False,C · palabras que no aparecen en la guía citada: involucre || después · la oración quedó cortada,otro | palabra fuera de la guía,determinista,"**A · Vía aérea.** Se realizó intubación orofaringea en un paciente con herida por arma de fuego en cráneo y sin orificio de salida [caso: 27587]
+
+**C · Circulación.** En un paciente con herida por arma de fuego en cuello se observó hipotensión o choque y se realizó cirugía en dos casos [caso: 6269] [caso: 38306]
+
+**Después de la revisión primaria.** En un caso se realizó TAC para evaluar presencia de proyectil en tallo cerebral [caso: 27587]
+
+**C · Circulación.** El manual del HUV recomienda que en heridas por arma de fuego en nivel I de cuello con sangrado activo se realice angioembolización y se involucre grupo Radiología y Cirugía [guía: HUV-04-013]
+
+**Después de la revisión primaria.** Pasajes de esta letra: [guía: HUV-04-006], [guía: HUV-04-007], [guía: HUV-15-002]; su texto está en «Fragmentos de los manuales».",100,10.7,,,,,,,
+qwen3:4b-instruct,atls,proc-01,procedimiento,0.374,1.17,False,casos+guias,,8,3,,,,,,11.55,2.12,1.3,6.07,0.017,4459,398,5,5,0.0,0.0,False,"«hemotórax» se cita a casos que no lo documentan || «neumotórax» se cita a casos que no lo documentan || «hemotórax» se cita a casos que no lo documentan || «hemotórax» se cita a casos que no lo documentan || palabras que no aparecen en los casos: compensado, masivo || «intubación / ventilación mecánica» no consta en la guía citada",mal atribuido | palabra ajena | término fuera de la guía,determinista,"En casos de trauma torácico con hipoventilación, hemotórax o neumotórax, se valoró la presencia de síntomas respiratorios o hemodinámicos [caso: 25165]. Cuando se presentan signos de neumotórax o hemotórax sintomático, se realizó colocación de tubo de tórax [caso: 22581]. En pacientes con hemotórax grado II o III, se colocó tubo de tórax para drenaje [caso: 32983]. En casos con deformidad torácica y dificultad respiratoria, se colocó tubo de tórax bilateral [caso: 58265]. En pacientes con hemotórax masivo o shock compensado, se colocó tubo de tórax en el quirófano [caso: 59410]. El manual del HUV recomienda colocar tubo de tórax en casos de neumotórax a tensión, neumotórax comunicante, neumotórax mayor de 25% o hemotórax grado II o III [guía: HUV-11-011]. El manual del HUV recomienda colocar tubo de tórax en pacientes con hemoneumotórax asociado o con requerimiento de ventilación mecánica [guía: HUV-22-002]. La 10.ª edición del ATLS recomienda colocar un tubo de drenaje torácico en pacientes con neumotórax conocido antes de su transporte en ambulancia de aire [guía: ATLS10-04-016].",100,10.99,14095.0,0.0,2.0,1.0,,,
+qwen3:4b-instruct,atls,proc-02,procedimiento,0.312,1.069,False,casos+guias,casos+guias,2,2,,,,,,10.75,2.12,1.01,5.58,0.008,3506,377,2,2,0.0,0.0,True,,,prosa,"En los casos similares se valoró herida penetrante en ambos [caso: 59269] [caso: 60699], se detectó hemotórax en uno de ellos [caso: 59269] y se realizó toracostomía cerrada con paso de tubo de tórax en ambos [caso: 59269] [caso: 60699]. Se hizo sutura en uno de los casos [caso: 59269] y se realizó drenaje con aproximadamente 160 cc en uno [caso: 59269] y 500 cc en otro [caso: 60699]. El manual del HUV recomienda realizar una lista de chequeo y pausa de seguridad, consentimiento informado, antibiótico profiláctico, monitoría y equipo requerido, identificación del equipo quirúrgico y del sitio anatómico [guía: HUV-22-006]. La 10.ª edición del ATLS recomienda colocar al paciente en posición con brazo ipsilateral extendido y flexionado en el codo, utilizando un asistente para mantener esa posición [guía: ATLS10-20-022]. El manual del HUV recomienda identificar el triángulo de seguridad con el borde lateral del latísimo del dorso, el borde lateral del pectoral mayor y el reborde del 5to arco costal, entre la línea axilar anterior y media [guía: HUV-22-006].",100,10.02,10846.0,0.0,1.0,1.0,,,
+qwen3:4b-instruct,atls,proc-03,procedimiento,0.297,1.015,False,guias,,7,3,,,,,,8.88,2.11,0.83,3.87,0.002,2894,271,0,0,,,False,«10» no está en la guía citada || palabras que no aparecen en la guía citada: infusion,cifra | palabra fuera de la guía,determinista,"La 11.ª edición del ATLS recomienda administrar ácido tranexámico como una dosis inicial de 1 gramo en bolus durante 10 minutos seguida de una infusión de 1 gramo durante más de 8 horas, o una sola dosis de 2 gramos, cuando se presenta un shock hemorrágico grave y se administra dentro de las 3 horas posteriores a la lesión [guía: ATLS-06-022]. La 10.ª edición del ATLS recomienda la administración de 1 gramo de ácido tranexámico en bolo durante 10 minutos y una infusión de 1 gramo por más de 8 horas en pacientes con shock hemorrágico en las primeras 3 horas del trauma [guía: ATLS10-03-044]. El manual del HUV recomienda aplicar 1 gramo de ácido tranexámico en bolo y luego una infusión de 1 gramo durante 8 horas en pacientes con shock hemorrágico severo en las primeras 3 horas del trauma [guía: HUV-06-004].",100,8.08,10410.0,1.0,2.0,1.0,,,
+qwen3:4b-instruct,atls,proc-04,procedimiento,0.353,1.141,False,casos+guias,,6,3,,,,,,11.08,2.12,1.21,5.7,0.017,4145,375,5,5,0.0,0.0,False,palabras que no aparecen en los casos: distraer || atribuye a la 11.ª edición del ATLS un pasaje de otro manual,manual equivocado | palabra ajena,determinista,"En los casos similares se valoró dolor torácico, amnesia y lesiones en otras áreas que pueden distraer la evaluación del tórax [caso: 23715], se realizó radiografía de tórax en todos los casos [caso: 38091] [caso: 48064] [caso: 46351] [caso: 23715] [caso: 27594] y se observó que en algunos casos se realizó inmovilización o analgesia [caso: 23715] [caso: 27594].
+La 11.ª edición del ATLS recomienda que la radiografía de tórax sea la imagen inicial en todo paciente politraumatizado, y que se utilice el protocolo NEXUS Chest como herramienta para definir la necesidad de realizarla [guía: HUV-12-005].
+La 10.ª edición del ATLS recomienda que en pacientes con trauma cerrado de tórax y hemodinámica normal, se solicite radiografía de tórax en posición vertical para excluir hemotórax o neumotórax asociado [guía: ATLS10-05-014].
+El manual del HUV recomienda que la radiografía de tórax se realice en dos proyecciones (anteroposterior y lateral) para evaluar neumotórax, hemotórax y localización de proyectiles [guía: HUV-11-004].",100,10.47,13909.0,0.0,3.0,1.0,,,
+qwen3:4b-instruct,atls,proc-05,procedimiento,0.321,1.049,False,guias,,5,2,,,,,,8.72,2.11,0.77,3.8,0.002,2709,268,0,0,,,False,"atribuye a la 10.ª edición del ATLS un pasaje de otro manual || palabras que no aparecen en la guía citada: volumen || «10» no está en la guía citada || palabras que no aparecen en la guía citada: ajustar, fluidos, funcion, incrementando, produccion",cifra | manual equivocado | palabra fuera de la guía,determinista,"La 11.ª edición del ATLS recomienda dividir el volumen total de líquidos calculado por 16 para obtener la tasa ajustada de fluidos, y aumentar esta tasa a 1000 mL/hora durante la evaluación secundaria, ajustando posteriormente según la producción urinaria [guía: ATLS-09-013]. La 10.ª edición del ATLS recomienda administrar la mitad del volumen calculado en las primeras 8 horas y el 50% restante en las siguientes 16 horas, con un objetivo de gasto urinario de 0.3–0.5 cc/kg/hora en adultos [guía: HUV-08-008]. El manual del HUV recomienda monitorear el gasto urinario con una meta de 0.3–0.5 cc/kg/hora en adultos y ajustar la tasa de fluidos en función de la producción urinaria, incrementando en 10–30% si el gasto es bajo y reduciéndolo si es superior [guía: HUV-08-008].",100,7.98,9614.0,1.0,1.0,0.0,,,
+qwen3:4b-instruct,atls,proc-06,procedimiento,0.369,1.071,False,casos+guias,casos,6,3,,,,,,11.47,2.11,1.25,6.06,0.003,4248,398,5,5,0.0,0.0,False,palabras que no aparecen en la guía citada: indique,palabra fuera de la guía,determinista,"En los casos similares se valoró alteración del nivel de conciencia, hipoventilación y sangrado activo [caso: 25353], se realizó estudio con TAC y radiografía [caso: 25353] y se llevó a cabo intubación orotraqueal con ventilación mecánica en todos los casos [caso: 25353] [caso: 16194] [caso: 40982] [caso: 37787] [caso: 14433].
+La 11.ª edición del ATLS recomienda que la intubación orotraqueal se indique en pacientes con incapacidad para mantener una vía aérea patente, respiración fallida o alteración del estado mental, como consecuencia de lesiones craneales, intoxicación o hipoperfusión [guía: ATLS-11-012].
+La 10.ª edición del ATLS recomienda que en pacientes con apnea se indique intubación orotraqueal, y que se tomen precauciones ante fracturas de la base del cráneo o signos de lesión craneal como equimosis bilateral o líquido cefalorraquídeo [guía: ATLS10-02-024].
+El manual del HUV recomienda definir la necesidad de intubación orotraqueal mediante una Secuencia de Intubación Rápida SIR y activar el protocolo de vía aérea quirúrgica si el paciente no puede oxigenar y no puede ventilar [guía: HUV-05-023].",100,10.8,13752.0,1.0,2.0,1.0,,,
+qwen3:4b-instruct,atls,proc-07,procedimiento,0.352,1.123,False,guias,,7,3,,,,,,7.78,2.12,0.84,2.78,0.002,2930,195,0,0,,,False,"palabras que no aparecen en la guía citada: adecuada, garantiza, hipercapnia, provocar",palabra fuera de la guía,determinista,"La 11.ª edición del ATLS recomienda que cuando no se puede oxigenar ni ventilar, se considere una vía aérea de rescate como la cricotiroidotomía aguja, ya que proporciona oxigenación temporal [guía: ATLS-11-013]. La 10.ª edición del ATLS recomienda la cricotiroidotomía aguja como técnica de emergencia para oxigenación, aunque no garantiza ventilación adecuada y puede provocar hipercapnia progresiva [guía: ATLS10-02-027]. El manual del HUV recomienda la técnica de cricotiroidotomía con bisturí, bujía y tubo por su facilidad técnica y de recursos [guía: HUV-05-023].",100,7.14,10001.0,1.0,3.0,1.0,,,
+qwen3:4b-instruct,atls,proc-08,procedimiento,0.229,0.83,False,casos+guias,casos,7,3,,,,,,12.6,2.12,1.28,7.15,0.005,4369,470,5,5,0.0,0.0,False,"atribuye a la 11.ª edición del ATLS un pasaje de otro manual || palabras que no aparecen en la guía citada: descompresion, french, liberar, quinto, senala || da una orden («se debe») en vez de orientar || «tubo de tórax» no consta en la guía citada || palabras que no aparecen en la guía citada: descompresion, exitosa, senala",manual equivocado | orden | palabra fuera de la guía | término fuera de la guía,determinista,"En los casos similares se valoró hipoventilación en el campo pulmonar afectado [caso: 3711] [caso: 40350] [caso: 25165], hemotorax en dos casos [caso: 24592] [caso: 25165] y fracturas en dos casos [caso: 3711] [caso: 24592]; se realizó radiografía en un caso [caso: 33204] y se colocó tubo de tórax en todos los casos [caso: 3711] [caso: 24592] [caso: 33204] [caso: 40350] [caso: 25165].
+La 11.ª edición del ATLS recomienda realizar descompresión inmediata con catéter de 14 o 16 French en el segundo o quinto espacio intercostal para liberar el aire que colapsa el pulmón y el mediastino, y señala que el manejo definitivo es la colocación de un tubo de tórax [guía: HUV-11-007].
+La 10.ª edición del ATLS recomienda cerrar rápidamente el defecto con un apósito estéril suficientemente grande, aplicando cinta en tres lados para crear un efecto flutter-válvula, y señala que si la descompresión con aguja no es exitosa, se debe realizar toracostomía [guía: ATLS10-04-008].
+El manual del HUV recomienda observar clínicamente y radiológicamente a pacientes con pequeños neumotórax o hemotórax grado I durante 6 horas, y en caso de dificultades de acceso, observarlos por 24 horas [guía: HUV-11-013].",100,11.54,14139.0,0.0,2.0,1.0,,,
+qwen3:4b-instruct,atls,proc-09,procedimiento,0.263,0.462,False,guias,,7,3,,,,,,8.4,2.1,0.82,3.44,0.003,2835,242,0,0,,,False,palabras que no aparecen en la guía citada: triada,palabra fuera de la guía,determinista,"La 11.ª edición del ATLS recomienda que en pacientes con trauma penetrante se active el protocolo de transfusión masiva cuando se identifique un ABC Score > 2, como trigger para iniciar la reanimación con productos sanguíneos [guía: ATLS-22-010]. La 10.ª edición del ATLS recomienda definir transfusión masiva como más de 10 unidades de pRBCs en 24 horas o más de 4 unidades en 1 hora, y que se administren productos sanguíneos en proporción equilibrada para reducir coagulopatía y acidosis [guía: ATLS10-03-043]. El manual del HUV recomienda identificar tempranamente candidatos a transfusión masiva mediante escalas como el ABC Score o el RABT, y activar el protocolo de manera temprana para evitar complicaciones como la tríada letal [guía: HUV-06-006].",100,7.03,10399.0,1.0,2.0,1.0,,,
+qwen3:4b-instruct,atls,proc-10,procedimiento,0.308,1.015,False,guias,,5,3,,,,,,8.71,2.12,0.79,3.75,0.002,2759,259,0,0,,,False,da una orden («debe») en vez de orientar || palabras que no aparecen en la guía citada: senala,orden | palabra fuera de la guía,determinista,"La 11.ª edición del ATLS recomienda aplicar un torniquete 2–3 inches (5–8 cm) proximal a la lesión, directamente sobre la piel y no sobre ropa ni sobre una articulación, y lo debe ajustarse hasta que se detenga la hemorragia y no se palpe pulso distal [guía: ATLS-03-005]. La 10.ª edición del ATLS recomienda usar un torniquete solo cuando la presión directa no es eficaz y la vida del paciente está en peligro, y señala que el uso de un torniquete puede conllevar riesgo de lesión isquémica a la extremidad [guía: ATLS10-01-013]. El manual del HUV recomienda colocar el torniquete 5 cm proximal a la lesión, ajustarlo hasta controlar la hemorragia, anotar la hora de aplicación y dejarlo visible, sin aflojarlo hasta estar en urgencias de la institución adecuada [guía: HUV-06-003].",100,7.92,9813.0,1.0,2.0,1.0,,,
+qwen3:4b-instruct,atls,proc-11,procedimiento,0.482,1.439,True,casos+guias,guias,5,2,4.0,3.0,2.0,1.0,False,9.91,2.13,1.15,4.58,0.0,3911,297,3,2,0.0,0.0,False,C · «un caso» no coincide con los casos || C · no nombra nada de la letra C,conteo | otro,determinista,"**C · Circulación.** En un caso con inestabilidad hemodinámica se identificó compromiso vascular [caso: 51682].
+
+**Después de la revisión primaria.** En un caso se realizó TAC para evaluación de lesiones pélvicas [caso: 39410]. En otro caso se administró antibiótico [caso: 51682].
+
+**C · Circulación.** El manual del HUV recomienda realizar un examen cuidadoso de la pelvis para identificar candidatos a Rx de pelvis, fractura inestable, lesión uretral, rectal y/o vaginal [guía: HUV-17-012]. El manual del HUV recomienda realizar una compresión pélvica circunferencial sobre los trocánteres mayores y la sínfisis del pubis con sábana, cinturón o dispositivo comercial como tratamiento inicial para una pelvis inestable en el contexto de un paciente con shock hemorrágico [guía: HUV-17-010].",100,9.7,,,,,,,
+qwen3:4b-instruct,atls,proc-12,procedimiento,0.346,1.112,False,casos+guias,,5,2,,,,,,11.12,2.12,1.22,5.72,0.016,4135,377,5,5,0.0,0.0,False,"«cuatro casos» no coincide con los casos || palabras que no aparecen en los casos: cuatro || palabras que no aparecen en la guía citada: enfasis, paraesternal, subxifoidea || «UCI» no consta en la guía citada || «observación» no consta en la guía citada",conteo | palabra ajena | palabra fuera de la guía | término fuera de la guía,determinista,"En los casos similares se valoró hipoventilación en un paciente [caso: 3393], se realizó TAC en uno [caso: 58286] y se hizo lavado / desbridamiento en uno [caso: 56419]. Se realizó ventana pericardica en cuatro casos [caso: 56419] [caso: 58286] [caso: 11295] [caso: 28423], con hallazgos negativos en tres [caso: 56419] [caso: 58286] [caso: 11295] y positiva en uno [caso: 3393].
+El manual del HUV recomienda que en pacientes con herida precordial y hemodinámica estable, se realice ultrasonido cardíaco con énfasis en la ventana subxifoidea o paraesternal largo [guía: HUV-13-005].
+El manual del HUV recomienda que en pacientes con ultrasonido positivo y hemopericardio menor de 10 mm, se realice observación en UCI y se repita el ultrasonido a las 6, 12 y 24 horas [guía: HUV-13-009].
+El manual del HUV recomienda que en pacientes con ultrasonido positivo y hemopericardio mayor de 10 mm, se realice ventana pericárdica [guía: HUV-13-009].",100,10.47,13096.0,0.0,0.0,0.0,,,
+qwen3:4b-instruct,atls,proc-13,procedimiento,0.251,0.935,False,guias,guias,4,2,,,,,,8.07,2.13,0.67,3.23,0.003,2363,231,0,0,,,True,,,prosa,"El manual del HUV recomienda definir si una herida es penetrante evaluando condiciones como heridas soplantes, epiploceles o evisceración, así como salida de contenido intestinal o sangrado activo, y se puede considerar explorar heridas con duda de penetración o localización en áreas limítrofes [guía: HUV-23-001]. El ATLS recomienda evaluar peritonitis, hematemesis, sangrado rectal o evisceración como indicaciones para exploración abdominal, y señala que las heridas por arma cortopunzante o punzones pueden ser consideradas penetrantes sin necesidad de exploración [guía: ATLS-22-010]. El ATLS recomienda que en casos de trauma penetrante abdominal o pélvico, se realice una evaluación con FAST y que si hay hallazgos positivos, se considere exploración laparótoma [guía: ATLS-22-010].",100,7.13,8951.0,1.0,0.0,0.0,,,
+qwen3:4b-instruct,atls,proc-14,procedimiento,0.235,0.96,False,guias,,8,3,,,,,,8.43,2.12,0.83,3.43,0.002,2905,237,0,0,,,False,"da una orden («se debe») en vez de orientar || palabras que no aparecen en la guía citada: politrauma || «hemotórax» no consta en la guía citada || palabras que no aparecen en la guía citada: definir, modalidad",orden | palabra fuera de la guía | término fuera de la guía,determinista,"El manual del HUV recomienda realizar el E-FAST como parte de la evaluación primaria de todo paciente traumatizado, especialmente en contextos de inestabilidad hemodinámica, para excluir causas de shock como neumotórax, hemotórax, hemopericardio o hemoperitoneo [guía: HUV-17-004]. El manual del HUV recomienda que el E-FAST sea utilizado en pacientes con trauma abdominal penetrante o politrauma para ayudar a definir qué cavidad se debe intervenir primero y como elemento para seleccionar pacientes para el protocolo de transfusión masiva [guía: HUV-15-007]. El manual del HUV recomienda que el E-FAST sea considerado como la modalidad diagnóstica de elección para definir la necesidad de intervención en pacientes traumatizados, superando a la Rx de tórax en el diagnóstico de hemotórax o taponamiento [guía: HUV-12-005].",100,7.51,9980.0,0.0,0.0,0.0,,,
+qwen3:4b-instruct,atls,proc-15,procedimiento,0.277,0.95,False,guias,guias,7,3,,,,,,7.85,2.12,0.79,2.88,0.002,2777,201,0,0,,,True,,,prosa,"La 11.ª edición del ATLS recomienda que durante la evaluación primaria se realice la exposición del paciente para examinarlo y que, al finalizar, se cubra para prevenir la hipotermia, ya que esta es una condición común en pacientes traumatizados [guía: ATLS-08-005]. El manual del HUV recomienda mantener una atención empática que brinde calor humano al paciente, permitiendo el acompañamiento permanente de su familiar o cuidador durante todo el proceso de atención [guía: HUV-03-008]. La 10.ª edición del ATLS recomienda que el paciente reciba fluidos intravenosos calentados antes de su infusión y que se mantenga un ambiente cálido para prevenir la hipotermia [guía: ATLS10-01-015].",100,6.96,10506.0,1.0,2.0,1.0,,,
+qwen3:4b-instruct,atls,proc-16,procedimiento,0.29,1.008,False,guias,,7,3,,,,,,8.07,2.1,0.79,3.12,0.001,2775,220,0,0,,,False,"palabras que no aparecen en la guía citada: componente, motriz, obtenida || atribuye al HUV un pasaje de otro manual",manual equivocado | palabra fuera de la guía,determinista,"La 11.ª edición del ATLS recomienda que la puntuación de la escala de coma de Glasgow se obtenga sumando las puntuaciones de apertura ojo, respuesta verbal y respuesta motriz, considerando NT (no comprobable) cuando una evaluación no se puede realizar [guía: ATLS-07-018]. La 10.ª edición del ATLS recomienda que la puntuación del GCS se calcule con la mejor respuesta obtenida en cada componente, y que el componente motriz sea el más correlacionado con los resultados a largo plazo [guía: ATLS10-06-011]. El manual del HUV recomienda que un nivel de alerta alterado se considere cuando la puntuación del GCS es de 14 o menos, o cuando hay disociación en la orientación a persona, lugar, tiempo o eventos [guía: ATLS-07-025].",100,7.27,9397.0,2.0,4.0,1.0,,,
+qwen3:4b-instruct,tarjeta,lex-01,lexica,0.334,1.058,True,casos+tarjeta,tarjeta,6,0,3.0,3.0,1.0,1.0,False,7.11,2.1,0.58,2.39,0.059,2009,172,5,4,1.0,1.0,False,"C · palabras que no aparecen en los casos: circulatorias || después · «hemotórax» es de la letra B, no de la después",letra equivocada | palabra ajena,determinista,"### Protocolo inicial: herida por arma de fuego
+
+- Un solo orificio de bala en la piel no descarta lesión de múltiples áreas del cuerpo, porque la trayectoria depende de la posición del paciente cuando es herido y puede cambiar al impactar huesos [guía: HUV-04-006]
+- Con múltiples orificios, primero la condición clínica y la localización de los orificios, y en un segundo tiempo las posibles trayectorias [guía: HUV-04-006]
+- Las heridas por arma de fuego se consideran penetrantes, a no ser que sea muy evidente un trayecto tangencial [guía: HUV-15-004]
+
+**x · Hemorragia exanguinante**
+- Compresión directa de la herida y, si el sangrado persiste, empaquetamiento con gasas o apósitos hemostáticos [guía: HUV-06-003]
+- Torniquete en sangrados de extremidades que no se controlan con las maniobras previas, 5 cm proximal a la lesión y anotando la hora de aplicación [guía: HUV-06-003]
+- En heridas con orificios de entrada pequeños y sangrado activo, introducir una sonda Foley e inflar el balón con agua para comprimir el vaso sangrante [guía: HUV-06-003]
+
+**A · Vía aérea**
+- Oxigenar, despejar la vía aérea y elevar el mentón, manteniendo la columna cervical en posición neutral [guía: HUV-02-003]
+- Vía aérea definitiva ante apnea, Glasgow de 8 o menos, riesgo de broncoaspiración o incapacidad para mantener oxigenación y ventilación con las maniobras iniciales [guía: HUV-02-003]
+
+**B · Respiración**
+- Identificar neumotórax a tensión, hemotórax masivo, neumotórax abierto y taponamiento cardiaco, con el apoyo del FAST-E, el oxímetro de pulso y la frecuencia respiratoria [guía: HUV-02-003]
+
+**C · Circulación**
+- Con frecuencia cardiaca mayor de 100, considerar al paciente en shock [guía: HUV-02-003]
+- Buscar sangrado no compresible en tórax, abdomen, retroperitoneo, pelvis y huesos largos con el examen físico, el FAST-E y las Rx de tórax, pelvis y extremidades [guía: HUV-02-003]
+- Dos catéteres venosos periféricos de gran calibre, con muestras para tipo de sangre y pruebas cruzadas, gases en sangre y lactato [guía: ATLS10-01-013]
+- *Si está inestable:* En shock severo, activar tempranamente el protocolo de transfusión masiva y, mientras llegan los hemoderivados, líquidos en bolos de 250 cc hasta una TAS entre 80 y 90 mm Hg [guía: HUV-02-003]
+- *Si está inestable:* En las primeras 3 horas del trauma con shock hemorrágico, Ácido Tranexámico 1 g durante 10 minutos y 1 g en infusión por 8 horas [guía: HUV-06-004]
+- *Si hay TCE:* Con TCE, la hipotensión permisiva puede resultar en un segundo golpe [guía: HUV-04-013]
+- Candidatos a transfusión masiva con el ABC Score (mecanismo penetrante, PAS ≤ 90 mm Hg, FC ≥ 120 lpm y FAST positivo), con una puntuación de 2 o más [guía: HUV-06-006]
+
+**D · Déficit neurológico**
+- Nivel de consciencia con la escala de Glasgow, tamaño pupilar y reacción del paciente, e incapacidad para movilizar las extremidades [guía: HUV-02-003]
+- Mantener una oxigenación, ventilación y perfusión adecuadas para evitar un daño neurológico secundario [guía: HUV-02-003]
+
+**E · Exposición**
+- Énfasis en la exposición para identificar todas las heridas, laceraciones o hematomas [guía: HUV-04-013]
+- Al completar la evaluación, cubrir al paciente con mantas calientes y administrar líquidos tibios a 39°C para evitar la hipotermia [guía: HUV-02-003]
+
+**Después de la revisión primaria**
+- Antes del catéter urinario, examinar el perineo y los genitales, porque sangre en el meato uretral o equimosis perineal hacen sospechar una lesión uretral [guía: ATLS10-01-021]
+- *Si está estable:* En el paciente estable o respondedor transitorio con politrauma, TAC corporal total sin interrumpir el proceso de resucitación [guía: HUV-06-007]
+- *Si está inestable:* Sangre intraabdominal en el FAST en un paciente hemodinámicamente anormal indica la necesidad de una intervención quirúrgica [guía: ATLS10-01-023]
+- Laparotomía con anormalidad hemodinámica, signos de irritación peritoneal o signos de penetración peritoneal como la evisceración [guía: ATLS10-05-020]
+- *Si está estable:* En pacientes estables con múltiples orificios o trayectos dudosos, TAC corporal total sin interrumpir el proceso de resucitación [guía: HUV-06-007]
+- *Si está inestable:* Los pacientes con trauma abdominal penetrante en shock que no responden van inmediatamente al quirófano para control del sangrado [guía: HUV-15-004]
+
+**Lesiones que se esperan**
+- En el abdomen, las heridas de bala lesionan más el intestino delgado (50 %), el colon (40 %), el hígado (30 %) y las estructuras vasculares abdominales (25 %) [guía: ATLS10-05-004]
+- En la extremidad, lesión neurovascular, fracturas y síndrome compartimental [guía: ATLS10-01-027]
+- Un número impar de heridas sugiere una bala retenida o, menos probable, una lesión tangencial [guía: ATLS10-23-019]
+- *Heridas en el tórax:* En el tórax, la presencia de hallazgos clínicos tiene mucho valor para identificar lesiones pleurales, pero la ausencia de ellos no las descarta [guía: HUV-11-003]
+
+**Además**
+- Manejo antitetánico y antibióticos en presencia de heridas sucias [guía: HUV-04-013]
+- Guiarse por la condición clínica, porque lo que se ve externamente puede no corresponder con los daños internos [guía: HUV-04-013]
+
+**Datos que cambiarían la orientación:** la edad, los signos vitales, el Glasgow y el tiempo desde el trauma.
+
+**B · Respiración.** Conviene colocar tubo de tórax en casos con hipoventilación por herida por arma de fuego en tórax [caso: 28860] [caso: 33765] [caso: 7109]
+
+**C · Circulación.** Se puede considerar realizar toracotomía en casos con herida por arma de fuego en tórax y alteraciones circulatorias [caso: 37838]
+
+**Después de la revisión primaria.** En casos con hipoventilación y hemotórax, se puede considerar cirugía para revisión de cavidad torácica [caso: 33765]",100,6.46,,,,,arma_de_fuego,16.0,32.0
+qwen3:4b-instruct,tarjeta,lex-02,lexica,0.324,1.053,True,casos+tarjeta,casos+tarjeta,5,0,1.0,1.0,1.0,0.0,False,6.26,2.11,0.59,1.52,0.052,2027,111,5,4,1.0,1.0,True,,,prosa,"### Protocolo inicial: caída
+
+- La caída > 6 metros está entre los hallazgos en la escena para sospechar politrauma [guía: HUV-04-011]
+- *Es adulto mayor:* La osteopenia y la fragilidad general son factores importantes en la gravedad de la lesión, incluso con caídas de bajo impacto [guía: ATLS10-23-013]
+- Al caer de pie, la energía se transmite por la extremidad inferior a la pelvis y luego a la columna vertebral [guía: ATLS10-23-013]
+
+**x · Hemorragia exanguinante**
+- Compresión directa de la herida y, si el sangrado persiste, empaquetamiento con gasas o apósitos hemostáticos [guía: HUV-06-003]
+- Torniquete en sangrados de extremidades que no se controlan con las maniobras previas, 5 cm proximal a la lesión y anotando la hora de aplicación [guía: HUV-06-003]
+
+**A · Vía aérea**
+- Oxigenar, despejar la vía aérea y elevar el mentón, manteniendo la columna cervical en posición neutral [guía: HUV-02-003]
+- Vía aérea definitiva ante apnea, Glasgow de 8 o menos, riesgo de broncoaspiración o incapacidad para mantener oxigenación y ventilación con las maniobras iniciales [guía: HUV-02-003]
+- Basándose en el mecanismo, se supone que existe una lesión de la médula, y el movimiento de la columna cervical se restringe [guía: ATLS10-01-009]
+
+**B · Respiración**
+- Identificar neumotórax a tensión, hemotórax masivo, neumotórax abierto y taponamiento cardiaco, con el apoyo del FAST-E, el oxímetro de pulso y la frecuencia respiratoria [guía: HUV-02-003]
+
+**C · Circulación**
+- Con frecuencia cardiaca mayor de 100, considerar al paciente en shock [guía: HUV-02-003]
+- Buscar sangrado no compresible en tórax, abdomen, retroperitoneo, pelvis y huesos largos con el examen físico, el FAST-E y las Rx de tórax, pelvis y extremidades [guía: HUV-02-003]
+- Dos catéteres venosos periféricos de gran calibre, con muestras para tipo de sangre y pruebas cruzadas, gases en sangre y lactato [guía: ATLS10-01-013]
+- *Si está inestable:* En shock severo, activar tempranamente el protocolo de transfusión masiva y, mientras llegan los hemoderivados, líquidos en bolos de 250 cc hasta una TAS entre 80 y 90 mm Hg [guía: HUV-02-003]
+- *Si está inestable:* En las primeras 3 horas del trauma con shock hemorrágico, Ácido Tranexámico 1 g durante 10 minutos y 1 g en infusión por 8 horas [guía: HUV-06-004]
+- *Si hay TCE:* Con TCE, la hipotensión permisiva puede resultar en un segundo golpe [guía: HUV-04-013]
+- Para el sangrado pélvico severo, compresión pélvica externa mediante sábanas o dispositivos colocados en la pelvis a nivel de los trocánteres mayores [guía: HUV-06-003]
+
+**D · Déficit neurológico**
+- Nivel de consciencia con la escala de Glasgow, tamaño pupilar y reacción del paciente, e incapacidad para movilizar las extremidades [guía: HUV-02-003]
+- Mantener una oxigenación, ventilación y perfusión adecuadas para evitar un daño neurológico secundario [guía: HUV-02-003]
+
+**E · Exposición**
+- Énfasis en la exposición para identificar todas las heridas, laceraciones o hematomas [guía: HUV-04-013]
+- Al completar la evaluación, cubrir al paciente con mantas calientes y administrar líquidos tibios a 39°C para evitar la hipotermia [guía: HUV-02-003]
+
+**Después de la revisión primaria**
+- Antes del catéter urinario, examinar el perineo y los genitales, porque sangre en el meato uretral o equimosis perineal hacen sospechar una lesión uretral [guía: ATLS10-01-021]
+- *Si está estable:* En el paciente estable o respondedor transitorio con politrauma, TAC corporal total sin interrumpir el proceso de resucitación [guía: HUV-06-007]
+- *Si está inestable:* Sangre intraabdominal en el FAST en un paciente hemodinámicamente anormal indica la necesidad de una intervención quirúrgica [guía: ATLS10-01-023]
+- Radiografías AP de tórax y pelvis en el área de reanimación, si no interrumpen el proceso de reanimación [guía: ATLS10-01-023]
+- TAC corporal total en el trauma cerrado por caídas mayores de 6 metros y en adultos mayores de 70 años [guía: HUV-04-013]
+
+**Lesiones que se esperan**
+- En la caída de altura, lesión craneal, lesión de la columna axial, lesiones viscerales abdominales y fractura de pelvis o acetábulo, incluyendo fracturas del calcáneo [guía: ATLS10-01-027]
+- Las personas que caen desde una altura corren un riesgo especial de fracturas de la unión toracolumbar, que por lo general son inestables [guía: ATLS10-07-017]
+
+**Además**
+- En las fracturas abiertas, antibióticos por vía intravenosa tan pronto como sea posible, ya que el retraso más allá de tres horas se relaciona con mayor riesgo de infección, y profilaxis del tétanos [guía: ATLS10-08-027]
+- Guiarse por la condición clínica, porque lo que se ve externamente puede no corresponder con los daños internos [guía: HUV-04-013]
+
+**Datos que cambiarían la orientación:** los signos vitales, el Glasgow y el tiempo desde el trauma.
+
+**Después de la revisión primaria.** Se realizó radiografía de pelvis en tres casos [caso: 59636] [caso: 57668] [caso: 59062]. se realizó reducción abierta con fijación con clavo cervico diafisiario en un caso [caso: 57383]. se iniciaron antibióticos en un caso [caso: 59636].",100,5.58,,,,,caida,14.0,29.0
+qwen3:4b-instruct,tarjeta,lex-03,lexica,0.333,1.089,True,casos+guias,,8,2,6.0,6.0,2.0,1.0,False,14.08,2.11,1.6,8.28,0.0,5363,511,5,5,0.0,0.0,False,D · «cuatro casos» no coincide con los casos || D · no nombra nada de la letra D || después · palabras que no aparecen en los casos: asigno || A · da una orden («se debe») en vez de orientar || después · palabras que no aparecen en la guía citada: volver,conteo | orden | otro | palabra ajena | palabra fuera de la guía,determinista,"**x · Hemorragia exanguinante.** Se registró sangrado activo en dos casos [caso: 1949] [caso: 34545]
+
+**A · Vía aérea.** En dos casos se realizó intubación orotraqueal [caso: 1949] [caso: 37876]
+
+**D · Déficit neurológico.** Se observó alteración del Glasgow en cuatro casos [caso: 52055] [caso: 1949] [caso: 37876] [caso: 34545]
+
+**Después de la revisión primaria.** En dos casos se registró emesis [caso: 1949] [caso: 34329]; en uno se observó cefalea [caso: 34329]; en uno se detectó otorragia [caso: 1949]; en dos casos se realizó TAC [caso: 52055] [caso: 34329]; en uno se asignó UCI [caso: 1949]; en uno se registró remisión [caso: 34545]; en uno se mantuvo observación [caso: 34329]
+
+**A · Vía aérea.** El manual del HUV recomienda asegurar una vía aérea permanente mediante intubación orotraqueal cuando el Glasgow es menor que 8, y en pacientes con deterioro del estado de conciencia adicionales con hipoxia o shock hemorrágico se debe corregir la oxigenación y ventilación y comenzar transfusión con hemoderivados [guía: HUV-05-010]
+
+**Después de la revisión primaria.** La 10.ª edición del ATLS recomienda volver a evaluar al paciente con frecuencia para detectar cualquier deterioro del estado mental, utilizar narcóticos y sedantes con cautela, garantizar una ventilación adecuada con supervisión de gases en sangre o capnografía cuando sea necesario, y intubar al paciente cuando la ventilación sea insuficiente [guía: ATLS10-06-017]",100,13.39,,,,,,,
+qwen3:4b-instruct,tarjeta,lex-04,lexica,0.247,0.833,True,casos,casos,0,0,1.0,1.0,1.0,0.0,False,5.38,2.1,0.52,0.72,0.0,1807,53,5,1,1.0,1.0,True,,,prosa,"**Después de la revisión primaria.** Conviene considerar curación en el miembro superior con intervalos de 48 horas en el caso de quemadura de segundo grado, [caso: 39310].",100,4.36,,,,,,,
+qwen3:4b-instruct,tarjeta,lex-05,lexica,0.302,0.965,True,casos+tarjeta,casos+tarjeta,7,0,2.0,2.0,2.0,0.0,False,6.53,2.11,0.59,1.78,0.05,2044,130,5,3,0.4,0.3333333333333333,True,,,prosa,"### Protocolo inicial: ocupante de carro o moto
+
+- El accidente vehículo contra moto, en moto o carro > 60 km, la eyección del vehículo y la muerte de un ocupante están entre los hallazgos en la escena para sospechar politrauma [guía: HUV-04-011]
+- Las lesiones en el tórax son más frecuentes en los accidentes de tránsito por automóvil o motocicleta (60 % a 70 %) [guía: HUV-04-005]
+- La eyección del vehículo aumenta en gran medida la posibilidad de lesión grave [guía: ATLS10-01-028]
+
+**x · Hemorragia exanguinante**
+- Compresión directa de la herida y, si el sangrado persiste, empaquetamiento con gasas o apósitos hemostáticos [guía: HUV-06-003]
+- Torniquete en sangrados de extremidades que no se controlan con las maniobras previas, 5 cm proximal a la lesión y anotando la hora de aplicación [guía: HUV-06-003]
+
+**A · Vía aérea**
+- Oxigenar, despejar la vía aérea y elevar el mentón, manteniendo la columna cervical en posición neutral [guía: HUV-02-003]
+- Vía aérea definitiva ante apnea, Glasgow de 8 o menos, riesgo de broncoaspiración o incapacidad para mantener oxigenación y ventilación con las maniobras iniciales [guía: HUV-02-003]
+
+**B · Respiración**
+- Identificar neumotórax a tensión, hemotórax masivo, neumotórax abierto y taponamiento cardiaco, con el apoyo del FAST-E, el oxímetro de pulso y la frecuencia respiratoria [guía: HUV-02-003]
+
+**C · Circulación**
+- Con frecuencia cardiaca mayor de 100, considerar al paciente en shock [guía: HUV-02-003]
+- Buscar sangrado no compresible en tórax, abdomen, retroperitoneo, pelvis y huesos largos con el examen físico, el FAST-E y las Rx de tórax, pelvis y extremidades [guía: HUV-02-003]
+- Dos catéteres venosos periféricos de gran calibre, con muestras para tipo de sangre y pruebas cruzadas, gases en sangre y lactato [guía: ATLS10-01-013]
+- *Si está inestable:* En shock severo, activar tempranamente el protocolo de transfusión masiva y, mientras llegan los hemoderivados, líquidos en bolos de 250 cc hasta una TAS entre 80 y 90 mm Hg [guía: HUV-02-003]
+- *Si está inestable:* En las primeras 3 horas del trauma con shock hemorrágico, Ácido Tranexámico 1 g durante 10 minutos y 1 g en infusión por 8 horas [guía: HUV-06-004]
+- *Si hay TCE:* Con TCE, la hipotensión permisiva puede resultar en un segundo golpe [guía: HUV-04-013]
+- Para el sangrado pélvico severo, compresión pélvica externa mediante sábanas o dispositivos colocados en la pelvis a nivel de los trocánteres mayores [guía: HUV-06-003]
+
+**D · Déficit neurológico**
+- Nivel de consciencia con la escala de Glasgow, tamaño pupilar y reacción del paciente, e incapacidad para movilizar las extremidades [guía: HUV-02-003]
+- Mantener una oxigenación, ventilación y perfusión adecuadas para evitar un daño neurológico secundario [guía: HUV-02-003]
+
+**E · Exposición**
+- Énfasis en la exposición para identificar todas las heridas, laceraciones o hematomas [guía: HUV-04-013]
+- Al completar la evaluación, cubrir al paciente con mantas calientes y administrar líquidos tibios a 39°C para evitar la hipotermia [guía: HUV-02-003]
+
+**Después de la revisión primaria**
+- Antes del catéter urinario, examinar el perineo y los genitales, porque sangre en el meato uretral o equimosis perineal hacen sospechar una lesión uretral [guía: ATLS10-01-021]
+- *Si está estable:* En el paciente estable o respondedor transitorio con politrauma, TAC corporal total sin interrumpir el proceso de resucitación [guía: HUV-06-007]
+- *Si está inestable:* Sangre intraabdominal en el FAST en un paciente hemodinámicamente anormal indica la necesidad de una intervención quirúrgica [guía: ATLS10-01-023]
+- Radiografías AP de tórax y pelvis en el área de reanimación, si no interrumpen el proceso de reanimación [guía: ATLS10-01-023]
+
+**Lesiones que se esperan**
+- En el impacto frontal, fractura de columna cervical, tórax inestable anterior, contusión miocárdica, neumotórax, lesión aórtica traumática, lesión del bazo o el hígado y fractura o luxación posterior de cadera o rodilla [guía: ATLS10-01-027]
+- En el impacto lateral, esguince cervical contralateral, lesión craneal, tórax batiente lateral, neumotórax, rotura diafragmática, fractura de bazo, hígado o riñón en función del lado de impacto y fractura de pelvis o acetábulo [guía: ATLS10-01-027]
+- Los motociclistas que salen despedidos hacia delante a menudo caen sobre la columna torácica superior y se fracturan múltiples vértebras torácicas, y las fracturas pélvicas y de huesos largos también son comunes [guía: ATLS10-23-012]
+- El cinturón de seguridad abdominal puede producir rotura de intestino delgado o colon, lesión pancreática o duodenal y fractura de vértebras lumbares [guía: ATLS10-05-004]
+
+**Además**
+- En las fracturas abiertas, antibióticos por vía intravenosa tan pronto como sea posible, ya que el retraso más allá de tres horas se relaciona con mayor riesgo de infección, y profilaxis del tétanos [guía: ATLS10-08-027]
+- Guiarse por la condición clínica, porque lo que se ve externamente puede no corresponder con los daños internos [guía: HUV-04-013]
+
+**Datos que cambiarían la orientación:** la edad, los signos vitales, el Glasgow y el tiempo desde el trauma.
+
+**D · Déficit neurológico.** En uno de los casos se evidencia pérdida de conciencia [caso: 51857].
+
+**Después de la revisión primaria.** Conviene realizar radiografía después de la revisión primaria en dos casos [caso: 21759] [caso: 51857]. Se puede considerar realizar TAC en uno de los casos [caso: 57352]. Se recomienda observación en uno de los casos [caso: 21759].",100,5.74,,,,,ocupante,15.0,29.0
+qwen3:4b-instruct,tarjeta,lex-06,lexica,0.376,1.129,True,casos+tarjeta,tarjeta,6,0,4.0,4.0,2.0,2.0,False,6.84,2.11,0.58,2.1,0.053,2046,151,5,4,1.0,1.0,False,C · «1 caso» no coincide con los casos || C · no nombra nada de la letra C || D · «1 caso» no coincide con los casos || D · no nombra nada de la letra D,conteo | otro,determinista,"### Protocolo inicial: herida por arma cortopunzante
+
+- Toda herida por arma corto punzante es potencialmente mortal, sea su apariencia externa dramática o insignificante [guía: HUV-04-007]
+- Un tercio de las heridas en el tórax no penetran a la pleura y el 80 % de las que penetran se manejan con un dren pleural sin cirugía [guía: HUV-04-007]
+- En el abdomen, el 25 % de las heridas no penetran y solo el 40 % de las que penetran al peritoneo requieren cirugía [guía: HUV-04-007]
+
+**x · Hemorragia exanguinante**
+- Compresión directa de la herida y, si el sangrado persiste, empaquetamiento con gasas o apósitos hemostáticos [guía: HUV-06-003]
+- Torniquete en sangrados de extremidades que no se controlan con las maniobras previas, 5 cm proximal a la lesión y anotando la hora de aplicación [guía: HUV-06-003]
+- En heridas con orificios de entrada pequeños y sangrado activo, introducir una sonda Foley e inflar el balón con agua para comprimir el vaso sangrante [guía: HUV-06-003]
+
+**A · Vía aérea**
+- Oxigenar, despejar la vía aérea y elevar el mentón, manteniendo la columna cervical en posición neutral [guía: HUV-02-003]
+- Vía aérea definitiva ante apnea, Glasgow de 8 o menos, riesgo de broncoaspiración o incapacidad para mantener oxigenación y ventilación con las maniobras iniciales [guía: HUV-02-003]
+
+**B · Respiración**
+- Identificar neumotórax a tensión, hemotórax masivo, neumotórax abierto y taponamiento cardiaco, con el apoyo del FAST-E, el oxímetro de pulso y la frecuencia respiratoria [guía: HUV-02-003]
+
+**C · Circulación**
+- Con frecuencia cardiaca mayor de 100, considerar al paciente en shock [guía: HUV-02-003]
+- Buscar sangrado no compresible en tórax, abdomen, retroperitoneo, pelvis y huesos largos con el examen físico, el FAST-E y las Rx de tórax, pelvis y extremidades [guía: HUV-02-003]
+- Dos catéteres venosos periféricos de gran calibre, con muestras para tipo de sangre y pruebas cruzadas, gases en sangre y lactato [guía: ATLS10-01-013]
+- *Si está inestable:* En shock severo, activar tempranamente el protocolo de transfusión masiva y, mientras llegan los hemoderivados, líquidos en bolos de 250 cc hasta una TAS entre 80 y 90 mm Hg [guía: HUV-02-003]
+- *Si está inestable:* En las primeras 3 horas del trauma con shock hemorrágico, Ácido Tranexámico 1 g durante 10 minutos y 1 g en infusión por 8 horas [guía: HUV-06-004]
+- *Si hay TCE:* Con TCE, la hipotensión permisiva puede resultar en un segundo golpe [guía: HUV-04-013]
+- Candidatos a transfusión masiva con el ABC Score (mecanismo penetrante, PAS ≤ 90 mm Hg, FC ≥ 120 lpm y FAST positivo), con una puntuación de 2 o más [guía: HUV-06-006]
+
+**D · Déficit neurológico**
+- Nivel de consciencia con la escala de Glasgow, tamaño pupilar y reacción del paciente, e incapacidad para movilizar las extremidades [guía: HUV-02-003]
+- Mantener una oxigenación, ventilación y perfusión adecuadas para evitar un daño neurológico secundario [guía: HUV-02-003]
+
+**E · Exposición**
+- Énfasis en la exposición para identificar todas las heridas, laceraciones o hematomas [guía: HUV-04-013]
+- Al completar la evaluación, cubrir al paciente con mantas calientes y administrar líquidos tibios a 39°C para evitar la hipotermia [guía: HUV-02-003]
+
+**Después de la revisión primaria**
+- Antes del catéter urinario, examinar el perineo y los genitales, porque sangre en el meato uretral o equimosis perineal hacen sospechar una lesión uretral [guía: ATLS10-01-021]
+- *Si está estable:* En el paciente estable o respondedor transitorio con politrauma, TAC corporal total sin interrumpir el proceso de resucitación [guía: HUV-06-007]
+- *Si está inestable:* Sangre intraabdominal en el FAST en un paciente hemodinámicamente anormal indica la necesidad de una intervención quirúrgica [guía: ATLS10-01-023]
+- Laparotomía con anormalidad hemodinámica, signos de irritación peritoneal o signos de penetración peritoneal como la evisceración [guía: ATLS10-05-020]
+- *Si está estable:* En el paciente estable y con abdomen sin hallazgos, definir si la herida es penetrante con la exploración, que identifica si atraviesa la fascia abdominal profunda [guía: HUV-15-004]
+- La mayoría de los pacientes que desarrollan signos de irritación peritoneal lo hacen en las primeras 12 horas, y conviene reevaluar periódicamente [guía: HUV-15-004]
+
+**Lesiones que se esperan**
+- En el abdomen, las puñaladas lesionan más el hígado (40 %), el intestino delgado (30 %), el diafragma (20 %) y el colon (15 %) [guía: ATLS10-05-004]
+- En el tórax anterior, taponamiento cardíaco si la herida está dentro de la caja, hemotórax, neumotórax o hemoneumotórax [guía: ATLS10-01-027]
+- En la región toracoabdominal izquierda, lesión de diafragma izquierda, lesión del bazo o hemoneumotórax [guía: ATLS10-01-027]
+- El diagnóstico clínico de una herida de diafragma es supremamente difícil y no existe un signo patognomónico [guía: HUV-14-004]
+
+**Además**
+- Manejo antitetánico y antibióticos en presencia de heridas sucias [guía: HUV-04-013]
+- Guiarse por la condición clínica, porque lo que se ve externamente puede no corresponder con los daños internos [guía: HUV-04-013]
+
+**Datos que cambiarían la orientación:** la edad, los signos vitales, el Glasgow y el tiempo desde el trauma.
+
+**B · Respiración.** En 1 caso se evidencia hemotórax [caso: 16159].
+
+**C · Circulación.** En 1 caso se evidencia compromiso vascular [caso: 16159].
+
+**D · Déficit neurológico.** En 1 caso se registra alteración del Glasgow [caso: 16159].
+
+**Después de la revisión primaria.** En 4 casos se realiza laparotomía o laparoscopia [caso: 27722] [caso: 14911] [caso: 16159] [caso: 39256].",100,6.29,,,,,cortopunzante,15.0,32.0
+qwen3:4b-instruct,tarjeta,voc-01,vocabulario,0.335,1.231,True,casos+tarjeta,tarjeta,7,0,2.0,2.0,0.0,1.0,False,5.99,2.1,0.55,1.29,0.047,1903,94,5,2,0.2,0.0,False,"C · «compromiso vascular» no consta en ningún caso recuperado || C · palabras que no aparecen en los casos: sospecha || después · «hemotórax» no consta en ningún caso recuperado || después · «neumotórax» no consta en ningún caso recuperado || después · «hemotórax» es de la letra B, no de la después || después · «neumotórax» es de la letra B, no de la después",letra equivocada | palabra ajena | término sin respaldo,determinista,"### Protocolo inicial: herida por arma cortopunzante
+
+- Toda herida por arma corto punzante es potencialmente mortal, sea su apariencia externa dramática o insignificante [guía: HUV-04-007]
+- Un tercio de las heridas en el tórax no penetran a la pleura y el 80 % de las que penetran se manejan con un dren pleural sin cirugía [guía: HUV-04-007]
+- En el abdomen, el 25 % de las heridas no penetran y solo el 40 % de las que penetran al peritoneo requieren cirugía [guía: HUV-04-007]
+
+**x · Hemorragia exanguinante**
+- Compresión directa de la herida y, si el sangrado persiste, empaquetamiento con gasas o apósitos hemostáticos [guía: HUV-06-003]
+- Torniquete en sangrados de extremidades que no se controlan con las maniobras previas, 5 cm proximal a la lesión y anotando la hora de aplicación [guía: HUV-06-003]
+- En heridas con orificios de entrada pequeños y sangrado activo, introducir una sonda Foley e inflar el balón con agua para comprimir el vaso sangrante [guía: HUV-06-003]
+
+**A · Vía aérea**
+- Oxigenar, despejar la vía aérea y elevar el mentón, manteniendo la columna cervical en posición neutral [guía: HUV-02-003]
+- Vía aérea definitiva ante apnea, Glasgow de 8 o menos, riesgo de broncoaspiración o incapacidad para mantener oxigenación y ventilación con las maniobras iniciales [guía: HUV-02-003]
+
+**B · Respiración**
+- Identificar neumotórax a tensión, hemotórax masivo, neumotórax abierto y taponamiento cardiaco, con el apoyo del FAST-E, el oxímetro de pulso y la frecuencia respiratoria [guía: HUV-02-003]
+
+**C · Circulación**
+- Con frecuencia cardiaca mayor de 100, considerar al paciente en shock [guía: HUV-02-003]
+- Buscar sangrado no compresible en tórax, abdomen, retroperitoneo, pelvis y huesos largos con el examen físico, el FAST-E y las Rx de tórax, pelvis y extremidades [guía: HUV-02-003]
+- Dos catéteres venosos periféricos de gran calibre, con muestras para tipo de sangre y pruebas cruzadas, gases en sangre y lactato [guía: ATLS10-01-013]
+- *Si está inestable:* En shock severo, activar tempranamente el protocolo de transfusión masiva y, mientras llegan los hemoderivados, líquidos en bolos de 250 cc hasta una TAS entre 80 y 90 mm Hg [guía: HUV-02-003]
+- *Si está inestable:* En las primeras 3 horas del trauma con shock hemorrágico, Ácido Tranexámico 1 g durante 10 minutos y 1 g en infusión por 8 horas [guía: HUV-06-004]
+- *Si hay TCE:* Con TCE, la hipotensión permisiva puede resultar en un segundo golpe [guía: HUV-04-013]
+- Candidatos a transfusión masiva con el ABC Score (mecanismo penetrante, PAS ≤ 90 mm Hg, FC ≥ 120 lpm y FAST positivo), con una puntuación de 2 o más [guía: HUV-06-006]
+
+**D · Déficit neurológico**
+- Nivel de consciencia con la escala de Glasgow, tamaño pupilar y reacción del paciente, e incapacidad para movilizar las extremidades [guía: HUV-02-003]
+- Mantener una oxigenación, ventilación y perfusión adecuadas para evitar un daño neurológico secundario [guía: HUV-02-003]
+
+**E · Exposición**
+- Énfasis en la exposición para identificar todas las heridas, laceraciones o hematomas [guía: HUV-04-013]
+- Al completar la evaluación, cubrir al paciente con mantas calientes y administrar líquidos tibios a 39°C para evitar la hipotermia [guía: HUV-02-003]
+
+**Después de la revisión primaria**
+- Antes del catéter urinario, examinar el perineo y los genitales, porque sangre en el meato uretral o equimosis perineal hacen sospechar una lesión uretral [guía: ATLS10-01-021]
+- *Si está estable:* En el paciente estable o respondedor transitorio con politrauma, TAC corporal total sin interrumpir el proceso de resucitación [guía: HUV-06-007]
+- *Si está inestable:* Sangre intraabdominal en el FAST en un paciente hemodinámicamente anormal indica la necesidad de una intervención quirúrgica [guía: ATLS10-01-023]
+- Laparotomía con anormalidad hemodinámica, signos de irritación peritoneal o signos de penetración peritoneal como la evisceración [guía: ATLS10-05-020]
+- *Si está estable:* En el paciente estable y con abdomen sin hallazgos, definir si la herida es penetrante con la exploración, que identifica si atraviesa la fascia abdominal profunda [guía: HUV-15-004]
+- La mayoría de los pacientes que desarrollan signos de irritación peritoneal lo hacen en las primeras 12 horas, y conviene reevaluar periódicamente [guía: HUV-15-004]
+
+**Lesiones que se esperan**
+- En el abdomen, las puñaladas lesionan más el hígado (40 %), el intestino delgado (30 %), el diafragma (20 %) y el colon (15 %) [guía: ATLS10-05-004]
+- En el tórax anterior, taponamiento cardíaco si la herida está dentro de la caja, hemotórax, neumotórax o hemoneumotórax [guía: ATLS10-01-027]
+- En la región toracoabdominal izquierda, lesión de diafragma izquierda, lesión del bazo o hemoneumotórax [guía: ATLS10-01-027]
+- El diagnóstico clínico de una herida de diafragma es supremamente difícil y no existe un signo patognomónico [guía: HUV-14-004]
+- *Si hay heridas en el tórax:* En el tórax, la presencia de hallazgos clínicos tiene mucho valor para identificar lesiones pleurales, pero la ausencia de ellos no las descarta [guía: HUV-11-003]
+- *Si hay heridas en el cuello:* En el cuello, buscar signos duros (sangrado activo, shock, hematoma expansivo, déficit neurológico, herida soplante, hematemesis o hemoptisis) [guía: HUV-09-006]
+
+**Además**
+- Manejo antitetánico y antibióticos en presencia de heridas sucias [guía: HUV-04-013]
+- Guiarse por la condición clínica, porque lo que se ve externamente puede no corresponder con los daños internos [guía: HUV-04-013]
+
+**Datos que cambiarían la orientación:** la edad, los signos vitales, el Glasgow, el tiempo desde el trauma y la localización de las heridas.
+
+**C · Circulación.** Se realizó ecografía / FAST en el cuello por sospecha de lesión vascular, con resultado negativo [caso: 23165]
+
+**Después de la revisión primaria.** Se realizó radiografía en el pecho para evaluar presencia de hemotórax o neumotórax [caso: 47485]",100,5.5,,,,,cortopunzante,17.0,34.0
+qwen3:4b-instruct,tarjeta,voc-02,vocabulario,0.225,0.954,True,casos+tarjeta,casos+tarjeta,0,0,2.0,2.0,2.0,0.0,False,5.82,2.1,0.54,1.14,0.053,1853,83,5,3,1.0,1.0,True,,,prosa,"### Protocolo inicial: herida por arma de fuego
+
+- Un solo orificio de bala en la piel no descarta lesión de múltiples áreas del cuerpo, porque la trayectoria depende de la posición del paciente cuando es herido y puede cambiar al impactar huesos [guía: HUV-04-006]
+- Con múltiples orificios, primero la condición clínica y la localización de los orificios, y en un segundo tiempo las posibles trayectorias [guía: HUV-04-006]
+- Las heridas por arma de fuego se consideran penetrantes, a no ser que sea muy evidente un trayecto tangencial [guía: HUV-15-004]
+
+**x · Hemorragia exanguinante**
+- Compresión directa de la herida y, si el sangrado persiste, empaquetamiento con gasas o apósitos hemostáticos [guía: HUV-06-003]
+- Torniquete en sangrados de extremidades que no se controlan con las maniobras previas, 5 cm proximal a la lesión y anotando la hora de aplicación [guía: HUV-06-003]
+- En heridas con orificios de entrada pequeños y sangrado activo, introducir una sonda Foley e inflar el balón con agua para comprimir el vaso sangrante [guía: HUV-06-003]
+
+**A · Vía aérea**
+- Oxigenar, despejar la vía aérea y elevar el mentón, manteniendo la columna cervical en posición neutral [guía: HUV-02-003]
+- Vía aérea definitiva ante apnea, Glasgow de 8 o menos, riesgo de broncoaspiración o incapacidad para mantener oxigenación y ventilación con las maniobras iniciales [guía: HUV-02-003]
+
+**B · Respiración**
+- Identificar neumotórax a tensión, hemotórax masivo, neumotórax abierto y taponamiento cardiaco, con el apoyo del FAST-E, el oxímetro de pulso y la frecuencia respiratoria [guía: HUV-02-003]
+
+**C · Circulación**
+- Con frecuencia cardiaca mayor de 100, considerar al paciente en shock [guía: HUV-02-003]
+- Buscar sangrado no compresible en tórax, abdomen, retroperitoneo, pelvis y huesos largos con el examen físico, el FAST-E y las Rx de tórax, pelvis y extremidades [guía: HUV-02-003]
+- Dos catéteres venosos periféricos de gran calibre, con muestras para tipo de sangre y pruebas cruzadas, gases en sangre y lactato [guía: ATLS10-01-013]
+- *Si está inestable:* En shock severo, activar tempranamente el protocolo de transfusión masiva y, mientras llegan los hemoderivados, líquidos en bolos de 250 cc hasta una TAS entre 80 y 90 mm Hg [guía: HUV-02-003]
+- *Si está inestable:* En las primeras 3 horas del trauma con shock hemorrágico, Ácido Tranexámico 1 g durante 10 minutos y 1 g en infusión por 8 horas [guía: HUV-06-004]
+- *Si hay TCE:* Con TCE, la hipotensión permisiva puede resultar en un segundo golpe [guía: HUV-04-013]
+- Candidatos a transfusión masiva con el ABC Score (mecanismo penetrante, PAS ≤ 90 mm Hg, FC ≥ 120 lpm y FAST positivo), con una puntuación de 2 o más [guía: HUV-06-006]
+
+**D · Déficit neurológico**
+- Nivel de consciencia con la escala de Glasgow, tamaño pupilar y reacción del paciente, e incapacidad para movilizar las extremidades [guía: HUV-02-003]
+- Mantener una oxigenación, ventilación y perfusión adecuadas para evitar un daño neurológico secundario [guía: HUV-02-003]
+
+**E · Exposición**
+- Énfasis en la exposición para identificar todas las heridas, laceraciones o hematomas [guía: HUV-04-013]
+- Al completar la evaluación, cubrir al paciente con mantas calientes y administrar líquidos tibios a 39°C para evitar la hipotermia [guía: HUV-02-003]
+
+**Después de la revisión primaria**
+- Antes del catéter urinario, examinar el perineo y los genitales, porque sangre en el meato uretral o equimosis perineal hacen sospechar una lesión uretral [guía: ATLS10-01-021]
+- *Si está estable:* En el paciente estable o respondedor transitorio con politrauma, TAC corporal total sin interrumpir el proceso de resucitación [guía: HUV-06-007]
+- *Si está inestable:* Sangre intraabdominal en el FAST en un paciente hemodinámicamente anormal indica la necesidad de una intervención quirúrgica [guía: ATLS10-01-023]
+- Laparotomía con anormalidad hemodinámica, signos de irritación peritoneal o signos de penetración peritoneal como la evisceración [guía: ATLS10-05-020]
+- *Si está estable:* En pacientes estables con múltiples orificios o trayectos dudosos, TAC corporal total sin interrumpir el proceso de resucitación [guía: HUV-06-007]
+- *Si está inestable:* Los pacientes con trauma abdominal penetrante en shock que no responden van inmediatamente al quirófano para control del sangrado [guía: HUV-15-004]
+
+**Lesiones que se esperan**
+- En el abdomen, las heridas de bala lesionan más el intestino delgado (50 %), el colon (40 %), el hígado (30 %) y las estructuras vasculares abdominales (25 %) [guía: ATLS10-05-004]
+- En la extremidad, lesión neurovascular, fracturas y síndrome compartimental [guía: ATLS10-01-027]
+- Un número impar de heridas sugiere una bala retenida o, menos probable, una lesión tangencial [guía: ATLS10-23-019]
+- *Si hay heridas en el tórax:* En el tórax, la presencia de hallazgos clínicos tiene mucho valor para identificar lesiones pleurales, pero la ausencia de ellos no las descarta [guía: HUV-11-003]
+- *Si hay heridas en el cuello:* En el cuello, buscar signos duros (sangrado activo, shock, hematoma expansivo, déficit neurológico, herida soplante, hematemesis o hemoptisis) [guía: HUV-09-006]
+
+**Además**
+- Manejo antitetánico y antibióticos en presencia de heridas sucias [guía: HUV-04-013]
+- Guiarse por la condición clínica, porque lo que se ve externamente puede no corresponder con los daños internos [guía: HUV-04-013]
+
+**Datos que cambiarían la orientación:** la edad, los signos vitales, el Glasgow, el tiempo desde el trauma y la localización de las heridas.
+
+**x · Hemorragia exanguinante.** Se encontró sangrado activo en un caso [caso: 17934]
+
+**Después de la revisión primaria.** Se encontró fractura en tres casos [caso: 14087] [caso: 17934] [caso: 8845]",100,4.95,,,,,arma_de_fuego,17.0,33.0
+qwen3:4b-instruct,tarjeta,voc-03,vocabulario,0.249,0.969,True,casos+tarjeta,casos+tarjeta,8,0,2.0,2.0,2.0,0.0,False,7.5,2.1,0.61,2.74,0.053,2110,198,5,4,0.6,0.5,True,,,prosa,"### Protocolo inicial: peatón atropellado
+
+- El accidente auto vs peatón está entre los hallazgos en la escena para sospechar politrauma [guía: HUV-04-011]
+- En los accidentes por peatón la probabilidad de lesión en la cabeza es > 70 %, y las lesiones de las extremidades son más frecuentes en peatones (60 % a 70 %) [guía: HUV-04-005]
+
+**x · Hemorragia exanguinante**
+- Compresión directa de la herida y, si el sangrado persiste, empaquetamiento con gasas o apósitos hemostáticos [guía: HUV-06-003]
+- Torniquete en sangrados de extremidades que no se controlan con las maniobras previas, 5 cm proximal a la lesión y anotando la hora de aplicación [guía: HUV-06-003]
+
+**A · Vía aérea**
+- Oxigenar, despejar la vía aérea y elevar el mentón, manteniendo la columna cervical en posición neutral [guía: HUV-02-003]
+- Vía aérea definitiva ante apnea, Glasgow de 8 o menos, riesgo de broncoaspiración o incapacidad para mantener oxigenación y ventilación con las maniobras iniciales [guía: HUV-02-003]
+
+**B · Respiración**
+- Identificar neumotórax a tensión, hemotórax masivo, neumotórax abierto y taponamiento cardiaco, con el apoyo del FAST-E, el oxímetro de pulso y la frecuencia respiratoria [guía: HUV-02-003]
+
+**C · Circulación**
+- Con frecuencia cardiaca mayor de 100, considerar al paciente en shock [guía: HUV-02-003]
+- Buscar sangrado no compresible en tórax, abdomen, retroperitoneo, pelvis y huesos largos con el examen físico, el FAST-E y las Rx de tórax, pelvis y extremidades [guía: HUV-02-003]
+- Dos catéteres venosos periféricos de gran calibre, con muestras para tipo de sangre y pruebas cruzadas, gases en sangre y lactato [guía: ATLS10-01-013]
+- *Si está inestable:* En shock severo, activar tempranamente el protocolo de transfusión masiva y, mientras llegan los hemoderivados, líquidos en bolos de 250 cc hasta una TAS entre 80 y 90 mm Hg [guía: HUV-02-003]
+- *Si está inestable:* En las primeras 3 horas del trauma con shock hemorrágico, Ácido Tranexámico 1 g durante 10 minutos y 1 g en infusión por 8 horas [guía: HUV-06-004]
+- *Si hay TCE:* Con TCE, la hipotensión permisiva puede resultar en un segundo golpe [guía: HUV-04-013]
+- Para el sangrado pélvico severo, compresión pélvica externa mediante sábanas o dispositivos colocados en la pelvis a nivel de los trocánteres mayores [guía: HUV-06-003]
+
+**D · Déficit neurológico**
+- Nivel de consciencia con la escala de Glasgow, tamaño pupilar y reacción del paciente, e incapacidad para movilizar las extremidades [guía: HUV-02-003]
+- Mantener una oxigenación, ventilación y perfusión adecuadas para evitar un daño neurológico secundario [guía: HUV-02-003]
+
+**E · Exposición**
+- Énfasis en la exposición para identificar todas las heridas, laceraciones o hematomas [guía: HUV-04-013]
+- Al completar la evaluación, cubrir al paciente con mantas calientes y administrar líquidos tibios a 39°C para evitar la hipotermia [guía: HUV-02-003]
+
+**Después de la revisión primaria**
+- Antes del catéter urinario, examinar el perineo y los genitales, porque sangre en el meato uretral o equimosis perineal hacen sospechar una lesión uretral [guía: ATLS10-01-021]
+- *Si está estable:* En el paciente estable o respondedor transitorio con politrauma, TAC corporal total sin interrumpir el proceso de resucitación [guía: HUV-06-007]
+- *Si está inestable:* Sangre intraabdominal en el FAST en un paciente hemodinámicamente anormal indica la necesidad de una intervención quirúrgica [guía: ATLS10-01-023]
+- Radiografías AP de tórax y pelvis en el área de reanimación, si no interrumpen el proceso de reanimación [guía: ATLS10-01-023]
+
+**Lesiones que se esperan**
+- El impacto con el parachoques lesiona la extremidad inferior, el impacto con el capó y el parabrisas la cabeza y el torso, y el impacto con el suelo la cabeza, la columna vertebral y las extremidades [guía: ATLS10-23-010]
+- Lesión craneal, lesión aórtica traumática, lesiones viscerales abdominales y fracturas de extremidades inferiores o pelvis [guía: ATLS10-01-027]
+- El síndrome compartimental es más común en la pierna, el antebrazo, el pie, la mano, la región glútea y el muslo [guía: ATLS10-08-031]
+- *Si las ruedas le pasaron por encima:* El aplastamiento produce rabdomiólisis traumática que libera mioglobina y potasio, con daño renal, y un estado isquémico en la extremidad [guía: HUV-04-009]
+- *Si las ruedas le pasaron por encima:* Las lesiones por aplastamiento y degloving internos pueden ser sutiles y se sospechan en base al mecanismo, como la lesión de Morel-Lavallée [guía: ATLS10-08-038]
+- *Si las ruedas le pasaron por encima:* En las lesiones por aplastamiento son frecuentes las fracturas severas de pelvis, y los dispositivos externos estabilizan la pelvis para evitar la muerte por hemorragia [guía: HUV-04-010]
+
+**Además**
+- En las fracturas abiertas, antibióticos por vía intravenosa tan pronto como sea posible, ya que el retraso más allá de tres horas se relaciona con mayor riesgo de infección, y profilaxis del tétanos [guía: ATLS10-08-027]
+- Manejo antitetánico y antibióticos en presencia de heridas sucias [guía: HUV-04-013]
+- Guiarse por la condición clínica, porque lo que se ve externamente puede no corresponder con los daños internos [guía: HUV-04-013]
+
+**Datos que cambiarían la orientación:** la edad, los signos vitales, el Glasgow, el tiempo desde el trauma y si las ruedas le pasaron por encima.
+
+**D · Déficit neurológico.** Conviene valorar pérdida de conciencia en pacientes con mecanismo de accidente de tránsito como peatón [caso: 51857]
+
+**Después de la revisión primaria.** Conviene evaluar otorragia en pacientes con mecanismo de accidente de tránsito como peatón [caso: 29324]; se puede considerar radiografía en pacientes con trauma en miembros o tórax [caso: 51857] [caso: 24095]; se puede considerar analgesia en pacientes con trauma en miembros o con dolor [caso: 29324] [caso: 55308];",100,6.67,,,,,peaton,17.0,31.0
+qwen3:4b-instruct,tarjeta,voc-04,vocabulario,0.232,0.904,True,casos+tarjeta,casos+tarjeta,7,0,2.0,2.0,2.0,0.0,False,6.38,2.11,0.58,1.65,0.049,2044,119,5,4,0.4,0.25,True,,,prosa,"### Protocolo inicial: caída
+
+- La caída > 6 metros está entre los hallazgos en la escena para sospechar politrauma [guía: HUV-04-011]
+- *Si es adulto mayor:* La osteopenia y la fragilidad general son factores importantes en la gravedad de la lesión, incluso con caídas de bajo impacto [guía: ATLS10-23-013]
+- Al caer de pie, la energía se transmite por la extremidad inferior a la pelvis y luego a la columna vertebral [guía: ATLS10-23-013]
+
+**x · Hemorragia exanguinante**
+- Compresión directa de la herida y, si el sangrado persiste, empaquetamiento con gasas o apósitos hemostáticos [guía: HUV-06-003]
+- Torniquete en sangrados de extremidades que no se controlan con las maniobras previas, 5 cm proximal a la lesión y anotando la hora de aplicación [guía: HUV-06-003]
+
+**A · Vía aérea**
+- Oxigenar, despejar la vía aérea y elevar el mentón, manteniendo la columna cervical en posición neutral [guía: HUV-02-003]
+- Vía aérea definitiva ante apnea, Glasgow de 8 o menos, riesgo de broncoaspiración o incapacidad para mantener oxigenación y ventilación con las maniobras iniciales [guía: HUV-02-003]
+- Basándose en el mecanismo, se supone que existe una lesión de la médula, y el movimiento de la columna cervical se restringe [guía: ATLS10-01-009]
+
+**B · Respiración**
+- Identificar neumotórax a tensión, hemotórax masivo, neumotórax abierto y taponamiento cardiaco, con el apoyo del FAST-E, el oxímetro de pulso y la frecuencia respiratoria [guía: HUV-02-003]
+
+**C · Circulación**
+- Con frecuencia cardiaca mayor de 100, considerar al paciente en shock [guía: HUV-02-003]
+- Buscar sangrado no compresible en tórax, abdomen, retroperitoneo, pelvis y huesos largos con el examen físico, el FAST-E y las Rx de tórax, pelvis y extremidades [guía: HUV-02-003]
+- Dos catéteres venosos periféricos de gran calibre, con muestras para tipo de sangre y pruebas cruzadas, gases en sangre y lactato [guía: ATLS10-01-013]
+- *Si está inestable:* En shock severo, activar tempranamente el protocolo de transfusión masiva y, mientras llegan los hemoderivados, líquidos en bolos de 250 cc hasta una TAS entre 80 y 90 mm Hg [guía: HUV-02-003]
+- *Si está inestable:* En las primeras 3 horas del trauma con shock hemorrágico, Ácido Tranexámico 1 g durante 10 minutos y 1 g en infusión por 8 horas [guía: HUV-06-004]
+- *Si hay TCE:* Con TCE, la hipotensión permisiva puede resultar en un segundo golpe [guía: HUV-04-013]
+- Para el sangrado pélvico severo, compresión pélvica externa mediante sábanas o dispositivos colocados en la pelvis a nivel de los trocánteres mayores [guía: HUV-06-003]
+
+**D · Déficit neurológico**
+- Nivel de consciencia con la escala de Glasgow, tamaño pupilar y reacción del paciente, e incapacidad para movilizar las extremidades [guía: HUV-02-003]
+- Mantener una oxigenación, ventilación y perfusión adecuadas para evitar un daño neurológico secundario [guía: HUV-02-003]
+
+**E · Exposición**
+- Énfasis en la exposición para identificar todas las heridas, laceraciones o hematomas [guía: HUV-04-013]
+- Al completar la evaluación, cubrir al paciente con mantas calientes y administrar líquidos tibios a 39°C para evitar la hipotermia [guía: HUV-02-003]
+
+**Después de la revisión primaria**
+- Antes del catéter urinario, examinar el perineo y los genitales, porque sangre en el meato uretral o equimosis perineal hacen sospechar una lesión uretral [guía: ATLS10-01-021]
+- *Si está estable:* En el paciente estable o respondedor transitorio con politrauma, TAC corporal total sin interrumpir el proceso de resucitación [guía: HUV-06-007]
+- *Si está inestable:* Sangre intraabdominal en el FAST en un paciente hemodinámicamente anormal indica la necesidad de una intervención quirúrgica [guía: ATLS10-01-023]
+- Radiografías AP de tórax y pelvis en el área de reanimación, si no interrumpen el proceso de reanimación [guía: ATLS10-01-023]
+- TAC corporal total en el trauma cerrado por caídas mayores de 6 metros y en adultos mayores de 70 años [guía: HUV-04-013]
+
+**Lesiones que se esperan**
+- En la caída de altura, lesión craneal, lesión de la columna axial, lesiones viscerales abdominales y fractura de pelvis o acetábulo, incluyendo fracturas del calcáneo [guía: ATLS10-01-027]
+- Las personas que caen desde una altura corren un riesgo especial de fracturas de la unión toracolumbar, que por lo general son inestables [guía: ATLS10-07-017]
+
+**Además**
+- En las fracturas abiertas, antibióticos por vía intravenosa tan pronto como sea posible, ya que el retraso más allá de tres horas se relaciona con mayor riesgo de infección, y profilaxis del tétanos [guía: ATLS10-08-027]
+- Guiarse por la condición clínica, porque lo que se ve externamente puede no corresponder con los daños internos [guía: HUV-04-013]
+
+**Datos que cambiarían la orientación:** la edad, los signos vitales, el Glasgow y el tiempo desde el trauma.
+
+**x · Hemorragia exanguinante.** Se puede considerar sutura en casos con herida en escápolo y hemorragia subaracnoidea, como en [caso: 35277].
+
+**Después de la revisión primaria.** Conviene realizar radiografía en casos de trauma de columna asociado a caída desde altura, como en [caso: 22208] y [caso: 40958][caso: 39927].",100,5.46,,,,,caida,14.0,29.0
+qwen3:4b-instruct,tarjeta,voc-05,vocabulario,0.305,0.962,True,casos+guias,,6,3,5.0,5.0,2.0,0.0,False,10.94,2.1,1.21,5.56,0.0,4156,363,5,4,0.8,0.75,False,x · palabras que no aparecen en los casos: exanguinante || C · palabras que no aparecen en la guía citada: pegado || después · atribuye al HUV un pasaje de otro manual,manual equivocado | palabra ajena | palabra fuera de la guía,determinista,"**x · Hemorragia exanguinante.** En dos casos se observó hemorragia exanguinante [caso: 35261] [caso: 7417].
+
+**Después de la revisión primaria.** En casos similares se realizó sutura en dos pacientes [caso: 14955] [caso: 2129].
+
+**C · Circulación.** La 10.ª edición del ATLS recomienda realizar una prueba de Seidel para localizar pequeñas fugas de fluido acuoso desde la cámara anterior y, si un cuerpo extraño está pegado hacia fuera del ojo, cortar una taza de espuma o papel para acomodar el cuerpo extraño, sin colocar vendajes blandos bajo el escudo rígido [guía: ATLS10-14-014].
+
+**D · Déficit neurológico.** La 10.ª edición del ATLS recomienda que las lesiones penetrantes de la columna vertebral suelen dar lugar a un déficit neurológico completo, aunque también pueden ocurrir por transferencia de energía asociada a un misil de alta velocidad que pase cerca de la médula espinal [guía: ATLS10-07-019].
+
+**Después de la revisión primaria.** El manual del HUV recomienda que los pacientes politraumatizados están en alto riesgo de muchas lesiones oculares sensibles al tiempo, que los miembros del equipo de trauma puedan encontrar [guía: ATLS10-14-011].",100,10.11,,,,,,,
+qwen3:4b-instruct,tarjeta,voc-06,vocabulario,0.285,1.025,True,casos,casos,0,0,1.0,1.0,1.0,0.0,False,5.09,2.12,0.37,0.55,0.0,1218,42,2,1,0.5,0.0,True,,,prosa,**Después de la revisión primaria.** En caso de fractura parietal deprimida expuesta se realiza esquirlectomia [caso: 12323],100,4.28,,,,,,,
+qwen3:4b-instruct,tarjeta,abr-01,abreviatura,0.348,1.182,True,casos+tarjeta,casos+tarjeta,6,0,1.0,1.0,1.0,0.0,False,5.18,2.12,0.52,0.52,0.052,1804,31,5,1,1.0,1.0,True,,,prosa,"### Protocolo inicial: herida por arma de fuego
+
+- Un solo orificio de bala en la piel no descarta lesión de múltiples áreas del cuerpo, porque la trayectoria depende de la posición del paciente cuando es herido y puede cambiar al impactar huesos [guía: HUV-04-006]
+- Con múltiples orificios, primero la condición clínica y la localización de los orificios, y en un segundo tiempo las posibles trayectorias [guía: HUV-04-006]
+- Las heridas por arma de fuego se consideran penetrantes, a no ser que sea muy evidente un trayecto tangencial [guía: HUV-15-004]
+
+**x · Hemorragia exanguinante**
+- Compresión directa de la herida y, si el sangrado persiste, empaquetamiento con gasas o apósitos hemostáticos [guía: HUV-06-003]
+- Torniquete en sangrados de extremidades que no se controlan con las maniobras previas, 5 cm proximal a la lesión y anotando la hora de aplicación [guía: HUV-06-003]
+- En heridas con orificios de entrada pequeños y sangrado activo, introducir una sonda Foley e inflar el balón con agua para comprimir el vaso sangrante [guía: HUV-06-003]
+
+**A · Vía aérea**
+- Oxigenar, despejar la vía aérea y elevar el mentón, manteniendo la columna cervical en posición neutral [guía: HUV-02-003]
+- Vía aérea definitiva ante apnea, Glasgow de 8 o menos, riesgo de broncoaspiración o incapacidad para mantener oxigenación y ventilación con las maniobras iniciales [guía: HUV-02-003]
+
+**B · Respiración**
+- Identificar neumotórax a tensión, hemotórax masivo, neumotórax abierto y taponamiento cardiaco, con el apoyo del FAST-E, el oxímetro de pulso y la frecuencia respiratoria [guía: HUV-02-003]
+
+**C · Circulación**
+- Con frecuencia cardiaca mayor de 100, considerar al paciente en shock [guía: HUV-02-003]
+- Buscar sangrado no compresible en tórax, abdomen, retroperitoneo, pelvis y huesos largos con el examen físico, el FAST-E y las Rx de tórax, pelvis y extremidades [guía: HUV-02-003]
+- Dos catéteres venosos periféricos de gran calibre, con muestras para tipo de sangre y pruebas cruzadas, gases en sangre y lactato [guía: ATLS10-01-013]
+- *Si está inestable:* En shock severo, activar tempranamente el protocolo de transfusión masiva y, mientras llegan los hemoderivados, líquidos en bolos de 250 cc hasta una TAS entre 80 y 90 mm Hg [guía: HUV-02-003]
+- *Si está inestable:* En las primeras 3 horas del trauma con shock hemorrágico, Ácido Tranexámico 1 g durante 10 minutos y 1 g en infusión por 8 horas [guía: HUV-06-004]
+- *Con TCE:* Con TCE, la hipotensión permisiva puede resultar en un segundo golpe [guía: HUV-04-013]
+- Candidatos a transfusión masiva con el ABC Score (mecanismo penetrante, PAS ≤ 90 mm Hg, FC ≥ 120 lpm y FAST positivo), con una puntuación de 2 o más [guía: HUV-06-006]
+
+**D · Déficit neurológico**
+- Nivel de consciencia con la escala de Glasgow, tamaño pupilar y reacción del paciente, e incapacidad para movilizar las extremidades [guía: HUV-02-003]
+- Mantener una oxigenación, ventilación y perfusión adecuadas para evitar un daño neurológico secundario [guía: HUV-02-003]
+
+**E · Exposición**
+- Énfasis en la exposición para identificar todas las heridas, laceraciones o hematomas [guía: HUV-04-013]
+- Al completar la evaluación, cubrir al paciente con mantas calientes y administrar líquidos tibios a 39°C para evitar la hipotermia [guía: HUV-02-003]
+
+**Después de la revisión primaria**
+- Antes del catéter urinario, examinar el perineo y los genitales, porque sangre en el meato uretral o equimosis perineal hacen sospechar una lesión uretral [guía: ATLS10-01-021]
+- *Si está estable:* En el paciente estable o respondedor transitorio con politrauma, TAC corporal total sin interrumpir el proceso de resucitación [guía: HUV-06-007]
+- *Si está inestable:* Sangre intraabdominal en el FAST en un paciente hemodinámicamente anormal indica la necesidad de una intervención quirúrgica [guía: ATLS10-01-023]
+- Laparotomía con anormalidad hemodinámica, signos de irritación peritoneal o signos de penetración peritoneal como la evisceración [guía: ATLS10-05-020]
+- *Si está estable:* En pacientes estables con múltiples orificios o trayectos dudosos, TAC corporal total sin interrumpir el proceso de resucitación [guía: HUV-06-007]
+- *Si está inestable:* Los pacientes con trauma abdominal penetrante en shock que no responden van inmediatamente al quirófano para control del sangrado [guía: HUV-15-004]
+
+**Lesiones que se esperan**
+- En el abdomen, las heridas de bala lesionan más el intestino delgado (50 %), el colon (40 %), el hígado (30 %) y las estructuras vasculares abdominales (25 %) [guía: ATLS10-05-004]
+- En la extremidad, lesión neurovascular, fracturas y síndrome compartimental [guía: ATLS10-01-027]
+- Un número impar de heridas sugiere una bala retenida o, menos probable, una lesión tangencial [guía: ATLS10-23-019]
+
+**Además**
+- Manejo antitetánico y antibióticos en presencia de heridas sucias [guía: HUV-04-013]
+- Guiarse por la condición clínica, porque lo que se ve externamente puede no corresponder con los daños internos [guía: HUV-04-013]
+
+**Datos que cambiarían la orientación:** la edad, los signos vitales, el Glasgow y el tiempo desde el trauma.
+
+**Después de la revisión primaria.** Conviene evaluar si hay fractura con [caso: 9831].",100,4.64,,,,,arma_de_fuego,15.0,31.0
+qwen3:4b-instruct,tarjeta,abr-02,abreviatura,0.242,0.968,True,casos+tarjeta,tarjeta,8,0,4.0,4.0,1.0,1.0,False,8.2,2.11,0.54,3.51,0.055,1918,254,5,5,0.8,0.8,False,"B · palabras que no aparecen en los casos: circulacion, respiratorio, soporte || C · palabras que no aparecen en los casos: circulacion || después · «sangrado activo» se cita a casos que no lo documentan || después · «sangrado activo» es de la letra x, no de la después",letra equivocada | mal atribuido | palabra ajena,determinista,"### Protocolo inicial: herida por arma cortopunzante
+
+- Toda herida por arma corto punzante es potencialmente mortal, sea su apariencia externa dramática o insignificante [guía: HUV-04-007]
+- Un tercio de las heridas en el tórax no penetran a la pleura y el 80 % de las que penetran se manejan con un dren pleural sin cirugía [guía: HUV-04-007]
+- En el abdomen, el 25 % de las heridas no penetran y solo el 40 % de las que penetran al peritoneo requieren cirugía [guía: HUV-04-007]
+
+**x · Hemorragia exanguinante**
+- Compresión directa de la herida y, si el sangrado persiste, empaquetamiento con gasas o apósitos hemostáticos [guía: HUV-06-003]
+- Torniquete en sangrados de extremidades que no se controlan con las maniobras previas, 5 cm proximal a la lesión y anotando la hora de aplicación [guía: HUV-06-003]
+- En heridas con orificios de entrada pequeños y sangrado activo, introducir una sonda Foley e inflar el balón con agua para comprimir el vaso sangrante [guía: HUV-06-003]
+
+**A · Vía aérea**
+- Oxigenar, despejar la vía aérea y elevar el mentón, manteniendo la columna cervical en posición neutral [guía: HUV-02-003]
+- Vía aérea definitiva ante apnea, Glasgow de 8 o menos, riesgo de broncoaspiración o incapacidad para mantener oxigenación y ventilación con las maniobras iniciales [guía: HUV-02-003]
+
+**B · Respiración**
+- Identificar neumotórax a tensión, hemotórax masivo, neumotórax abierto y taponamiento cardiaco, con el apoyo del FAST-E, el oxímetro de pulso y la frecuencia respiratoria [guía: HUV-02-003]
+
+**C · Circulación**
+- Con frecuencia cardiaca mayor de 100, considerar al paciente en shock [guía: HUV-02-003]
+- Buscar sangrado no compresible en tórax, abdomen, retroperitoneo, pelvis y huesos largos con el examen físico, el FAST-E y las Rx de tórax, pelvis y extremidades [guía: HUV-02-003]
+- Dos catéteres venosos periféricos de gran calibre, con muestras para tipo de sangre y pruebas cruzadas, gases en sangre y lactato [guía: ATLS10-01-013]
+- *Si está inestable:* En shock severo, activar tempranamente el protocolo de transfusión masiva y, mientras llegan los hemoderivados, líquidos en bolos de 250 cc hasta una TAS entre 80 y 90 mm Hg [guía: HUV-02-003]
+- *Si está inestable:* En las primeras 3 horas del trauma con shock hemorrágico, Ácido Tranexámico 1 g durante 10 minutos y 1 g en infusión por 8 horas [guía: HUV-06-004]
+- *Si hay TCE:* Con TCE, la hipotensión permisiva puede resultar en un segundo golpe [guía: HUV-04-013]
+- Candidatos a transfusión masiva con el ABC Score (mecanismo penetrante, PAS ≤ 90 mm Hg, FC ≥ 120 lpm y FAST positivo), con una puntuación de 2 o más [guía: HUV-06-006]
+
+**D · Déficit neurológico**
+- Nivel de consciencia con la escala de Glasgow, tamaño pupilar y reacción del paciente, e incapacidad para movilizar las extremidades [guía: HUV-02-003]
+- Mantener una oxigenación, ventilación y perfusión adecuadas para evitar un daño neurológico secundario [guía: HUV-02-003]
+
+**E · Exposición**
+- Énfasis en la exposición para identificar todas las heridas, laceraciones o hematomas [guía: HUV-04-013]
+- Al completar la evaluación, cubrir al paciente con mantas calientes y administrar líquidos tibios a 39°C para evitar la hipotermia [guía: HUV-02-003]
+
+**Después de la revisión primaria**
+- Antes del catéter urinario, examinar el perineo y los genitales, porque sangre en el meato uretral o equimosis perineal hacen sospechar una lesión uretral [guía: ATLS10-01-021]
+- *Si está estable:* En el paciente estable o respondedor transitorio con politrauma, TAC corporal total sin interrumpir el proceso de resucitación [guía: HUV-06-007]
+- *Si está inestable:* Sangre intraabdominal en el FAST en un paciente hemodinámicamente anormal indica la necesidad de una intervención quirúrgica [guía: ATLS10-01-023]
+- Laparotomía con anormalidad hemodinámica, signos de irritación peritoneal o signos de penetración peritoneal como la evisceración [guía: ATLS10-05-020]
+- *Si está estable:* En el paciente estable y con abdomen sin hallazgos, definir si la herida es penetrante con la exploración, que identifica si atraviesa la fascia abdominal profunda [guía: HUV-15-004]
+- La mayoría de los pacientes que desarrollan signos de irritación peritoneal lo hacen en las primeras 12 horas, y conviene reevaluar periódicamente [guía: HUV-15-004]
+
+**Lesiones que se esperan**
+- En el abdomen, las puñaladas lesionan más el hígado (40 %), el intestino delgado (30 %), el diafragma (20 %) y el colon (15 %) [guía: ATLS10-05-004]
+- En el tórax anterior, taponamiento cardíaco si la herida está dentro de la caja, hemotórax, neumotórax o hemoneumotórax [guía: ATLS10-01-027]
+- En la región toracoabdominal izquierda, lesión de diafragma izquierda, lesión del bazo o hemoneumotórax [guía: ATLS10-01-027]
+- El diagnóstico clínico de una herida de diafragma es supremamente difícil y no existe un signo patognomónico [guía: HUV-14-004]
+- *Heridas en el cuello:* En el cuello, buscar signos duros (sangrado activo, shock, hematoma expansivo, déficit neurológico, herida soplante, hematemesis o hemoptisis) [guía: HUV-09-006]
+
+**Además**
+- Manejo antitetánico y antibióticos en presencia de heridas sucias [guía: HUV-04-013]
+- Guiarse por la condición clínica, porque lo que se ve externamente puede no corresponder con los daños internos [guía: HUV-04-013]
+
+**Datos que cambiarían la orientación:** la edad, los signos vitales, el Glasgow y el tiempo desde el trauma.
+
+**x · Hemorragia exanguinante.** En casos similares se observó sangrado activo en heridas por arma cortopunzante en zona II de cuello [caso: 22592] y [caso: 37867]
+
+**B · Respiración.** En casos similares se realizó tubo de tórax en paciente con herida en zona II de cuello con compromiso de circulación y necesidad de soporte respiratorio [caso: 37867]
+
+**C · Circulación.** En casos similares se realizó ecografía / FAST en paciente con herida por arma cortopunzante en cuello para evaluar circulación [caso: 26117]
+
+**Después de la revisión primaria.** En casos similares se realizó sutura en paciente con herida por arma cortopunzante en zona II de cuello con sangrado activo [caso: 35215] y observación clínica en paciente con herida en zona II de cuello con hematoma estable [caso: 1265]",100,7.36,,,,,cortopunzante,16.0,33.0
+qwen3:4b-instruct,tarjeta,abr-03,abreviatura,0.245,0.885,True,casos+guias,casos,3,2,3.0,3.0,2.0,0.0,False,10.06,2.12,1.22,4.66,0.0,4180,300,5,3,0.0,0.0,False,después · la oración quedó cortada,otro,determinista,"**Después de la revisión primaria.** Se realizó TAC en 2 de los casos [caso: 34284] [caso: 22203]. Se evaluó con cefalea en 1 caso [caso: 34284]. Se realizó radiografía en 1 caso [caso: 22203]. Se realizó sutura en 1 caso [caso: 46519]. Se realizó reducción cerrada y inmovilización con yeso en 1 caso [caso: 22203].
+
+**D · Déficit neurológico.** La 10.ª edición del ATLS recomienda evaluar cuidadosamente para otras lesiones [guía: ATLS10-06-016].
+
+**Después de la revisión primaria.** Pasajes de esta letra: [guía: ATLS10-06-017]; su texto está en «Fragmentos de los manuales».",100,9.07,,,,,,,
+qwen3:4b-instruct,tarjeta,abr-04,abreviatura,0.275,0.985,True,casos+guias,casos,9,0,3.0,3.0,1.0,0.0,False,12.1,2.1,1.29,6.64,0.0,4395,423,5,5,0.2,0.2,False,C · una oración del apartado de los manuales no cita un manual || después · una oración del apartado de los manuales no cita un manual,fuente cruzada,determinista,"**Después de la revisión primaria.** Se realizó radiografía en tres casos [caso: 35213] [caso: 39001] [caso: 8291]. Se realizó inmovilización con férula o yeso en cinco casos [caso: 35829] [caso: 23278] [caso: 35213] [caso: 39001] [caso: 8291]. Se realizó reducción cerrada en tres casos [caso: 35829] [caso: 35213] [caso: 8291]. Se realizó cirugía en uno de los casos [caso: 8291].
+
+**C · Circulación.** El manual del HUV recomienda que en relación a la médula espinal, por lo subluxaciones de fractura en la columna torácica resultan comúnmente en los déficits neurológicos completos. fracturas por compresión simples son generalmente estables y con frecuencia se trata con un corsé rígido.
+
+**Después de la revisión primaria.** La 10.ª edición del ATLS recomienda que el objetivo de la inmovilización de la fractura inicial es realinear la extremidad lesionada en lo más cercano a la posición anatómica como sea posible y evitar el exceso de movimiento fractura in situ. A. El acortamiento y rotación externa de la pierna derecha debido a una fractura de fémur mitad de la diáfisis B.",100,11.26,,,,,,,
+qwen3:4b-instruct,tarjeta,abr-05,abreviatura,0.348,1.292,True,casos+guias,,9,3,7.0,7.0,5.0,0.0,False,13.76,2.11,1.18,8.39,0.0,4011,556,5,5,0.2,0.2,False,después · «fractura» se cita a casos que no lo documentan || B · palabras que no aparecen en la guía citada: coloque,mal atribuido | palabra fuera de la guía,determinista,"**A · Vía aérea.** En los casos similares se realizó intubación orotraqueal en todos los pacientes [caso: 12261] [caso: 38400] [caso: 57366] [caso: 32366] [caso: 17357].
+
+**B · Respiración.** En un caso se detectó hemotórax y en dos casos se colocó tubo de tórax [caso: 57366] [caso: 38400] [caso: 57366].
+
+**C · Circulación.** En un caso se observó hipotensión o choque y en otro se evidenció compromiso vascular [caso: 17357] [caso: 12261].
+
+**Después de la revisión primaria.** En un caso se identificó fractura, en uno se realizó radiografía y en tres casos se decidió ingresar al paciente en UCI [caso: 57366] [caso: 12261] [caso: 17357].
+
+**A · Vía aérea.** El manual del HUV recomienda que la intubación orotraqueal pueda estar justificada en escenarios prehospitalarios, pero solo si se realiza con prontitud, por personal entrenado y no demora el proceso de remisión [guía: HUV-05-017].
+
+**B · Respiración.** El manual del HUV recomienda que en el ámbito extrahospitalario se coloque un catéter # 14 o 16 Frech en el segundo espacio intercostal con línea medio clavicular o en el 5º espacio intercostal con línea axilar media para lograr la salida inmediata del aire que colapsa el pulmón y el mediastino [guía: HUV-11-007].
+
+**C · Circulación.** El manual del HUV recomienda que en pacientes con hemotórax masivo y requerimiento de toracotomía se considere la apertura del tórax por toracotomía o esternotomía, y que se monitorea permanentemente los signos vitales, pues todo paciente en shock persistente tiene indicación de cirugía [guía: HUV-11-009].",100,13.29,,,,,,,
+qwen3:4b-instruct,tarjeta,ort-01,ortografica,0.296,1.296,True,casos+tarjeta,tarjeta,6,0,2.0,2.0,1.0,1.0,False,7.69,2.13,0.64,2.86,0.053,2224,205,5,3,0.8,0.6666666666666666,False,"después · «hemotórax» es de la letra B, no de la después || después · «neumotórax» es de la letra B, no de la después",letra equivocada,determinista,"### Protocolo inicial: herida por arma de fuego
+
+- Un solo orificio de bala en la piel no descarta lesión de múltiples áreas del cuerpo, porque la trayectoria depende de la posición del paciente cuando es herido y puede cambiar al impactar huesos [guía: HUV-04-006]
+- Con múltiples orificios, primero la condición clínica y la localización de los orificios, y en un segundo tiempo las posibles trayectorias [guía: HUV-04-006]
+- Las heridas por arma de fuego se consideran penetrantes, a no ser que sea muy evidente un trayecto tangencial [guía: HUV-15-004]
+
+**x · Hemorragia exanguinante**
+- Compresión directa de la herida y, si el sangrado persiste, empaquetamiento con gasas o apósitos hemostáticos [guía: HUV-06-003]
+- Torniquete en sangrados de extremidades que no se controlan con las maniobras previas, 5 cm proximal a la lesión y anotando la hora de aplicación [guía: HUV-06-003]
+- En heridas con orificios de entrada pequeños y sangrado activo, introducir una sonda Foley e inflar el balón con agua para comprimir el vaso sangrante [guía: HUV-06-003]
+
+**A · Vía aérea**
+- Oxigenar, despejar la vía aérea y elevar el mentón, manteniendo la columna cervical en posición neutral [guía: HUV-02-003]
+- Vía aérea definitiva ante apnea, Glasgow de 8 o menos, riesgo de broncoaspiración o incapacidad para mantener oxigenación y ventilación con las maniobras iniciales [guía: HUV-02-003]
+
+**B · Respiración**
+- Identificar neumotórax a tensión, hemotórax masivo, neumotórax abierto y taponamiento cardiaco, con el apoyo del FAST-E, el oxímetro de pulso y la frecuencia respiratoria [guía: HUV-02-003]
+
+**C · Circulación**
+- Con frecuencia cardiaca mayor de 100, considerar al paciente en shock [guía: HUV-02-003]
+- Buscar sangrado no compresible en tórax, abdomen, retroperitoneo, pelvis y huesos largos con el examen físico, el FAST-E y las Rx de tórax, pelvis y extremidades [guía: HUV-02-003]
+- Dos catéteres venosos periféricos de gran calibre, con muestras para tipo de sangre y pruebas cruzadas, gases en sangre y lactato [guía: ATLS10-01-013]
+- *Si está inestable:* En shock severo, activar tempranamente el protocolo de transfusión masiva y, mientras llegan los hemoderivados, líquidos en bolos de 250 cc hasta una TAS entre 80 y 90 mm Hg [guía: HUV-02-003]
+- *Si está inestable:* En las primeras 3 horas del trauma con shock hemorrágico, Ácido Tranexámico 1 g durante 10 minutos y 1 g en infusión por 8 horas [guía: HUV-06-004]
+- *Si hay TCE:* Con TCE, la hipotensión permisiva puede resultar en un segundo golpe [guía: HUV-04-013]
+- Candidatos a transfusión masiva con el ABC Score (mecanismo penetrante, PAS ≤ 90 mm Hg, FC ≥ 120 lpm y FAST positivo), con una puntuación de 2 o más [guía: HUV-06-006]
+
+**D · Déficit neurológico**
+- Nivel de consciencia con la escala de Glasgow, tamaño pupilar y reacción del paciente, e incapacidad para movilizar las extremidades [guía: HUV-02-003]
+- Mantener una oxigenación, ventilación y perfusión adecuadas para evitar un daño neurológico secundario [guía: HUV-02-003]
+
+**E · Exposición**
+- Énfasis en la exposición para identificar todas las heridas, laceraciones o hematomas [guía: HUV-04-013]
+- Al completar la evaluación, cubrir al paciente con mantas calientes y administrar líquidos tibios a 39°C para evitar la hipotermia [guía: HUV-02-003]
+
+**Después de la revisión primaria**
+- Antes del catéter urinario, examinar el perineo y los genitales, porque sangre en el meato uretral o equimosis perineal hacen sospechar una lesión uretral [guía: ATLS10-01-021]
+- *Si está estable:* En el paciente estable o respondedor transitorio con politrauma, TAC corporal total sin interrumpir el proceso de resucitación [guía: HUV-06-007]
+- *Si está inestable:* Sangre intraabdominal en el FAST en un paciente hemodinámicamente anormal indica la necesidad de una intervención quirúrgica [guía: ATLS10-01-023]
+- Laparotomía con anormalidad hemodinámica, signos de irritación peritoneal o signos de penetración peritoneal como la evisceración [guía: ATLS10-05-020]
+- *Si está estable:* En pacientes estables con múltiples orificios o trayectos dudosos, TAC corporal total sin interrumpir el proceso de resucitación [guía: HUV-06-007]
+- *Si está inestable:* Los pacientes con trauma abdominal penetrante en shock que no responden van inmediatamente al quirófano para control del sangrado [guía: HUV-15-004]
+
+**Lesiones que se esperan**
+- En el abdomen, las heridas de bala lesionan más el intestino delgado (50 %), el colon (40 %), el hígado (30 %) y las estructuras vasculares abdominales (25 %) [guía: ATLS10-05-004]
+- En la extremidad, lesión neurovascular, fracturas y síndrome compartimental [guía: ATLS10-01-027]
+- Un número impar de heridas sugiere una bala retenida o, menos probable, una lesión tangencial [guía: ATLS10-23-019]
+- *Heridas en el tórax:* En el tórax, la presencia de hallazgos clínicos tiene mucho valor para identificar lesiones pleurales, pero la ausencia de ellos no las descarta [guía: HUV-11-003]
+
+**Además**
+- Manejo antitetánico y antibióticos en presencia de heridas sucias [guía: HUV-04-013]
+- Guiarse por la condición clínica, porque lo que se ve externamente puede no corresponder con los daños internos [guía: HUV-04-013]
+
+**Datos que cambiarían la orientación:** la edad, los signos vitales, el Glasgow y el tiempo desde el trauma.
+
+**B · Respiración.** Conviene valorar neumotórax en pacientes con herida por arma de fuego en tórax, como ocurrió en [caso: 33127] y [caso: 34132][caso: 33127][caso: 34132].
+
+**Después de la revisión primaria.** Conviene realizar radiografía de tórax en casos de herida por arma de fuego en tórax, como en [caso: 33127]. Se puede considerar TAC de tórax en pacientes con herida por arma de fuego en tórax, como en [caso: 31492]. Se puede considerar remisión en casos con hemotórax y neumotórax, como en [caso: 34132].",100,7.21,,,,,arma_de_fuego,16.0,32.0
+qwen3:4b-instruct,tarjeta,ort-02,ortografica,0.357,1.122,True,casos,,0,0,2.0,2.0,1.0,1.0,False,7.9,2.12,0.6,3.12,0.0,2089,219,5,5,0.4,0.4,False,D · no nombra nada de la letra D,otro,determinista,"**D · Déficit neurológico.** No se evidencia déficit neurológico en los casos similares [caso: 32384] [caso: 35024] [caso: 38742] [caso: 52376]
+
+**Después de la revisión primaria.** Conviene evaluar cefalea en el momento de la consulta en casos con lesión parietal [caso: 32384]; se puede considerar realizar TAC en pacientes con trauma craneoencefalico y lesión parietal [caso: 35063]; se puede considerar observación en pacientes con lesión parietal [caso: 32384] [caso: 35024]; se puede considerar sutura en casos con herida en región parieto occipital [caso: 35024];",100,7.26,,,,,,,
+qwen3:4b-instruct,tarjeta,ort-03,ortografica,0.238,0.847,True,casos+tarjeta,tarjeta,7,0,1.0,1.0,0.0,0.0,False,6.72,2.1,0.5,2.08,0.05,1721,150,5,4,0.8,1.0,False,"después · palabras que no aparecen en los casos: alivio, mantiene",palabra ajena,determinista,"### Protocolo inicial: caída
+
+- La caída > 6 metros está entre los hallazgos en la escena para sospechar politrauma [guía: HUV-04-011]
+- *Si es adulto mayor:* La osteopenia y la fragilidad general son factores importantes en la gravedad de la lesión, incluso con caídas de bajo impacto [guía: ATLS10-23-013]
+- Al caer de pie, la energía se transmite por la extremidad inferior a la pelvis y luego a la columna vertebral [guía: ATLS10-23-013]
+
+**x · Hemorragia exanguinante**
+- Compresión directa de la herida y, si el sangrado persiste, empaquetamiento con gasas o apósitos hemostáticos [guía: HUV-06-003]
+- Torniquete en sangrados de extremidades que no se controlan con las maniobras previas, 5 cm proximal a la lesión y anotando la hora de aplicación [guía: HUV-06-003]
+
+**A · Vía aérea**
+- Oxigenar, despejar la vía aérea y elevar el mentón, manteniendo la columna cervical en posición neutral [guía: HUV-02-003]
+- Vía aérea definitiva ante apnea, Glasgow de 8 o menos, riesgo de broncoaspiración o incapacidad para mantener oxigenación y ventilación con las maniobras iniciales [guía: HUV-02-003]
+- Basándose en el mecanismo, se supone que existe una lesión de la médula, y el movimiento de la columna cervical se restringe [guía: ATLS10-01-009]
+
+**B · Respiración**
+- Identificar neumotórax a tensión, hemotórax masivo, neumotórax abierto y taponamiento cardiaco, con el apoyo del FAST-E, el oxímetro de pulso y la frecuencia respiratoria [guía: HUV-02-003]
+
+**C · Circulación**
+- Con frecuencia cardiaca mayor de 100, considerar al paciente en shock [guía: HUV-02-003]
+- Buscar sangrado no compresible en tórax, abdomen, retroperitoneo, pelvis y huesos largos con el examen físico, el FAST-E y las Rx de tórax, pelvis y extremidades [guía: HUV-02-003]
+- Dos catéteres venosos periféricos de gran calibre, con muestras para tipo de sangre y pruebas cruzadas, gases en sangre y lactato [guía: ATLS10-01-013]
+- *Si está inestable:* En shock severo, activar tempranamente el protocolo de transfusión masiva y, mientras llegan los hemoderivados, líquidos en bolos de 250 cc hasta una TAS entre 80 y 90 mm Hg [guía: HUV-02-003]
+- *Si está inestable:* En las primeras 3 horas del trauma con shock hemorrágico, Ácido Tranexámico 1 g durante 10 minutos y 1 g en infusión por 8 horas [guía: HUV-06-004]
+- *Si hay TCE:* Con TCE, la hipotensión permisiva puede resultar en un segundo golpe [guía: HUV-04-013]
+- Para el sangrado pélvico severo, compresión pélvica externa mediante sábanas o dispositivos colocados en la pelvis a nivel de los trocánteres mayores [guía: HUV-06-003]
+
+**D · Déficit neurológico**
+- Nivel de consciencia con la escala de Glasgow, tamaño pupilar y reacción del paciente, e incapacidad para movilizar las extremidades [guía: HUV-02-003]
+- Mantener una oxigenación, ventilación y perfusión adecuadas para evitar un daño neurológico secundario [guía: HUV-02-003]
+
+**E · Exposición**
+- Énfasis en la exposición para identificar todas las heridas, laceraciones o hematomas [guía: HUV-04-013]
+- Al completar la evaluación, cubrir al paciente con mantas calientes y administrar líquidos tibios a 39°C para evitar la hipotermia [guía: HUV-02-003]
+
+**Después de la revisión primaria**
+- Antes del catéter urinario, examinar el perineo y los genitales, porque sangre en el meato uretral o equimosis perineal hacen sospechar una lesión uretral [guía: ATLS10-01-021]
+- *Si está estable:* En el paciente estable o respondedor transitorio con politrauma, TAC corporal total sin interrumpir el proceso de resucitación [guía: HUV-06-007]
+- *Si está inestable:* Sangre intraabdominal en el FAST en un paciente hemodinámicamente anormal indica la necesidad de una intervención quirúrgica [guía: ATLS10-01-023]
+- Radiografías AP de tórax y pelvis en el área de reanimación, si no interrumpen el proceso de reanimación [guía: ATLS10-01-023]
+- TAC corporal total en el trauma cerrado por caídas mayores de 6 metros y en adultos mayores de 70 años [guía: HUV-04-013]
+
+**Lesiones que se esperan**
+- En la caída de altura, lesión craneal, lesión de la columna axial, lesiones viscerales abdominales y fractura de pelvis o acetábulo, incluyendo fracturas del calcáneo [guía: ATLS10-01-027]
+- Las personas que caen desde una altura corren un riesgo especial de fracturas de la unión toracolumbar, que por lo general son inestables [guía: ATLS10-07-017]
+
+**Además**
+- En las fracturas abiertas, antibióticos por vía intravenosa tan pronto como sea posible, ya que el retraso más allá de tres horas se relaciona con mayor riesgo de infección, y profilaxis del tétanos [guía: ATLS10-08-027]
+- Guiarse por la condición clínica, porque lo que se ve externamente puede no corresponder con los daños internos [guía: HUV-04-013]
+
+**Datos que cambiarían la orientación:** la edad, los signos vitales, el Glasgow y el tiempo desde el trauma.
+
+**Después de la revisión primaria.** Se realiza radiografía de hombro para evaluación de la luxación [caso: 35045]. se realiza inmovilización con férula para el hombro [caso: 23099] [caso: 35045]. se administra analgesia para alivio del dolor [caso: 35045] [caso: 915]. se realiza reducción cerrada de la luxación [caso: 35045]. se mantiene en observación por politraumatismo [caso: 29032].",100,5.75,,,,,caida,14.0,29.0
+qwen3:4b-instruct,tarjeta,ort-04,ortografica,0.255,0.897,False,casos,,0,0,,,,,,6.73,2.1,0.54,2.05,0.012,1860,149,5,3,1.0,1.0,False,«curación» se cita a casos que no lo documentan || palabras que no aparecen en los casos: aereas,mal atribuido | palabra ajena,determinista,Conviene valorar signos de edema ventilatorio en cara y cuello por posible compromiso de vías aéreas [caso: 31110]. Se puede considerar observación en caso de estabilidad hemodinámica y ausencia de signos de dificultad respiratoria [caso: 31110]. En casos similares se hizo escarectomía por quemaduras de segundo grado en cara y cuello [caso: 41061]. Se puede considerar curación con gases vaselinas en heridas de primer grado [caso: 38380].,100,5.79,5498.0,0.0,0.0,0.0,,,
+qwen3:4b-instruct,tarjeta,fin-01,fina,0.296,0.952,True,casos+guias,casos,6,3,3.0,3.0,1.0,0.0,False,11.43,2.1,1.14,6.14,0.0,3892,398,5,5,0.4,0.4,False,C · atribuye al HUV un pasaje de otro manual || C · palabras que no aparecen en la guía citada: volver || después · atribuye a la 10.ª edición del ATLS un pasaje de otro manual || después · palabras que no aparecen en la guía citada: blandos,manual equivocado | palabra fuera de la guía,determinista,"**Después de la revisión primaria.** Se realizó sutura en heridas de mano y cara con pérdida de tejido en [caso: 5015], [caso: 48305] y [caso: 25689]. Se realizó lavado y desbridamiento en heridas de mano y cara en [caso: 47838] y [caso: 27812]. Se administró antibiótico intravenoso en una herida de mano en [caso: 47838]. Se aplicó profilaxis antitetánica en una mordedura en pabellón auricular en [caso: 48305].
+
+**C · Circulación.** El manual del HUV recomienda evaluar y heridas de vestir temprana para controlar el sangrado con presión directa y el cierre temporal, y volver a evaluar las heridas y lavar y cerrar de manera definitiva una vez que el paciente se ha estabilizado [guía: ATLS10-03-023].
+
+**Después de la revisión primaria.** El manual del HUV recomienda revisar cada 3 a 5 días para evaluar la epitelización y la ausencia de signos de infección en heridas con pérdida de tejido [guía: HUV-08-009]. La 10.ª edición del ATLS recomienda que en lesiones de tejidos blandos con pérdida de tejido, conviene considerar la posibilidad de infección por rabia en mordeduras por animales [guía: HUV-19-014].",100,10.58,,,,,,,
+qwen3:4b-instruct,tarjeta,fin-02,fina,0.242,0.9,True,casos+guias,casos,8,3,4.0,4.0,3.0,0.0,False,10.98,2.12,1.27,5.51,0.0,4307,354,4,2,0.25,0.0,False,después · atribuye a la 10.ª edición del ATLS un pasaje de otro manual,manual equivocado,determinista,"**Después de la revisión primaria.** Se realizó radiografía de tórax en uno de los casos [caso: 38091] y TAC de abdomen en otro [caso: 37325]. Se realizó inmovilización en uno de los casos [caso: 37325] y se mantuvo observación en otro [caso: 38091].
+
+**B · Respiración.** El manual del HUV recomienda realizar evaluación de la respiración en pacientes con trauma abdominal cerrado, incluyendo el examen de signos de lesión torácica, y se puede considerar el uso de dren pleural si se cumplen los criterios [guía: HUV-12-008].
+
+**C · Circulación.** La 10.ª edición del ATLS recomienda evaluar la circulación durante la revisión primaria para detectar posibles hemorragias intra-abdominales o pélvicas, y considerar el mecanismo de la lesión para guiar la evaluación [guía: ATLS10-05-001].
+
+**Después de la revisión primaria.** La 10.ª edición del ATLS recomienda que en pacientes con trauma cerrado de abdomen se realice una evaluación secundaria con examen físico que incluya inspección y palpación del abdomen, y que se evite tocar el área de mayor dolor para evitar sesgos [guía: HUV-16-002].",100,10.0,,,,,,,
+qwen3:4b-instruct,tarjeta,fin-03,fina,0.292,0.929,True,casos+tarjeta,tarjeta,0,0,2.0,2.0,1.0,0.0,False,6.42,2.11,0.57,1.71,0.05,1945,126,5,4,0.0,0.0,False,después · palabras que no aparecen en los casos: prescribe,palabra ajena,determinista,"### Protocolo inicial: caída
+
+- La caída > 6 metros está entre los hallazgos en la escena para sospechar politrauma [guía: HUV-04-011]
+- Al caer de pie, la energía se transmite por la extremidad inferior a la pelvis y luego a la columna vertebral [guía: ATLS10-23-013]
+
+**x · Hemorragia exanguinante**
+- Compresión directa de la herida y, si el sangrado persiste, empaquetamiento con gasas o apósitos hemostáticos [guía: HUV-06-003]
+- Torniquete en sangrados de extremidades que no se controlan con las maniobras previas, 5 cm proximal a la lesión y anotando la hora de aplicación [guía: HUV-06-003]
+
+**A · Vía aérea**
+- Oxigenar, despejar la vía aérea y elevar el mentón, manteniendo la columna cervical en posición neutral [guía: HUV-02-003]
+- Vía aérea definitiva ante apnea, Glasgow de 8 o menos, riesgo de broncoaspiración o incapacidad para mantener oxigenación y ventilación con las maniobras iniciales [guía: HUV-02-003]
+- Basándose en el mecanismo, se supone que existe una lesión de la médula, y el movimiento de la columna cervical se restringe [guía: ATLS10-01-009]
+
+**B · Respiración**
+- Identificar neumotórax a tensión, hemotórax masivo, neumotórax abierto y taponamiento cardiaco, con el apoyo del FAST-E, el oxímetro de pulso y la frecuencia respiratoria [guía: HUV-02-003]
+
+**C · Circulación**
+- Con frecuencia cardiaca mayor de 100, considerar al paciente en shock [guía: HUV-02-003]
+- Buscar sangrado no compresible en tórax, abdomen, retroperitoneo, pelvis y huesos largos con el examen físico, el FAST-E y las Rx de tórax, pelvis y extremidades [guía: HUV-02-003]
+- Dos catéteres venosos periféricos de gran calibre, con muestras para tipo de sangre y pruebas cruzadas, gases en sangre y lactato [guía: ATLS10-01-013]
+- *Si está inestable:* En shock severo, activar tempranamente el protocolo de transfusión masiva y, mientras llegan los hemoderivados, líquidos en bolos de 250 cc hasta una TAS entre 80 y 90 mm Hg [guía: HUV-02-003]
+- *Si está inestable:* En las primeras 3 horas del trauma con shock hemorrágico, Ácido Tranexámico 1 g durante 10 minutos y 1 g en infusión por 8 horas [guía: HUV-06-004]
+- *Con TCE:* Con TCE, la hipotensión permisiva puede resultar en un segundo golpe [guía: HUV-04-013]
+- Para el sangrado pélvico severo, compresión pélvica externa mediante sábanas o dispositivos colocados en la pelvis a nivel de los trocánteres mayores [guía: HUV-06-003]
+
+**D · Déficit neurológico**
+- Nivel de consciencia con la escala de Glasgow, tamaño pupilar y reacción del paciente, e incapacidad para movilizar las extremidades [guía: HUV-02-003]
+- Mantener una oxigenación, ventilación y perfusión adecuadas para evitar un daño neurológico secundario [guía: HUV-02-003]
+
+**E · Exposición**
+- Énfasis en la exposición para identificar todas las heridas, laceraciones o hematomas [guía: HUV-04-013]
+- Al completar la evaluación, cubrir al paciente con mantas calientes y administrar líquidos tibios a 39°C para evitar la hipotermia [guía: HUV-02-003]
+
+**Después de la revisión primaria**
+- Antes del catéter urinario, examinar el perineo y los genitales, porque sangre en el meato uretral o equimosis perineal hacen sospechar una lesión uretral [guía: ATLS10-01-021]
+- *Si está estable:* En el paciente estable o respondedor transitorio con politrauma, TAC corporal total sin interrumpir el proceso de resucitación [guía: HUV-06-007]
+- *Si está inestable:* Sangre intraabdominal en el FAST en un paciente hemodinámicamente anormal indica la necesidad de una intervención quirúrgica [guía: ATLS10-01-023]
+- Radiografías AP de tórax y pelvis en el área de reanimación, si no interrumpen el proceso de reanimación [guía: ATLS10-01-023]
+- TAC corporal total en el trauma cerrado por caídas mayores de 6 metros y en adultos mayores de 70 años [guía: HUV-04-013]
+
+**Lesiones que se esperan**
+- En la caída de altura, lesión craneal, lesión de la columna axial, lesiones viscerales abdominales y fractura de pelvis o acetábulo, incluyendo fracturas del calcáneo [guía: ATLS10-01-027]
+- Las personas que caen desde una altura corren un riesgo especial de fracturas de la unión toracolumbar, que por lo general son inestables [guía: ATLS10-07-017]
+
+**Además**
+- En las fracturas abiertas, antibióticos por vía intravenosa tan pronto como sea posible, ya que el retraso más allá de tres horas se relaciona con mayor riesgo de infección, y profilaxis del tétanos [guía: ATLS10-08-027]
+- Guiarse por la condición clínica, porque lo que se ve externamente puede no corresponder con los daños internos [guía: HUV-04-013]
+
+**Datos que cambiarían la orientación:** los signos vitales, el Glasgow y el tiempo desde el trauma.
+
+**D · Déficit neurológico.** Se evidencia pérdida de conciencia en 1 caso [caso: 41635]
+
+**Después de la revisión primaria.** Se realiza TAC en 2 casos [caso: 41635] [caso: 21961]; se realiza observación en 2 casos [caso: 24998] [caso: 41635]; se prescribe antibiótico en 1 caso [caso: 22469]",100,5.58,,,,,caida,14.0,28.0
+qwen3:4b-instruct,tarjeta,fin-04,fina,0.358,1.118,True,casos+tarjeta,tarjeta,5,0,3.0,3.0,2.0,0.0,False,7.33,2.1,0.54,2.61,0.048,1825,192,5,3,0.0,0.0,False,después · «dos casos» no coincide con los casos,conteo,determinista,"### Protocolo inicial: herida por arma de fuego
+
+- Un solo orificio de bala en la piel no descarta lesión de múltiples áreas del cuerpo, porque la trayectoria depende de la posición del paciente cuando es herido y puede cambiar al impactar huesos [guía: HUV-04-006]
+- Con múltiples orificios, primero la condición clínica y la localización de los orificios, y en un segundo tiempo las posibles trayectorias [guía: HUV-04-006]
+- Las heridas por arma de fuego se consideran penetrantes, a no ser que sea muy evidente un trayecto tangencial [guía: HUV-15-004]
+
+**x · Hemorragia exanguinante**
+- Compresión directa de la herida y, si el sangrado persiste, empaquetamiento con gasas o apósitos hemostáticos [guía: HUV-06-003]
+- Torniquete en sangrados de extremidades que no se controlan con las maniobras previas, 5 cm proximal a la lesión y anotando la hora de aplicación [guía: HUV-06-003]
+- En heridas con orificios de entrada pequeños y sangrado activo, introducir una sonda Foley e inflar el balón con agua para comprimir el vaso sangrante [guía: HUV-06-003]
+
+**A · Vía aérea**
+- Oxigenar, despejar la vía aérea y elevar el mentón, manteniendo la columna cervical en posición neutral [guía: HUV-02-003]
+- Vía aérea definitiva ante apnea, Glasgow de 8 o menos, riesgo de broncoaspiración o incapacidad para mantener oxigenación y ventilación con las maniobras iniciales [guía: HUV-02-003]
+
+**B · Respiración**
+- Identificar neumotórax a tensión, hemotórax masivo, neumotórax abierto y taponamiento cardiaco, con el apoyo del FAST-E, el oxímetro de pulso y la frecuencia respiratoria [guía: HUV-02-003]
+
+**C · Circulación**
+- Con frecuencia cardiaca mayor de 100, considerar al paciente en shock [guía: HUV-02-003]
+- Buscar sangrado no compresible en tórax, abdomen, retroperitoneo, pelvis y huesos largos con el examen físico, el FAST-E y las Rx de tórax, pelvis y extremidades [guía: HUV-02-003]
+- Dos catéteres venosos periféricos de gran calibre, con muestras para tipo de sangre y pruebas cruzadas, gases en sangre y lactato [guía: ATLS10-01-013]
+- *Si está inestable:* En shock severo, activar tempranamente el protocolo de transfusión masiva y, mientras llegan los hemoderivados, líquidos en bolos de 250 cc hasta una TAS entre 80 y 90 mm Hg [guía: HUV-02-003]
+- *Si está inestable:* En las primeras 3 horas del trauma con shock hemorrágico, Ácido Tranexámico 1 g durante 10 minutos y 1 g en infusión por 8 horas [guía: HUV-06-004]
+- *Si hay TCE:* Con TCE, la hipotensión permisiva puede resultar en un segundo golpe [guía: HUV-04-013]
+- Candidatos a transfusión masiva con el ABC Score (mecanismo penetrante, PAS ≤ 90 mm Hg, FC ≥ 120 lpm y FAST positivo), con una puntuación de 2 o más [guía: HUV-06-006]
+
+**D · Déficit neurológico**
+- Nivel de consciencia con la escala de Glasgow, tamaño pupilar y reacción del paciente, e incapacidad para movilizar las extremidades [guía: HUV-02-003]
+- Mantener una oxigenación, ventilación y perfusión adecuadas para evitar un daño neurológico secundario [guía: HUV-02-003]
+
+**E · Exposición**
+- Énfasis en la exposición para identificar todas las heridas, laceraciones o hematomas [guía: HUV-04-013]
+- Al completar la evaluación, cubrir al paciente con mantas calientes y administrar líquidos tibios a 39°C para evitar la hipotermia [guía: HUV-02-003]
+
+**Después de la revisión primaria**
+- Antes del catéter urinario, examinar el perineo y los genitales, porque sangre en el meato uretral o equimosis perineal hacen sospechar una lesión uretral [guía: ATLS10-01-021]
+- *Si está estable:* En el paciente estable o respondedor transitorio con politrauma, TAC corporal total sin interrumpir el proceso de resucitación [guía: HUV-06-007]
+- *Si está inestable:* Sangre intraabdominal en el FAST en un paciente hemodinámicamente anormal indica la necesidad de una intervención quirúrgica [guía: ATLS10-01-023]
+- Laparotomía con anormalidad hemodinámica, signos de irritación peritoneal o signos de penetración peritoneal como la evisceración [guía: ATLS10-05-020]
+- *Si está estable:* En pacientes estables con múltiples orificios o trayectos dudosos, TAC corporal total sin interrumpir el proceso de resucitación [guía: HUV-06-007]
+- *Si está inestable:* Los pacientes con trauma abdominal penetrante en shock que no responden van inmediatamente al quirófano para control del sangrado [guía: HUV-15-004]
+
+**Lesiones que se esperan**
+- En el abdomen, las heridas de bala lesionan más el intestino delgado (50 %), el colon (40 %), el hígado (30 %) y las estructuras vasculares abdominales (25 %) [guía: ATLS10-05-004]
+- En la extremidad, lesión neurovascular, fracturas y síndrome compartimental [guía: ATLS10-01-027]
+- Un número impar de heridas sugiere una bala retenida o, menos probable, una lesión tangencial [guía: ATLS10-23-019]
+- *Si hay heridas en el tórax:* En el tórax, la presencia de hallazgos clínicos tiene mucho valor para identificar lesiones pleurales, pero la ausencia de ellos no las descarta [guía: HUV-11-003]
+- *Si hay heridas en el cuello:* En el cuello, buscar signos duros (sangrado activo, shock, hematoma expansivo, déficit neurológico, herida soplante, hematemesis o hemoptisis) [guía: HUV-09-006]
+
+**Además**
+- Manejo antitetánico y antibióticos en presencia de heridas sucias [guía: HUV-04-013]
+- Guiarse por la condición clínica, porque lo que se ve externamente puede no corresponder con los daños internos [guía: HUV-04-013]
+
+**Datos que cambiarían la orientación:** la edad, los signos vitales, el Glasgow, el tiempo desde el trauma y la localización de las heridas.
+
+**A · Vía aérea.** Se realizó intubación orofaringea en caso de herida por arma de fuego en cráneo con epistaxis [caso: 27587]
+
+**C · Circulación.** Se registró hipotensión o choque en uno de los casos [caso: 6269] y hemoperitoneo en otro [caso: 38306]
+
+**Después de la revisión primaria.** Se realizó TAC en un caso [caso: 27587], cirugía en dos casos [caso: 6269] [caso: 38306], curación en un caso [caso: 27587], se remitió a UCI en un caso [caso: 27587]",100,6.75,,,,,arma_de_fuego,17.0,33.0
+qwen3:4b-instruct,tarjeta,proc-01,procedimiento,0.374,1.17,False,casos+guias,,8,3,,,,,,11.59,2.1,1.31,6.13,0.016,4459,402,5,5,0.0,0.0,False,"«hemotórax» se cita a casos que no lo documentan || «neumotórax» se cita a casos que no lo documentan || «hemotórax» se cita a casos que no lo documentan || «hemotórax» se cita a casos que no lo documentan || palabras que no aparecen en los casos: compensado, masivo || «intubación / ventilación mecánica» no consta en la guía citada",mal atribuido | palabra ajena | término fuera de la guía,determinista,"En casos de trauma torácico con hipoventilación, hemotórax o neumotórax, se valoró la presencia de síntomas respiratorios o hemodinámicos [caso: 25165]. Cuando se presentan signos de neumotórax o hemotórax sintomático, se realizó colocación de tubo de tórax [caso: 22581]. En pacientes con hemotórax grado II o III, se colocó tubo de tórax para drenaje [caso: 32983]. En casos con deformidad torácica y dificultad respiratoria, se colocó tubo de tórax bilateral [caso: 58265]. En pacientes con hemotórax masivo o shock compensado, se colocó tubo de tórax en el quirófano [caso: 59410]. El manual del HUV recomienda colocar tubo de tórax en neumotórax a tensión, neumotórax comunicante, neumotórax mayor de 25% o hemotórax grado II o III [guía: HUV-11-011]. El manual del HUV recomienda colocar tubo de tórax en hemoneumotórax asociado o en cualquier hemotórax o neumotórax sintomático [guía: HUV-22-002]. La 10.ª edición del ATLS recomienda colocar un tubo de drenaje torácico en pacientes con neumotórax conocido antes de ventilación mecánica o transporte aéreo [guía: ATLS10-04-016].",100,11.05,14095.0,0.0,2.0,1.0,,,
+qwen3:4b-instruct,tarjeta,proc-02,procedimiento,0.312,1.069,False,casos+guias,guias,2,2,,,,,,10.45,2.1,1.01,5.27,0.017,3506,360,2,2,0.0,0.0,False,«uno de ellos» no coincide con los casos || palabras que no aparecen en los casos: volumen,conteo | palabra ajena,determinista,"En los casos similares se identificó herida penetrante en ambos [caso: 59269] [caso: 60699], con hemotórax en uno de ellos [caso: 59269]. Se realizó toracostomía cerrada con paso de tubo de tórax en ambos casos [caso: 59269] [caso: 60699], y se cuantificó el volumen de sangre drenada en uno de ellos [caso: 59269]. Se aplicó sutura en uno de los casos [caso: 59269]. El manual del HUV recomienda realizar una lista de chequeo y pausa de seguridad, consentimiento informado, antibiótico profiláctico, monitoría y equipo requerido, identificación del equipo quirúrgico y del sitio anatómico [guía: HUV-22-006]. La 10.ª edición del ATLS recomienda colocar al paciente en posición con brazo ipsilateral extendido y flexionado en el codo, utilizando un asistente para mantener esa posición [guía: ATLS10-20-022]. El manual del HUV recomienda identificar el triángulo de seguridad mediante el borde lateral del latísimo del dorso, el borde lateral del pectoral mayor y el reborde del 5to arco costal, entre la línea axilar anterior y media [guía: HUV-22-006].",100,9.75,10846.0,0.0,1.0,1.0,,,
+qwen3:4b-instruct,tarjeta,proc-03,procedimiento,0.297,1.015,False,guias,,7,3,,,,,,8.35,2.11,0.83,3.35,0.002,2894,234,0,0,,,False,«10» no está en la guía citada || «1» no está en la guía citada || «1» no está en la guía citada || palabras que no aparecen en la guía citada: minutos,cifra | palabra fuera de la guía,determinista,"La 11.ª edición del ATLS recomienda administrar ácido tranexámico como una dosis inicial de 1 gramo en bolus durante 10 minutos y una infusión de 1 gramo durante más de 8 horas, cuando se administra dentro de las 3 horas de la lesión [guía: ATLS-06-022]. La 10.ª edición del ATLS recomienda la administración de 1 gramo en bolus durante 10 minutos y una infusión de 1 gramo durante más de 8 horas en pacientes con shock hemorrágico en las primeras 3 horas del trauma [guía: ATLS10-01-013]. El manual del HUV recomienda una dosis inicial de 1 gramo en bolo y una infusión de 1 gramo durante 8 horas para pacientes con shock hemorrágico severo en las primeras 3 horas del trauma [guía: HUV-06-004].",100,7.55,10410.0,1.0,2.0,1.0,,,
+qwen3:4b-instruct,tarjeta,proc-04,procedimiento,0.353,1.141,False,casos+guias,,6,3,,,,,,11.51,2.11,1.22,6.15,0.017,4145,408,5,5,0.0,0.0,False,palabras que no aparecen en los casos: distraer || atribuye a la 11.ª edición del ATLS un pasaje de otro manual || palabras que no aparecen en la guía citada: estables,manual equivocado | palabra ajena | palabra fuera de la guía,determinista,"En los casos similares se valoró dolor torácico, amnesia y lesiones en otras áreas que pueden distraer la evaluación del tórax [caso: 23715], se realizó radiografía de tórax en todos los casos [caso: 38091] [caso: 48064] [caso: 46351] [caso: 23715] [caso: 27594] y se observó que en algunos casos se realizó inmovilización o analgesia [caso: 23715] [caso: 27594].
+La 11.ª edición del ATLS recomienda que en pacientes con trauma cerrado de tórax se realice radiografía de tórax en la proyección anteroposterior y lateral para evaluar hemotórax, neumotórax y desplazamiento del mediastino [guía: HUV-11-004].
+La 10.ª edición del ATLS recomienda que en pacientes con trauma cerrado y hemodinámicamente estables se realice radiografía de tórax para excluir hemotórax o neumotórax asociado [guía: ATLS10-05-014].
+El manual del HUV recomienda el uso de los criterios NEXUS Chest para definir la necesidad de radiografía de tórax en pacientes con trauma cerrado de tórax, incluyendo edad mayor de 60 años, mecanismo de trauma con rápida desaceleración, dolor torácico, lesiones en otras áreas o alteración del estado mental [guía: HUV-12-005].",100,10.91,13909.0,0.0,3.0,1.0,,,
+qwen3:4b-instruct,tarjeta,proc-05,procedimiento,0.321,1.049,False,guias,,5,3,,,,,,8.52,2.11,0.77,3.6,0.001,2709,254,0,0,,,False,"atribuye a la 10.ª edición del ATLS un pasaje de otro manual || palabras que no aparecen en la guía citada: produccion, volumen || atribuye al HUV un pasaje de otro manual",manual equivocado | palabra fuera de la guía,determinista,"La 11.ª edición del ATLS recomienda dividir el volumen total de líquidos calculado por 16 para obtener la tasa ajustada de fluidos, y aumentar esta tasa a 1000 mL/hora durante la evaluación secundaria, ajustando posteriormente según la producción urinaria [guía: ATLS-09-013]. La 10.ª edición del ATLS recomienda administrar la mitad del volumen calculado en las primeras 8 horas y el 50% restante en las siguientes 16 horas, con un objetivo de producción urinaria de 0.3–0.5 cc/kg/hora en adultos [guía: HUV-08-008]. El manual del HUV recomienda monitorear la producción urinaria para ajustar la tasa de fluidos, incrementando en 10%–30% si el paciente no alcanza la meta y reduciéndola en 10%–30% si supera el objetivo [guía: ATLS-09-012].",100,7.78,9614.0,2.0,1.0,0.0,,,
+qwen3:4b-instruct,tarjeta,proc-06,procedimiento,0.369,1.071,False,casos+guias,casos,6,3,,,,,,11.29,2.1,1.24,5.89,0.003,4248,390,5,5,0.0,0.0,False,palabras que no aparecen en la guía citada: indique,palabra fuera de la guía,determinista,"En los casos similares se valoró alteración del nivel de conciencia, hipoventilación y sangrado activo [caso: 25353], se realizó estudio con TAC y radiografía [caso: 25353] y se realizó intubación orotraqueal en todos los casos [caso: 25353] [caso: 16194] [caso: 40982] [caso: 37787] [caso: 14433].
+La 11.ª edición del ATLS recomienda que la intubación orotraqueal se indique en pacientes con incapacidad para mantener una vía aérea patente, respiración fallida o alteración del estado mental, como consecuencia de lesiones craneales, intoxicación o hipoperfusión [guía: ATLS-11-012].
+La 10.ª edición del ATLS recomienda que en pacientes con apnea se indique intubación orotraqueal, y que se tomen precauciones ante fracturas de la base del cráneo o signos de lesión craneal como equimosis bilateral o líquido cefalorraquídeo [guía: ATLS10-02-024].
+El manual del HUV recomienda definir la necesidad de intubación orotraqueal mediante una Secuencia de Intubación Rápida SIR y activar el protocolo de vía aérea quirúrgica si el paciente no puede oxigenar y no puede ventilar [guía: HUV-05-023].",100,10.63,13752.0,1.0,2.0,1.0,,,
+qwen3:4b-instruct,tarjeta,proc-07,procedimiento,0.352,1.123,False,guias,,7,3,,,,,,7.76,2.1,0.84,2.78,0.002,2930,195,0,0,,,False,"palabras que no aparecen en la guía citada: adecuada, garantiza, hipercapnia, provocar",palabra fuera de la guía,determinista,"La 11.ª edición del ATLS recomienda que cuando no se puede oxigenar ni ventilar, se considere una vía aérea de rescate como la cricotiroidotomía aguja, ya que proporciona oxigenación temporal [guía: ATLS-11-013]. La 10.ª edición del ATLS recomienda la cricotiroidotomía aguja como técnica de emergencia para oxigenación, aunque no garantiza ventilación adecuada y puede provocar hipercapnia progresiva [guía: ATLS10-02-027]. El manual del HUV recomienda la técnica de cricotiroidotomía con bisturí, bujía y tubo por su facilidad técnica y de recursos [guía: HUV-05-023].",100,7.14,10001.0,1.0,3.0,1.0,,,
+qwen3:4b-instruct,tarjeta,proc-08,procedimiento,0.229,0.83,False,casos+guias,casos,7,3,,,,,,12.72,2.1,1.28,7.27,0.006,4369,473,5,5,0.0,0.0,False,"atribuye a la 11.ª edición del ATLS un pasaje de otro manual || palabras que no aparecen en la guía citada: coloque, quinto || palabras que no aparecen en la guía citada: aumenta",manual equivocado | palabra fuera de la guía,determinista,"En los casos similares se valoró hipoventilación en el campo pulmonar afectado [caso: 3711] [caso: 40350] [caso: 25165], hemotorax en dos casos [caso: 24592] [caso: 25165] y fracturas en dos casos [caso: 3711] [caso: 24592]; se realizó radiografía en un caso [caso: 33204] y se colocó tubo de tórax en todos los casos [caso: 3711] [caso: 24592] [caso: 33204] [caso: 40350] [caso: 25165].
+La 11.ª edición del ATLS recomienda que en el ámbito extrahospitalario se coloque un catéter de 14 o 16 Fréch en el segundo o quinto espacio intercostal con línea medio clavicular o axilar media para lograr la salida inmediata del aire y evitar el colapso pulmonar y mediastinal [guía: HUV-11-007].
+La 10.ª edición del ATLS recomienda que en caso de neumotórax a tensión se realice una descompresión inmediata con aguja o catéter, y que si la descompresión no es exitosa, se considere la toracostomía como enfoque alternativo [guía: ATLS10-04-007].
+El manual del HUV recomienda observar clínicamente y radiológicamente a pacientes con pequeños neumotórax o hemotórax grado I durante 6 horas, y dar egreso si el neumotórax no aumenta o disminuye, de lo contrario colocar drenaje pleural [guía: HUV-11-013].",100,11.69,14139.0,0.0,2.0,1.0,,,
+qwen3:4b-instruct,tarjeta,proc-09,procedimiento,0.263,0.462,False,guias,guias,7,3,,,,,,8.8,2.1,0.82,3.83,0.003,2835,266,0,0,,,True,,,prosa,"La 11.ª edición del ATLS recomienda que en pacientes con shock hemorrágico traumático, se considere activar un protocolo de transfusión masiva en aquellos con respuesta fisiológica refractaria, y que se utilice un enfoque de reanimación equilibrada con productos sanguíneos [guía: ATLS-11-021]. La 10.ª edición del ATLS recomienda definir transfusión masiva como más de 10 unidades de pRBCs en 24 horas o más de 4 unidades en una hora, y que se administren productos sanguíneos en proporción equilibrada para reducir coagulopatía y acidosis [guía: ATLS10-03-043]. El manual del HUV recomienda identificar candidatos a transfusión masiva tempranamente mediante escalas como el ABC Score o el RABT, donde una puntuación ABC de 2 o más se asocia con alta posibilidad de requerir transfusión masiva [guía: HUV-06-006].",100,7.43,10399.0,1.0,2.0,1.0,,,
+qwen3:4b-instruct,tarjeta,proc-10,procedimiento,0.308,1.015,False,guias,,5,3,,,,,,8.62,2.12,0.78,3.67,0.002,2759,259,0,0,,,False,da una orden («debe») en vez de orientar || palabras que no aparecen en la guía citada: senala,orden | palabra fuera de la guía,determinista,"La 11.ª edición del ATLS recomienda aplicar un torniquete 2–3 inches (5–8 cm) proximal a la lesión, directamente sobre la piel y no sobre ropa ni sobre una articulación, y lo debe ajustarse hasta que se pierda el pulso distal y se detenga la hemorragia [guía: ATLS-03-005]. La 10.ª edición del ATLS recomienda usar un torniquete solo cuando la presión directa no es eficaz y la vida del paciente está en peligro, y señala que el uso de un torniquete puede conllevar riesgo de lesión isquémica a la extremidad [guía: ATLS10-01-013]. El manual del HUV recomienda colocar el torniquete 5 cm proximal a la lesión, ajustarlo hasta controlar la hemorragia, anotar la hora de aplicación y dejarlo visible, sin aflojarlo hasta estar en urgencias de la institución adecuada [guía: HUV-06-003].",100,7.82,9813.0,1.0,2.0,1.0,,,
+qwen3:4b-instruct,tarjeta,proc-11,procedimiento,0.482,1.439,True,casos+guias,guias,5,2,4.0,3.0,2.0,1.0,False,9.85,2.1,1.14,4.55,0.0,3911,297,3,2,0.0,0.0,False,C · «un caso» no coincide con los casos || C · no nombra nada de la letra C,conteo | otro,determinista,"**C · Circulación.** En un caso con inestabilidad hemodinámica se identificó compromiso vascular [caso: 51682].
+
+**Después de la revisión primaria.** En un caso se realizó TAC para evaluación de lesiones pélvicas [caso: 39410]. En otro caso se administró antibiótico [caso: 51682].
+
+**C · Circulación.** El manual del HUV recomienda realizar un examen cuidadoso de la pelvis para identificar candidatos a Rx de pelvis, fractura inestable, lesión uretral, rectal y/o vaginal [guía: HUV-17-012]. El manual del HUV recomienda realizar una compresión pélvica circunferencial sobre los trocánteres mayores y la sínfisis del pubis con sábana, cinturón o dispositivo comercial como tratamiento inicial para una pelvis inestable en el contexto de un paciente con shock hemorrágico [guía: HUV-17-010].",100,9.67,,,,,,,
+qwen3:4b-instruct,tarjeta,proc-12,procedimiento,0.346,1.112,False,casos+guias,,5,2,,,,,,11.0,2.1,1.21,5.63,0.016,4135,375,5,5,0.0,0.0,False,"«cuatro casos» no coincide con los casos || palabras que no aparecen en los casos: cuatro || palabras que no aparecen en la guía citada: enfasis, paraesternal, subxifoidea || «UCI» no consta en la guía citada || «observación» no consta en la guía citada",conteo | palabra ajena | palabra fuera de la guía | término fuera de la guía,determinista,"En los casos similares se valoró hipoventilación en un paciente [caso: 3393], se realizó TAC en uno [caso: 58286] y se hizo lavado / desbridamiento en uno [caso: 56419]. Se realizó ventana pericardica en cuatro casos [caso: 56419] [caso: 58286] [caso: 11295] [caso: 28423], con resultados negativos en tres [caso: 56419] [caso: 58286] [caso: 11295] y positivo en uno [caso: 3393].
+El manual del HUV recomienda que en pacientes con herida precordial y hemodinámica estable, se realice ultrasonido cardíaco con énfasis en la ventana subxifoidea o paraesternal largo [guía: HUV-13-005].
+El manual del HUV recomienda que en pacientes con ultrasonido positivo y hemopericardio menor de 10 mm, se realice observación en UCI y se repita el ultrasonido a las 6, 12 y 24 horas [guía: HUV-13-009].
+El manual del HUV recomienda que en pacientes con ultrasonido positivo y hemopericardio mayor de 10 mm, se realice ventana pericárdica [guía: HUV-13-009].",100,10.37,13096.0,0.0,0.0,0.0,,,
+qwen3:4b-instruct,tarjeta,proc-13,procedimiento,0.251,0.935,False,guias,guias,4,2,,,,,,8.17,2.12,0.67,3.32,0.003,2363,236,0,0,,,True,,,prosa,"El manual del HUV recomienda definir si una herida es penetrante evaluando condiciones como heridas soplante, epiplocele o evisceración, trauma de tórax con neumotórax o hemotórax, o salida de contenido intestinal, y se puede considerar explorar heridas con duda de penetración o tangenciales por arma de fuego [guía: HUV-23-001]. El ATLS recomienda evaluar peritonitis, hematemesis, sangrado rectal o evisceración como indicaciones para exploración abdominal, y señala que las heridas por punzón o almarada pueden ser consideradas penetrantes sin necesidad de exploración [guía: ATLS-22-010]. El ATLS recomienda que en casos de trauma abdominal penetrante se puede realizar una exploración local para determinar penetración, y que si hay penetración, se requiere evaluación, operación o observación [guía: ATLS-22-010].",100,7.24,8951.0,1.0,0.0,0.0,,,
+qwen3:4b-instruct,tarjeta,proc-14,procedimiento,0.235,0.96,False,guias,guias,8,3,,,,,,8.24,2.11,0.83,3.25,0.003,2905,228,0,0,,,True,,,prosa,"El manual del HUV recomienda realizar el E-FAST como parte de la evaluación primaria de todo paciente traumatizado, especialmente en contextos de inestabilidad hemodinámica, para excluir causas de shock como neumotórax, hemotórax, hemopericardio o hemoperitoneo [guía: HUV-17-004]. El manual del HUV recomienda que el ultrasonido FAST-E sea realizado al pie de la cama con equipos portátiles, ya que es el gold standard para el diagnóstico de hemopericardio y taponamiento en trauma torácico cerrado [guía: HUV-12-005]. El manual del HUV recomienda que en pacientes con FAST-E positivo, abdomen dudoso, hematuria o politrauma severo, se realice un TAC corporal total para evaluar la necesidad de intervención quirúrgica [guía: HUV-16-006].",100,7.33,9980.0,0.0,0.0,0.0,,,
+qwen3:4b-instruct,tarjeta,proc-15,procedimiento,0.277,0.95,False,guias,guias,7,3,,,,,,7.82,2.1,0.79,2.88,0.002,2777,201,0,0,,,True,,,prosa,"La 11.ª edición del ATLS recomienda que durante la evaluación primaria se realice la exposición del paciente para examinarlo y que, al finalizar, se cubra para prevenir la hipotermia, ya que esta es una condición común en pacientes traumatizados [guía: ATLS-08-005]. El manual del HUV recomienda mantener una atención empática que brinde calor humano al paciente, permitiendo el acompañamiento permanente de su familiar o cuidador durante todo el proceso de atención [guía: HUV-03-008]. La 10.ª edición del ATLS recomienda que el paciente reciba fluidos intravenosos calentados antes de su infusión y que se mantenga un ambiente cálido para prevenir la hipotermia [guía: ATLS10-01-015].",100,6.95,10506.0,1.0,2.0,1.0,,,
+qwen3:4b-instruct,tarjeta,proc-16,procedimiento,0.29,1.008,False,guias,,7,3,,,,,,8.0,2.11,0.76,3.08,0.001,2775,224,0,0,,,False,"palabras que no aparecen en la guía citada: componente, motriz, obtenida || atribuye al HUV un pasaje de otro manual",manual equivocado | palabra fuera de la guía,determinista,"La 11.ª edición del ATLS recomienda que la puntuación de la escala de coma de Glasgow se obtenga sumando las puntuaciones de apertura ojo, respuesta verbal y respuesta motriz, considerando NT (no comprobable) cuando una evaluación no se puede realizar [guía: ATLS-07-018]. La 10.ª edición del ATLS recomienda que la puntuación del GCS se calcule con la mejor respuesta obtenida en cada componente, y que el componente motriz sea el más correlacionado con los resultados a largo plazo [guía: ATLS10-06-011]. El manual del HUV recomienda que un nivel de alerta alterado se considere cuando la puntuación del GCS es de 14 o menos, o cuando se presentan signos como desorientación o incapacidad para recordar tres objetos en cinco minutos [guía: ATLS-07-025].",100,7.19,9397.0,2.0,4.0,1.0,,,

@@ -106,6 +106,32 @@ primaria tiene que nombrar algo de esa letra para pasar la verificación; con
 - **el usuario, en el pendiente 12:** las notas de la demo de la GTX 1650 y qué
   le faltó a quien hizo el pedido.
 
+**Respuestas como la ideal: hecho el 24/10** (`PLAN_RESPUESTA_IDEAL.md`, raíz;
+comparado con `respuesta_ideal_arrollado.md`, de Claude Opus 5.5). Las cuatro
+decisiones del usuario se tomaron como se recomendó: tarjetas, se muestran
+antes de que las revise el médico, el protocolo primero y cinco tarjetas.
+- **El protocolo de cada mecanismo es una tarjeta** (`tarjetas/tarjetas.yaml`,
+  `rag/tarjetas.py`, `TARJETAS=1`): peatón, ocupante, caída, arma de fuego y
+  cortopunzante.
+  - La redactó Claude una vez desde los pasajes: 67 viñetas que citan 32
+    secciones del HUV y del ATLS 10, y todas pasan el verificador.
+  - Se ajusta a la ficha con reglas: las ramas de estable e inestable, el
+    aplastamiento y los datos de cada letra.
+  - Va primero, en lugar de la prosa de los manuales, y el 4B escribe solo
+    sobre los casos.
+- **Encima de los casos va la línea del registro** ("En el registro hay 324
+  casos de peatón atropellado…", con `scripts/patrones_registro.py`).
+- **La ficha registra el peatón y si las ruedas le pasaron por encima**
+  (`Ficha.variantes`), sin cambiar el mecanismo, y hay una pregunta con
+  botones para eso.
+- **En las 14 de 25 presentaciones con tarjeta:** 5,7 s de mediana contra 9,8
+  s; los manuales quedan verificados en 14 de 14 contra 3 de 12. La
+  recuperación quedó idéntica a la línea base.
+- **Pendiente:**
+  - la parte de los casos pasa algo menos (45 % contra 57 %, en 4 corridas);
+  - 11 presentaciones sin tarjeta (TCE sin mecanismo, quemadura, mordedura…);
+  - la revisión del médico de las viñetas.
+
 ---
 
 ## 00. Libros de trauma (desde el 07/10)
@@ -400,8 +426,10 @@ rag_trauma/
     rag/                 config, encoder, retrieve, index, build_prompt, hallazgos, generate,
                          verificar, guias (extracción de los libros), fragmentar
     guias/               perfiles.yaml (en git) y el texto extraído de los libros (no está en git)
+    tarjetas/            tarjetas.yaml (el protocolo por mecanismo, con sus citas) y
+                         patrones_registro.json (conteos del registro), en git (PLAN_RESPUESTA_IDEAL.md)
     indices/             BM25 + Qdrant local (casos: 8.198 puntos; guias: 2.201) — no está en git
-    tests/               408 tests del extractor, los libros, la respuesta y el verificador (sin Ollama ni índices)
+    tests/               437 tests del extractor, los libros, la respuesta y el verificador (sin Ollama ni índices)
     scripts/             revisar_entorno, probar_respuestas, exportar_revision, preparar_demo,
                          calibrar_umbral/_guias, comparar_modelos/_fragmentacion, extraer_guias
     eval/                consultas.yaml (35 consultas), consultas_guias.yaml (51, libros), evaluate.py,
@@ -792,7 +820,9 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
    - si haría las preguntas: la columna `medico_la_haria` de
      `reports/probar_preguntas.csv`;
    - la letra de cada término y de cada capítulo (`rag/prioridades.py`), con
-     los 7 dudosos de `DUDOSOS`.
+     los 7 dudosos de `DUDOSOS`;
+   - las 67 viñetas de las tarjetas (`tarjetas/tarjetas.yaml`;
+     `PLAN_RESPUESTA_IDEAL.md`, decisión 2: se muestran antes de su revisión).
 2. **Seguir mejorando las sugerencias** (el principio de la sección 0). Ideas
    abiertas:
    - el léxico solo reconoce lo que tiene. En quemaduras no hay hallazgos que
@@ -858,6 +888,12 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
 
 ## 6. Trampas conocidas
 
+- **Las tarjetas citan secciones por su identificador** (`[guía: HUV-06-003]`).
+  Si se vuelven a extraer o indexar los libros y cambia un identificador o su
+  texto, `tests/test_tarjetas.py` (o `python -m rag.tarjetas`) lo avisa: cada
+  viñeta tiene que seguir pasando el verificador contra su pasaje. Ese test se
+  salta en un PC sin `guias/secciones.jsonl`. Si se regenera el corpus, volver a
+  correr `scripts/patrones_registro.py`.
 - **Qdrant local admite un solo proceso.** Con el chatbot abierto, fallan
   `rag.index`, `eval.evaluate`, `probar_respuestas.py` y
   `exportar_revision.py` con `already accessed by another instance`. Cerrar
@@ -937,6 +973,8 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
 | `PREGUNTAS` | `1` | hasta 2 preguntas con botones bajo la respuesta, en el orden xABCDE (`rag/preguntas.py`, fase 3, 24/10). Necesita `CONVERSACION=ficha` |
 | `ORDEN_ATLS` | `1` | la prosa por letras de la revisión primaria (xABCDE) dentro de cada apartado, solo con un paciente (`rag/prioridades.py`, `generate.prosa_atls`, fase 4, 24/10). `0` = la prosa de siempre |
 | `PROSA_SIEMPRE_ATLS` | el de `PROSA_SIEMPRE` | con `ORDEN_ATLS`: `1` = la letra que no pasa la verificación se muestra igual; `0` = va armada desde su fuente (decisión 3, 24/10: se deja como `PROSA_SIEMPRE`; con 0, los manuales quedan como lista en 16 de 20) |
+| `TARJETAS` | `1` | con un paciente de un mecanismo con tarjeta (peatón, ocupante, caída, arma de fuego, cortopunzante), el protocolo de `tarjetas/tarjetas.yaml` va primero en lugar de la prosa de los manuales, y el modelo escribe solo sobre los casos (`PLAN_RESPUESTA_IDEAL.md`, decisiones 1 a 4 del usuario) |
+| `TARJETAS_YAML`, `PATRONES_REGISTRO` | `tarjetas/…` | las tarjetas y los conteos del registro (`scripts/patrones_registro.py`) |
 | `MAX_TOKENS_ATLS` | `1000` | salida de la prosa por letras: 7 letras de 400 caracteres como máximo |
 | `MAX_TOKENS_PROSA` | `600` | 400 hasta el 17/10: con los libros se cortaba el JSON |
 | `COLECCION_GUIAS` | `guias` | colección de Qdrant con los libros (17/10) |

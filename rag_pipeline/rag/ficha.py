@@ -21,7 +21,9 @@ Qué se lee de cada mensaje:
     que lee los casos. Lo que se pregunta ("¿le hago FAST?") no es un hecho:
     sus estudios y su manejo no entran. Lo que se plantea ("¿y si está
     hipotenso?") sí;
-  · signos con su valor (TA, FC, FR, SatO2, Glasgow), grupo y estado.
+  · signos con su valor (TA, FC, FR, SatO2, Glasgow), grupo y estado;
+  · lo que precisa el mecanismo para la tarjeta (VARIANTES): peatón, y si las
+    ruedas le pasaron por encima o fue un impacto.
 
 La búsqueda de un seguimiento (Ficha.consulta) son las palabras del médico,
 no un texto armado con las etiquetas: las cláusulas del paciente sin lo negado
@@ -45,8 +47,23 @@ from .senal import MECANISMOS as _MECANISMOS_SENAL
 RX_CASO = re.compile(r"^\s*(?:caso|id|registro)?\s*#?\s*(\d{3,8})\s*$", re.IGNORECASE)
 
 MECANISMOS = {k: list(v) for k, v in _MECANISMOS_SENAL.items()}
-MECANISMOS["accidente_transito"] += [r"\bmoto\b", r"motociclist", r"\bpeaton",
-                                     r"accidente\s+de\s+(carro|bus|bicicleta)"]# "choque de moto", "choque entre vehículos": la colisión, no el shock
+MECANISMOS["accidente_transito"] += [r"\bmoto\b", r"motociclist", r"\bpeaton", r"arrollad",
+                                     r"accidente\s+de\s+(carro|bus|bicicleta)"]
+# Lo que precisa el mecanismo para elegir la tarjeta (PLAN_RESPUESTA_IDEAL.md,
+# fase 3), sin cambiarlo: Ficha.mecanismo sigue siendo "accidente_transito" y
+# la búsqueda no cambia. "Impacto" va antes que "aplastamiento": "no le pasó
+# por encima" es un impacto.
+VARIANTES = {
+    "peaton": [r"atropell", r"arrollad", r"\bpeaton"],
+    "impacto": [r"atropellamiento\s+por\s+impacto", r"\bpor\s+impacto\b", r"\bsolo\s+(fue\s+)?(el\s+)?impacto",
+                r"\bsin\s+arrollamiento", r"\bno\s+(le\s+)?pas(o|aron)\s+(\w+\s+){0,3}por\s+encima"],
+    "aplastamiento": [r"\bpas(o|aron)\s+(\w+\s+){0,3}por\s+encima", r"aplastad", r"aplastamiento",
+                      r"arrollamiento", r"atrapad"],
+}
+NOMBRES_VARIANTE = {"peaton": "peatón", "impacto": "impacto, sin arrollamiento",
+                    "aplastamiento": "las ruedas le pasaron por encima"}
+_VAR = {k: [re.compile(p) for p in ps] for k, ps in VARIANTES.items()}
+# "choque de moto", "choque entre vehículos": la colisión, no el shock
 _RX_CHOQUE_VIAL = re.compile(r"\b(choques?)(?=\s+(de|entre|contra|frontal|vehicular|con)\b)")
 
 REGIONES = {
@@ -148,6 +165,7 @@ class Lectura:
     general: bool = False                                  # una pregunta de procedimiento
     presentacion: bool = False      # un hecho que nombra mecanismo o lesión, sin continuar a otro
     sin_senal: bool = False         # sin mecanismo, lesión ni procedimiento de trauma (rag/senal.py)
+    variantes: list[str] = field(default_factory=list)     # VARIANTES: "peaton", "aplastamiento"…
 
 
 @dataclass
@@ -164,6 +182,9 @@ class Ficha:
     sin_dato: list[str] = field(default_factory=list)    # "No se sabe": no se vuelve a preguntar (preguntas.py)
     lesion: bool = False                                   # nombró una lesión ("TCE severo")
     general: bool = False                                  # empezó con una pregunta de procedimiento
+    # lo que precisa el mecanismo (VARIANTES); no entra en datos(), que compara
+    # con eval/conversaciones.yaml
+    variantes: list[str] = field(default_factory=list)
 
     def es_paciente(self) -> bool:
         """¿Hay un paciente? Las regiones solas no bastan: "¿cuándo poner un
@@ -186,6 +207,7 @@ class Ficha:
         salida = []
         if self.mecanismo:
             salida.append(config.ETIQUETAS_MECANISMO.get(self.mecanismo, self.mecanismo).lower())
+        salida += [NOMBRES_VARIANTE[v] for v in self.variantes]
         salida += [config.ETIQUETAS_REGION.get(r, r).lower() for r in self.regiones]
         salida += self.afirmados + [f"sin {t}" for t in self.negados]
         salida += [describir_signo(k, v) for k, v in self.signos.items()]
@@ -343,6 +365,12 @@ def leer(mensaje: str) -> Lectura:
                 if lec.mecanismo is None or (clase == "hecho" and not lec.mecanismo_es_hecho):
                     lec.mecanismo, lec.mecanismo_es_hecho = k, clase == "hecho"
             lec.regiones += [r for r in _primero(_REG, n) if r not in lec.regiones]
+            if clase != "pregunta":
+                for v in _primero(_VAR, n):
+                    if v == "aplastamiento" and "impacto" in _primero(_VAR, n):
+                        continue                        # "no le pasó por encima"
+                    if v not in lec.variantes:
+                        lec.variantes.append(v)
             lec.lesion = lec.lesion or bool(_LESION.search(n))
             afirmados, negados = menciones(n)
             if clase == "pregunta":           # "¿le hago FAST?": no es un hecho
@@ -379,6 +407,12 @@ def _sumar(f: Ficha, lec: Lectura, presentacion: bool) -> None:
         if t not in f.negados:
             f.negados.append(t)
     f.signos.update(lec.signos)
+    for v in lec.variantes:
+        otra = {"impacto": "aplastamiento", "aplastamiento": "impacto"}.get(v)
+        if otra in f.variantes:
+            f.variantes.remove(otra)
+        if v not in f.variantes:
+            f.variantes.append(v)
     f.grupo = lec.grupo or f.grupo
     f.lesion = f.lesion or lec.lesion
     if lec.estado:

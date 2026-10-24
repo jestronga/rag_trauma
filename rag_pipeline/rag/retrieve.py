@@ -446,8 +446,29 @@ def _fragmento(punto) -> FragmentoGuia:
         idioma=p.get("idioma", ""), texto=p.get("text", ""),
         texto_contexto=p.get("texto_contexto", p.get("text", "")),
         n_tokens_contexto=int(p.get("n_tokens_contexto", p.get("n_tokens", 0))),
-        coseno=float(punto.score), capitulo_num=p.get("capitulo_num"),
+        # sin puntaje cuando sale de un scroll (fragmentos_de), no de una búsqueda
+        coseno=float(getattr(punto, "score", None) or 0.0), capitulo_num=p.get("capitulo_num"),
     )
+
+
+def fragmentos_de(secciones: list[str]) -> list[FragmentoGuia]:
+    """Los fragmentos de unas secciones, por su identificador, sin buscar: los
+    pasajes que cita una tarjeta (rag/tarjetas.py), en el orden de `secciones`
+    y, dentro de cada una, en orden de lectura."""
+    if not secciones or not hay_guias():
+        return []
+    from qdrant_client import models
+    filtro = models.Filter(must=[models.FieldCondition(
+        key="seccion_id", match=models.MatchAny(any=list(dict.fromkeys(secciones))))])
+    puntos, siguiente = [], None
+    while True:
+        lote, siguiente = _qdrant().scroll(config.COLECCION_GUIAS, scroll_filter=filtro, limit=256,
+                                           offset=siguiente, with_payload=True, with_vectors=False)
+        puntos += lote
+        if siguiente is None:
+            break
+    orden = {s: i for i, s in enumerate(dict.fromkeys(secciones))}
+    return sorted((_fragmento(p) for p in puntos), key=lambda f: (orden[f.seccion_id], f.id))
 
 
 def candidatos_guias(consulta: str, ruta: str | None = None, profundidad: int | None = None,

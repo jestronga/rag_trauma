@@ -257,19 +257,27 @@ def portada():
 def aviso_respuesta(respuesta) -> str:
     """El aviso fijo bajo cada respuesta: qué es cada fuente y sus límites."""
     partes = []
+    if respuesta.tarjeta:
+        partes.append("El protocolo inicial se escribió de antemano desde los pasajes de los manuales "
+                      "que cita; cada viñeta se verificó contra su pasaje y falta la revisión del médico.")
     if respuesta.casos:
-        partes.append(f"Casos históricos del registro ({config.COBERTURA_TEMPORAL}): los conteos "
-                      f"describen estos casos, no frecuencias generales, y los protocolos pueden "
-                      f"haber cambiado.")
-    if respuesta.guias:
-        fuentes = {f.fuente for f in respuesta.guias}
+        alcance = ("«En el registro» cuenta todos los casos del registro con ese mecanismo; los "
+                   "demás conteos describen los casos recuperados" if respuesta.tarjeta else
+                   "los conteos describen estos casos, no frecuencias generales")
+        partes.append(f"Casos históricos del registro ({config.COBERTURA_TEMPORAL}): {alcance}, y los "
+                      f"protocolos pueden haber cambiado.")
+    pasajes = respuesta.guias + respuesta.pasajes_tarjeta
+    if pasajes:
+        fuentes = {f.fuente for f in pasajes}
         nombres = [n for libro, n in (("ATLS", "del ATLS 11.ª ed."),
                                       ("ATLS10", "del ATLS 10.ª ed. (2018, traducción no oficial)"),
                                       ("HUV", "del manual del HUV")) if libro in fuentes]
         lista = nombres[0] if len(nombres) == 1 else ", ".join(nombres[:-1]) + " y " + nombres[-1]
         ingles = ("; lo del ATLS 11 (en inglés) va resumido en español" if "ATLS" in fuentes else "")
-        partes.append(f"Pasajes {lista}{ingles}. El texto de cada uno está en «Fragmentos de los "
-                      f"manuales».")
+        donde = ("«Pasajes que cita el protocolo»" + (" y «Otros fragmentos que encontró la búsqueda»"
+                                                      if respuesta.guias else "")
+                 if respuesta.tarjeta else "«Fragmentos de los manuales»")
+        partes.append(f"Pasajes {lista}{ingles}. El texto de cada uno está en {donde}.")
     partes.append("Apoyo a la decisión; no reemplaza el juicio clínico.")
     return " ".join(partes)
 
@@ -305,15 +313,18 @@ def etiquetas_guia(f) -> str:
             f"cap{'s' if len(equivalentes) > 1 else ''}. {caps}</span>")
 
 
-def tarjeta_guia(seccion: str, fragmentos, consulta: str = "") -> str:
+def tarjeta_guia(seccion: str, fragmentos, consulta: str = "", con_puntaje: bool = True) -> str:
     """Un pasaje de un manual: libro, capítulo, sección y páginas impresas, y su
-    texto tal cual (el ATLS 11 en inglés, el ATLS 10 en la traducción del PDF)."""
+    texto tal cual (el ATLS 11 en inglés, el ATLS 10 en la traducción del PDF).
+    Sin puntaje, los que cita el protocolo: no salen de una búsqueda."""
     f = fragmentos[0]
-    escala = "relevancia" if f.relevancia is not None else "similitud"
-    puntaje = max(x.puntaje for x in fragmentos)
+    puntaje = ""
+    if con_puntaje:
+        escala = "relevancia" if f.relevancia is not None else "similitud"
+        puntaje = f" · {escala} {max(x.puntaje for x in fragmentos):.2f}"
     texto = resaltar_html(texto_guia(fragmentos), consulta).replace("\n", "<br>")
-    return (f"<div class='caso-box guia-box'><span class='caso-id'>guía {seccion}</span> "
-            f"· {escala} {puntaje:.2f}<br><span class='etq'>{html.escape(cabecera_guia(fragmentos))}"
+    return (f"<div class='caso-box guia-box'><span class='caso-id'>guía {seccion}</span>"
+            f"{puntaje}<br><span class='etq'>{html.escape(cabecera_guia(fragmentos))}"
             f"</span>{etiquetas_guia(f)}<br><br>{texto}</div>")
 
 
@@ -374,15 +385,34 @@ def desplegable_casos(respuesta, consulta: str) -> None:
             st.markdown(tarjeta_caso(c, buscada), unsafe_allow_html=True)
 
 
-def desplegable_guias(respuesta, consulta: str) -> None:
-    """El texto completo de cada pasaje de los manuales."""
-    if not respuesta.guias:
+def desplegable_tarjeta(respuesta, consulta: str) -> None:
+    """Bajo el protocolo (PLAN_RESPUESTA_IDEAL.md): los pasajes que cita y,
+    aparte, los que encontró la búsqueda y el protocolo no cita."""
+    grupos = agrupar_guias(respuesta.pasajes_tarjeta)
+    if grupos:
+        with st.expander(f"Pasajes que cita el protocolo ({len(grupos)}) · texto completo"):
+            st.caption("El protocolo se escribió de antemano desde estos pasajes, y cada viñeta se "
+                       "verificó contra el suyo. Páginas impresas del libro"
+                       + ("; el ATLS 10, tal como viene en la traducción no oficial, sin corregir."
+                          if config.ATLS10 else "."))
+            for seccion, fragmentos in grupos.items():
+                st.markdown(tarjeta_guia(seccion, fragmentos, con_puntaje=False), unsafe_allow_html=True)
+    otros = [f for f in respuesta.guias if f.seccion_id not in grupos]
+    desplegable_guias(respuesta, consulta, otros, "Otros fragmentos que encontró la búsqueda")
+
+
+def desplegable_guias(respuesta, consulta: str, fragmentos=None,
+                      titulo: str = "Fragmentos de los manuales") -> None:
+    """El texto completo de cada pasaje de los manuales (los de la búsqueda, o
+    `fragmentos`)."""
+    fragmentos = respuesta.guias if fragmentos is None else fragmentos
+    if not fragmentos:
         return
     buscada = respuesta.consulta_reescrita or consulta
     # la de los manuales, con abreviaturas y mecanismo (retrieve.candidatos_guias)
     en_libros = para_libros(buscada)
-    grupos = agrupar_guias(respuesta.guias)
-    with st.expander(f"Fragmentos de los manuales ({len(grupos)}) · texto completo"):
+    grupos = agrupar_guias(fragmentos)
+    with st.expander(f"{titulo} ({len(grupos)}) · texto completo"):
         if en_libros != buscada:
             st.caption(f"Búsqueda en los manuales: «{en_libros}»")
         st.caption("Pasajes que pasaron la guarda de los manuales, del más al menos relevante. "
@@ -409,7 +439,8 @@ def citas_en_rojo(texto: str) -> str:
 
 def cuerpo_respuesta(respuesta, consulta: str, de_a_poco: bool = False) -> None:
     """La respuesta por apartados: casos (prosa y su desplegable) y manuales
-    (prosa o aviso de los pasajes, y su desplegable). Sin apartados
+    (prosa o aviso de los pasajes, y su desplegable), o primero el protocolo de
+    la tarjeta (sus pasajes y los de la búsqueda, en dos desplegables). Sin apartados
     (abstención, resumen de un caso), el texto y los desplegables al final."""
     def escribir(texto: str) -> None:
         texto = RX_LINEA_RESPALDO.sub("", texto).strip()
@@ -436,6 +467,8 @@ def cuerpo_respuesta(respuesta, consulta: str, de_a_poco: bool = False) -> None:
             desplegable_casos(respuesta, consulta)
         elif seccion.fuente == "guias":
             desplegable_guias(respuesta, consulta)
+        elif seccion.fuente == "tarjeta":
+            desplegable_tarjeta(respuesta, consulta)
 
 
 def detalle_respuesta(respuesta, segundos: float | None) -> None:

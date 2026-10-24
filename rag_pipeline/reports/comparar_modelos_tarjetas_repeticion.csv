@@ -1,0 +1,85 @@
+rep,id,modo,casos_ok,s,tok,motivos
+0,lex-01,atls,False,14.51,384,"C · palabras que no aparecen en los casos: inmediato, riesgo || después · «tubo de tórax» es de la letra B, no de la después || A · da una orden («debe») en vez de orientar || A · atribuye al HUV un pasaje de otro manual || B · atribuye a la 11.ª edición del ATLS un pasaje de otro manual"
+0,lex-01,tarjeta,False,10.04,201,"C · palabras que no aparecen en los casos: circulacion || después · «hemotórax» es de la letra B, no de la después"
+0,lex-02,atls,True,11.29,225,"C · da una orden («se debe») en vez de orientar || C · palabras que no aparecen en la guía citada: antecedentes, previas || después · da una orden («se debe») en vez de orientar"
+0,lex-02,tarjeta,True,9.15,144,
+0,lex-05,atls,True,7.8,302,"D · palabras que no aparecen en la guía citada: circulacion, oxigeno, respiratoria, saturacion"
+0,lex-05,tarjeta,False,4.97,155,después · palabras que no aparecen en los casos: sospecha
+0,lex-06,atls,False,10.43,448,"C · «uno de los» no coincide con los casos || C · no nombra nada de la letra C || D · «uno de los» no coincide con los casos || D · no nombra nada de la letra D || después · palabras que no aparecen en los casos: cuatro || C · «40» no está en la guía citada || C · palabras que no aparecen en la guía citada: adicional, aproximadamente || C · «irritación peritoneal» no consta en la guía citada || C · palabras que no aparecen en la guía citada: anormal"
+0,lex-06,tarjeta,False,6.61,275,B · palabras que no aparecen en los casos: respiracion || C · «1 caso» no coincide con los casos || C · no nombra nada de la letra C || D · «1 caso» no coincide con los casos || D · no nombra nada de la letra D
+0,voc-01,atls,True,12.66,326,después · atribuye a la 10.ª edición del ATLS un pasaje de otro manual
+0,voc-01,tarjeta,False,8.16,93,C · «compromiso vascular» no consta en ningún caso recuperado || C · palabras que no aparecen en los casos: sospecha || después · palabras que no aparecen en los casos: sospecha
+0,voc-02,atls,True,4.16,121,
+0,voc-02,tarjeta,True,3.78,121,
+0,voc-03,atls,False,9.3,422,"después · palabras que no aparecen en los casos: dispuso || B · atribuye al HUV un pasaje de otro manual || C · «pérdida de conciencia» no consta en la guía citada || C · palabras que no aparecen en la guía citada: circulacion, minutos, respiratoria || D · palabras que no aparecen en la guía citada: extremidades"
+0,voc-03,tarjeta,True,5.43,195,
+0,voc-04,atls,False,12.13,308,x · palabras que no aparecen en los casos: exanguinante || B · atribuye al HUV un pasaje de otro manual
+0,voc-04,tarjeta,True,8.27,119,
+0,abr-01,atls,False,5.89,163,después · palabras que no aparecen en los casos: concomitante
+0,abr-01,tarjeta,True,3.15,31,
+0,abr-02,atls,True,8.27,321,
+0,abr-02,tarjeta,False,5.41,192,"B · «sangrado activo» es de la letra x, no de la B || después · palabras que no aparecen en los casos: aproximadamente"
+0,ort-01,atls,True,13.54,403,
+0,ort-01,tarjeta,False,9.81,206,"después · «hemotórax» es de la letra B, no de la después || después · «neumotórax» es de la letra B, no de la después"
+0,ort-03,atls,True,9.04,362,C · atribuye al HUV un pasaje de otro manual || C · palabras que no aparecen en la guía citada: circulacion
+0,ort-03,tarjeta,False,4.56,138,después · palabras que no aparecen en los casos: dispuso
+0,fin-03,atls,False,4.41,136,después · palabras que no aparecen en los casos: mantener
+0,fin-03,tarjeta,False,4.48,174,después · palabras que no aparecen en los casos: mantener
+0,fin-04,atls,False,9.48,419,después · «dos casos» no coincide con los casos || después · palabras que no aparecen en los casos: hicieron || después · la oración quedó cortada
+0,fin-04,tarjeta,False,6.56,294,después · la oración quedó cortada
+1,lex-01,atls,False,15.23,507,"B · la oración quedó cortada || después · «tubo de tórax» es de la letra B, no de la después || A · da una orden («debe») en vez de orientar || A · atribuye al HUV un pasaje de otro manual || B · la oración quedó cortada"
+1,lex-01,tarjeta,False,9.27,200,"C · palabras que no aparecen en los casos: circulatorias || después · «hemotórax» es de la letra B, no de la después"
+1,lex-02,atls,True,10.27,225,"C · da una orden («se debe») en vez de orientar || C · palabras que no aparecen en la guía citada: antecedentes, previas || después · da una orden («se debe») en vez de orientar"
+1,lex-02,tarjeta,True,8.08,147,
+1,lex-05,atls,True,8.07,302,"D · palabras que no aparecen en la guía citada: circulacion, oxigeno, respiratoria, saturacion"
+1,lex-05,tarjeta,True,4.8,145,
+1,lex-06,atls,False,9.16,370,C · «un caso» no coincide con los casos || C · no nombra nada de la letra C || D · «un caso» no coincide con los casos || D · no nombra nada de la letra D || después · palabras que no aparecen en los casos: cuatro || C · «irritación peritoneal» no consta en la guía citada
+1,lex-06,tarjeta,False,6.62,275,B · palabras que no aparecen en los casos: respiracion || C · «1 caso» no coincide con los casos || C · no nombra nada de la letra C || D · «1 caso» no coincide con los casos || D · no nombra nada de la letra D
+1,voc-01,atls,True,11.87,343,después · atribuye a la 10.ª edición del ATLS un pasaje de otro manual || después · una oración del apartado de los manuales no cita un manual
+1,voc-01,tarjeta,False,7.18,93,C · «compromiso vascular» no consta en ningún caso recuperado || C · palabras que no aparecen en los casos: sospecha || después · palabras que no aparecen en los casos: sospecha
+1,voc-02,atls,True,4.05,121,
+1,voc-02,tarjeta,True,4.38,160,
+1,voc-03,atls,False,9.05,405,"después · palabras que no aparecen en los casos: dispuso || B · atribuye al HUV un pasaje de otro manual || C · «5» no está en la guía citada || C · «pérdida de conciencia» no consta en la guía citada || C · palabras que no aparecen en la guía citada: circulacion, minutos, oxigeno, saturacion || D · palabras que no aparecen en la guía citada: altura"
+1,voc-03,tarjeta,True,5.57,199,
+1,voc-04,atls,False,11.48,308,x · palabras que no aparecen en los casos: exanguinante || B · atribuye al HUV un pasaje de otro manual
+1,voc-04,tarjeta,True,7.74,119,
+1,abr-01,atls,False,5.52,163,después · palabras que no aparecen en los casos: concomitante
+1,abr-01,tarjeta,True,3.16,31,
+1,abr-02,atls,True,8.27,321,
+1,abr-02,tarjeta,True,4.96,157,
+1,ort-01,atls,True,14.11,397,después · palabras que no aparecen en la guía citada: senala
+1,ort-01,tarjeta,False,8.76,205,"después · «hemotórax» es de la letra B, no de la después || después · «neumotórax» es de la letra B, no de la después"
+1,ort-03,atls,True,8.88,366,C · atribuye al HUV un pasaje de otro manual
+1,ort-03,tarjeta,False,4.51,138,después · palabras que no aparecen en los casos: dispuso
+1,fin-03,atls,False,4.82,168,después · palabras que no aparecen en los casos: mantener
+1,fin-03,tarjeta,False,4.41,168,después · palabras que no aparecen en los casos: mantener
+1,fin-04,atls,True,8.99,371,C · palabras que no aparecen en la guía citada: involucre || después · la oración quedó cortada
+1,fin-04,tarjeta,False,6.34,280,después · «dos casos» no coincide con los casos
+2,lex-01,atls,False,12.36,394,"C · palabras que no aparecen en los casos: inmediato, riesgo || después · «tubo de tórax» es de la letra B, no de la después || A · da una orden («debe») en vez de orientar || A · palabras que no aparecen en la guía citada: aereas || B · atribuye a la 11.ª edición del ATLS un pasaje de otro manual"
+2,lex-01,tarjeta,False,7.99,173,"C · palabras que no aparecen en los casos: circulacion || después · «hemotórax» es de la letra B, no de la después"
+2,lex-02,atls,True,9.55,223,"C · da una orden («deben») en vez de orientar || C · «3» no está en la guía citada || C · «70» no está en la guía citada || C · palabras que no aparecen en la guía citada: centro, comorbilidades"
+2,lex-02,tarjeta,True,7.63,147,
+2,lex-05,atls,False,8.12,330,"D · «déficit neurológico» no consta en ningún caso recuperado || D · palabras que no aparecen en la guía citada: circulacion, oxigeno, respiratoria, saturacion"
+2,lex-05,tarjeta,True,4.74,145,
+2,lex-06,atls,False,10.27,449,"C · «uno de los» no coincide con los casos || C · no nombra nada de la letra C || D · «uno de los» no coincide con los casos || D · no nombra nada de la letra D || después · palabras que no aparecen en los casos: cuatro || C · «40» no está en la guía citada || C · palabras que no aparecen en la guía citada: adicional, aproximadamente || C · «irritación peritoneal» no consta en la guía citada || C · palabras que no aparecen en la guía citada: anormal"
+2,lex-06,tarjeta,False,6.57,279,B · palabras que no aparecen en los casos: respiracion || C · «1 caso» no coincide con los casos || C · no nombra nada de la letra C
+2,voc-01,atls,True,11.3,326,después · atribuye a la 10.ª edición del ATLS un pasaje de otro manual
+2,voc-01,tarjeta,False,6.81,92,"C · «compromiso vascular» no consta en ningún caso recuperado || C · palabras que no aparecen en los casos: sospecha || después · «neumotórax» no consta en ningún caso recuperado || después · palabras que no aparecen en los casos: hematomas || después · «neumotórax» es de la letra B, no de la después"
+2,voc-02,atls,True,4.13,128,
+2,voc-02,tarjeta,True,3.87,121,
+2,voc-03,atls,False,9.02,420,"después · palabras que no aparecen en los casos: dispuso || B · atribuye al HUV un pasaje de otro manual || C · «29» no está en la guía citada || C · «pérdida de conciencia» no consta en la guía citada || C · palabras que no aparecen en la guía citada: circulacion, minutos, politrauma, respiratoria || D · palabras que no aparecen en la guía citada: extremidades"
+2,voc-03,tarjeta,True,5.31,193,
+2,voc-04,atls,False,11.23,310,x · palabras que no aparecen en los casos: exanguinante || B · atribuye al HUV un pasaje de otro manual || C · palabras que no aparecen en la guía citada: grandes
+2,voc-04,tarjeta,True,7.52,119,
+2,abr-01,atls,False,5.92,185,después · palabras que no aparecen en los casos: concomitante
+2,abr-01,tarjeta,True,3.18,31,
+2,abr-02,atls,True,8.24,321,
+2,abr-02,tarjeta,False,5.32,192,"B · «sangrado activo» es de la letra x, no de la B || después · palabras que no aparecen en los casos: aproximadamente"
+2,ort-01,atls,True,12.71,404,
+2,ort-01,tarjeta,True,8.52,206,
+2,ort-03,atls,True,9.04,366,C · atribuye al HUV un pasaje de otro manual || C · palabras que no aparecen en la guía citada: circulacion
+2,ort-03,tarjeta,False,4.6,138,después · palabras que no aparecen en los casos: dispuso
+2,fin-03,atls,False,4.94,168,después · palabras que no aparecen en los casos: mantener
+2,fin-03,tarjeta,False,4.61,172,"después · palabras que no aparecen en los casos: infeccion, mantener"
+2,fin-04,atls,True,10.43,464,C · da una orden («debe») en vez de orientar
+2,fin-04,tarjeta,False,5.31,192,después · «dos casos» no coincide con los casos

@@ -266,6 +266,37 @@ Desde el 24/10 (`PLAN_CHATBOT_CLINICO.md`), con un paciente presentado:
   mecanismo. "Fragmentos de los manuales" muestra la búsqueda usada: «HPAF
   (herida por arma de fuego) en abdomen».
 
+Desde el 24/10 (`PLAN_RESPUESTA_IDEAL.md`), con un paciente cuyo mecanismo
+tiene tarjeta (peatón, ocupante de carro o moto, caída, arma de fuego,
+cortopunzante):
+
+- **Primero va el protocolo** (`TARJETAS=1`): "Protocolo inicial: peatón
+  atropellado", en lugar de la prosa de los manuales.
+  - La lectura del mecanismo ("El accidente auto vs peatón está entre los
+    hallazgos en la escena para sospechar politrauma").
+  - Una lista por letra, de x a E, y "Después de la revisión primaria".
+  - "Lesiones que se esperan", "Además" y, al final, los datos que
+    cambiarían la orientación.
+  - Cada viñeta cita su pasaje en rojo. Las escribió Claude una vez desde el
+    texto de los pasajes (`tarjetas/tarjetas.yaml`), pasan el verificador
+    (`tests/test_tarjetas.py`) y las revisa el médico en la fase 7.
+- **La tarjeta se ajusta a la ficha.** Sin el dato, cada rama va con su rótulo
+  ("*Si está inestable:*", "*Si las ruedas le pasaron por encima:*"). Con el
+  dato, va la que corresponde ("*Está inestable:*") y la letra muestra lo que
+  dice la ficha ("C · Circulación · TA 80/50 · inestable").
+- **Debajo del protocolo, dos desplegables:** "Pasajes que cita el protocolo"
+  (el texto de cada pasaje) y "Otros fragmentos que encontró la búsqueda".
+- **Los casos empiezan con la línea del registro:** "En el registro hay 324
+  casos de peatón atropellado: las regiones más afectadas son miembro inferior
+  (48 %)…". Cuenta todos los casos del registro con ese mecanismo
+  (`scripts/patrones_registro.py`); el modelo escribe solo las letras de los
+  casos recuperados.
+- **Una pregunta concreta no lleva protocolo:** "¿qué dice el ATLS del FAST?" y
+  "¿le hago FAST?" van con la prosa de los pasajes que encontró la búsqueda,
+  como antes.
+- **El peatón tiene su pregunta:** "¿fue un impacto o las ruedas le pasaron
+  por encima?". Con tarjeta, también se pregunta la C, que decide las ramas.
+
 ---
 
 ## 6. Guion sugerido para la demostración
@@ -284,7 +315,9 @@ tenga el modelo entero en la VRAM (100 %) y pasa por el sistema completo:
 - las consultas de la demo (campo `boton` de `eval/consultas.yaml` y
   `eval/consultas_guias.yaml`; la 7, la del ATLS 10, se salta con `ATLS10=0`);
 - la conversación del paso 6 (sección 4), con la ficha y la respuesta anterior
-  como las pasa la app.
+  como las pasa la app;
+- el peatón del paso 6b (sección 5): su protocolo, la pregunta de las ruedas y
+  el botón.
 
 Debe terminar en "Todo listo". Después: `streamlit run app.py`. Al abrir, la
 app precarga los modelos (~30 s, una sola vez) y el modelo queda cargado 2 horas
@@ -292,12 +325,15 @@ app precarga los modelos (~30 s, una sola vez) y el modelo queda cargado 2 horas
 
 En el PC de 8 GB (RTX 4060) corre el reranker para casos y manuales. Cada
 respuesta con las dos fuentes tarda **~9-10 s** (por letras; solo casos, ~5 s).
-Un seguimiento tarda lo mismo: ya no hay una llamada para reescribirlo.
+Con el protocolo de una tarjeta, **~6-7 s**: el modelo escribe solo sobre los
+casos. Un seguimiento tarda lo mismo: ya no hay una llamada para reescribirlo.
 
 **La frase de la reunión: más sofisticado no es más libre.** El asistente
 pregunta como un clínico, ordena como el ATLS y recuerda al paciente, y todo
 sigue citado. Las preguntas, la ficha y el orden los pone el código; el modelo
-solo redacta, y lo que redacta se verifica.
+solo redacta, y lo que redacta se verifica. El protocolo de cada mecanismo lo
+escribió una vez un modelo grande desde los manuales, verificado y para que lo
+revise el médico; el modelo chico escribe solo sobre los casos.
 
 Las consultas ya no son botones de la app: se escriben. Diez minutos, en este orden:
 
@@ -308,18 +344,21 @@ principio es una limitación reconocida; dicho por alguien del público a mitad
 de la demo, es un agujero.
 
 **2 · Caso directo** (1) — *"herida por arma de fuego en tórax con
-hipoventilación"*. Dos miradas: lo que se hizo en casos similares, con
-`[caso: ID]`, y lo que recomiendan los manuales, con `[guía: ID]`.
-- **Las dos van ordenadas como la revisión primaria:** "B · Respiración"
+hipoventilación"*. Dos miradas: lo que recomiendan los manuales, con
+`[guía: ID]`, y lo que se hizo en casos similares, con `[caso: ID]`.
+- **Primero, el protocolo inicial de arma de fuego** (paso 6b): una lista por
+  letra con su cita; con el tórax en la ficha, aparece lo del tórax penetrante.
+- **Los casos van ordenados como la revisión primaria:** "B · Respiración"
   (hipoventilación, tubo de tórax), "C · Circulación", "Después de la revisión
   primaria". La letra de cada cosa la decide el código con una tabla que tiene
   que validar el médico; el modelo solo redacta dentro de cada letra.
 - **Arriba, la ficha** ("Paciente: arma de fuego · tórax · hipoventilación").
   **Abajo, las preguntas** de lo que falta: "C · ¿cómo está
   hemodinámicamente?" y el grupo de edad.
-- **Abre "Casos consultados" y "Fragmentos de los manuales":** el texto
+- **Abre "Casos consultados" y "Pasajes que cita el protocolo":** el texto
   completo de cada caso y de cada pasaje (libro, capítulo, página). **Todo lo
-  que dice la sugerencia se puede comprobar ahí.**
+  que dice la respuesta se puede comprobar ahí.** "Otros fragmentos que encontró
+  la búsqueda" tiene lo demás que trajo la búsqueda en los manuales.
 - Los casos son de hasta 2018 y pueden no coincidir con los manuales: el
   sistema no elige. Dilo tú; en pantalla solo lo dice "Alcance", en la barra
   lateral.
@@ -372,6 +411,29 @@ Para mostrar que se corrige con un clic: escribe *"mujer de 75 años con fractur
 de cadera"*. El código lo toma como **paciente nuevo** y lo dice; si fuera el
 mismo, "Era el mismo paciente" lo rehace. "Paciente nuevo", en la barra lateral,
 empieza de cero.
+
+En los turnos 1 y 2 la respuesta empieza con el **protocolo de arma de fuego**;
+tras el clic, sus ramas cambian a "*Está inestable:*" (transfusión masiva,
+ácido tranexámico, la cirugía con FAST positivo). El turno 3 no lo lleva: es una
+pregunta concreta y la responde la prosa de los manuales.
+
+**6b · El peatón de la respuesta ideal** — *"hombre arrollado por vehiculo
+automotor"*.
+- Arriba, el **protocolo inicial: peatón atropellado**:
+  - por qué es de alto riesgo ("El accidente auto vs peatón está entre los
+    hallazgos en la escena para sospechar politrauma");
+  - una lista por letra, de x a E;
+  - los estudios con sus ramas ("*Si está estable:* TAC corporal total…");
+  - las lesiones que se esperan (parachoques, capó y parabrisas, suelo);
+  - al final, los datos que cambiarían la orientación.
+- Cada viñeta cita su pasaje. "Pasajes que cita el protocolo" tiene el texto de
+  cada uno. **Lo escribió una vez un modelo grande desde esos pasajes, el código
+  lo verificó y lo revisará el médico; el modelo chico solo escribe sobre los
+  casos.** Por eso es más rápido que antes, no más lento.
+- Debajo, los casos empiezan con el registro: "En el registro hay 324 casos de
+  peatón atropellado: miembro inferior (48 %), cráneo (36 %)…".
+- Haz clic en **"Le pasaron por encima"**: aparecen, sin rótulo condicional, el
+  aplastamiento, la rabdomiólisis y la lesión de Morel-Lavallée.
 
 **7 · Caso grave** (4) — *"herida por arma de fuego con desenlace fatal"*.
 Con la barra lateral se puede filtrar por mecanismo, región o desenlace en vivo.
@@ -457,6 +519,9 @@ de trauma, las dos guardas piden más (guarda por señal de trauma,
 | `PREGUNTAS` | encendido | hasta 2 preguntas con botones bajo la respuesta (`rag/preguntas.py`); necesita `CONVERSACION=ficha` |
 | `ORDEN_ATLS` | encendido | la prosa por letras de la revisión primaria (xABCDE) dentro de cada apartado, solo con un paciente (`rag/prioridades.py`) |
 | `PROSA_SIEMPRE_ATLS` | el de `PROSA_SIEMPRE` | por letras: `1` = la letra que no pasa la verificación se muestra igual; `0` = va armada desde su fuente (decisión 3 del plan, 24/10: se deja como `PROSA_SIEMPRE`) |
+| `TARJETAS` | encendido | con un paciente de un mecanismo con tarjeta, el protocolo escrito de antemano va primero, en lugar de la prosa de los manuales, y el modelo escribe solo sobre los casos (`rag/tarjetas.py`, `PLAN_RESPUESTA_IDEAL.md`). `0` = como antes |
+| `TARJETAS_YAML` | `tarjetas/tarjetas.yaml` | las tarjetas; cada viñeta con su cita. Se revisan con `python -m rag.tarjetas` (y `tests/test_tarjetas.py`) contra `guias/secciones.jsonl` |
+| `PATRONES_REGISTRO` | `tarjetas/patrones_registro.json` | los conteos del registro por mecanismo (`scripts/patrones_registro.py`; volver a correrlo si se regenera el corpus) |
 | `UMBRAL_GUIAS` | `0.34` | ruta `rerank`: probabilidad mínima del mejor fragmento para que los libros hablen (0,2 hasta el 19/10). Calibrar con `scripts\calibrar_guias.py` |
 | `UMBRAL_GUIAS_COSENO` | `0.60` | ruta `densa` (sin el reranker en GPU): coseno mínimo del mejor fragmento. Separa mal: con 0,60 frena las 10 fuera de dominio pero deja sin libros a 16 de 25 consultas de trauma |
 

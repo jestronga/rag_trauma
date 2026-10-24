@@ -1,0 +1,265 @@
+# Tarjetas por mecanismo (PLAN_RESPUESTA_IDEAL.md, fase 1): el protocolo inicial
+# de cada mecanismo, redactado una vez desde el texto de los pasajes que cita
+# (guias/secciones.jsonl), no desde la memoria de un modelo.
+#
+# Cada viñeta:
+#   texto  una sola oración, sin punto final ni punto y coma (verificar.py corta
+#          en ellos y una oración sin cita se revisaría contra los casos)
+#   cita   las secciones que la respaldan ([guía: ID])
+#   si     opcional: la condición de la ficha (rag/tarjetas.py, CONDICIONES).
+#          Sin dato, la viñeta va con su rótulo ("Si está inestable: …"); si la
+#          ficha dice lo contrario, no va.
+#
+# tests/test_tarjetas.py pasa cada viñeta por el verificador de la prosa contra
+# su pasaje (palabras, cifras, términos, tono) y comprueba que cada cita exista.
+# Las redactó Claude el 24/10/2026; las valida el médico en la fase 7 de los
+# libros (decisión 2 del plan: se muestran antes).
+
+# La revisión primaria que comparten todas las tarjetas; cada tarjeta suma lo suyo.
+comun:
+  x:
+    - texto: Compresión directa de la herida y, si el sangrado persiste, empaquetamiento con gasas o apósitos hemostáticos
+      cita: [HUV-06-003]
+    - texto: Torniquete en sangrados de extremidades que no se controlan con las maniobras previas, 5 cm proximal a la lesión y anotando la hora de aplicación
+      cita: [HUV-06-003]
+  A:
+    - texto: Oxigenar, despejar la vía aérea y elevar el mentón, manteniendo la columna cervical en posición neutral
+      cita: [HUV-02-003]
+    - texto: Vía aérea definitiva ante apnea, Glasgow de 8 o menos, riesgo de broncoaspiración o incapacidad para mantener oxigenación y ventilación con las maniobras iniciales
+      cita: [HUV-02-003]
+  B:
+    - texto: Identificar neumotórax a tensión, hemotórax masivo, neumotórax abierto y taponamiento cardiaco, con el apoyo del FAST-E, el oxímetro de pulso y la frecuencia respiratoria
+      cita: [HUV-02-003]
+  C:
+    - texto: Con frecuencia cardiaca mayor de 100, considerar al paciente en shock
+      cita: [HUV-02-003]
+    - texto: Buscar sangrado no compresible en tórax, abdomen, retroperitoneo, pelvis y huesos largos con el examen físico, el FAST-E y las Rx de tórax, pelvis y extremidades
+      cita: [HUV-02-003]
+    - texto: Dos catéteres venosos periféricos de gran calibre, con muestras para tipo de sangre y pruebas cruzadas, gases en sangre y lactato
+      cita: [ATLS10-01-013]
+    - texto: En shock severo, activar tempranamente el protocolo de transfusión masiva y, mientras llegan los hemoderivados, líquidos en bolos de 250 cc hasta una TAS entre 80 y 90 mm Hg
+      cita: [HUV-02-003]
+      si: inestable
+    - texto: En las primeras 3 horas del trauma con shock hemorrágico, Ácido Tranexámico 1 g durante 10 minutos y 1 g en infusión por 8 horas
+      cita: [HUV-06-004]
+      si: inestable
+    - texto: Con TCE, la hipotensión permisiva puede resultar en un segundo golpe
+      cita: [HUV-04-013]
+      si: tce
+  D:
+    - texto: Nivel de consciencia con la escala de Glasgow, tamaño pupilar y reacción del paciente, e incapacidad para movilizar las extremidades
+      cita: [HUV-02-003]
+    - texto: Mantener una oxigenación, ventilación y perfusión adecuadas para evitar un daño neurológico secundario
+      cita: [HUV-02-003]
+  E:
+    - texto: Énfasis en la exposición para identificar todas las heridas, laceraciones o hematomas
+      cita: [HUV-04-013]
+    - texto: Al completar la evaluación, cubrir al paciente con mantas calientes y administrar líquidos tibios a 39°C para evitar la hipotermia
+      cita: [HUV-02-003]
+  despues:
+    - texto: Antes del catéter urinario, examinar el perineo y los genitales, porque sangre en el meato uretral o equimosis perineal hacen sospechar una lesión uretral
+      cita: [ATLS10-01-021]
+    - texto: En el paciente estable o respondedor transitorio con politrauma, TAC corporal total sin interrumpir el proceso de resucitación
+      cita: [HUV-06-007]
+      si: estable
+    - texto: Sangre intraabdominal en el FAST en un paciente hemodinámicamente anormal indica la necesidad de una intervención quirúrgica
+      cita: [ATLS10-01-023]
+      si: inestable
+
+# Lo que se repite entre tarjetas (anclas de YAML)
+bloques:
+  pelvis: &pelvis
+    texto: Para el sangrado pélvico severo, compresión pélvica externa mediante sábanas o dispositivos colocados en la pelvis a nivel de los trocánteres mayores
+    cita: [HUV-06-003]
+  rx_cerrado: &rx_cerrado
+    texto: Radiografías AP de tórax y pelvis en el área de reanimación, si no interrumpen el proceso de reanimación
+    cita: [ATLS10-01-023]
+  foley: &foley
+    texto: En heridas con orificios de entrada pequeños y sangrado activo, introducir una sonda Foley e inflar el balón con agua para comprimir el vaso sangrante
+    cita: [HUV-06-003]
+  abc: &abc
+    texto: Candidatos a transfusión masiva con el ABC Score (mecanismo penetrante, PAS ≤ 90 mm Hg, FC ≥ 120 lpm y FAST positivo), con una puntuación de 2 o más
+    cita: [HUV-06-006]
+  abiertas: &abiertas
+    texto: En las fracturas abiertas, antibióticos por vía intravenosa tan pronto como sea posible, ya que el retraso más allá de tres horas se relaciona con mayor riesgo de infección, y profilaxis del tétanos
+    cita: [ATLS10-08-027]
+  clinica: &clinica
+    texto: Guiarse por la condición clínica, porque lo que se ve externamente puede no corresponder con los daños internos
+    cita: [HUV-04-013]
+  antitetanico: &antitetanico
+    texto: Manejo antitetánico y antibióticos en presencia de heridas sucias
+    cita: [HUV-04-013]
+  compartimental: &compartimental
+    texto: El síndrome compartimental es más común en la pierna, el antebrazo, el pie, la mano, la región glútea y el muslo
+    cita: [ATLS10-08-031]
+  laparotomia: &laparotomia
+    texto: Laparotomía con anormalidad hemodinámica, signos de irritación peritoneal o signos de penetración peritoneal como la evisceración
+    cita: [ATLS10-05-020]
+  cuello: &cuello
+    texto: En el cuello, buscar signos duros (sangrado activo, shock, hematoma expansivo, déficit neurológico, herida soplante, hematemesis o hemoptisis)
+    cita: [HUV-09-006]
+    si: region:cuello
+  torax_penetrante: &torax_penetrante
+    texto: En el tórax, la presencia de hallazgos clínicos tiene mucho valor para identificar lesiones pleurales, pero la ausencia de ellos no las descarta
+    cita: [HUV-11-003]
+    si: region:torax
+
+tarjetas:
+  peaton:
+    titulo: peatón atropellado
+    lectura:
+      - texto: El accidente auto vs peatón está entre los hallazgos en la escena para sospechar politrauma
+        cita: [HUV-04-011]
+      - texto: En los accidentes por peatón la probabilidad de lesión en la cabeza es > 70 %, y las lesiones de las extremidades son más frecuentes en peatones (60 % a 70 %)
+        cita: [HUV-04-005]
+    letras:
+      C:
+        - *pelvis
+      despues:
+        - *rx_cerrado
+    patron:
+      - texto: El impacto con el parachoques lesiona la extremidad inferior, el impacto con el capó y el parabrisas la cabeza y el torso, y el impacto con el suelo la cabeza, la columna vertebral y las extremidades
+        cita: [ATLS10-23-010]
+      - texto: Lesión craneal, lesión aórtica traumática, lesiones viscerales abdominales y fracturas de extremidades inferiores o pelvis
+        cita: [ATLS10-01-027]
+      - *compartimental
+      - texto: El aplastamiento produce rabdomiólisis traumática que libera mioglobina y potasio, con daño renal, y un estado isquémico en la extremidad
+        cita: [HUV-04-009]
+        si: aplastamiento
+      - texto: Las lesiones por aplastamiento y degloving internos pueden ser sutiles y se sospechan en base al mecanismo, como la lesión de Morel-Lavallée
+        cita: [ATLS10-08-038]
+        si: aplastamiento
+      - texto: En las lesiones por aplastamiento son frecuentes las fracturas severas de pelvis, y los dispositivos externos estabilizan la pelvis para evitar la muerte por hemorragia
+        cita: [HUV-04-010]
+        si: aplastamiento
+    ademas:
+      - *abiertas
+      - *antitetanico
+      - *clinica
+
+  ocupante:
+    titulo: ocupante de carro o moto
+    lectura:
+      - texto: El accidente vehículo contra moto, en moto o carro > 60 km, la eyección del vehículo y la muerte de un ocupante están entre los hallazgos en la escena para sospechar politrauma
+        cita: [HUV-04-011]
+      - texto: Las lesiones en el tórax son más frecuentes en los accidentes de tránsito por automóvil o motocicleta (60 % a 70 %)
+        cita: [HUV-04-005]
+      - texto: La eyección del vehículo aumenta en gran medida la posibilidad de lesión grave
+        cita: [ATLS10-01-028]
+    letras:
+      C:
+        - *pelvis
+      despues:
+        - *rx_cerrado
+    patron:
+      - texto: En el impacto frontal, fractura de columna cervical, tórax inestable anterior, contusión miocárdica, neumotórax, lesión aórtica traumática, lesión del bazo o el hígado y fractura o luxación posterior de cadera o rodilla
+        cita: [ATLS10-01-027]
+      - texto: En el impacto lateral, esguince cervical contralateral, lesión craneal, tórax batiente lateral, neumotórax, rotura diafragmática, fractura de bazo, hígado o riñón en función del lado de impacto y fractura de pelvis o acetábulo
+        cita: [ATLS10-01-027]
+      - texto: Los motociclistas que salen despedidos hacia delante a menudo caen sobre la columna torácica superior y se fracturan múltiples vértebras torácicas, y las fracturas pélvicas y de huesos largos también son comunes
+        cita: [ATLS10-23-012]
+      - texto: El cinturón de seguridad abdominal puede producir rotura de intestino delgado o colon, lesión pancreática o duodenal y fractura de vértebras lumbares
+        cita: [ATLS10-05-004]
+    ademas:
+      - *abiertas
+      - *clinica
+
+  caida:
+    titulo: caída
+    lectura:
+      - texto: La caída > 6 metros está entre los hallazgos en la escena para sospechar politrauma
+        cita: [HUV-04-011]
+      - texto: La osteopenia y la fragilidad general son factores importantes en la gravedad de la lesión, incluso con caídas de bajo impacto
+        cita: [ATLS10-23-013]
+        si: adulto_mayor
+      - texto: Al caer de pie, la energía se transmite por la extremidad inferior a la pelvis y luego a la columna vertebral
+        cita: [ATLS10-23-013]
+    letras:
+      A:
+        - texto: Basándose en el mecanismo, se supone que existe una lesión de la médula, y el movimiento de la columna cervical se restringe
+          cita: [ATLS10-01-009]
+      C:
+        - *pelvis
+      despues:
+        - *rx_cerrado
+        - texto: TAC corporal total en el trauma cerrado por caídas mayores de 6 metros y en adultos mayores de 70 años
+          cita: [HUV-04-013]
+    patron:
+      - texto: En la caída de altura, lesión craneal, lesión de la columna axial, lesiones viscerales abdominales y fractura de pelvis o acetábulo, incluyendo fracturas del calcáneo
+        cita: [ATLS10-01-027]
+      - texto: Las personas que caen desde una altura corren un riesgo especial de fracturas de la unión toracolumbar, que por lo general son inestables
+        cita: [ATLS10-07-017]
+    ademas:
+      - *abiertas
+      - *clinica
+
+  arma_de_fuego:
+    titulo: herida por arma de fuego
+    lectura:
+      - texto: Un solo orificio de bala en la piel no descarta lesión de múltiples áreas del cuerpo, porque la trayectoria depende de la posición del paciente cuando es herido y puede cambiar al impactar huesos
+        cita: [HUV-04-006]
+      - texto: Con múltiples orificios, primero la condición clínica y la localización de los orificios, y en un segundo tiempo las posibles trayectorias
+        cita: [HUV-04-006]
+      - texto: Las heridas por arma de fuego se consideran penetrantes, a no ser que sea muy evidente un trayecto tangencial
+        cita: [HUV-15-004]
+    letras:
+      x:
+        - *foley
+      C:
+        - *abc
+      despues:
+        - *laparotomia
+        - texto: En pacientes estables con múltiples orificios o trayectos dudosos, TAC corporal total sin interrumpir el proceso de resucitación
+          cita: [HUV-06-007]
+          si: estable
+        - texto: Los pacientes con trauma abdominal penetrante en shock que no responden van inmediatamente al quirófano para control del sangrado
+          cita: [HUV-15-004]
+          si: inestable
+    patron:
+      - texto: En el abdomen, las heridas de bala lesionan más el intestino delgado (50 %), el colon (40 %), el hígado (30 %) y las estructuras vasculares abdominales (25 %)
+        cita: [ATLS10-05-004]
+      - texto: En la extremidad, lesión neurovascular, fracturas y síndrome compartimental
+        cita: [ATLS10-01-027]
+      - texto: Un número impar de heridas sugiere una bala retenida o, menos probable, una lesión tangencial
+        cita: [ATLS10-23-019]
+      - *torax_penetrante
+      - *cuello
+    ademas:
+      - *antitetanico
+      - *clinica
+
+  cortopunzante:
+    titulo: herida por arma cortopunzante
+    lectura:
+      - texto: Toda herida por arma corto punzante es potencialmente mortal, sea su apariencia externa dramática o insignificante
+        cita: [HUV-04-007]
+      - texto: Un tercio de las heridas en el tórax no penetran a la pleura y el 80 % de las que penetran se manejan con un dren pleural sin cirugía
+        cita: [HUV-04-007]
+      - texto: En el abdomen, el 25 % de las heridas no penetran y solo el 40 % de las que penetran al peritoneo requieren cirugía
+        cita: [HUV-04-007]
+    letras:
+      x:
+        - *foley
+      C:
+        - *abc
+      despues:
+        - *laparotomia
+        - texto: En el paciente estable y con abdomen sin hallazgos, definir si la herida es penetrante con la exploración, que identifica si atraviesa la fascia abdominal profunda
+          cita: [HUV-15-004]
+          si: estable
+        - texto: La mayoría de los pacientes que desarrollan signos de irritación peritoneal lo hacen en las primeras 12 horas, y conviene reevaluar periódicamente
+          cita: [HUV-15-004]
+    patron:
+      - texto: En el abdomen, las puñaladas lesionan más el hígado (40 %), el intestino delgado (30 %), el diafragma (20 %) y el colon (15 %)
+        cita: [ATLS10-05-004]
+      - texto: En el tórax anterior, taponamiento cardíaco si la herida está dentro de la caja, hemotórax, neumotórax o hemoneumotórax
+        cita: [ATLS10-01-027]
+      - texto: En la región toracoabdominal izquierda, lesión de diafragma izquierda, lesión del bazo o hemoneumotórax
+        cita: [ATLS10-01-027]
+      - texto: El diagnóstico clínico de una herida de diafragma es supremamente difícil y no existe un signo patognomónico
+        cita: [HUV-14-004]
+      - *torax_penetrante
+      - *cuello
+    ademas:
+      - *antitetanico
+      - *clinica

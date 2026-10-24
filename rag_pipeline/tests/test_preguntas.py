@@ -27,7 +27,9 @@ def claves(texto: str, casos=(), abstuvo: bool = False) -> list[str]:
     ("lesión ocular penetrante en adulto", []),                      # el ojo solo no pide la C
     ("¿cuándo se pone un tubo de tórax?", []),                        # no hay paciente
 ])
-def test_que_se_pregunta(texto, esperadas):
+def test_que_se_pregunta(texto, esperadas, monkeypatch):
+    # las reglas de la fase 3; con tarjeta se suman las suyas (tests/test_tarjetas.py)
+    monkeypatch.setattr(config, "TARJETAS", False)
     assert claves(texto) == esperadas
 
 

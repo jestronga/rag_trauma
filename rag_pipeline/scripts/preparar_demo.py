@@ -19,7 +19,12 @@ Qué revisa:
      app: "HPAF en abdomen" → el botón "Hipotenso o en choque" → "¿qué dice el
      ATLS del FAST?". Que la ficha siga al paciente, que salga la pregunta y su
      respuesta se sume, que se diga qué cambió y que la respuesta vaya por
-     letras (xABCDE).
+     letras (xABCDE). Con TARJETAS, que los dos primeros turnos traigan el
+     protocolo y el del FAST no (es una pregunta concreta).
+  5. El peatón de la respuesta ideal (PLAN_RESPUESTA_IDEAL.md): "hombre
+     arrollado por vehiculo automotor" → su tarjeta y la pregunta de si las
+     ruedas pasaron por encima → el botón "Le pasaron por encima" → la tarjeta
+     con lo del aplastamiento.
 
 Al final deja el modelo cargado (KEEP_ALIVE) para que la primera pregunta de
 la demo no espere la carga.
@@ -44,6 +49,7 @@ from rag.generate import (_ollama, ollama_disponible, porcentaje_gpu, responder,
                           usar_guias)
 from rag.retrieve import (dispositivo_reranker, libros_indexados, ruta_guias_por_defecto,  # noqa: E402
                           ruta_por_defecto, umbral_guias, vram_gb)
+from rag.tarjetas import cargar as cargar_tarjetas                           # noqa: E402
 
 OK, MAL, AVISO = "  [ok]", "  [!!]", "  [ ?]"
 
@@ -82,6 +88,17 @@ def main() -> int:
         # la respuesta por letras (fase 4)
         print(f"{OK} respuesta: " + ("por letras de la revisión primaria (xABCDE) dentro de cada apartado, "
                                      "con un paciente" if config.ORDEN_ATLS else "prosa de siempre (ORDEN_ATLS=0)"))
+        # las tarjetas por mecanismo (PLAN_RESPUESTA_IDEAL.md)
+        if config.TARJETAS:
+            tarjetas = cargar_tarjetas()
+            print(f"{OK if tarjetas else MAL} tarjetas por mecanismo: {len(tarjetas)} "
+                  f"({', '.join(t.titulo for t in tarjetas.values()) or f'no encuentro {config.TARJETAS_YAML}'})")
+            problemas += not tarjetas
+            if not config.PATRONES_REGISTRO.exists():
+                print(f"{AVISO} sin {config.PATRONES_REGISTRO.name}: los casos van sin la línea del registro. "
+                      f"Correr: python scripts\\patrones_registro.py")
+        else:
+            print(f"{AVISO} TARJETAS=0: los manuales van en prosa del modelo, sin el protocolo del mecanismo")
         # la consulta de los manuales (PLAN_CHATBOT_CLINICO.md, fase 1)
         if config.ABREV_LIBROS and not diccionario():
             print(f"{AVISO} ABREV_LIBROS=1 pero no encuentro {config.ABREVIATURAS_YAML}: "
@@ -154,7 +171,8 @@ def main() -> int:
         if r.abstuvo:
             detalle = f"se abstiene (coseno {r.confianza:.3f})"
         else:
-            fuentes = " + ".join(n for n, hay in (("casos", r.casos), ("manuales", r.guias)) if hay)
+            fuentes = " + ".join(n for n, hay in ((f"protocolo ({r.tarjeta})", r.tarjeta), ("casos", r.casos),
+                                                  ("manuales", r.guias and not r.tarjeta)) if hay)
             en_prosa = " + ".join({"casos": "casos", "guias": "manuales"}[n] for n in r.fuentes_en_prosa)
             if r.prosa_verificada:
                 detalle = f"{fuentes} · prosa verificada"
@@ -181,6 +199,11 @@ def main() -> int:
     else:
         problemas += secuencia_guion()
         problemas += conversacion_demo(con_guias)
+        print("\n5 · El peatón de la respuesta ideal (tarjeta y su pregunta)")
+        if not (config.TARJETAS and con_guias and config.PREGUNTAS):
+            print(f"{AVISO} se salta: necesita TARJETAS, los manuales y PREGUNTAS")
+        else:
+            problemas += peaton_demo()
 
     print(f"\n{'Todo listo' if not problemas else f'{problemas} problema(s): ver arriba'}. "
           f"Abrir el chatbot desde rag_pipeline\\: streamlit run app.py")
@@ -198,12 +221,16 @@ GUION = [
     ("hipotenso o en choque", "seguimiento"),                                 # 6, el botón
     ("¿qué dice el ATLS del FAST?", "seguimiento"),                           # 6
     ("mujer de 75 años con fractura de cadera", "nuevo"),                     # 6, la corrección
+    ("hombre arrollado por vehiculo automotor", "nuevo"),                     # 6b
+    ("las ruedas le pasaron por encima", "seguimiento"),                      # 6b, el botón
     ("herida por arma de fuego con desenlace fatal en sala de urgencias", "nuevo"),   # 7
     ("Paciente nuevo", None),                                                 # 7a, el botón
     ("cuándo activar el protocolo de transfusión masiva", "nuevo"),           # 7a
     ("TCE leve con pérdida de conciencia transitoria", "nuevo"),              # 7b
     ("manejo de cetoacidosis diabética en urgencias", "nuevo"),               # 8
 ]
+# las respuestas de los botones (rag/preguntas.py): la app las manda como seguimiento
+BOTONES = {"hipotenso o en choque", "las ruedas le pasaron por encima"}
 
 
 def secuencia_guion() -> int:
@@ -215,7 +242,7 @@ def secuencia_guion() -> int:
         if esperado is None:
             ficha = None
             continue
-        forzar = "seguimiento" if texto == "hipotenso o en choque" else None   # el clic
+        forzar = "seguimiento" if texto in BOTONES else None                   # el clic
         tipo, ficha = actualizar(ficha, texto, forzar)
         if tipo != esperado:
             fallos.append(f"«{texto}»: {tipo}, se esperaba {esperado}")
@@ -259,8 +286,12 @@ def conversacion_demo(con_guias: bool) -> int:
         fallos.append(f"no sale la pregunta C con «{RESPUESTA_C}»: {[p.clave for p in r1.preguntas]}")
     if config.ORDEN_ATLS and not r1.orden_atls:
         fallos.append("la respuesta no va por letras (ORDEN_ATLS)")
+    con_tarjeta = config.TARJETAS and con_guias
+    if con_tarjeta and r1.tarjeta != "arma_de_fuego":
+        fallos.append(f"no trae el protocolo de arma de fuego (tarjeta {r1.tarjeta})")
     problemas += _turno("a · " + TURNO_1, s, r1, fallos,
-                        f"{r1.ficha.linea() if r1.ficha else ''} · preguntas {[p.clave for p in r1.preguntas]}")
+                        f"{r1.ficha.linea() if r1.ficha else ''} · preguntas {[p.clave for p in r1.preguntas]}"
+                        + (f" · protocolo {r1.tarjeta}" if r1.tarjeta else ""))
     if fallos or not config.PREGUNTAS:
         if not config.PREGUNTAS:
             print(f"{AVISO} PREGUNTAS=0: el turno b (el botón) se salta")
@@ -278,6 +309,8 @@ def conversacion_demo(con_guias: bool) -> int:
         fallos.append("no dice qué cambió respecto de la respuesta anterior")
     if any(p.clave == "C" for p in r2.preguntas):
         fallos.append("vuelve a preguntar la C")
+    if con_tarjeta and not (r2.tarjeta and "*Está inestable:*" in r2.secciones[0].texto):
+        fallos.append("el protocolo no se ajustó al paciente inestable")
     problemas += _turno(f"b · botón «{RESPUESTA_C}»", s, r2, fallos, r2.cambio or "")
 
     t0 = time.perf_counter()
@@ -293,8 +326,49 @@ def conversacion_demo(con_guias: bool) -> int:
         fallos.append("los manuales no responden la pregunta del FAST")
     if r3.ficha and "ecografía / FAST" in r3.ficha.afirmados:
         fallos.append("tomó la pregunta por el FAST como un hecho")
+    if r3.tarjeta:
+        fallos.append("una pregunta concreta (el FAST) no lleva el protocolo, sino la prosa de los manuales")
     libros = sorted({f.fuente for f in r3.guias})
     problemas += _turno("c · " + TURNO_3, s, r3, fallos, f"busca «{busqueda}» · manuales {libros}")
+    return problemas
+
+
+# El peatón de la respuesta ideal (SETUP.md §6, paso 6b; PLAN_RESPUESTA_IDEAL.md)
+PEATON = "hombre arrollado por vehiculo automotor"
+RESPUESTA_RUEDAS = "Le pasaron por encima"      # el botón de la pregunta del peatón
+
+
+def peaton_demo() -> int:
+    """La tarjeta del peatón y su pregunta, como en la app. Devuelve cuántos turnos fallan."""
+    problemas = 0
+    t0 = time.perf_counter()
+    r1 = responder(PEATON)
+    s = time.perf_counter() - t0
+    fallos = []
+    if r1.abstuvo or r1.tarjeta != "peaton":
+        fallos.append(f"no trae el protocolo del peatón (tarjeta {r1.tarjeta}, abstuvo {r1.abstuvo})")
+    pregunta = next((p for p in r1.preguntas if p.clave == "aplastamiento"), None)
+    opcion = next((o for o in pregunta.opciones if o.etiqueta == RESPUESTA_RUEDAS), None) if pregunta else None
+    if opcion is None:
+        fallos.append(f"no pregunta si las ruedas pasaron por encima: {[p.clave for p in r1.preguntas]}")
+    if r1.citas_invalidas:
+        fallos.append(f"citas inválidas {r1.citas_invalidas}")
+    protocolo = r1.secciones[0].texto if r1.secciones else ""
+    letras = sum(f"**{l} · " in protocolo for l in "xABCDE")
+    problemas += _turno("a · " + PEATON, s, r1, fallos,
+                        f"protocolo con {letras} letras y {len({f.seccion_id for f in r1.pasajes_tarjeta})} "
+                        f"pasajes · preguntas {[p.clave for p in r1.preguntas]}")
+    if fallos:
+        return problemas
+    t0 = time.perf_counter()
+    r2 = responder(opcion.mensaje, ficha=r1.ficha, anterior=r1, tipo="seguimiento")    # el clic
+    s = time.perf_counter() - t0
+    fallos = []
+    if r2.tarjeta != "peaton" or "*Las ruedas le pasaron por encima:*" not in r2.secciones[0].texto:
+        fallos.append("el protocolo no muestra lo del aplastamiento")
+    if any(p.clave == "aplastamiento" for p in r2.preguntas):
+        fallos.append("vuelve a preguntar si las ruedas pasaron por encima")
+    problemas += _turno(f"b · botón «{RESPUESTA_RUEDAS}»", s, r2, fallos, r2.ficha.linea() if r2.ficha else "")
     return problemas
 
 
