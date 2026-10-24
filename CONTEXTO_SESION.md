@@ -88,6 +88,17 @@ está en `SETUP.md` §6. Al armarlo se vio que, en un solo chat, cada consulta s
 sumaba al paciente anterior; ahora una presentación nueva o una consulta
 general sin trauma empiezan de cero.
 
+**Diseño minimalista el 24/10** (pedido del usuario, con la paleta de siempre):
+- al abrir, un saludo y el cuadro de la consulta en el centro;
+- en la conversación, la consulta en una burbuja a la derecha y la respuesta sin
+  avatares;
+- la barra lateral abre cerrada.
+
+Se revisó con capturas de Edge sin ventana. En ellas se vio una "B ·
+Respiración" que no hablaba de respiración. Ahora un texto de una letra
+primaria tiene que nombrar algo de esa letra para pasar la verificación; con
+`PROSA_SIEMPRE_ATLS=1` se muestra igual (decisión 3).
+
 **Pendientes del plan del chatbot:**
 - el médico: la pertinencia de las preguntas (`reports/probar_preguntas.csv`)
   y la tabla de letras (`prioridades.DUDOSOS`);

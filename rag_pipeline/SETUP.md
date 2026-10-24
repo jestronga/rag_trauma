@@ -202,10 +202,18 @@ $env:RUTA="rrf"
 streamlit run app.py
 ```
 
-Abre `http://localhost:8501`. La barra lateral permite cambiar de ruta, ajustar
-el umbral de abstención, encender o apagar los manuales (interruptor "Manuales
-de trauma") y filtrar los casos por mecanismo, región y desenlace en vivo —
-útil para responder preguntas durante la demostración sin salir de la interfaz.
+Abre `http://localhost:8501`. Desde el 24/10 el diseño es minimalista:
+- **Al abrir:** un saludo ("✚ Buenas tardes") y el cuadro de la consulta en el
+  centro.
+- **En la conversación:** la consulta va en una burbuja a la derecha y la
+  respuesta como texto, sin avatares.
+- **Siempre:** la paleta de siempre (blanco, rojo y rosa).
+
+La barra lateral abre cerrada (la flecha `»` arriba a la izquierda). Ahí están:
+- la ruta, el umbral de abstención y el interruptor "Manuales de trauma";
+- los filtros por mecanismo, región y desenlace, en vivo, útiles para responder
+  preguntas durante la demostración sin salir de la interfaz;
+- "Paciente nuevo" y "Limpiar conversación".
 
 Cada respuesta va en dos apartados, uno debajo del otro:
 

@@ -584,10 +584,15 @@ def verificar_atls(datos: dict, casos: list[Resultado], consulta: str, guias: li
             # en cualquiera; lo de otra letra primaria, no (medido el 24/10: la
             # regla estricta rechazaba esa oración, y "laparotomía" es también
             # "cirugía" para el léxico)
-            nombrados = {x for ts in terminos(RX_CITA.sub(" ", t.texto)).values() for x in ts} - de_consulta
+            todos = {x for ts in terminos(RX_CITA.sub(" ", t.texto)).values() for x in ts}
+            nombrados = todos - de_consulta
             t.motivos += [f"«{x}» es de la letra {letra_termino(x)}, no de la {t.letra}"
                           for x in sorted(nombrados)
                           if letra_termino(x) != t.letra and letra_termino(x) != DESPUES]
+            # y nombra algo de su letra: "B · …signos de irritación peritoneal" no
+            # dice nada de la respiración (visto el 24/10 en la app)
+            if t.letra != DESPUES and not any(letra_termino(x) == t.letra for x in todos):
+                t.motivos.append(f"no nombra nada de la letra {t.letra}")
         else:
             t.motivos += v.motivos_guias
             if v.oraciones_casos:

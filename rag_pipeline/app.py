@@ -12,6 +12,7 @@ import html
 import re
 import time
 import warnings
+from datetime import datetime
 
 import streamlit as st
 
@@ -29,42 +30,64 @@ from rag.guias import cargar_perfiles, equivalentes_atls11      # noqa: E402
 from rag.hallazgos import resaltar_html                        # noqa: E402
 from rag.retrieve import RUTAS, Filtros, hay_guias, ruta_por_defecto  # noqa: E402
 
-st.set_page_config(page_title="Asistente Clínico de Trauma",
-                   page_icon="🩺", layout="wide")
+st.set_page_config(page_title="Asistente Clínico de Trauma", page_icon="🩺",
+                   layout="centered", initial_sidebar_state="collapsed")
 
 CON_FICHA = config.CONVERSACION == "ficha"      # PLAN_CHATBOT_CLINICO.md, fase 2
 
+# Diseño minimalista (24/10, pedido del usuario): al abrir, un saludo y el cuadro
+# de la consulta en el centro; en la conversación, sin avatares, la consulta en
+# una burbuja a la derecha y la respuesta como texto. La paleta es la de
+# siempre (.streamlit/config.toml): blanco, rojo #C8102E y rosa #FCEEEF; azul
+# para los manuales y la ficha, ocre para las notas de verificación.
 CSS = """
 <style>
-  .cabecera { display:flex; gap:16px; align-items:center; padding:18px 22px;
-              border-left:6px solid #C8102E; border-radius:10px; background:#FCEEEF;
-              margin-bottom:18px; }
-  .cabecera h1 { color:#C8102E; margin:0; padding:0; font-size:2rem; }
-  .cab-icono { flex:none; width:54px; height:54px; border-radius:50%; background:#C8102E;
-               color:#FFFFFF; font-size:1.9rem; display:flex; align-items:center;
-               justify-content:center; }
-  .cab-lema { font-size:1.1rem; opacity:.8; margin:2px 0 0; }
-  .bienvenida { display:flex; flex-wrap:wrap; gap:12px; margin:6px 0 10px; }
-  .bv-item { flex:1 1 220px; padding:12px 14px; border-radius:8px; font-size:0.98rem;
-             border:1px solid rgba(200,16,46,.22); line-height:1.45; }
-  .bv-item b { color:#C8102E; }
-  .stChatMessage { font-size: 1.05rem; line-height: 1.6; }
-  .stChatInput textarea { font-size: 1.05rem; }
-  .caso-box { border:1px solid rgba(128,128,128,.28); border-radius:8px;
-              padding:10px 12px; margin-bottom:10px; font-size:0.95rem; line-height:1.55; }
+  :root { --rojo:#C8102E; --rosa:#FCEEEF; --azul:#1F6FB2; --ocre:#B26B00;
+          --borde:rgba(31,31,31,.12); --tenue:rgba(31,31,31,.55); }
+  [data-testid="stHeader"] { background:transparent; }
+  [data-testid="stAppDeployButton"], [data-testid="stDecoration"] { display:none; }
+  [data-testid="stMainBlockContainer"] { max-width:780px; padding-top:2.5rem; padding-bottom:6rem; }
+
+  /* la portada: saludo y consulta en el centro */
+  .saludo { text-align:center; margin:18vh 0 1.6rem; font-family:Georgia,"Times New Roman",serif;
+            font-size:2.6rem; font-weight:400; letter-spacing:-.01em; color:#1F1F1F; }
+  .saludo .marca { color:var(--rojo); margin-right:.3em; }
+  .al-pie { text-align:center; color:var(--tenue); font-size:.85rem; margin-top:.9rem; }
+
+  /* el cuadro de la consulta */
+  [data-testid="stChatInput"], [data-testid="stChatInput"] > div { border-radius:18px; }
+  [data-testid="stChatInput"] { box-shadow:0 1px 8px rgba(0,0,0,.06); }
+  [data-testid="stChatInput"] textarea { font-size:1.05rem; }
+  [data-testid="stBottom"] > div { background:#FFFFFF; }
+
+  /* la conversación: sin avatares; la consulta, en una burbuja a la derecha */
+  [data-testid="stChatMessageAvatarUser"], [data-testid="stChatMessageAvatarAssistant"] { display:none; }
+  [data-testid="stChatMessage"] { background:transparent; padding:.2rem 0; gap:0;
+                                  font-size:1.05rem; line-height:1.6; }
+  [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
+      background:var(--rosa); border-radius:18px; padding:.55rem 1.1rem; margin:1.4rem 0 .6rem auto;
+      width:fit-content; max-width:85%; }
+  [data-testid="stChatMessageContent"] h3 { font-size:1.15rem; font-weight:600; margin:1.1rem 0 .3rem; }
+  [data-testid="stExpander"] details { border:1px solid var(--borde); border-radius:12px; }
+
+  .caso-box { border:1px solid var(--borde); border-radius:12px;
+              padding:10px 14px; margin-bottom:10px; font-size:0.95rem; line-height:1.55; }
   .caso-id  { font-weight:600; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
-  .etq { display:inline-block; padding:1px 7px; border-radius:10px; font-size:0.82rem;
-         border:1px solid rgba(128,128,128,.35); margin:2px 3px 2px 0; }
+  .etq { display:inline-block; padding:1px 8px; border-radius:10px; font-size:0.82rem;
+         background:rgba(31,31,31,.05); margin:2px 3px 2px 0; }
   .caso-box mark { background:rgba(255,200,0,.35); color:inherit; padding:0 2px; border-radius:3px; }
-  .guia-box { border-left:4px solid #1F6FB2; }
-  .nota { font-size:0.95rem; padding:8px 12px; margin-bottom:10px; border-radius:6px;
-          border-left:4px solid #B26B00; background:rgba(178,107,0,.08); line-height:1.45; }
-  .nota.ficha { border-left-color:#1F6FB2; background:rgba(31,111,178,.08); }
-  .tiempo { font-size:0.8rem; opacity:.45; text-align:right; margin-top:2px;
+  .guia-box { border-left:3px solid var(--azul); }
+  .nota { font-size:0.93rem; padding:8px 12px; margin-bottom:10px; border-radius:10px;
+          border-left:3px solid var(--ocre); background:rgba(178,107,0,.06); line-height:1.45; }
+  .nota.ficha { border-left-color:var(--azul); background:rgba(31,111,178,.06); }
+  .tiempo { font-size:0.75rem; color:var(--tenue); opacity:.7; text-align:right; margin-top:2px;
             font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
   .aviso { font-size:0.9rem; opacity:.75; line-height:1.45; }
+  .marca-lateral { font-family:Georgia,"Times New Roman",serif; font-size:1.25rem; margin-bottom:.4rem; }
+  .marca-lateral span { color:var(--rojo); margin-right:.3em; }
 </style>
 """
+PLACEHOLDER = "Describa el paciente: mecanismo, región y hallazgos"
 st.markdown(CSS, unsafe_allow_html=True)
 
 
@@ -122,6 +145,8 @@ with st.spinner("Cargando modelos (solo la primera vez, ~30 s)…"):
 # Barra lateral
 # ---------------------------------------------------------------------------
 with st.sidebar:
+    st.markdown("<div class='marca-lateral'><span>✚</span>Asistente Clínico de Trauma</div>",
+                unsafe_allow_html=True)
     st.markdown("### Configuración")
 
     ok_ollama, msg_ollama = ollama_disponible()
@@ -208,33 +233,25 @@ if "mensajes" not in st.session_state:
 if "ficha" not in st.session_state:
     st.session_state.ficha = None
 
-st.markdown(
-    f"<div class='cabecera'>"
-    f"<div class='cab-icono'>✚</div>"
-    f"<div><h1>Asistente Clínico de Trauma</h1>"
-    f"<div class='cab-lema'>Apoyo al diagnóstico basado en casos similares del registro de trauma"
-    f"{' y en los manuales ATLS y HUV' if con_guias else ''}</div>"
-    f"</div></div>",
-    unsafe_allow_html=True,
-)
 
-if not st.session_state.mensajes:
-    revise = ("Qué valorar y qué se hizo en los casos similares, y qué recomiendan los manuales, "
-              "con la cita de cada afirmación." if con_guias else
-              "Qué valorar y qué se hizo en los casos similares, con la cita de cada uno.")
-    verifique = ("El texto completo de cada caso y de cada pasaje está en «Casos consultados» y "
-                 "«Fragmentos de los manuales»." if con_guias else
-                 "El texto completo de cada caso está en «Casos consultados».")
-    st.markdown(
-        "<div class='bienvenida'>"
-        "<div class='bv-item'><b>1 · Describa el caso</b><br>Mecanismo, región y hallazgos: "
-        "«herida por arma cortopunzante en abdomen con irritación peritoneal».</div>"
-        f"<div class='bv-item'><b>2 · Revise la sugerencia</b><br>{revise}</div>"
-        f"<div class='bv-item'><b>3 · Verifique el origen</b><br>{verifique} "
-        "También acepta un número de caso.</div>"
-        "</div>",
-        unsafe_allow_html=True,
-    )
+def saludo() -> str:
+    hora = datetime.now().hour
+    return "Buenos días" if hora < 12 else "Buenas tardes" if hora < 19 else "Buenas noches"
+
+
+def portada():
+    """Antes de la primera consulta: el saludo y el cuadro de la consulta en el
+    centro, y una línea con las fuentes. Devuelve lo escrito y el lugar, para
+    quitarla en cuanto llega la consulta."""
+    lugar = st.empty()
+    with lugar.container():
+        st.markdown(f"<div class='saludo'><span class='marca'>✚</span>{saludo()}</div>",
+                    unsafe_allow_html=True)
+        escrita = st.chat_input(PLACEHOLDER, key="consulta_portada")
+        fuentes = "Casos del registro y manuales ATLS y HUV" if con_guias else "Casos del registro"
+        st.markdown(f"<div class='al-pie'>{fuentes}, con la cita de cada afirmación · "
+                    f"no reemplaza el juicio clínico</div>", unsafe_allow_html=True)
+    return escrita, lugar
 
 
 def aviso_respuesta(respuesta) -> str:
@@ -547,11 +564,17 @@ boton_corregir()
 # ---------------------------------------------------------------------------
 # Turno
 # ---------------------------------------------------------------------------
-escrita = st.chat_input("Ej.: varón joven con herida por arma cortopunzante en cuello, estable")
-# el botón de corregir repite la última pregunta con el tipo corregido
+# Sin conversación, la portada (el cuadro en el centro); con ella, el cuadro abajo.
+if st.session_state.mensajes or "repetir" in st.session_state:
+    escrita, lugar_portada = st.chat_input(PLACEHOLDER, key="consulta"), None
+else:
+    escrita, lugar_portada = portada()
+# el botón de corregir y las preguntas repiten o suman una consulta
 pregunta, forzar = (escrita, None) if escrita else st.session_state.pop("repetir", (None, None))
 
 if pregunta:
+    if lugar_portada is not None:
+        lugar_portada.empty()
     st.session_state.mensajes.append({"role": "user", "content": pregunta})
     pintar("user", pregunta)
 
@@ -591,5 +614,6 @@ if pregunta:
         {"role": "assistant", "content": texto, "respuesta": r, "segundos": segundos,
          "consulta": pregunta, "ficha_previa": ficha_previa}
     )
-    if CON_FICHA:
-        st.rerun()           # el botón de corregir y la ficha de la barra lateral, al día
+    # el cuadro de la consulta abajo (tras la portada), el botón de corregir, las
+    # preguntas y la ficha de la barra lateral, al día
+    st.rerun()

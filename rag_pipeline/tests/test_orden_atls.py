@@ -101,6 +101,10 @@ def test_lo_que_nombra_un_texto_es_de_su_letra(casos, guias):
     # lo que se hizo, de "después", pasa en una letra primaria
     datos = {"casos": {"C": "En casos con hipotensión se hizo transfusión y sutura [caso: 101]."}}
     assert generate.verificar_atls(datos, casos, CONSULTA, guias, letras)[0].motivos == []
+    # pero una letra primaria tiene que nombrar algo suyo
+    datos = {"casos": {"B": "En casos similares se hizo sutura [caso: 101] [caso: 102] [caso: 103]."}}
+    assert generate.verificar_atls(datos, casos, CONSULTA, guias, letras)[0].motivos == \
+        ["no nombra nada de la letra B"]
     # el texto de los manuales va en la letra del pasaje que cita (la decide el código)
     assert ("guias", "C") not in textos and textos[("guias", "B")].motivos == []
     assert textos[("guias", DESPUES)].motivos == []
