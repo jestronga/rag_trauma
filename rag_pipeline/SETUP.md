@@ -384,10 +384,11 @@ hay búsqueda densa y no solo por palabras.
 parietal"*.
 - Los casos la entienden porque el corpus trae las abreviaturas expandidas.
 - Desde el 24/10, los manuales también: su búsqueda se hace con «HPAF (herida
-  por arma de fuego) en cráneo…». Ábrelo en "Fragmentos de los manuales": dice
-  la búsqueda usada.
-- **Ojo:** los pasajes que llegan son del HUV sobre arma de fuego en general y
-  trauma penetrante de tórax y abdomen, no de cráneo. "Herida por arma de
+  por arma de fuego) en cráneo…». Arriba va el protocolo de arma de fuego; la
+  búsqueda usada se ve en "Otros fragmentos que encontró la búsqueda" (los
+  pasajes que el protocolo no cita).
+- **Ojo:** esos pasajes son del HUV sobre el manejo definitivo y el trauma
+  penetrante de tórax, no de cráneo. "Herida por arma de
   fuego" pesa más que "cráneo", porque la búsqueda está en español y lo del
   cráneo está en el ATLS 11, en inglés. Si alguien lo pregunta, esa es la
   respuesta.
