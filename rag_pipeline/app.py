@@ -12,7 +12,6 @@ import html
 import re
 import time
 import warnings
-from datetime import datetime
 
 import streamlit as st
 
@@ -21,23 +20,25 @@ warnings.filterwarnings("ignore")
 from rag import config                                    # noqa: E402
 from rag.consulta import para_libros                           # noqa: E402
 from rag.build_prompt import (                                 # noqa: E402
-    RX_LINEA_RESPALDO, agrupar_guias, cabecera_guia, desenlace_visible, texto_guia,
+    AVISO_ATLS10, RX_LINEA_RESPALDO, agrupar_guias, cabecera_guia, desenlace_visible, texto_guia,
 )
 from rag.ficha import RX_CASO, unir                            # noqa: E402
-from rag.preguntas import descartar                            # noqa: E402
+from rag.preguntas import NO_SE_SABE, descartar                # noqa: E402
+from rag.tarjetas import ROTULO_PRIORIDAD                      # noqa: E402
 from rag.generate import ollama_disponible, responder, resumir_caso, usar_guias   # noqa: E402
 from rag.guias import cargar_perfiles, equivalentes_atls11      # noqa: E402
 from rag.hallazgos import resaltar_html                        # noqa: E402
 from rag.retrieve import RUTAS, Filtros, hay_guias, ruta_por_defecto  # noqa: E402
 
-st.set_page_config(page_title="Asistente Clínico de Trauma", page_icon="🩺",
-                   layout="centered", initial_sidebar_state="collapsed")
+TITULO = "Asistente Clínico de Trauma"
+st.set_page_config(page_title=TITULO, page_icon="🩺", layout="centered", initial_sidebar_state="collapsed")
 
 CON_FICHA = config.CONVERSACION == "ficha"      # PLAN_CHATBOT_CLINICO.md, fase 2
 
-# Diseño minimalista (24/10, pedido del usuario): al abrir, un saludo y el cuadro
-# de la consulta en el centro; en la conversación, sin avatares, la consulta en
-# una burbuja a la derecha y la respuesta como texto. La paleta es la de
+# Diseño minimalista (24/10, pedido del usuario): al abrir, el título (desde el
+# 26/10, siempre el mismo; antes un saludo según la hora) y el cuadro de la
+# consulta en el centro; en la conversación, sin avatares, la consulta en una
+# burbuja a la derecha y la respuesta como texto. La paleta es la de
 # siempre (.streamlit/config.toml): blanco, rojo #C8102E y rosa #FCEEEF; azul
 # para los manuales y la ficha, ocre para las notas de verificación.
 CSS = """
@@ -48,10 +49,10 @@ CSS = """
   [data-testid="stAppDeployButton"], [data-testid="stDecoration"] { display:none; }
   [data-testid="stMainBlockContainer"] { max-width:780px; padding-top:2.5rem; padding-bottom:6rem; }
 
-  /* la portada: saludo y consulta en el centro */
-  .saludo { text-align:center; margin:18vh 0 1.6rem; font-family:Georgia,"Times New Roman",serif;
+  /* la portada: título y consulta en el centro */
+  .titulo { text-align:center; margin:18vh 0 1.6rem; font-family:Georgia,"Times New Roman",serif;
             font-size:2.6rem; font-weight:400; letter-spacing:-.01em; color:#1F1F1F; }
-  .saludo .marca { color:var(--rojo); margin-right:.3em; }
+  .titulo .marca { color:var(--rojo); margin-right:.3em; }
   .al-pie { text-align:center; color:var(--tenue); font-size:.85rem; margin-top:.9rem; }
 
   /* el cuadro de la consulta */
@@ -85,7 +86,154 @@ CSS = """
   .aviso { font-size:0.9rem; opacity:.75; line-height:1.45; }
   .marca-lateral { font-family:Georgia,"Times New Roman",serif; font-size:1.25rem; margin-bottom:.4rem; }
   .marca-lateral span { color:var(--rojo); margin-right:.3em; }
+  /* las preguntas con botones, bajo la última respuesta (app.eleccion, 26/10):
+     en una tarjeta; el tema de cada pregunta, una línea pequeña en rojo encima;
+     los botones, blancos, y al pasar, rojo sobre rosa */
+  .st-key-eleccion { border:1px solid var(--borde); border-radius:16px; background:#FFFFFF;
+                     padding:1rem 1.25rem 1.1rem; margin-top:.6rem; gap:.95rem; }
+  .eleccion-titulo { font-size:.8rem; color:var(--tenue); letter-spacing:.03em; margin-bottom:.45rem; }
+  .st-key-eleccion [data-testid="stWidgetLabel"] p { font-size:1rem; line-height:1.4; color:#1F1F1F; }
+  .st-key-eleccion [data-testid="stWidgetLabel"] strong {
+      display:block; margin-bottom:.15rem; font-size:.72rem; font-weight:600; letter-spacing:.08em;
+      text-transform:uppercase; color:var(--rojo); }
+  .st-key-eleccion button[data-variant="pills"] {
+      border:1px solid rgba(31,31,31,.18); border-radius:999px; background:#FFFFFF; color:#1F1F1F;
+      padding:.3rem 1rem; min-height:2.2rem; transition:background-color .15s, border-color .15s, color .15s; }
+  .st-key-eleccion button[data-variant="pills"] p { font-size:.95rem; }
+  .st-key-eleccion button[data-variant="pills"]:hover {
+      border-color:var(--rojo); color:var(--rojo); background:var(--rosa); }
+  .st-key-eleccion button[data-variant="pills"][aria-checked="true"] {
+      border-color:var(--rojo); background:var(--rojo); color:#FFFFFF; }
+  /* "No se sabe" (en cursiva desde app.eleccion): la salida, más discreta */
+  .st-key-eleccion button[data-variant="pills"]:has(em) { border-style:dashed; color:var(--tenue); }
+  .st-key-eleccion button[data-variant="pills"] em { font-style:normal; }
+  /* corregir al código: aparte, como acción secundaria */
+  .st-key-eleccion [class*="st-key-corregir-"] { width:100%; border-top:1px solid var(--borde); padding-top:.7rem; }
+  .st-key-eleccion [class*="st-key-corregir-"] [data-testid="stTooltipHoverTarget"] {
+      justify-content:flex-start !important; }
+  .st-key-eleccion [class*="st-key-corregir-"] button { width:fit-content; color:var(--tenue); }
+  .st-key-eleccion [class*="st-key-corregir-"] button:hover { color:var(--rojo); }
+
+  /* el script que acompaña la respuesta (SEGUIR_RESPUESTA) no ocupa lugar */
+  [data-testid="stElementContainer"]:has(.seguir-respuesta) { display:none; }
 </style>
+"""
+# Una consulta nueva, escrita o con un botón: la página baja con la respuesta
+# mientras se genera, como lo hacía Streamlit, y se queda quieta cuando la
+# respuesta termina (su línea de tiempo y modelo), antes de que aparezcan los
+# botones de las preguntas (26/10, pedido del usuario: que hasta ellos baje el
+# médico con la rueda). Medido en Edge, por eso:
+#   · baja hasta el final del último mensaje, justo encima del cuadro de la
+#     consulta, y no hasta el fondo de la página: al terminar el turno Streamlit
+#     quita lo que sobró de la pasada anterior, la página se acorta y, desde el
+#     fondo, el navegador dejaba a la vista los botones;
+#   · reconoce los botones por la clave de su contenedor (st-key-pregunta-…),
+#     que existe antes de que cargue el componente (stButtonGroup llega después),
+#     y solo los de esta respuesta: los de la anterior siguen un momento en la
+#     página;
+#   · baja suave (26/10, pedido del usuario): en cada cuadro de animación avanza
+#     una parte de lo que falta (SUAVIDAD), con un tope (TOPE) para un ritmo
+#     parejo, en vez de saltar cada 120 ms hasta el final del texto. Cuando la
+#     respuesta termina (su línea de tiempo, o ya están sus botones, que llegan
+#     casi junto con el final) baja lo que le falte hasta el final del mensaje y
+#     ahí se detiene. Con "reducir movimiento" en el sistema, salta.
+# También se detiene si el médico sube con la rueda o el teclado, o a los 3
+# minutos. Va en el documento principal (st.html con JavaScript); el contenedor
+# que se desplaza es #stMain. `{turno}` cambia el cuerpo en cada consulta, para
+# que el script vuelva a correr.
+SEGUIR_RESPUESTA = """
+<div class="seguir-respuesta" data-turno="{turno}"></div>
+<script>
+(() => {
+  const main = document.getElementById("stMain");
+  if (!main) return;
+  if (window.pararSeguirRespuesta) window.pararSeguirRespuesta();
+  const SUAVIDAD = 0.1;            // parte de lo que falta que avanza en cada cuadro (~60 por segundo)
+  const TOPE = 28;                 // px por cuadro como máximo (~1.700 px/s): un ritmo parejo
+  const suave = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const inicio = performance.now();
+  let activo = true, terminada = false, revisado = -1e9, u = null, cuadroAnim = 0;
+  const ultimo = () => {
+    const mensajes = main.querySelectorAll('[data-testid="stChatMessage"]');
+    return mensajes[mensajes.length - 1];
+  };
+  // los botones de la respuesta nueva, por su clave (app.eleccion usa el
+  // índice de la respuesta, que es {turno}); los de la
+  // anterior siguen un momento en la página mientras Streamlit la vuelve a pintar
+  const deEstaRespuesta = (c) => c.startsWith("st-key-pregunta-{turno}-") || c === "st-key-corregir-{turno}";
+  const hayBotones = () => [...main.querySelectorAll('[class*="st-key-"]')]
+    .some((el) => [...el.classList].some(deEstaRespuesta));
+  // cuánto falta para que el final del mensaje quede encima del cuadro de la consulta
+  const falta = (u) => {
+    const cuadro = document.querySelector('[data-testid="stBottom"]');
+    const limite = main.getBoundingClientRect().bottom - (cuadro ? cuadro.getBoundingClientRect().height : 0) - 16;
+    return u.getBoundingClientRect().bottom - limite;
+  };
+  const alRueda = (e) => { if (e.deltaY < 0) parar(); };
+  const alTecla = (e) => { if (["PageUp", "ArrowUp", "Home"].includes(e.key)) parar(); };
+  const paso = (ahora) => {
+    if (!activo) return;
+    if (ahora - revisado > 120) {                           // cada 120 ms: ¿terminó?
+      revisado = ahora;
+      u = ultimo();
+      if (ahora - inicio > 180000) return parar();
+      // terminó: su línea de tiempo, o ya están sus botones (llegan casi junto
+      // con el final y la página va detrás: se termina de bajar igual)
+      terminada = !!(u && u.querySelector(".tiempo")) || hayBotones();
+    }
+    if (u) {
+      const f = falta(u);                                   // solo hacia abajo, hasta el mensaje
+      if (f > 0.5) main.scrollTop += suave ? Math.min(f, TOPE, Math.max(1, f * SUAVIDAD)) : f;
+      else if (terminada) return parar();                   // terminó y llegó: hasta aquí
+    }
+    cuadroAnim = requestAnimationFrame(paso);
+  };
+  cuadroAnim = requestAnimationFrame(paso);
+  function parar() {
+    activo = false;
+    cancelAnimationFrame(cuadroAnim);
+    if (window.soltarAlto) window.soltarAlto();            // ver GUARDAR_ALTO
+    main.removeEventListener("wheel", alRueda);
+    main.removeEventListener("touchmove", parar);
+    window.removeEventListener("keydown", alTecla);
+    window.pararSeguirRespuesta = null;
+  }
+  main.addEventListener("wheel", alRueda, { passive: true });
+  main.addEventListener("touchmove", parar, { passive: true });
+  window.addEventListener("keydown", alTecla);
+  window.pararSeguirRespuesta = parar;
+})();
+</script>
+"""
+# Al hacer clic en un botón de elección o enviar una consulta, el contenido
+# guarda su altura hasta que SEGUIR_RESPUESTA termina. Sin esto, la tarjeta de
+# los botones se va con la consulta nueva, la página se acorta y, si el médico
+# estaba al fondo (donde están los botones), la vista saltaba hacia arriba
+# (medido en Edge, 26/10: ~170 px). Si no llega una respuesta (p. ej. "No se
+# sabe"), la suelta a los 6 s. Se instala una vez, desde la barra lateral, que
+# no mueve nada de la conversación.
+GUARDAR_ALTO = """
+<div class="seguir-respuesta"></div>
+<script>
+(() => {
+  if (window.guardarAltoInstalado) return;
+  window.guardarAltoInstalado = true;
+  const bloque = () => document.querySelector('[data-testid="stMainBlockContainer"]');
+  window.soltarAlto = () => { const b = bloque(); if (b) b.style.minHeight = ""; };
+  const guardar = () => {
+    const b = bloque();
+    if (!b) return;
+    b.style.minHeight = getComputedStyle(b).height;      // sin el relleno: min-height es del contenido
+    setTimeout(() => { if (!window.pararSeguirRespuesta) window.soltarAlto(); }, 6000);
+  };
+  document.addEventListener("pointerdown", (e) => {
+    if (e.target.closest('.st-key-eleccion button[data-variant="pills"]')) guardar();
+  }, true);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey && e.target.closest('[data-testid="stChatInput"]')) guardar();
+  }, true);
+})();
+</script>
 """
 PLACEHOLDER = "Describa el paciente: mecanismo, región y hallazgos"
 st.markdown(CSS, unsafe_allow_html=True)
@@ -145,8 +293,8 @@ with st.spinner("Cargando modelos (solo la primera vez, ~30 s)…"):
 # Barra lateral
 # ---------------------------------------------------------------------------
 with st.sidebar:
-    st.markdown("<div class='marca-lateral'><span>✚</span>Asistente Clínico de Trauma</div>",
-                unsafe_allow_html=True)
+    st.markdown(f"<div class='marca-lateral'><span>✚</span>{TITULO}</div>", unsafe_allow_html=True)
+    st.html(GUARDAR_ALTO, unsafe_allow_javascript=True)
     st.markdown("### Configuración")
 
     ok_ollama, msg_ollama = ollama_disponible()
@@ -234,52 +382,18 @@ if "ficha" not in st.session_state:
     st.session_state.ficha = None
 
 
-def saludo() -> str:
-    hora = datetime.now().hour
-    return "Buenos días" if hora < 12 else "Buenas tardes" if hora < 19 else "Buenas noches"
-
-
-def portada():
-    """Antes de la primera consulta: el saludo y el cuadro de la consulta en el
-    centro, y una línea con las fuentes. Devuelve lo escrito y el lugar, para
-    quitarla en cuanto llega la consulta."""
-    lugar = st.empty()
+def portada(lugar) -> str | None:
+    """Antes de la primera consulta: el título y el cuadro de la consulta en el
+    centro, y una línea con las fuentes, en `lugar` (se vacía en cuanto llega la
+    consulta). Devuelve lo escrito."""
     with lugar.container():
-        st.markdown(f"<div class='saludo'><span class='marca'>✚</span>{saludo()}</div>",
+        st.markdown(f"<div class='titulo'><span class='marca'>✚</span>{TITULO}</div>",
                     unsafe_allow_html=True)
         escrita = st.chat_input(PLACEHOLDER, key="consulta_portada")
         fuentes = "Casos del registro y manuales ATLS y HUV" if con_guias else "Casos del registro"
         st.markdown(f"<div class='al-pie'>{fuentes}, con la cita de cada afirmación · "
                     f"no reemplaza el juicio clínico</div>", unsafe_allow_html=True)
-    return escrita, lugar
-
-
-def aviso_respuesta(respuesta) -> str:
-    """El aviso fijo bajo cada respuesta: qué es cada fuente y sus límites."""
-    partes = []
-    if respuesta.tarjeta:
-        partes.append("El protocolo inicial se escribió de antemano desde los pasajes de los manuales "
-                      "que cita; cada viñeta se verificó contra su pasaje y falta la revisión del médico.")
-    if respuesta.casos:
-        alcance = ("«En el registro» cuenta todos los casos del registro con ese mecanismo; los "
-                   "demás conteos describen los casos recuperados" if respuesta.tarjeta else
-                   "los conteos describen estos casos, no frecuencias generales")
-        partes.append(f"Casos históricos del registro ({config.COBERTURA_TEMPORAL}): {alcance}, y los "
-                      f"protocolos pueden haber cambiado.")
-    pasajes = respuesta.guias + respuesta.pasajes_tarjeta
-    if pasajes:
-        fuentes = {f.fuente for f in pasajes}
-        nombres = [n for libro, n in (("ATLS", "del ATLS 11.ª ed."),
-                                      ("ATLS10", "del ATLS 10.ª ed. (2018, traducción no oficial)"),
-                                      ("HUV", "del manual del HUV")) if libro in fuentes]
-        lista = nombres[0] if len(nombres) == 1 else ", ".join(nombres[:-1]) + " y " + nombres[-1]
-        ingles = ("; lo del ATLS 11 (en inglés) va resumido en español" if "ATLS" in fuentes else "")
-        donde = ("«Pasajes que cita el protocolo»" + (" y «Otros fragmentos que encontró la búsqueda»"
-                                                      if respuesta.guias else "")
-                 if respuesta.tarjeta else "«Fragmentos de los manuales»")
-        partes.append(f"Pasajes {lista}{ingles}. El texto de cada uno está en {donde}.")
-    partes.append("Apoyo a la decisión; no reemplaza el juicio clínico.")
-    return " ".join(partes)
+    return escrita
 
 
 def tarjeta_caso(caso, consulta: str = "") -> str:
@@ -413,7 +527,10 @@ def desplegable_guias(respuesta, consulta: str, fragmentos=None,
     en_libros = para_libros(buscada)
     grupos = agrupar_guias(fragmentos)
     with st.expander(f"{titulo} ({len(grupos)}) · texto completo"):
-        if en_libros != buscada:
+        if respuesta.guias_heredadas:
+            st.caption("Los de la respuesta anterior: con los datos nuevos, la búsqueda en los "
+                       "manuales no encontró pasajes que pasen la guarda.")
+        elif en_libros != buscada:
             st.caption(f"Búsqueda en los manuales: «{en_libros}»")
         st.caption("Pasajes que pasaron la guarda de los manuales, del más al menos relevante. "
                    "Páginas impresas del libro; el ATLS 11, en su idioma original"
@@ -425,9 +542,11 @@ def desplegable_guias(respuesta, consulta: str, fragmentos=None,
 
 # Pedido del usuario para la demo (19/10): en pantalla no van la línea de
 # respaldo ("Respaldo: 5 casos del registro · similitud…") ni el aviso de que
-# casos y manuales pueden no coincidir (apartado "pie"); siguen en
-# Respuesta.texto, para el historial y los scripts. El aviso de similitud baja
-# sí se muestra. Las citas van en rojo, con el color de texto de Streamlit.
+# casos y manuales pueden no coincidir (apartado "pie"); tampoco, desde el
+# 26/10, el aviso de que el ATLS 10 es la edición anterior en traducción no
+# oficial (AVISO_ATLS10). Siguen en Respuesta.texto, para el historial y los
+# scripts. El aviso de similitud baja sí se muestra. Las citas van en rojo, con
+# el color de texto de Streamlit.
 APARTADOS_OCULTOS = {"pie"}
 RX_CITA_PANTALLA = re.compile(r"\[(caso|guía): ([^\]\n]+)\]")
 
@@ -440,10 +559,14 @@ def citas_en_rojo(texto: str) -> str:
 def cuerpo_respuesta(respuesta, consulta: str, de_a_poco: bool = False) -> None:
     """La respuesta por apartados: casos (prosa y su desplegable) y manuales
     (prosa o aviso de los pasajes, y su desplegable), o primero el protocolo de
-    la tarjeta (sus pasajes y los de la búsqueda, en dos desplegables). Sin apartados
+    la tarjeta (sus pasajes y los de la búsqueda, en dos desplegables). En un
+    seguimiento, el resto del protocolo va plegado ("tarjeta_resto"). Sin apartados
     (abstención, resumen de un caso), el texto y los desplegables al final."""
+    def en_pantalla(texto: str) -> str:
+        return RX_LINEA_RESPALDO.sub("", texto).replace(AVISO_ATLS10, "").strip()
+
     def escribir(texto: str) -> None:
-        texto = RX_LINEA_RESPALDO.sub("", texto).strip()
+        texto = en_pantalla(texto)
         if not de_a_poco:
             st.markdown(citas_en_rojo(texto))
             return
@@ -459,29 +582,24 @@ def cuerpo_respuesta(respuesta, consulta: str, de_a_poco: bool = False) -> None:
         desplegable_casos(respuesta, consulta)
         desplegable_guias(respuesta, consulta)
         return
+    textos = {s.fuente: s.texto for s in respuesta.secciones}
+    # los pasajes de la tarjeta, debajo del protocolo: del plegado si lo hay
+    ultima_tarjeta = "tarjeta_resto" if "tarjeta_resto" in textos else "tarjeta"
     for seccion in respuesta.secciones:
         if seccion.fuente in APARTADOS_OCULTOS:
             continue
-        escribir(seccion.texto)
+        if seccion.fuente == "tarjeta_resto":
+            with st.expander("Resto del protocolo" if ROTULO_PRIORIDAD in textos.get("tarjeta", "")
+                             else "Protocolo completo"):
+                st.markdown(citas_en_rojo(en_pantalla(seccion.texto)))
+        else:
+            escribir(seccion.texto)
         if seccion.fuente == "casos":
             desplegable_casos(respuesta, consulta)
         elif seccion.fuente == "guias":
             desplegable_guias(respuesta, consulta)
-        elif seccion.fuente == "tarjeta":
+        elif seccion.fuente == ultima_tarjeta:
             desplegable_tarjeta(respuesta, consulta)
-
-
-def detalle_respuesta(respuesta, segundos: float | None) -> None:
-    """Lo que va al final: tiempo, aviso fijo y alertas."""
-    pie_tiempo(segundos)
-    if respuesta.error:
-        return
-    if (respuesta.casos or respuesta.guias) and not respuesta.abstuvo:
-        st.caption(aviso_respuesta(respuesta))
-    if respuesta.citas_invalidas:
-        st.warning("El modelo citó identificadores que no están entre los casos ni los pasajes "
-                   f"recuperados: {', '.join(respuesta.citas_invalidas)}. "
-                   "Esa parte de la respuesta no está respaldada.")
 
 
 def escribir_de_a_poco(texto: str, segundos_max: float = 2.0):
@@ -519,7 +637,7 @@ def pintar(rol: str, contenido: str, respuesta=None, segundos: float | None = No
             nota_verificacion(respuesta)
             cuerpo_respuesta(respuesta, consulta)
         if respuesta is not None:
-            detalle_respuesta(respuesta, segundos)
+            pie_tiempo(segundos)
 
 
 def corregir(indice: int, tipo: str) -> None:
@@ -534,23 +652,19 @@ def corregir(indice: int, tipo: str) -> None:
     st.session_state.repetir = (turno["consulta"], tipo)
 
 
-def boton_corregir() -> None:
-    """Bajo la última respuesta: "Es otro paciente" si se sumó a la ficha, "Era
-    el mismo paciente" si empezó una nueva."""
+def correccion_pendiente() -> str | None:
+    """Bajo la última respuesta, el tipo con que se repetiría: "nuevo" ("Es otro
+    paciente") si se sumó a la ficha, "seguimiento" ("Era el mismo paciente") si
+    empezó una nueva; None si no va el botón."""
     if not CON_FICHA or not st.session_state.mensajes:
-        return
+        return None
     ultimo = st.session_state.mensajes[-1]
     r = ultimo.get("respuesta")
     if ultimo["role"] != "assistant" or r is None or r.tipo not in ("nuevo", "seguimiento"):
-        return
+        return None
     if r.tipo == "nuevo" and not r.otro_paciente:
-        return
-    otro = "seguimiento" if r.tipo == "nuevo" else "nuevo"
-    indice = len(st.session_state.mensajes) - 1
-    st.button("Era el mismo paciente" if otro == "seguimiento" else "Es otro paciente",
-              on_click=corregir, args=(indice, otro), key=f"corregir-{indice}",
-              help="El código lo tomó como " + ("un paciente nuevo." if r.tipo == "nuevo" else
-                                                 "el mismo paciente.") + " Responde de nuevo.")
+        return None
+    return "seguimiento" if r.tipo == "nuevo" else "nuevo"
 
 
 def contestar(indice: int, clave: str, llave: str) -> None:
@@ -570,46 +684,101 @@ def contestar(indice: int, clave: str, llave: str) -> None:
         st.session_state.repetir = (opcion.mensaje, "seguimiento")
 
 
-def botones_preguntas() -> None:
+def preguntas_pendientes() -> list:
     """Bajo la última respuesta, lo que falta (PREGUNTAS=1; rag/preguntas.py)."""
     if not (CON_FICHA and config.PREGUNTAS) or not st.session_state.mensajes:
-        return
+        return []
     ultimo = st.session_state.mensajes[-1]
     r = ultimo.get("respuesta")
-    if ultimo["role"] != "assistant" or r is None or not r.preguntas:
-        return
+    if ultimo["role"] != "assistant" or r is None:
+        return []
     sin_dato = set(st.session_state.ficha.sin_dato) if st.session_state.ficha else set()
+    return [p for p in r.preguntas if p.clave not in sin_dato]
+
+
+def etiqueta_pregunta(texto: str) -> str:
+    """"B · Respiración — ¿cómo ventila?" → "**B · Respiración** ¿Cómo ventila?":
+    el tema va en negrita, y el CSS de .st-key-eleccion lo pone como una línea
+    pequeña encima de la pregunta."""
+    tema, _, pregunta = texto.partition(" — ")
+    if not pregunta:
+        return texto
+    if pregunta.startswith("¿"):
+        pregunta = "¿" + pregunta[1:2].upper() + pregunta[2:]
+    return f"**{tema}** {pregunta}"
+
+
+def eleccion() -> None:
+    """Bajo la última respuesta, en una tarjeta: las preguntas con botones y el
+    botón para corregir al código si tomó mal al paciente (26/10, pedido del
+    usuario: más cuidados para la demo, sin perder formalidad; el estilo va en
+    el CSS, .st-key-eleccion). "No se sabe" va en cursiva para que el CSS lo
+    distinga; el valor de la opción no cambia (format_func)."""
+    preguntas, otro = preguntas_pendientes(), correccion_pendiente()
+    if not preguntas and otro is None:
+        return
     indice = len(st.session_state.mensajes) - 1
-    for p in r.preguntas:
-        if p.clave in sin_dato:
-            continue
-        llave = f"pregunta-{indice}-{p.clave}"
-        st.pills(p.texto, [o.etiqueta for o in p.opciones], key=llave,
-                 on_change=contestar, args=(indice, p.clave, llave))
+    with st.container(key="eleccion"):
+        if preguntas:
+            st.markdown("<div class='eleccion-titulo'>Para afinar la respuesta</div>", unsafe_allow_html=True)
+        for p in preguntas:
+            llave = f"pregunta-{indice}-{p.clave}"
+            st.pills(etiqueta_pregunta(p.texto), [o.etiqueta for o in p.opciones], key=llave,
+                     format_func=lambda e: f"*{e}*" if e == NO_SE_SABE.etiqueta else e,
+                     on_change=contestar, args=(indice, p.clave, llave))
+        if otro is not None:
+            r = st.session_state.mensajes[-1]["respuesta"]
+            st.button("Era el mismo paciente" if otro == "seguimiento" else "Es otro paciente",
+                      icon=":material/undo:" if otro == "seguimiento" else ":material/person_add:",
+                      type="tertiary", on_click=corregir, args=(indice, otro), key=f"corregir-{indice}",
+                      help="El código lo tomó como " + ("un paciente nuevo." if r.tipo == "nuevo" else
+                                                         "el mismo paciente.") + " Responde de nuevo.")
 
 
+# El lugar de la portada va siempre primero, vacío en la conversación: así,
+# cuando la portada se va, lo que sigue no cambia de posición al volver a
+# pintarse la página (ver SEGUIR_RESPUESTA).
+lugar_portada = st.empty()
 for m in st.session_state.mensajes:
     pintar(m["role"], m["content"], m.get("respuesta"), m.get("segundos"), m.get("consulta", ""))
-botones_preguntas()
-boton_corregir()
 
 
 # ---------------------------------------------------------------------------
 # Turno
 # ---------------------------------------------------------------------------
 # Sin conversación, la portada (el cuadro en el centro); con ella, el cuadro abajo.
+# En `st.bottom` y no con st.chat_input en la raíz: así Streamlit lo fija abajo
+# igual, pero no envuelve la página en su contenedor que se pega al final
+# (stAppScrollToBottomContainer), que bajaba solo hasta los botones de las
+# preguntas al terminar cada respuesta. Lo que sí baja, la respuesta mientras
+# se genera, lo hace SEGUIR_RESPUESTA (26/10, pedido del usuario).
 if st.session_state.mensajes or "repetir" in st.session_state:
-    escrita, lugar_portada = st.chat_input(PLACEHOLDER, key="consulta"), None
+    escrita = st.bottom.chat_input(PLACEHOLDER, key="consulta")
 else:
-    escrita, lugar_portada = portada()
+    escrita = portada(lugar_portada)
+    if escrita:
+        # el cuadro de abajo aparece ya con la primera consulta, no al terminar:
+        # si no, al aparecer tapaba ~130 px del final de la respuesta
+        st.bottom.chat_input(PLACEHOLDER, key="consulta")
 # el botón de corregir y las preguntas repiten o suman una consulta
 pregunta, forzar = (escrita, None) if escrita else st.session_state.pop("repetir", (None, None))
 
+# Los botones de la última respuesta, solo si no llega una consulta nueva. Si
+# llega, quedaban arriba de ella mientras se generaba y, al pintarse debajo de la
+# respuesta nueva, lo de arriba se encogía y la página saltaba hasta ellos
+# (medido en Edge, 26/10: ~300 px).
+if not pregunta:
+    eleccion()
+
 if pregunta:
-    if lugar_portada is not None:
-        lugar_portada.empty()
+    lugar_portada.empty()
     st.session_state.mensajes.append({"role": "user", "content": pregunta})
-    pintar("user", pregunta)
+    with st.chat_message("user"):
+        st.markdown(pregunta)
+        # dentro de la burbuja y al final: al volver a pintarse la página, quitarlo
+        # no corre de lugar la respuesta (ver SEGUIR_RESPUESTA)
+        st.html(SEGUIR_RESPUESTA.replace("{turno}", str(len(st.session_state.mensajes))),
+                unsafe_allow_javascript=True)
 
     historial = [{"role": m["role"], "content": m["content"]}
                  for m in st.session_state.mensajes[:-1]]
@@ -641,7 +810,7 @@ if pregunta:
             encabezado_paciente(r)
             nota_verificacion(r)
             cuerpo_respuesta(r, pregunta, de_a_poco=True)
-        detalle_respuesta(r, segundos)
+        pie_tiempo(segundos)
 
     st.session_state.mensajes.append(
         {"role": "assistant", "content": texto, "respuesta": r, "segundos": segundos,

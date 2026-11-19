@@ -432,7 +432,13 @@ def tipo_de_mensaje(ficha: Ficha | None, mensaje: str, lec: Lectura | None = Non
     if RX_CASO.match(mensaje):
         return "caso"
     lec = lec or leer(mensaje)
-    if ficha is None or not ficha.es_paciente() or lec.dice_nuevo or lec.presenta:
+    if ficha is None or not ficha.es_paciente() or lec.dice_nuevo:
+        return "nuevo"
+    # Quien se presenta ("mujer de 70 años con fractura de cadera") es otro
+    # paciente si cuenta un trauma; sin eso es un dato del mismo ("adulto mayor
+    # anticoagulado", "paciente con Glasgow 7"). Visto el 26/10: "adulto mayor
+    # anticoagulado" tras un TCE empezaba de cero y se perdía el TCE.
+    if lec.presenta and (lec.mecanismo or lec.lesion or lec.regiones):
         return "nuevo"
     if lec.mecanismo_es_hecho and ficha.mecanismo and lec.mecanismo != ficha.mecanismo:
         return "nuevo"

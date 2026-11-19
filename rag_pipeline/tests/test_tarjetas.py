@@ -46,6 +46,7 @@ def test_cada_vineta_es_una_oracion_citada_que_orienta():
             assert not RX_CITA_GUIA.search(v.texto)       # la cita la pone el código
             assert not _RX_ORDEN.search(normalizar(v.texto)), v.texto
             assert v.si is None or v.si in tarjetas.CONDICIONES
+            assert v.prioriza is None or (v.prioriza in tarjetas.PRIORIZA and v.si is None)
 
 
 @pytest.mark.skipif(not config.GUIAS_SECCIONES.exists(), reason="sin el texto de los libros")
@@ -131,6 +132,7 @@ def test_sin_datos_van_las_dos_ramas_con_su_rotulo(monkeypatch):
     t = tarjetas.cargar()["peaton"]
     texto, citas = tarjetas.armar(t, ficha("hombre arrollado por vehiculo automotor"))
     assert texto.startswith("### Protocolo inicial: peatón atropellado")
+    assert tarjetas.ROTULO_PRIORIDAD not in texto                      # sin datos, nada sube
     assert "*Si está estable:*" in texto and "*Si está inestable:*" in texto
     assert "*Si las ruedas le pasaron por encima:*" in texto
     assert all(f"**{l} · " in texto for l in "xABCDE") and "**Después de la revisión primaria**" in texto
@@ -150,6 +152,34 @@ def test_con_datos_la_rama_que_corresponde_y_los_datos_en_su_letra():
     f = ficha("peatón atropellado, hemodinámicamente estable", "fue solo el impacto")
     texto, _ = tarjetas.armar(t, f)
     assert "*Está estable:*" in texto and "inestable" not in texto and "aplastamiento" not in texto.lower()
+
+
+def test_lo_que_vuelven_prioritario_los_datos_sube_y_no_se_repite():
+    # visto el 26/10: con "TA 80/50, FC 130" y "Glasgow 7" el protocolo quedaba
+    # igual en un 96 a 100 %; la vía aérea definitiva no se movía de su letra
+    t = tarjetas.cargar()["peaton"]
+    armada = tarjetas.ajustar(t, ficha("peatón atropellado", "TA 80/50, FC 130", "Glasgow 7"))
+    lineas = armada.prioridad.splitlines()
+    assert lineas[0] == tarjetas.ROTULO_PRIORIDAD
+    assert lineas[1].startswith("- **A** · *Glasgow 7:* Vía aérea definitiva")
+    assert lineas[2].startswith("- **C** · *FC 130:* Con frecuencia cardiaca mayor de 100")
+    assert lineas[3].startswith("- **C** · *Está inestable:* En shock severo")
+    assert any(l.startswith("- *Está inestable:* Sangre intraabdominal en el FAST") for l in lineas)   # después
+    # cada viñeta va una sola vez: lo que subió no queda en su letra
+    for linea in lineas[1:]:
+        cita = linea.rsplit("[guía:", 1)[0].split(":* ", 1)[1]
+        assert cita not in armada.protocolo
+    assert "**D · Déficit neurológico** · Glasgow 7" in armada.protocolo
+    assert armada.texto().index(tarjetas.ROTULO_PRIORIDAD) < armada.texto().index("**x · ")
+    # a la vista en un seguimiento: lo que subió y lo que falta, sin el resto
+    assert armada.visible() == "\n\n".join([armada.titulo, armada.prioridad, armada.faltan])
+
+
+@pytest.mark.parametrize("dato, sube", [("Glasgow 7", True), ("Glasgow 8 o menos", True),
+                                        ("Glasgow 9-12", False), ("FC 100", False), ("FC 101", True)])
+def test_el_umbral_es_el_que_dice_la_vineta(dato, sube):
+    armada = tarjetas.ajustar(tarjetas.cargar()["caida"], ficha("caída de 6 metros", dato))
+    assert (dato in armada.prioridad) is sube
 
 
 def test_la_region_decide_las_vinetas_de_cuello_y_torax():
@@ -271,7 +301,30 @@ def test_un_seguimiento_con_datos_rearma_la_tarjeta(entorno):
     r1 = generate.responder("HPAF en abdomen")
     r2 = generate.responder("hipotenso o en choque", ficha=r1.ficha, anterior=r1)
     assert r2.tarjeta == "arma_de_fuego" and "*Está inestable:*" in r2.secciones[0].texto
-    assert "*Si está estable:*" not in r2.secciones[0].texto
+    assert "*Si está estable:*" not in r2.texto
+
+
+def test_en_un_seguimiento_el_protocolo_va_plegado(entorno):
+    r1 = generate.responder("HPAF en abdomen")
+    assert [s.fuente for s in r1.secciones] == ["tarjeta", "casos", "pie"]           # la presentación, entera
+    assert "**x · Hemorragia exanguinante**" in r1.secciones[0].texto
+    r2 = generate.responder("hipotenso o en choque", ficha=r1.ficha, anterior=r1)
+    assert [s.fuente for s in r2.secciones] == ["tarjeta", "tarjeta_resto", "casos", "pie"]
+    visible, resto = r2.secciones[0].texto, r2.secciones[1].texto
+    assert visible.startswith("### Protocolo inicial: herida por arma de fuego\n\n" + tarjetas.ROTULO_PRIORIDAD)
+    assert "**Datos que cambiarían la orientación:**" in visible and "**x · " not in visible
+    assert "**x · Hemorragia exanguinante**" in resto
+    assert r2.citas_invalidas == []
+
+
+def test_un_seguimiento_sin_pasajes_conserva_los_anteriores(entorno, monkeypatch):
+    r1 = generate.responder("HPAF en abdomen")
+    monkeypatch.setattr(generate, "buscar_guias", lambda *a, **k: [])
+    r2 = generate.responder("Glasgow 9", ficha=r1.ficha, anterior=r1)
+    assert r2.tipo == "seguimiento" and r2.guias == r1.guias and r2.guias_heredadas
+    assert r2.cambio.endswith("mismos pasajes de los manuales.")
+    nuevo = generate.responder("HPAF en muslo", ficha=r1.ficha, anterior=r1)       # otro paciente
+    assert nuevo.tipo == "nuevo" and nuevo.guias == [] and not nuevo.guias_heredadas
 
 
 def test_sin_tarjetas_todo_como_antes(entorno, monkeypatch):

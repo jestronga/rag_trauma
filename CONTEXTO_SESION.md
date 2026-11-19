@@ -1,6 +1,6 @@
 # Contexto de trabajo — rag_trauma
 
-Resumen para retomar el trabajo. Última sesión: **19 de octubre de 2026**, en
+Resumen para retomar el trabajo. Última sesión: **26 de octubre de 2026**, en
 el **PC de 8 GB** (RTX 4060), preparado desde un clon limpio. **Desde el 17/10
 solo se mide en la RTX 4060** (decisión del usuario): la GTX 1650 ya no es
 objetivo. **Empezar por la sección 00** (libros de trauma: fases 1 a 6 hechas,
@@ -89,7 +89,7 @@ sumaba al paciente anterior; ahora una presentación nueva o una consulta
 general sin trauma empiezan de cero.
 
 **Diseño minimalista el 24/10** (pedido del usuario, con la paleta de siempre):
-- al abrir, un saludo y el cuadro de la consulta en el centro;
+- al abrir, el título (desde el 26/10, siempre "Asistente Clínico de Trauma") y el cuadro de la consulta en el centro;
 - en la conversación, la consulta en una burbuja a la derecha y la respuesta sin
   avatares;
 - la barra lateral abre cerrada.
@@ -131,6 +131,35 @@ antes de que las revise el médico, el protocolo primero y cinco tarjetas.
   - la parte de los casos pasa algo menos (45 % contra 57 %, en 4 corridas);
   - 11 presentaciones sin tarjeta (TCE sin mecanismo, quemadura, mordedura…);
   - la revisión del médico de las viñetas.
+
+**Los seguimientos parecían la misma respuesta: corregido el 26/10** (pedido
+del usuario: "parece que diera siempre la misma respuesta aunque le amplíes
+contexto"). Medido con tres conversaciones por el pipeline real: con tarjeta,
+el protocolo (~80 % de la pantalla) quedaba igual en un 96 a 100 % entre turnos;
+con "Glasgow 7" solo cambiaba "D · Déficit neurológico · Glasgow 7". Tres
+arreglos, decididos por el usuario:
+1. **"Con estos datos"** (`tarjetas.ajustar`, `Armada`): las viñetas que el
+   dato vuelve prioritarias suben arriba del protocolo, con la letra y el dato
+   como rótulo. Son las ramas `si` que la ficha cumple y, nuevo, las de
+   `prioriza` (`glasgow_8`: vía aérea definitiva; `fc_100`: considerar shock),
+   con el umbral que dice su propio texto. En un **seguimiento**, el resto del
+   protocolo va en el apartado `tarjeta_resto`, que la app pliega ("Resto del
+   protocolo"). La presentación se ve como antes. Ahora la parte visible del
+   protocolo cambia en cada turno.
+2. **"adulto mayor anticoagulado" empezaba otro paciente** y se perdía el TCE
+   (`_RX_PRESENTA` lo toma como presentación). Ahora quien se presenta es otro
+   paciente solo si cuenta un trauma (mecanismo, lesión o región). La ficha
+   sigue igual en `probar_conversaciones.py --solo-ficha` (47/47 y 26/27).
+3. **Los manuales desaparecían en los seguimientos:** los signos con su valor
+   hunden al reranker ("TCE con pérdida de conciencia" 0,925; con ", Glasgow 9
+   con anisocoria" 0,195). Si no pasa la guarda, siguen los pasajes de la
+   respuesta anterior (`Respuesta.guias_heredadas`) y el desplegable lo dice.
+   Los tiempos no cambiaron (7 a 9 s por seguimiento).
+
+Además, la pantalla de la demo: al pie de cada respuesta solo el tiempo y el
+modelo (sin el aviso fijo ni la alerta de citas inválidas, que revisa
+`preparar_demo.py`), y sin el aviso de que el ATLS 10 es la edición anterior
+(`AVISO_ATLS10`; sigue en `Respuesta.texto`). 448 tests.
 
 ---
 
@@ -319,7 +348,7 @@ el 08/10; sirven para el PC de 8 GB):
    cd rag_pipeline
    ..\.venv\Scripts\python.exe -m pip install "pymupdf==1.28.2"
    ..\.venv\Scripts\python.exe scripts\extraer_guias.py
-   ..\.venv\Scripts\python.exe -m pytest tests/ -q        # 300 desde el 24/10
+   ..\.venv\Scripts\python.exe -m pytest tests/ -q        # 448 desde el 26/10
    ```
    Después de extraer: `..\.venv\Scripts\python.exe -m rag.index --fuente guias`.
    **Versión exacta de PyMuPDF a propósito:** otra versión podría extraer
@@ -429,7 +458,7 @@ rag_trauma/
     tarjetas/            tarjetas.yaml (el protocolo por mecanismo, con sus citas) y
                          patrones_registro.json (conteos del registro), en git (PLAN_RESPUESTA_IDEAL.md)
     indices/             BM25 + Qdrant local (casos: 8.198 puntos; guias: 2.201) — no está en git
-    tests/               437 tests del extractor, los libros, la respuesta y el verificador (sin Ollama ni índices)
+    tests/               448 tests del extractor, los libros, la respuesta y el verificador (sin Ollama ni índices)
     scripts/             revisar_entorno, probar_respuestas, exportar_revision, preparar_demo,
                          calibrar_umbral/_guias, comparar_modelos/_fragmentacion, extraer_guias
     eval/                consultas.yaml (35 consultas), consultas_guias.yaml (51, libros), evaluate.py,
@@ -785,7 +814,7 @@ la demo, **solo prosa y debajo los casos consultados**.
 5. Índices (no están en git): `python -m rag.index` desde `rag_pipeline\`, y
    para los libros `python -m rag.index --fuente guias` (antes, la sección 00).
    Si falta `anonimizacion/outputs/`, antes: `cd ..\anonimizacion; python run_pipeline.py`.
-6. Tests: `python -m pytest tests/ -q` (300).
+6. Tests: `python -m pytest tests/ -q` (448).
 7. Probar: `python scripts\probar_respuestas.py "herida por arma de fuego en tórax con hipoventilación"`
 8. Antes de una demo: `python scripts\preparar_demo.py` (debe decir "Todo
    listo" y 100 % en GPU).

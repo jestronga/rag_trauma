@@ -314,7 +314,8 @@ PATRONES_REGISTRO = Path(_env("PATRONES_REGISTRO", str(RAIZ / "tarjetas" / "patr
 # Cuánto deja Ollama el modelo cargado tras cada llamada. Su valor por defecto
 # son 5 min: en una demo, la pregunta después de una pausa recargaba el modelo
 # (25-35 s en la GTX 1650). Se envía en cada llamada: no hace falta
-# OLLAMA_KEEP_ALIVE ni reiniciar Ollama. "-1" = para siempre.
+# OLLAMA_KEEP_ALIVE ni reiniciar Ollama. Se envía como texto, así que lleva
+# unidad ("24h", "-1h" = para siempre); "-1" a secas da HTTP 400.
 KEEP_ALIVE = _env("KEEP_ALIVE", "2h")
 
 # --- corpus ----------------------------------------------------------------

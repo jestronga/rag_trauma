@@ -32,6 +32,10 @@ def conversacion(*mensajes: str) -> list[tuple[str, Ficha]]:
     ("una paciente con herida en mano", "nuevo"),
     ("el paciente tiene Glasgow 12", "seguimiento"),               # el mismo
     ("paciente ahora con Glasgow 12", "seguimiento"),
+    # quien se presenta sin contar un trauma es el mismo (26/10)
+    ("adulto mayor anticoagulado", "seguimiento"),
+    ("paciente con Glasgow 7", "seguimiento"),
+    ("mujer de 75 años", "seguimiento"),
     ("se cayó de un segundo piso", "nuevo"),                       # hecho con otro mecanismo
     ("¿y si se hubiera caído de un segundo piso?", "seguimiento"), # hipótesis: el mismo
     ("fue por arma cortopunzante", "seguimiento"),                 # el mismo mecanismo

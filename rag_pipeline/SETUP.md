@@ -203,10 +203,15 @@ streamlit run app.py
 ```
 
 Abre `http://localhost:8501`. Desde el 24/10 el diseño es minimalista:
-- **Al abrir:** un saludo ("✚ Buenas tardes") y el cuadro de la consulta en el
-  centro.
+- **Al abrir:** el título ("✚ Asistente Clínico de Trauma"; hasta el 26/10, un
+  saludo según la hora) y el cuadro de la consulta en el centro.
 - **En la conversación:** la consulta va en una burbuja a la derecha y la
-  respuesta como texto, sin avatares.
+  respuesta como texto, sin avatares. Desde el 26/10, al escribir o al elegir
+  un botón la página baja suave con la respuesta mientras se genera (a ritmo
+  parejo, nunca más de 28 px por cuadro) y se queda quieta al llegar al final:
+  hasta los botones de las preguntas se baja con la rueda del ratón. Si se sube
+  durante la respuesta, deja de bajar (`SEGUIR_RESPUESTA`, `GUARDAR_ALTO` y
+  `st.bottom.chat_input`, comentarios en `app.py`; medido en Edge).
 - **Siempre:** la paleta de siempre (blanco, rojo y rosa).
 
 La barra lateral abre cerrada (la flecha `»` arriba a la izquierda). Ahí están:
@@ -233,7 +238,10 @@ Las citas `[caso: ID]` y `[guía: ID]` van en rojo. Para la demo (19/10) no se
 muestran la línea de respaldo ("Respaldo: 5 casos del registro · similitud…")
 ni el aviso de que casos y manuales pueden no coincidir: lo dice "Alcance", en
 la barra lateral (`app.APARTADOS_OCULTOS` y `RX_LINEA_RESPALDO`; siguen en
-`Respuesta.texto`).
+`Respuesta.texto`). Desde el 26/10 tampoco se muestra el aviso de que los
+pasajes son solo de la 10.ª edición (`AVISO_ATLS10`), ni el aviso fijo ni la
+alerta de citas inválidas al pie; bajo cada respuesta queda solo el tiempo y el
+modelo que la generó.
 
 Si una fuente no responde, su apartado lo dice. Con `PROSA_SIEMPRE=0`, la parte
 de la redacción del modelo que no pasó la verificación se muestra armada desde
@@ -256,7 +264,11 @@ Desde el 24/10 (`PLAN_CHATBOT_CLINICO.md`), con un paciente presentado:
   con botones, en el orden de la revisión primaria: "C · Circulación — ¿cómo
   está hemodinámicamente?", "D · Neurológico — ¿qué Glasgow tiene?"… Un clic
   suma el dato a la ficha y responde de nuevo; "No se sabe" deja de
-  preguntarlo.
+  preguntarlo. Desde el 26/10 van en una tarjeta, "Para afinar la respuesta":
+  el tema de cada pregunta en una línea pequeña en rojo, los botones blancos
+  que al pasar el mouse se tiñen de rojo sobre rosa, "No se sabe" con borde
+  punteado y, separado abajo, "Es otro paciente" (`app.eleccion` y el CSS de
+  `.st-key-eleccion`).
 - **Por letras** (`ORDEN_ATLS=1`). Dentro de cada apartado, la prosa va por
   letras ("**B · Respiración.**", "**C · Circulación.**", "**Después de la
   revisión primaria.**"). La letra la pone el código, no el modelo. Las
@@ -264,7 +276,12 @@ Desde el 24/10 (`PLAN_CHATBOT_CLINICO.md`), con un paciente presentado:
   tórax?") siguen con la prosa de siempre y sin preguntas.
 - **La búsqueda de los manuales** expande las abreviaturas y nombra el
   mecanismo. "Fragmentos de los manuales" muestra la búsqueda usada: «HPAF
-  (herida por arma de fuego) en abdomen».
+  (herida por arma de fuego) en abdomen». Si en un seguimiento no pasa la
+  guarda (los signos con su valor, "Glasgow 9", la hunden), siguen los pasajes
+  de la respuesta anterior y el desplegable lo dice (26/10).
+- **Quien se presenta sin contar un trauma es el mismo paciente** (26/10):
+  "adulto mayor anticoagulado" o "paciente con Glasgow 7" se suman a la ficha;
+  "mujer de 70 años con fractura de cadera" empieza un paciente nuevo.
 
 Desde el 24/10 (`PLAN_RESPUESTA_IDEAL.md`), con un paciente cuyo mecanismo
 tiene tarjeta (peatón, ocupante de carro o moto, caída, arma de fuego,
@@ -282,8 +299,15 @@ cortopunzante):
     (`tests/test_tarjetas.py`) y las revisa el médico en la fase 7.
 - **La tarjeta se ajusta a la ficha.** Sin el dato, cada rama va con su rótulo
   ("*Si está inestable:*", "*Si las ruedas le pasaron por encima:*"). Con el
-  dato, va la que corresponde ("*Está inestable:*") y la letra muestra lo que
-  dice la ficha ("C · Circulación · TA 80/50 · inestable").
+  dato, la rama que corresponde sube a **"Con estos datos"**, arriba del
+  protocolo ("**C** · *Está inestable:* …"), y la letra muestra lo que dice la
+  ficha ("C · Circulación · TA 80/50 · inestable"). Desde el 26/10 también
+  suben las viñetas cuyo umbral cumple un signo: "**A** · *Glasgow 7:* Vía
+  aérea definitiva ante… Glasgow de 8 o menos", "**C** · *FC 130:* …".
+- **En un seguimiento** (26/10) quedan a la vista "Con estos datos" y los
+  datos que faltan; el resto del protocolo, que ya se leyó, va en el
+  desplegable "Resto del protocolo". Antes, un seguimiento dejaba el protocolo
+  igual en un 96 a 100 % y parecía la misma respuesta.
 - **Debajo del protocolo, dos desplegables:** "Pasajes que cita el protocolo"
   (el texto de cada pasaje) y "Otros fragmentos que encontró la búsqueda".
 - **Los casos empiezan con la línea del registro:** "En el registro hay 324

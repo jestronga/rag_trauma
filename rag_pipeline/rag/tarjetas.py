@@ -15,9 +15,17 @@ antes).
 Lo que hace la ficha con una tarjeta:
   · las viñetas con condición (`si`) se filtran: sin dato van con su rótulo
     ("Si está inestable: …"), con el dato en contra no van, con el dato a favor
-    van con el rótulo en presente ("Está inestable: …");
+    suben a "Con estos datos", arriba, con el rótulo en presente ("Está
+    inestable: …");
+  · también suben las viñetas con `prioriza` cuyo signo cumple lo que dicen
+    ("Glasgow de 8 o menos" con Glasgow 7), con el valor como rótulo;
   · la letra con datos en la ficha los muestra ("C · Circulación · TA 85/55");
   · al final, los datos que cambiarían la orientación y que la ficha no tiene.
+
+"Con estos datos" existe porque, sin él, un seguimiento ("TA 80/50", "Glasgow
+7") dejaba el protocolo igual en un 96 a 100 % (medido el 26/10): solo cambiaban
+los rótulos. En un seguimiento, generate.responder deja a la vista ese bloque y
+los datos que faltan, y el resto del protocolo va plegado (`Armada.visible`).
 
 No hay tarjeta si la consulta pregunta algo concreto ("¿qué dice el ATLS del
 FAST?", "¿le hago FAST?"): eso lo responde la prosa sobre los pasajes que
@@ -51,6 +59,7 @@ class Vineta:
     texto: str
     citas: list[str]
     si: str | None = None
+    prioriza: str | None = None
 
     def con_citas(self) -> str:
         return f"{self.texto} " + " ".join(f"[guía: {c}]" for c in self.citas)
@@ -75,7 +84,7 @@ class Tarjeta:
 
 
 def _vinetas(datos: list[dict] | None) -> list[Vineta]:
-    return [Vineta(d["texto"].strip(), list(d["cita"]), d.get("si")) for d in datos or []]
+    return [Vineta(d["texto"].strip(), list(d["cita"]), d.get("si"), d.get("prioriza")) for d in datos or []]
 
 
 @lru_cache(maxsize=4)
@@ -139,8 +148,9 @@ def _estado(ficha: Ficha, cual: str) -> bool | None:
     return None if ficha.estado is None else ficha.estado == cual
 
 
-def _glasgow(ficha: Ficha) -> int | None:
-    valor = ficha.signos.get("Glasgow")
+def _numero(ficha: Ficha, signo: str) -> int | None:
+    """El primer número del signo: "130", "7", "80/50" → 80, "8 o menos" → 8."""
+    valor = ficha.signos.get(signo)
     return int(re.match(r"\d+", valor).group()) if valor else None
 
 
@@ -179,6 +189,15 @@ CONDICIONES = {
 }
 
 
+# prioriza -> (signo, lo que dice la viñeta del valor): la viñeta va siempre y,
+# si el signo de la ficha lo cumple, sube a "Con estos datos"
+PRIORIZA = {
+    "glasgow_8": ("Glasgow", lambda n: n <= 8),
+    "fc_100": ("FC", lambda n: n > 100),
+}
+ROTULO_PRIORIDAD = "**Con estos datos**"
+
+
 def _con_rotulo(v: Vineta, ficha: Ficha) -> str | None:
     """El texto de la viñeta con su rótulo, o None si la ficha dice lo contrario."""
     if v.si is None:
@@ -188,6 +207,19 @@ def _con_rotulo(v: Vineta, ficha: Ficha) -> str | None:
     if cumple is False:
         return None
     return f"*{con_dato if cumple else sin_dato}:* {v.con_citas()}"
+
+
+def _rotulo_prioridad(v: Vineta, ficha: Ficha) -> str | None:
+    """El rótulo con que la viñeta sube a "Con estos datos" ("Está inestable",
+    "Glasgow 7"), o None si la ficha no tiene el dato que la sube."""
+    if v.si is not None:
+        dice, _, con_dato = CONDICIONES[v.si]
+        return con_dato if dice(ficha) else None
+    if v.prioriza is not None:
+        signo, cumple = PRIORIZA[v.prioriza]
+        n = _numero(ficha, signo)
+        return describir_signo(signo, ficha.signos[signo]) if n is not None and cumple(n) else None
+    return None
 
 
 def _apagada(v: Vineta) -> bool:
@@ -226,18 +258,39 @@ def faltan(tarjeta: Tarjeta, ficha: Ficha) -> list[str]:
     return salida
 
 
-def armar(tarjeta: Tarjeta, ficha: Ficha) -> tuple[str, list[str]]:
-    """(el apartado en Markdown, las secciones que cita). Lo arma el código: el
-    modelo no interviene."""
-    bloques = [f"### Protocolo inicial: {tarjeta.titulo}"]
+@dataclass
+class Armada:
+    """La tarjeta ajustada a la ficha, por partes (Markdown; vacías si no hay)."""
+    titulo: str
+    prioridad: str          # "Con estos datos": lo que los datos de la ficha vuelven prioritario
+    protocolo: str          # el resto, por apartados
+    faltan: str             # los datos que cambiarían la orientación
+    citas: list[str]
+
+    def texto(self) -> str:
+        """Entera, como en una presentación."""
+        return "\n\n".join(p for p in (self.titulo, self.prioridad, self.protocolo, self.faltan) if p)
+
+    def visible(self) -> str:
+        """Lo que queda a la vista en un seguimiento; el protocolo va plegado."""
+        return "\n\n".join(p for p in (self.titulo, self.prioridad, self.faltan) if p)
+
+
+def ajustar(tarjeta: Tarjeta, ficha: Ficha) -> Armada:
+    """La tarjeta para esta ficha. Lo arma el código: el modelo no interviene."""
+    prioridad: list[str] = []
+    bloques: list[str] = []
     citas: list[str] = []
     for parte, vinetas in tarjeta.partes():
         lineas = []
         for v in vinetas:
             if _apagada(v):
                 continue
-            texto = _con_rotulo(v, ficha)
-            if texto is not None:
+            if (rotulo := _rotulo_prioridad(v, ficha)) is not None:
+                letra = f"**{parte}** · " if parte in PRIMARIAS else ""
+                prioridad.append(f"- {letra}*{rotulo}:* {v.con_citas()}")
+                citas += v.citas
+            elif (texto := _con_rotulo(v, ficha)) is not None:
                 lineas.append(f"- {texto}")
                 citas += v.citas
         if not lineas:
@@ -249,9 +302,18 @@ def armar(tarjeta: Tarjeta, ficha: Ficha) -> tuple[str, list[str]]:
         else:
             rotulo = NOMBRES[parte] if parte == DESPUES else f"{parte} · {NOMBRES[parte]}"
             bloques.append(f"**{rotulo}**{_datos_letra(parte, ficha)}\n" + "\n".join(lineas))
-    if falta := faltan(tarjeta, ficha):
-        bloques.append(f"**Datos que cambiarían la orientación:** {unir(falta)}.")
-    return "\n\n".join(bloques), list(dict.fromkeys(citas))
+    falta = faltan(tarjeta, ficha)
+    return Armada(titulo=f"### Protocolo inicial: {tarjeta.titulo}",
+                  prioridad=f"{ROTULO_PRIORIDAD}\n" + "\n".join(prioridad) if prioridad else "",
+                  protocolo="\n\n".join(bloques),
+                  faltan=f"**Datos que cambiarían la orientación:** {unir(falta)}." if falta else "",
+                  citas=list(dict.fromkeys(citas)))
+
+
+def armar(tarjeta: Tarjeta, ficha: Ficha) -> tuple[str, list[str]]:
+    """(el apartado entero en Markdown, las secciones que cita)."""
+    armada = ajustar(tarjeta, ficha)
+    return armada.texto(), armada.citas
 
 
 # ---------------------------------------------------------------------------
@@ -332,6 +394,8 @@ def revisar(secciones: dict[str, dict], tarjetas: dict[str, Tarjeta] | None = No
                     motivos.append("no es una sola oración")
             if v.si is not None and v.si not in CONDICIONES:
                 motivos.append(f"condición desconocida: {v.si}")
+            if v.prioriza is not None and (v.prioriza not in PRIORIZA or v.si is not None):
+                motivos.append(f"prioriza desconocido o junto a una condición: {v.prioriza}")
             if motivos:
                 salida.append((t.clave, parte, v.texto, motivos))
     return salida

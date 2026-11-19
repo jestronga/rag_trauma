@@ -8,7 +8,10 @@
 #   cita   las secciones que la respaldan ([guía: ID])
 #   si     opcional: la condición de la ficha (rag/tarjetas.py, CONDICIONES).
 #          Sin dato, la viñeta va con su rótulo ("Si está inestable: …"); si la
-#          ficha dice lo contrario, no va.
+#          ficha dice lo contrario, no va; si la cumple, sube a "Con estos datos".
+#   prioriza  opcional, sin `si`: la viñeta va siempre y sube a "Con estos
+#          datos" cuando el signo de la ficha cumple el umbral que dice su
+#          texto (rag/tarjetas.py, PRIORIZA; 26/10).
 #
 # tests/test_tarjetas.py pasa cada viñeta por el verificador de la prosa contra
 # su pasaje (palabras, cifras, términos, tono) y comprueba que cada cita exista.
@@ -27,12 +30,14 @@ comun:
       cita: [HUV-02-003]
     - texto: Vía aérea definitiva ante apnea, Glasgow de 8 o menos, riesgo de broncoaspiración o incapacidad para mantener oxigenación y ventilación con las maniobras iniciales
       cita: [HUV-02-003]
+      prioriza: glasgow_8
   B:
     - texto: Identificar neumotórax a tensión, hemotórax masivo, neumotórax abierto y taponamiento cardiaco, con el apoyo del FAST-E, el oxímetro de pulso y la frecuencia respiratoria
       cita: [HUV-02-003]
   C:
     - texto: Con frecuencia cardiaca mayor de 100, considerar al paciente en shock
       cita: [HUV-02-003]
+      prioriza: fc_100
     - texto: Buscar sangrado no compresible en tórax, abdomen, retroperitoneo, pelvis y huesos largos con el examen físico, el FAST-E y las Rx de tórax, pelvis y extremidades
       cita: [HUV-02-003]
     - texto: Dos catéteres venosos periféricos de gran calibre, con muestras para tipo de sangre y pruebas cruzadas, gases en sangre y lactato

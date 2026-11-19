@@ -50,14 +50,15 @@ from .prioridades import NOMBRES as NOMBRES_LETRAS
 from .retrieve import (
     FragmentoGuia, Filtros, Resultado, buscar, buscar_guias, confianza, fragmentos_de, hay_guias,
 )
-from .tarjetas import armar as armar_tarjeta, elegir as elegir_tarjeta, linea_registro
+from .tarjetas import ajustar as ajustar_tarjeta, elegir as elegir_tarjeta, linea_registro
 from .verificar import RX_CITA, RX_CITA_GUIA, Verificacion, oraciones, suavizar, verificar_por_fuente
 
 
 @dataclass
 class Seccion:
-    """Un apartado de la respuesta: "casos", "guias" o "pie" (los avisos). La
-    app pinta cada uno con su desplegable de texto completo debajo."""
+    """Un apartado de la respuesta: "casos", "guias", "tarjeta", "tarjeta_resto"
+    (el protocolo plegado de un seguimiento) o "pie" (los avisos). La app pinta
+    cada uno con su desplegable de texto completo debajo."""
     fuente: str
     texto: str
 
@@ -68,6 +69,9 @@ class Respuesta:
     casos: list[Resultado] = field(default_factory=list)
     # fragmentos de los libros que pasaron su guarda (vacío si no la pasaron o GUIAS=0)
     guias: list[FragmentoGuia] = field(default_factory=list)
+    # un seguimiento cuya búsqueda en los libros no pasó la guarda: `guias` son
+    # los de la respuesta anterior
+    guias_heredadas: bool = False
     confianza: float = 0.0
     abstuvo: bool = False
     citas_validas: list[str] = field(default_factory=list)
@@ -304,6 +308,15 @@ def responder(
                     umbral_rerank=umbral_rerank, guias=guias)
     conf, casos, descartados, relevancia = rec.confianza, rec.casos, rec.descartados, rec.relevancia
     con_guias, fragmentos = rec.con_guias, rec.fragmentos
+    # Un seguimiento busca con todo lo dicho, y los signos con su valor ("TA
+    # 80/50", "Glasgow 9") hunden al reranker: medido el 26/10, "TCE con pérdida
+    # de conciencia" da 0,925 y con ", Glasgow 9 con anisocoria" 0,195. Si no
+    # pasa la guarda, siguen los pasajes de la respuesta anterior, que la pasaron
+    # para este paciente, en lugar de que los manuales desaparezcan.
+    guias_heredadas = False
+    if (con_guias and not fragmentos and conversacion.get("tipo") == "seguimiento"
+            and anterior is not None and anterior.guias):
+        fragmentos, guias_heredadas = anterior.guias, True
     if not casos and not fragmentos:
         mensaje = MENSAJE_ABSTENCION_GUIAS if con_guias else MENSAJE_ABSTENCION
         return Respuesta(
@@ -316,18 +329,27 @@ def responder(
     prosa_verificada, motivos = None, []
     prosa_casos = prosa_guias = eleccion = ""
     orden_atls, letras_armadas = False, []
-    texto_tarjeta, pasajes_tarjeta = "", []
+    texto_tarjeta, resto_tarjeta, pasajes_tarjeta = "", "", []
     ficha_actual = conversacion.get("ficha") or actualizar(None, consulta)[1]
     tarjeta = (elegir_tarjeta(ficha_actual, pregunta, con_guias)
                if config.SALIDA == "prosa" and not config.SINTESIS_LLM else None)
     try:
         if tarjeta is not None:
             # El protocolo sale de la tarjeta, ajustado a la ficha; el modelo
-            # escribe solo sobre los casos (decisión 1 de PLAN_RESPUESTA_IDEAL.md)
-            texto_tarjeta, citas = armar_tarjeta(tarjeta, ficha_actual)
-            pasajes_tarjeta = fragmentos_de(citas)
+            # escribe solo sobre los casos (decisión 1 de PLAN_RESPUESTA_IDEAL.md).
+            # En un seguimiento, a la vista lo que cambió con los datos y el
+            # resto plegado: ya se leyó en la respuesta anterior (26/10).
+            armada = ajustar_tarjeta(tarjeta, ficha_actual)
+            pasajes_tarjeta = fragmentos_de(armada.citas)
+            if conversacion.get("tipo") == "seguimiento":
+                texto_tarjeta, resto_tarjeta = armada.visible(), armada.protocolo
+            else:
+                texto_tarjeta = armada.texto()
             if aviso := aviso_ediciones(pasajes_tarjeta):
-                texto_tarjeta += f"\n\n{aviso}"
+                if resto_tarjeta:
+                    resto_tarjeta += f"\n\n{aviso}"
+                else:
+                    texto_tarjeta += f"\n\n{aviso}"
             if config.ORDEN_ATLS:
                 orden_atls = True
                 prosa_casos, _, prosa_verificada, motivos, detalle = prosa_atls(
@@ -360,7 +382,8 @@ def responder(
             eleccion = generar_eleccion(consulta, casos)
         secciones = armar_secciones(casos, consulta, fragmentos, con_guias,
                                     prosa_casos, prosa_guias, eleccion, tarjeta=texto_tarjeta,
-                                    registro=linea_registro(tarjeta.clave) if texto_tarjeta else "")
+                                    registro=linea_registro(tarjeta.clave) if texto_tarjeta else "",
+                                    tarjeta_resto=resto_tarjeta)
     except Exception as e:
         return Respuesta(texto="", casos=casos, guias=fragmentos, confianza=conf,
                          consulta_reescrita=reescrita,
@@ -368,8 +391,8 @@ def responder(
 
     texto = "\n\n".join(s.texto for s in secciones)
     validas, invalidas = verificar_citas(texto, casos, fragmentos + pasajes_tarjeta)
-    respuesta = Respuesta(texto=texto, casos=casos, guias=fragmentos, confianza=conf,
-                          citas_validas=validas, citas_invalidas=invalidas,
+    respuesta = Respuesta(texto=texto, casos=casos, guias=fragmentos, guias_heredadas=guias_heredadas,
+                          confianza=conf, citas_validas=validas, citas_invalidas=invalidas,
                           consulta_reescrita=reescrita, relevancia=relevancia,
                           prosa_verificada=prosa_verificada, motivos=motivos,
                           fuentes_en_prosa=[n for n, p in (("casos", prosa_casos), ("guias", prosa_guias)) if p],
@@ -716,7 +739,8 @@ def prosa_por_fuente(v: Verificacion, casos: list[Resultado], guias: list[Fragme
 
 def armar_secciones(casos: list[Resultado], consulta: str, guias: list[FragmentoGuia] | None = None,
                     con_guias: bool = False, prosa_casos: str = "", prosa_guias: str = "",
-                    eleccion: str = "", tarjeta: str = "", registro: str = "") -> list[Seccion]:
+                    eleccion: str = "", tarjeta: str = "", registro: str = "",
+                    tarjeta_resto: str = "") -> list[Seccion]:
     """La respuesta en apartados, uno por fuente, cada uno con su título (la app
     pone debajo de cada uno el desplegable con el texto completo):
 
@@ -732,7 +756,9 @@ def armar_secciones(casos: list[Resultado], consulta: str, guias: list[Fragmento
 
     Con `tarjeta` (PLAN_RESPUESTA_IDEAL.md), el protocolo va primero, en lugar
     del apartado de los manuales (decisiones 1 y 3 del usuario), y `registro`
-    (la línea con los conteos del mecanismo) encabeza los casos."""
+    (la línea con los conteos del mecanismo) encabeza los casos. Con
+    `tarjeta_resto` (un seguimiento), el protocolo va en su propio apartado,
+    que la app pliega."""
     guias = guias or []
     if not casos:
         texto_casos = AVISO_SOLO_GUIAS
@@ -744,7 +770,8 @@ def armar_secciones(casos: list[Resultado], consulta: str, guias: list[Fragmento
         texto_casos = f"{registro}\n\n{texto_casos}"
     secciones = [Seccion("casos", f"{ROTULO_CASOS}\n\n{texto_casos}")]
     if tarjeta:
-        secciones.insert(0, Seccion("tarjeta", tarjeta))
+        secciones[:0] = [Seccion("tarjeta", tarjeta)] + ([Seccion("tarjeta_resto", tarjeta_resto)]
+                                                         if tarjeta_resto else [])
         if casos:
             secciones.append(Seccion("pie", AVISO_DOS_FUENTES))
         return secciones
