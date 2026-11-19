@@ -465,6 +465,19 @@ def texto_guia(fragmentos: list[FragmentoGuia]) -> str:
     return "\n\n".join([t for t in [texto] if t] + tablas)
 
 
+# El ATLS 11 se indexó primero y quedó como "ATLS" a secas (ATLS-21-013); el
+# ATLS 10 llegó después con su número (ATLS10-01-021). En pantalla, un médico
+# leería "ATLS-" como "el ATLS en general": la app lo muestra como ATLS11-21-013
+# (18/11/2026, pedido del usuario). Solo en pantalla: los identificadores de
+# los índices, las anotaciones, las tarjetas y el verificador no cambian.
+_RX_ID_ATLS11 = re.compile(r"\bATLS-(?=\d{2}-\d{3})")
+
+
+def ids_en_pantalla(texto: str) -> str:
+    """El texto con los identificadores del ATLS 11 como ATLS11-…"""
+    return _RX_ID_ATLS11.sub("ATLS11-", texto)
+
+
 def cabecera_guia(fragmentos: list[FragmentoGuia]) -> str:
     """Libro, capítulo, títulos y páginas impresas: lo que permite ir al libro."""
     f = fragmentos[0]

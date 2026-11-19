@@ -127,3 +127,12 @@ def test_aviso_de_las_ediciones():
     assert _apartado_manuales([ATLS10, HUV]).endswith(AVISO_ATLS10)
     texto = _apartado_manuales([ATLS11, HUV])
     assert AVISO_ATLS10 not in texto and AVISO_EDICIONES not in texto
+
+
+def test_en_pantalla_el_atls11_lleva_su_numero():
+    # solo en la app (18/11/2026): los identificadores por dentro no cambian
+    from rag.build_prompt import ids_en_pantalla
+    assert ids_en_pantalla("Examinar el perineo [guía: ATLS-21-013] [guía: ATLS10-01-021] [guía: HUV-06-003]") == \
+        "Examinar el perineo [guía: ATLS11-21-013] [guía: ATLS10-01-021] [guía: HUV-06-003]"
+    assert ids_en_pantalla("ATLS-21-013-02") == "ATLS11-21-013-02"
+    assert ids_en_pantalla("el ATLS recomienda; ATLS-ish") == "el ATLS recomienda; ATLS-ish"

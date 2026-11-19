@@ -20,7 +20,8 @@ warnings.filterwarnings("ignore")
 from rag import config                                    # noqa: E402
 from rag.consulta import para_libros                           # noqa: E402
 from rag.build_prompt import (                                 # noqa: E402
-    AVISO_ATLS10, RX_LINEA_RESPALDO, agrupar_guias, cabecera_guia, desenlace_visible, texto_guia,
+    AVISO_ATLS10, RX_LINEA_RESPALDO, agrupar_guias, cabecera_guia, desenlace_visible, ids_en_pantalla,
+    texto_guia,
 )
 from rag.ficha import RX_CASO, unir                            # noqa: E402
 from rag.preguntas import NO_SE_SABE, descartar                # noqa: E402
@@ -437,7 +438,7 @@ def tarjeta_guia(seccion: str, fragmentos, consulta: str = "", con_puntaje: bool
         escala = "relevancia" if f.relevancia is not None else "similitud"
         puntaje = f" · {escala} {max(x.puntaje for x in fragmentos):.2f}"
     texto = resaltar_html(texto_guia(fragmentos), consulta).replace("\n", "<br>")
-    return (f"<div class='caso-box guia-box'><span class='caso-id'>guía {seccion}</span>"
+    return (f"<div class='caso-box guia-box'><span class='caso-id'>guía {ids_en_pantalla(seccion)}</span>"
             f"{puntaje}<br><span class='etq'>{html.escape(cabecera_guia(fragmentos))}"
             f"</span>{etiquetas_guia(f)}<br><br>{texto}</div>")
 
@@ -559,8 +560,9 @@ RX_CITA_PANTALLA = re.compile(r"\[(caso|guía): ([^\]\n]+)\]")
 
 
 def citas_en_rojo(texto: str) -> str:
-    """[caso: ID] y [guía: ID] en rojo (`:red[…]` de Streamlit, corchetes escapados)."""
-    return RX_CITA_PANTALLA.sub(lambda m: f":red[\\[{m.group(1)}: {m.group(2)}\\]]", texto)
+    """[caso: ID] y [guía: ID] en rojo (`:red[…]` de Streamlit, corchetes escapados),
+    con el ATLS 11 como ATLS11-… (build_prompt.ids_en_pantalla)."""
+    return RX_CITA_PANTALLA.sub(lambda m: f":red[\\[{m.group(1)}: {ids_en_pantalla(m.group(2))}\\]]", texto)
 
 
 def cuerpo_respuesta(respuesta, consulta: str, de_a_poco: bool = False) -> None:
