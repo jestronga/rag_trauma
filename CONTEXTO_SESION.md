@@ -1,6 +1,6 @@
 # Contexto de trabajo — rag_trauma
 
-Resumen para retomar el trabajo. Última sesión: **26 de octubre de 2026**, en
+Resumen para retomar el trabajo. Última sesión: **18 de noviembre de 2026**, en
 el **PC de 8 GB** (RTX 4060), preparado desde un clon limpio. **Desde el 17/10
 solo se mide en la RTX 4060** (decisión del usuario): la GTX 1650 ya no es
 objetivo. **Empezar por la sección 00** (libros de trauma: fases 1 a 6 hechas,
@@ -160,6 +160,56 @@ Además, la pantalla de la demo: al pie de cada respuesta solo el tiempo y el
 modelo (sin el aviso fijo ni la alerta de citas inválidas, que revisa
 `preparar_demo.py`), y sin el aviso de que el ATLS 10 es la edición anterior
 (`AVISO_ATLS10`; sigue en `Respuesta.texto`). 448 tests.
+
+**El ATLS 11 casi nunca llegaba al prompt: corregido el 18/11** (pedido del
+usuario, que propuso quitar el ATLS 10). Quitarlo no lo arreglaba: sin él, el
+ATLS 11 llega en 17 de 41 consultas anotadas contra 16 con él. La causa es el
+idioma: el reranker puntúa bajo un pasaje en inglés ante una consulta en
+español (mejor pasaje del ATLS 11, mediana 0,18; de los libros en español,
+0,72 y 0,75; la sección anotada del ATLS 11, 0,11), aunque la densa sí la
+encuentra (32 de 37 entre sus 30 primeros). **Arreglo (`TRADUCIR_ATLS11=1`):**
+el ATLS 11 se busca y se reordena con la consulta traducida al inglés por el
+generador (`consulta.en_ingles`, primera línea y descarte si no parece
+traducción), con sus 30 candidatos propios; los libros en español, como
+antes. Medido con `comparar_libros.py` (cuota y 1.800 tokens;
+`reports/comparar_libros_sin_traduccion.csv` y `_traduccion.csv`):
+- R@ppto anotado 0,280 → 0,334; ATLS 11 0,209 → 0,387; ATLS 10 0,258 →
+  0,241; **HUV 0,569 → 0,523** (pierde espacio); sintéticas 0,811 → 0,850;
+- el ATLS 11 pasa del 18 % al 44 % de los fragmentos del prompt;
+- trauma sin manuales 6 → 3 de 25; con las dos guardas (`calibrar_umbral.py`)
+  22 de 25 de trauma con las dos fuentes y **0 de 20 fuera de dominio**. Sin la
+  guarda por señal, neg-15 (ACV) sube de 0,362 a 0,504: la frena la señal;
+- la búsqueda en los manuales pasa de 0,61 s a 1,52 s de mediana (traducción,
+  segundo vector en CPU y 30 pares más al reranker); en `preparar_demo.py`,
+  ~1 a 2 s más por respuesta. "Todo listo" con y sin la traducción. En el
+  botón c del guion ("¿qué dice el ATLS del FAST?") ahora llega el ATLS 11.
+- **De paso, `OLLAMA_URL` → `http://127.0.0.1:11434`:** con "localhost",
+  urllib en Windows prueba primero IPv6 (::1), donde Ollama no escucha, y
+  **cada llamada al modelo perdía 2 s** (2,06 s contra 0,00 s). Afectaba a
+  todas las respuestas desde siempre.
+
+**El ATLS 11 en las tarjetas: hecho el 18/11** (pedido del usuario). Antes
+ninguna viñeta lo citaba (41 citas del HUV, 26 del ATLS 10), así que con
+tarjeta solo salía en "Otros fragmentos". Claude leyó, para cada viñeta, las
+tres secciones del ATLS 11 que mejor puntúa el reranker con la viñeta en
+inglés, y sumó la cita solo donde dice lo mismo: **44 de 67 viñetas**, 51 citas.
+- **Verificación por libro** (`tarjetas.revisar`): la viñeta tiene que pasar
+  contra lo que cita de cada libro por separado. Juntas, una cita en inglés le
+  quitaba la revisión de términos a toda la viñeta, y las cifras las podía
+  poner el otro pasaje. Así se cayó el ácido tranexámico: el ATLS 11 no dice
+  "10 minutos". Toda viñeta sigue citando el HUV o el ATLS 10 (test).
+- **Sin el ATLS 11, a propósito, donde dice otra cosa** (para el médico, en el
+  encabezado de `tarjetas.yaml`): elevar el mentón (el ATLS 11 prefiere la
+  tracción mandibular), los bolos de 250 cc hasta una TAS de 80 a 90 (el ATLS 11:
+  meta de 90 con 100 a 200 mL) y el tranexámico en 10 minutos (1 g en bolo).
+- Con `ATLS10=0`, una viñeta que cita el ATLS 10 y el ATLS 11 queda con la
+  del 11; antes desaparecía (`tarjetas._citas_activas`).
+- El aviso bajo el protocolo sigue siendo el del ATLS 10 (oculto en la demo),
+  no el de "pueden no coincidir": las dos ediciones citadas se revisaron.
+- El desplegable "Pasajes que cita el protocolo" del peatón pasa de 17 a 43
+  secciones. `preparar_demo.py`: "Todo listo". 465 tests.
+
+Pendiente: decidir con quien lo pidió si el ATLS 10 sigue.
 
 ---
 
@@ -851,7 +901,9 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
    - la letra de cada término y de cada capítulo (`rag/prioridades.py`), con
      los 7 dudosos de `DUDOSOS`;
    - las 67 viñetas de las tarjetas (`tarjetas/tarjetas.yaml`;
-     `PLAN_RESPUESTA_IDEAL.md`, decisión 2: se muestran antes de su revisión).
+     `PLAN_RESPUESTA_IDEAL.md`, decisión 2: se muestran antes de su revisión),
+     con sus 51 citas del ATLS 11 (18/11) y las tres viñetas donde el ATLS 11
+     dice otra cosa (encabezado del archivo).
 2. **Seguir mejorando las sugerencias** (el principio de la sección 0). Ideas
    abiertas:
    - el léxico solo reconoce lo que tiene. En quemaduras no hay hallazgos que
@@ -997,6 +1049,7 @@ existen en el PC de la GTX 1650. Traerlos para el pendiente 12.
 | `CANDIDATOS_POR_LIBRO` | `0` | el reranker ve los 30 primeros de cada libro; medido el 23/10: +0,57 s y no compensa |
 | `ABREV_LIBROS` | `1` | los manuales se buscan con las abreviaturas expandidas ("HPAF (herida por arma de fuego)"; `rag/consulta.py`, fase 1 de `PLAN_CHATBOT_CLINICO.md`, 24/10). Sin `tx`, `qx`, `ha` ni las que los manuales ya usan (FAST, GCS, Rx, Fr…) |
 | `MECANISMO_LIBROS` | `1` | y con el nombre del mecanismo de `rag/senal.py` cuando la consulta lo dice con otras palabras ("baleado" → herida por arma de fuego). Las dos juntas, 24/10: trauma sin manuales de 9 a 6 de 25 |
+| `TRADUCIR_ATLS11` | `1` | el ATLS 11 se busca y se reordena con la consulta traducida al inglés (`consulta.en_ingles`, 18/11); los libros en español, como antes. Solo ruta `rerank`. Sin Ollama o con una traducción rara, en español. `MAX_TOKENS_TRADUCCION` 60, `TIMEOUT_TRADUCCION` 30 |
 | `ABREVIATURAS_YAML` | `anonimizacion/config/abreviaturas.yaml` | el diccionario de la anonimización, leído como dato |
 | `CONVERSACION` | `ficha` | cómo se sigue la conversación: `ficha` = la ficha del paciente armada por el código (`rag/ficha.py`, fase 2 de `PLAN_CHATBOT_CLINICO.md`, 24/10), sin llamar al modelo; `llm` = el modelo reescribe cada seguimiento con el historial (`generate.reescribir`), como hasta el 24/10. Con la ficha: 9,9 s contra 13,8 s por seguimiento y más casos del mecanismo y la región |
 | `PREGUNTAS` | `1` | hasta 2 preguntas con botones bajo la respuesta, en el orden xABCDE (`rag/preguntas.py`, fase 3, 24/10). Necesita `CONVERSACION=ficha` |

@@ -59,6 +59,40 @@ def test_cada_vineta_pasa_el_verificador_contra_su_pasaje():
     assert tarjetas.revisar(secciones) == []
 
 
+def test_toda_vineta_cita_un_manual_en_espanol_y_el_atls11_aparece():
+    # el ATLS 11 (en inglés) solo se verifica en cifras y tono: va junto a un
+    # pasaje en español que revisa la viñeta entera (18/11/2026)
+    con_atls11 = set()
+    for t in tarjetas.cargar().values():
+        for _, v in t.vinetas():
+            libros = {c.split("-")[0] for c in v.citas}
+            assert libros & {"HUV", "ATLS10"}, v.texto
+            if "ATLS" in libros:
+                con_atls11.add(v.texto)
+    assert len(con_atls11) >= 40
+
+
+def test_revisar_verifica_cada_libro_por_separado():
+    # la cifra está en el pasaje del HUV pero no en el del ATLS 11: juntos
+    # pasaría, por separado el ATLS 11 no la respalda
+    secciones = {"HUV-06-004": {"fuente": "HUV", "idioma": "es", "texto": "Ácido tranexámico 1 g en 10 minutos."},
+                 "ATLS-06-022": {"fuente": "ATLS", "idioma": "en", "texto": "A 1 g TXA bolus."}}
+    t = tarjetas.Tarjeta("x", "x", [tarjetas.Vineta("Ácido tranexámico 1 g en 10 minutos",
+                                                    ["HUV-06-004", "ATLS-06-022"])], {})
+    (_, _, _, motivos), = tarjetas.revisar(secciones, {"x": t})
+    assert motivos == ["ATLS: «10» no está en la guía citada"]
+
+
+def test_con_el_atls10_apagado_queda_la_cita_del_atls11(monkeypatch):
+    monkeypatch.setattr(retrieve, "libros_apagados", lambda: {"ATLS10"})
+    v_dos = tarjetas.Vineta("Antes del catéter urinario, examinar el perineo", ["ATLS10-01-021", "ATLS-21-013"])
+    v_sola = tarjetas.Vineta("La eyección del vehículo aumenta el riesgo", ["ATLS10-01-028"])
+    t = tarjetas.Tarjeta("x", "x", [v_dos, v_sola], {l: [] for l in LETRAS})
+    armada = tarjetas.ajustar(t, ficha("peatón atropellado"))
+    assert "[guía: ATLS-21-013]" in armada.texto() and "ATLS10" not in armada.texto()
+    assert "eyección" not in armada.texto() and armada.citas == ["ATLS-21-013"]
+
+
 def test_revisar_atrapa_lo_que_no_dice_el_pasaje():
     secciones = {"HUV-02-003": {"fuente": "HUV", "idioma": "es", "texto": "Coloque un torniquete."}}
     t = tarjetas.Tarjeta("x", "x", [tarjetas.Vineta("Torniquete en la pierna con 5 cm de margen", ["HUV-02-003"]),

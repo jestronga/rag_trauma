@@ -345,7 +345,10 @@ def responder(
                 texto_tarjeta, resto_tarjeta = armada.visible(), armada.protocolo
             else:
                 texto_tarjeta = armada.texto()
-            if aviso := aviso_ediciones(pasajes_tarjeta):
+            # Solo el aviso del ATLS 10, no el de "pueden no coincidir": donde la
+            # tarjeta cita las dos ediciones, la viñeta se revisó contra las dos
+            # (tarjetas/tarjetas.yaml, 18/11/2026).
+            if aviso := aviso_ediciones([f for f in pasajes_tarjeta if f.fuente != "ATLS"]):
                 if resto_tarjeta:
                     resto_tarjeta += f"\n\n{aviso}"
                 else:

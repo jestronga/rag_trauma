@@ -61,8 +61,8 @@ class Vineta:
     si: str | None = None
     prioriza: str | None = None
 
-    def con_citas(self) -> str:
-        return f"{self.texto} " + " ".join(f"[guía: {c}]" for c in self.citas)
+    def con_citas(self, citas: list[str] | None = None) -> str:
+        return f"{self.texto} " + " ".join(f"[guía: {c}]" for c in (self.citas if citas is None else citas))
 
 
 @dataclass
@@ -198,15 +198,15 @@ PRIORIZA = {
 ROTULO_PRIORIDAD = "**Con estos datos**"
 
 
-def _con_rotulo(v: Vineta, ficha: Ficha) -> str | None:
+def _con_rotulo(v: Vineta, ficha: Ficha, citas: list[str]) -> str | None:
     """El texto de la viñeta con su rótulo, o None si la ficha dice lo contrario."""
     if v.si is None:
-        return v.con_citas()
+        return v.con_citas(citas)
     dice, sin_dato, con_dato = CONDICIONES[v.si]
     cumple = dice(ficha)
     if cumple is False:
         return None
-    return f"*{con_dato if cumple else sin_dato}:* {v.con_citas()}"
+    return f"*{con_dato if cumple else sin_dato}:* {v.con_citas(citas)}"
 
 
 def _rotulo_prioridad(v: Vineta, ficha: Ficha) -> str | None:
@@ -222,10 +222,11 @@ def _rotulo_prioridad(v: Vineta, ficha: Ficha) -> str | None:
     return None
 
 
-def _apagada(v: Vineta) -> bool:
-    """Cita un libro que no se busca (el ATLS 10 con ATLS10=0)."""
+def _citas_activas(v: Vineta) -> list[str]:
+    """Las citas de la viñeta sin las de los libros que no se buscan (el ATLS 10
+    con ATLS10=0). Vacía = la viñeta no va: ningún libro activo la respalda."""
     from .retrieve import libros_apagados
-    return any(c.split("-")[0] in libros_apagados() for c in v.citas)
+    return [c for c in v.citas if c.split("-")[0] not in libros_apagados()]
 
 
 def _datos_letra(letra: str, ficha: Ficha) -> str:
@@ -284,15 +285,16 @@ def ajustar(tarjeta: Tarjeta, ficha: Ficha) -> Armada:
     for parte, vinetas in tarjeta.partes():
         lineas = []
         for v in vinetas:
-            if _apagada(v):
+            activas = _citas_activas(v)
+            if not activas:
                 continue
             if (rotulo := _rotulo_prioridad(v, ficha)) is not None:
                 letra = f"**{parte}** · " if parte in PRIMARIAS else ""
-                prioridad.append(f"- {letra}*{rotulo}:* {v.con_citas()}")
-                citas += v.citas
-            elif (texto := _con_rotulo(v, ficha)) is not None:
+                prioridad.append(f"- {letra}*{rotulo}:* {v.con_citas(activas)}")
+                citas += activas
+            elif (texto := _con_rotulo(v, ficha, activas)) is not None:
                 lineas.append(f"- {texto}")
-                citas += v.citas
+                citas += activas
         if not lineas:
             continue
         if parte == "lectura":
@@ -368,7 +370,13 @@ def linea_registro(clave_tarjeta: str, ruta: Path | str | None = None) -> str:
 def revisar(secciones: dict[str, dict], tarjetas: dict[str, Tarjeta] | None = None) -> list[tuple[str, str, str, list[str]]]:
     """[(tarjeta, apartado, texto, motivos)] de cada viñeta que no pasa el
     verificador de la prosa contra el texto de las secciones que cita
-    (`secciones`: id -> registro de guias/secciones.jsonl)."""
+    (`secciones`: id -> registro de guias/secciones.jsonl).
+
+    Se verifica contra cada libro por separado: lo que cita de un libro tiene
+    que respaldarla solo (18/11/2026, al sumar el ATLS 11). Juntas, una cita en
+    inglés le quitaría a toda la viñeta la revisión de términos y vocabulario
+    (verificar.py la hace solo en español), y la del ATLS 11 no tendría que
+    tener las cifras: las podría poner el pasaje en español."""
     from .retrieve import FragmentoGuia
     from .verificar import oraciones, verificar_por_fuente
 
@@ -388,8 +396,11 @@ def revisar(secciones: dict[str, dict], tarjetas: dict[str, Tarjeta] | None = No
             vistas.add((v.texto, tuple(v.citas)))
             motivos = [f"no existe la sección {c}" for c in v.citas if c not in secciones]
             if not motivos:
-                ver = verificar_por_fuente(v.con_citas(), [], "", [fragmento(c) for c in v.citas])
-                motivos = ver.motivos_guias + ver.motivos_casos
+                libros = dict.fromkeys(c.split("-")[0] for c in v.citas)
+                for libro in libros:
+                    citas = [c for c in v.citas if c.split("-")[0] == libro]
+                    ver = verificar_por_fuente(v.con_citas(citas), [], "", [fragmento(c) for c in citas])
+                    motivos += [f"{libro}: {m}" for m in ver.motivos_guias + ver.motivos_casos]
                 if len(oraciones(v.texto)) != 1:
                     motivos.append("no es una sola oración")
             if v.si is not None and v.si not in CONDICIONES:
