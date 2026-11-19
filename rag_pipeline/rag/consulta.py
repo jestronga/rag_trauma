@@ -96,6 +96,57 @@ def agregar_mecanismo(consulta: str) -> str:
     return f"{consulta} ({', '.join(nuevos)})" if nuevos else consulta
 
 
+# --- la consulta en inglés, para el ATLS 11 (TRADUCIR_ATLS11, 18/11/2026) ------
+# El reranker (bge-reranker-v2-m3) es multilingüe, pero una consulta en español
+# contra un pasaje en inglés puntúa muy por debajo de la misma contra un pasaje
+# en español: con tres manuales, el ATLS 11 casi nunca pasaba la guarda. La
+# traduce el generador; el código solo se queda con la primera línea y la
+# descarta si no parece una traducción (el modelo a veces responde la pregunta:
+# "Closed thoracostomy technique step-by-step: 1. Position…").
+SISTEMA_TRADUCCION = ("You translate Spanish clinical trauma queries into concise medical English, "
+                      "as an ATLS course manual would phrase them. Expand abbreviations. "
+                      "Answer with the translation only.")
+_traducciones: dict[str, str | None] = {}
+
+
+def limpiar_traduccion(original: str, crudo: str) -> str | None:
+    """La primera línea de lo que devolvió el modelo, o None si no sirve: vacía,
+    sin letras, mucho más larga que la consulta o igual a ella."""
+    lineas = [l.strip() for l in crudo.splitlines() if l.strip()]
+    if not lineas:
+        return None
+    t = lineas[0].strip(" \"'«»*").rstrip(":").strip()
+    if not re.search(r"[A-Za-z]", t) or len(t) > 3 * len(original) + 40:
+        return None
+    return None if normalizar(t) == normalizar(original) else t
+
+
+def _pedir_traduccion(consulta: str) -> str:
+    from .generate import _ollama               # generate → retrieve → consulta
+    return _ollama([{"role": "system", "content": SISTEMA_TRADUCCION},
+                    {"role": "user", "content": consulta}],
+                   temperatura=0, max_tokens=config.MAX_TOKENS_TRADUCCION,
+                   timeout=config.TIMEOUT_TRADUCCION)
+
+
+def en_ingles(consulta: str) -> str | None:
+    """La consulta de los manuales traducida al inglés, para buscar el ATLS 11
+    (retrieve.candidatos_guias). None si TRADUCIR_ATLS11 está apagado, si
+    Ollama no responde (no se guarda: se reintenta en la consulta siguiente) o
+    si la traducción no sirve; entonces el ATLS 11 se busca en español."""
+    if not config.TRADUCIR_ATLS11 or not consulta.strip():
+        return None
+    if consulta not in _traducciones:
+        try:
+            crudo = _pedir_traduccion(consulta)
+        except (OSError, ValueError, KeyError):  # URLError y TimeoutError son OSError
+            return None
+        if len(_traducciones) >= 1000:
+            _traducciones.clear()
+        _traducciones[consulta] = limpiar_traduccion(consulta, crudo)
+    return _traducciones[consulta]
+
+
 def para_libros(consulta: str, abreviaturas: bool | None = None, mecanismo: bool | None = None) -> str:
     """La consulta con que se buscan los manuales: con las abreviaturas
     expandidas (ABREV_LIBROS) y el nombre del mecanismo (MECANISMO_LIBROS)."""

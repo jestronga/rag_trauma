@@ -540,6 +540,7 @@ de trauma, las dos guardas piden más (guarda por señal de trauma,
 | `PRESUPUESTO_GUIAS` | `1800` (`1400` con `ATLS10=0`) | tokens de fragmentos de los libros que van al prompt, con cuota por libro si está el ATLS 10 |
 | `ABREV_LIBROS` | encendido | los manuales se buscan con las abreviaturas expandidas («HPAF (herida por arma de fuego)»), salvo las que los manuales ya usan (FAST, GCS, Rx…) |
 | `MECANISMO_LIBROS` | encendido | y con el nombre del mecanismo cuando la consulta lo dice con otras palabras ("baleado" → herida por arma de fuego) |
+| `TRADUCIR_ATLS11` | encendido | el ATLS 11 se busca con la consulta traducida al inglés por el generador (~0,2 s; solo con el reranker). Si la traducción falla, se busca en español. "Fragmentos de los manuales" muestra la traducción usada |
 | `CONVERSACION` | `ficha` | la ficha del paciente la arma el código (`rag/ficha.py`); `llm` = el modelo reescribe cada seguimiento, como antes del 24/10 |
 | `PREGUNTAS` | encendido | hasta 2 preguntas con botones bajo la respuesta (`rag/preguntas.py`); necesita `CONVERSACION=ficha` |
 | `ORDEN_ATLS` | encendido | la prosa por letras de la revisión primaria (xABCDE) dentro de cada apartado, solo con un paciente (`rag/prioridades.py`) |

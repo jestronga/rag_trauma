@@ -530,14 +530,21 @@ def desplegable_guias(respuesta, consulta: str, fragmentos=None,
         if respuesta.guias_heredadas:
             st.caption("Los de la respuesta anterior: con los datos nuevos, la búsqueda en los "
                        "manuales no encontró pasajes que pasen la guarda.")
-        elif en_libros != buscada:
-            st.caption(f"Búsqueda en los manuales: «{en_libros}»")
+        else:
+            if en_libros != buscada:
+                st.caption(f"Búsqueda en los manuales: «{en_libros}»")
+            # el ATLS 11 se busca en inglés (TRADUCIR_ATLS11, retrieve.candidatos_guias)
+            ingles = next((f.busqueda for f in fragmentos if f.fuente == "ATLS" and f.busqueda
+                           and f.busqueda != en_libros), None)
+            if ingles:
+                st.caption(f"Búsqueda en el ATLS 11, traducida: «{ingles}»")
         st.caption("Pasajes que pasaron la guarda de los manuales, del más al menos relevante. "
                    "Páginas impresas del libro; el ATLS 11, en su idioma original"
                    + ("; el ATLS 10, tal como viene en la traducción no oficial, sin corregir."
                       if config.ATLS10 else "."))
         for seccion, fragmentos in grupos.items():
-            st.markdown(tarjeta_guia(seccion, fragmentos, en_libros), unsafe_allow_html=True)
+            st.markdown(tarjeta_guia(seccion, fragmentos, fragmentos[0].busqueda or en_libros),
+                        unsafe_allow_html=True)
 
 
 # Pedido del usuario para la demo (19/10): en pantalla no van la línea de

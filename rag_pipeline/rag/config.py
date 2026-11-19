@@ -136,6 +136,16 @@ CANDIDATOS_POR_LIBRO = _env_bool("CANDIDATOS_POR_LIBRO", False)
 # 0,819 igual, fuera de dominio 0 de 20. Los casos se buscan con la original.
 ABREV_LIBROS = _env_bool("ABREV_LIBROS", True)
 MECANISMO_LIBROS = _env_bool("MECANISMO_LIBROS", True)
+# El ATLS 11 se busca con la consulta traducida al inglés (rag/consulta.py,
+# en_ingles; 18/11/2026). El reranker puntúa bajo un pasaje en inglés frente a
+# una consulta en español aunque sea el correcto: la sección anotada del ATLS 11
+# sacaba 0,04 de mediana en las 25 de trauma y el libro pasaba la guarda en 5.
+# Traducida por el generador (~0,2 s): 0,47 y 18 de 25, fuera de dominio igual.
+# Solo en la ruta rerank; los libros en español se buscan como antes. Si la
+# traducción falla o sale rara, el ATLS 11 se busca en español.
+TRADUCIR_ATLS11 = _env_bool("TRADUCIR_ATLS11", True)
+MAX_TOKENS_TRADUCCION = _env_int("MAX_TOKENS_TRADUCCION", 60)
+TIMEOUT_TRADUCCION = _env_int("TIMEOUT_TRADUCCION", 30)
 ABREVIATURAS_YAML = Path(_env("ABREVIATURAS_YAML", str(RAIZ_ANONIMIZACION / "config" / "abreviaturas.yaml")))
 
 # --- modelos ---------------------------------------------------------------
@@ -147,7 +157,10 @@ MODELO_RERANKER = _env("MODELO_RERANKER", "BAAI/bge-reranker-v2-m3")
 # pida "think": false; con 900 tokens no alcanzaba a escribir las sugerencias
 # y tardaba ~80 s. Sin GPU NVIDIA y poca RAM: MODELO_LLM=qwen2.5:3b.
 MODELO_LLM = _env("MODELO_LLM", "qwen3:4b-instruct")
-OLLAMA_URL = _env("OLLAMA_URL", "http://localhost:11434")
+# 127.0.0.1 y no "localhost": en Windows, urllib prueba primero ::1 (IPv6),
+# donde Ollama no escucha, y cada llamada esperaba 2 s antes de caer a IPv4
+# (medido el 18/11/2026 en la RTX 4060: 2,06 s contra 0,00 s).
+OLLAMA_URL = _env("OLLAMA_URL", "http://127.0.0.1:11434")
 
 # bge-m3 es un modelo de recuperación asimétrico: la consulta y el documento
 # se codifican igual, pero el modelo espera textos, no palabras sueltas.

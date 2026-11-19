@@ -377,6 +377,7 @@ class FragmentoGuia:
     coseno: float
     relevancia: float | None = None     # probabilidad del reranker (ruta rerank)
     capitulo_num: int | None = None
+    busqueda: str | None = None         # la consulta con que se encontró (en inglés: ATLS 11, TRADUCIR_ATLS11)
 
     @property
     def puntaje(self) -> float:
@@ -406,17 +407,17 @@ def libros_apagados() -> set[str]:
     return set() if config.ATLS10 else {"ATLS10"}
 
 
-def _filtro_libros(libro: str | None = None):
-    """Filtro de Qdrant: un libro solo (`libro`), o todos menos los apagados
-    (None si no hay apagados)."""
+def _filtro_libros(libro: str | None = None, excluir: tuple[str, ...] = ()):
+    """Filtro de Qdrant: un libro solo (`libro`), o todos menos los apagados y
+    los de `excluir` (None si no queda ninguno fuera)."""
     from qdrant_client import models
     if libro:
         return models.Filter(must=[models.FieldCondition(key="fuente", match=models.MatchValue(value=libro))])
-    apagados = libros_apagados()
-    if not apagados:
+    fuera = libros_apagados() | set(excluir)
+    if not fuera:
         return None
     return models.Filter(must_not=[models.FieldCondition(
-        key="fuente", match=models.MatchAny(any=sorted(apagados)))])
+        key="fuente", match=models.MatchAny(any=sorted(fuera)))])
 
 
 @lru_cache(maxsize=1)
@@ -482,7 +483,14 @@ def candidatos_guias(consulta: str, ruta: str | None = None, profundidad: int | 
     libro activo, no de todos juntos. Una consulta en español prefiere el texto
     en español: entre los 30 primeros de los tres libros, el ATLS 11 (en
     inglés) puede no estar aunque tenga la respuesta (PLAN_INDEXAR_ATLS10.md,
-    fase 4). Cuesta más reranker: 30 por libro."""
+    fase 4). Cuesta más reranker: 30 por libro.
+
+    Con TRADUCIR_ATLS11 (ruta rerank), el ATLS 11 se busca y se reordena con
+    la consulta traducida al inglés (consulta.en_ingles): trae sus propios
+    `profundidad` candidatos y los libros en español los suyos, con la
+    consulta de siempre. Las probabilidades quedan comparables entre libros
+    y la cuota por libro reparte como se diseñó. Cada fragmento guarda en
+    `busqueda` la consulta con que se encontró."""
     ruta = (ruta or ruta_guias_por_defecto()).lower()
     if ruta not in RUTAS_GUIAS:
         raise ValueError(f"Ruta de libros desconocida: {ruta!r}. Opciones: {', '.join(RUTAS_GUIAS)}")
@@ -493,20 +501,35 @@ def candidatos_guias(consulta: str, ruta: str | None = None, profundidad: int | 
     if config.ABREV_LIBROS or config.MECANISMO_LIBROS:
         from .consulta import para_libros       # consulta → hallazgos → retrieve
         consulta = para_libros(consulta)
-    vector = _vector_consulta(consulta).tolist()
-    filtros = [_filtro_libros(l) for l in libros_activos()] if por_libro else [_filtro_libros()]
-    puntos = []
-    for filtro in filtros:
-        puntos += _qdrant().query_points(
+    ingles = None
+    if ruta == "rerank" and config.TRADUCIR_ATLS11 and "ATLS" in libros_activos():
+        from .consulta import en_ingles
+        ingles = en_ingles(consulta)
+    if por_libro:
+        busquedas = [(_filtro_libros(l), ingles if l == "ATLS" and ingles else consulta)
+                     for l in libros_activos()]
+    elif ingles:
+        busquedas = [(_filtro_libros(excluir=("ATLS",)), consulta), (_filtro_libros("ATLS"), ingles)]
+    else:
+        busquedas = [(_filtro_libros(), consulta)]
+    vectores: dict[str, list[float]] = {}
+    frags = []
+    for filtro, texto in busquedas:
+        if texto not in vectores:
+            vectores[texto] = _vector_consulta(texto).tolist()
+        for p in _qdrant().query_points(
             config.COLECCION_GUIAS,
-            query=vector,
+            query=vectores[texto],
             query_filter=filtro,
             limit=profundidad or config.PROFUNDIDAD_RERANK,
             with_payload=True,
-        ).points
-    frags = sorted((_fragmento(p) for p in puntos), key=lambda f: f.coseno, reverse=True)
+        ).points:
+            f = _fragmento(p)
+            f.busqueda = texto
+            frags.append(f)
+    frags.sort(key=lambda f: f.coseno, reverse=True)
     if ruta == "rerank" and frags:
-        for f, p in zip(frags, _probabilidades([(consulta, f.texto) for f in frags])):
+        for f, p in zip(frags, _probabilidades([(f.busqueda, f.texto) for f in frags])):
             f.relevancia = float(p)
         frags.sort(key=lambda f: f.relevancia, reverse=True)
     return frags
